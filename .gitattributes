@@ -1,0 +1,6 @@
+# keep this this the first line in the file
+*	text=auto
+
+# We dont want CRLF for bash shell scripts
+*.sh text eol=lf
+
