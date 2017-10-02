@@ -18,7 +18,7 @@ git fetch
 
 rem determine whether to pull changes (i.e. if there is no changes in the workspace)
 git status > "%TEMP%\gitfetch.log"
-find /i "nothing to commit, working tree clean" "%TEMP%\gitfetch.log"
+find /i "nothing to commit, working tree clean" "%TEMP%\gitfetch.log" > NUL
 IF %ERRORLEVEL% == 0 call :pull
 popd
 
