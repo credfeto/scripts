@@ -1,6 +1,6 @@
 @echo off
 rem @echo on
-for /d %%a in (*.) do call :fetch %%a
+for /d %%a in (*.*) do call :fetch %%a
 goto finish
 
 
