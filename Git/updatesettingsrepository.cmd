@@ -1,5 +1,5 @@
 d:
-pushd \work
+pushd \work\RiderSettings.git
 rem git clone --bare git@github.com:credfeto/rider-settings.git RiderSettings.git
 rem git push --set-upstream origin master
 git fetch
