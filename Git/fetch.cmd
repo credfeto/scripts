@@ -13,7 +13,7 @@ echo.
 echo Retrieving %1:
 git remote get-url origin
 echo.
-rem Get latest from server
+echo * Fetching...
 git fetch
 
 rem determine whether to pull changes (i.e. if there is no changes in the workspace)
@@ -26,7 +26,13 @@ popd
 goto :eof
 
 :pull
+echo * Pulling....
 git pull
+echo * Running GC...
+git gc --aggressive
+echo * Done
+echo.
+
 goto :eof
 
 :finish
