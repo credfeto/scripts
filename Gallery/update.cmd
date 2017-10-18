@@ -1,11 +1,11 @@
-@echo off
+REM @echo off
 
 SET LOGFILE=C:\LOGS\Gallery.log
-SET REPOSITORY=C:\PhotosDB
+SET REPOSITORY=C:\PhotoDB
 SET OUTPUTBUILDER=C:\Development\GallerySync\OutputBuilderClient\bin\Release\OutputBuilderClient.exe
 
 C:
-PUSHD %PHOTOSDB"
+PUSHD %REPOSITORY%
 call :updateshorturls
 REM git reset head --hard
 
@@ -13,7 +13,7 @@ echo %DATE% %TIME% Getting latest source...
 git pull
 
 echo %DATE% %TIME% Updating Output...
-%OUTPUTBUILDER% > %LOGFILE$
+%OUTPUTBUILDER% > %LOGFILE%
 
 call :updateshorturls
 call :updateall
