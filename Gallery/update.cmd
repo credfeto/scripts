@@ -1,4 +1,4 @@
-REM @echo off
+@echo off
 
 SET LOGFILE=C:\LOGS\Gallery.log
 SET REPOSITORY=C:\PhotoDB
