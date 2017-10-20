@@ -1,13 +1,15 @@
 @echo off
 
+REM TODO: Get these externally configured
 SET LOGFILE=C:\LOGS\Gallery.log
 SET REPOSITORY=C:\PhotoDB
 SET OUTPUTBUILDER=C:\Development\GallerySync\OutputBuilderClient\bin\Release\OutputBuilderClient.exe
 
+SET STARTTIME=%DATE% %TIME%
 C:
 PUSHD %REPOSITORY%
 call :updateshorturls
-REM git reset head --hard
+git reset head --hard
 
 echo %DATE% %TIME% Getting latest source...
 git pull
@@ -25,8 +27,8 @@ goto finish
 
 :updateall
 echo %DATE% %TIME% Updating all metadata...
-REM git add -A
-REM git commit -m"Updated metadata"
+git add -A
+git commit -m"Updated metadata for %STARTTIME%"
 git push
 goto :eof
 
