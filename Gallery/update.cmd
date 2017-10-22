@@ -4,7 +4,7 @@ REM TODO: Get these externally configured
 SET LOGFILE=C:\LOGS\Gallery.log
 SET REPOSITORY=C:\PhotoDB
 SET OUTPUTBUILDER=C:\Development\GallerySync\OutputBuilderClient\bin\Release\OutputBuilderClient.exe
-
+SET BUILDSITEINDEX=C:\Development\GallerySync\BuildSiteIndex\bin\Release\BuildSiteIndex.exe
 SET STARTTIME=%DATE% %TIME%
 C:
 PUSHD %REPOSITORY%
@@ -17,6 +17,9 @@ git pull
 echo %DATE% %TIME% Updating Output...
 %OUTPUTBUILDER% > %LOGFILE%
 
+echo %DATE% %TIME% Updating Site Index...
+%BUILDSITEINDEX% >> %LOGFILE%
+ 
 call :updateshorturls
 call :updateall
 
