@@ -17,6 +17,9 @@ git pull
 echo %DATE% %TIME% Updating Output...
 %OUTPUTBUILDER% > %LOGFILE%
 
+call :updateshorturls
+call :updateall
+
 echo %DATE% %TIME% Updating Site Index...
 %BUILDSITEINDEX% >> %LOGFILE%
  
