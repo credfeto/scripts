@@ -1,3 +1,5 @@
+@echo off
+d:
 pushd d:\work\Contracts-POC
 
 copy /y d:\work\truffle-localtest.js d:\work\Contracts-POC\truffle.js
