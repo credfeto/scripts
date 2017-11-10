@@ -18,13 +18,13 @@ echo %DATE% %TIME% Updating Output...
 %OUTPUTBUILDER% > %LOGFILE%
 
 call :updateshorturls
-call :updateall
+call :updateall "Metadata"
 
 echo %DATE% %TIME% Updating Site Index...
 %BUILDSITEINDEX% >> %LOGFILE%
  
 call :updateshorturls
-call :updateall
+call :updateall "Site Index"
 
 git pull
 git push
@@ -34,7 +34,7 @@ goto finish
 :updateall
 echo %DATE% %TIME% Updating all metadata...
 git add -A
-git commit -m"Updated metadata for %STARTTIME%"
+git commit -m"Updated %~1 for %STARTTIME%"
 git push
 goto :eof
 
@@ -42,7 +42,7 @@ goto :eof
 ECHO %DATE% %TIME% Updating Short URLS...
 git add ShortUrls.csv
 git add ShortUrls.csv.tracking.json
-git commit -m"Updated Short URLS"
+git commit -m"Updated Short URLS for %STARTTIME%"
 git push
 goto :eof
 
