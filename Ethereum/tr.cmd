@@ -11,6 +11,7 @@ echo Compiling...
 call truffle.cmd compile --network localtest --reset
 IF ERRORLEVEL 1 goto error
 
+echo Linting...
 SET LINTERRORS=0
 pushd Contracts
 for /r %%a in (*.sol) do call :lint %%a
@@ -19,7 +20,6 @@ popd
 IF %LINTERRORS% GTR 0 goto :error
 
 
-pause 
 echo Testing...
 call truffle.cmd test --network localtest
 
