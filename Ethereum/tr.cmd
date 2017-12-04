@@ -13,4 +13,6 @@ call truffle.cmd compile --network localtest --reset
 echo Testing...
 call truffle.cmd test --network localtest
 
+git checkout -- sharedABI/*.json
+
 popd
