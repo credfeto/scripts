@@ -1,0 +1,5 @@
+@echo off
+REM See: https://blog.g3rt.nl/upgrade-your-ssh-keys.html
+
+rem basically:
+rem ssh-keygen -o -a 100 -t ed25519
