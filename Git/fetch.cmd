@@ -31,7 +31,7 @@ git pull
 echo * Pruning unreachable...
 git prune
 echo * Running GC...
-git gc --aggressive
+git gc --aggressive --prune
 echo * Done
 echo.
 
