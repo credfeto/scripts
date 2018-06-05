@@ -1,3 +1,5 @@
+@echo off
+echo Rebasing changes from master into %1...
 git pull
 git checkout %1
 git pull
@@ -9,3 +11,4 @@ git pull
 git rebase %1
 git pull
 git push
+echo Done
