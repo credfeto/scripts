@@ -18,6 +18,7 @@ git pull
 
 echo * Pushing...
 git push
+git pushgtm
 popd
 
 :notgit
