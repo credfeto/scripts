@@ -17,7 +17,7 @@ IF "%1\src\CodeAnalysis.ruleset" == "%SRCCODEANALYSIS%" goto :noupdate
 pushd "%1"
 COPY /Y %SRCCODEANALYSIS%  %1\src\CodeAnalysis.ruleset
 
-git add src/CodeAnalysis.ruleset
+git add */CodeAnalysis.ruleset
 git commit -m"Updated %~NX1 CodeAnalysis.ruleset"
 git push
 
