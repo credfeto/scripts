@@ -1,6 +1,15 @@
 @echo off
+
+echo Setup Git Environment
+call %~DP0EnvironmentSetup.cmd
+
 rem @echo on
 for /d %%a in (*.*) do call :fetch %%a
+
+call %~D0
+
+call %~DP0EnvironmentSetup.cmd
+
 goto finish
 
 
