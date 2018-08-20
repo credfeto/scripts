@@ -11,7 +11,7 @@ git config --global merge.ff false
 rem Setup LG-> log
 git config --global alias.lg "log --oneline --color --decorate --graph --branches --tags"
 
-rem it Garbage Collection
-git config --global gc.auto=1
-git config --global gc.aggressivedepth=100
-git config --global gc.aggressivewindow=400
+rem  Garbage Collection
+REM git config --global gc.auto=1
+REM git config --global gc.aggressivedepth=100
+REM git config --global gc.aggressivewindow=400
