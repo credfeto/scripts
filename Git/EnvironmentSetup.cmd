@@ -1,17 +1,22 @@
 @echo off
 
-rem Username
+REM Username/Email
 git config --global user.name "Mark Ridgwell"
 git config --global user.email credfeto@users.noreply.github.com
 
-rem Git options
+REM GPG Signing of commits/Tags etc
+git config --global user.signingkey 4897531CF5AE6253
+git config --global commit.gpgsign true
+
+REM Git options
 git config --global pull.rebase true
 git config --global merge.ff false
+git config --global rebase.autosquash true
+git config --global core.autocrlf true
 
-rem Setup LG-> log
+REM Git Performance
+git config --global core.preloadindex true
+
+REM Setup LG-> log
 git config --global alias.lg "log --oneline --color --decorate --graph --branches --tags"
 
-rem  Garbage Collection
-REM git config --global gc.auto=1
-REM git config --global gc.aggressivedepth=100
-REM git config --global gc.aggressivewindow=400
