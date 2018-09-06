@@ -1,4 +1,4 @@
-@echo off
+@echo on
 
 REM TODO: Get these externally configured
 SET LOGFILE=C:\LOGS\Gallery.log
