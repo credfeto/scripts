@@ -10,8 +10,8 @@
     if($status -eq "2") {
         blink1-tool  --green
     } elseif ($status -eq "1") {
-        blink1-tool --yellow --blink 5
-        blink1-tool --yellow
+        blink1-tool --rgb FF9900 --blink 5
+        blink1-tool --rgb FF9900
     }
     else
     {
