@@ -5,7 +5,8 @@ git config --global user.name "Mark Ridgwell"
 git config --global user.email credfeto@users.noreply.github.com
 
 REM GPG Signing of commits/Tags etc
-git config --global user.signingkey 4897531CF5AE6253
+REM git config --global user.signingkey F2E608545D203528
+REM git config --global user.signingkey 4897531CF5AE6253
 git config --global commit.gpgsign true
 
 REM Git options
