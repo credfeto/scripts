@@ -17,6 +17,7 @@ git config --global core.autocrlf true
 
 REM Git Performance
 git config --global core.preloadindex true
+git config --global core.fscache true
 
 REM Setup LG-> log
 git config --global alias.lg "log --oneline --color --decorate --graph --branches --tags"
