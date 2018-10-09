@@ -1,14 +1,18 @@
 @echo off
 echo Rebasing changes from master into %1...
-git pull
+git checkout master
+git fetch
+git rebase origin/master
 git checkout %1
-git pull
-git rebase master
-git pull
+git fetch
+git rebase origin/%1
+git fetch
+git rebase origin/master
 git push
 git checkout master
-git pull
-git rebase %1
-git pull
+git fetch
+git rebase origin/%1
+git fetch
+git rebase origin/master
 git push
 echo Done
