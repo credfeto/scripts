@@ -21,4 +21,4 @@ git config --global core.fscache true
 
 REM Setup LG-> log
 rem git config --global alias.lg "log --oneline --color --decorate --graph --branches --tags"
-git config --global alias.lg "log --graph --oneline --pretty=format:'%Cred%h%Creset - %C(yellow)%s%Creset %C(green)<%an>%Creset %C(blue)@%d%Creset' --abbrev-commit"
+git config --global alias.lg "log --graph --oneline --pretty=format:'%%Cred%%h%%Creset - %%C(yellow)%%s%%Creset %%C(green)%%an%%Creset %%C(blue)%%d%%Creset' --abbrev-commit"
