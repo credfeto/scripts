@@ -1,4 +1,10 @@
+@echo off
 
-REM npm install -g remixd
+npm install -g remixd
 
-RemixD -s D:\Work\Contracts\contracts
+echo ******************************************************************************
+echo ******************************************************************************
+echo ******************************************************************************
+echo ******************************************************************************
+echo ** Starting RemixD
+RemixD -s D:\Work\Contracts\contracts --remix-ide https://remix.ethereum.org
