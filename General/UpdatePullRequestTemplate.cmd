@@ -12,14 +12,14 @@ IF "%1\.github\PULL_REQUEST_TEMPLATE.md" == "%SRC%" goto :noupdate
 
 pushd "%1"
 md %1\.github
+cd %1\.github
 COPY /Y %SRC%  %1\.github\PULL_REQUEST_TEMPLATE.md
 
 git reset head --hard
 git checkout master
 git pull
 
-git add .github
-git add .github\PULL_REQUEST_TEMPLATE.md
+git add PULL_REQUEST_TEMPLATE.md
 git commit -m"Updated %~NX1 GitHub PULL_REQUEST_TEMPLATE.md"
 git push
 
