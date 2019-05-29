@@ -19,9 +19,5 @@ curl http://rinkeby-faucet.com/send?address=0x11cEc7c5Adb845402C405Fd4dfEA6c869c
 REM SHOWCASE.FUNFAIR.IO
 curl http://rinkeby-faucet.com/send?address=0x22FbAC74f447717234DF4C3B5b28e25Cec0fd12f -H "Connection: keep-alive" -H "Pragma: no-cache" -H "Cache-Control: no-cache" -H "Upgrade-Insecure-Requests: 1" -H "DNT: 1" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" -H "Referer: http://rinkeby-faucet.com/" -H "Accept-Language: en-GB,en;q=0.9,en-US;q=0.8"  >> %FILENAME%
 
-
-REM: Showcase
-REM https://plus.google.com/u/1/b/107186216937940988217/+MarkridgwellCoUk/posts/71qG5awkCsY
-
 REM: ME
-REM https://plus.google.com/u/1/b/107186216937940988217/+MarkridgwellCoUk/posts/gseqamonuWv
+REM https://twitter.com/mtrphotos/status/1133772485202194432
