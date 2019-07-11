@@ -3,21 +3,25 @@
 
         $status = Invoke-WebRequest -Uri $uri | Select-Object -ExpandProperty Content 
 
-        $status
+
 
         if($status -eq "2") {
+    	    Write-Output "$uri : $status"
             blink1-tool --id $led --green
         } elseif ($status -eq "1") {
+    	    Write-Warning "$uri : $status"
             blink1-tool --id $led --rgb FF9900 --blink 5
             blink1-tool --id $led --rgb FF9900
         }
         else
         {
+    	    Write-Error "$uri : $status"
             blink1-tool --id $led --red --blink 5
             blink1-tool --id $led --red
         }
     }
     Catch {
+  	Write-Error "$uri : Error"
         blink1-tool --id $led --red --blink 5
         blink1-tool --id $led --red
     }
