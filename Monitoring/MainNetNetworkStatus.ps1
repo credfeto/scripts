@@ -26,11 +26,11 @@
 
 CheckUrl 'https://casinofair.com/api/networks/health?NetworkId=1' '1A0011F8'
 
-CheckUrl 'https://showcase.funfair.io/api/networks/health?NetworkId=4' '1A001BBB'
+CheckUrl 'https://cryptocasino.com/api/networks/health?NetworkId=1' '1A001BBB'
 
-CheckUrl 'https://staging.funfair.io/api/networks/health?NetworkId=1' '1A001C47'
+CheckUrl 'https://showcase.funfair.io/api/networks/health?NetworkId=4' '1A001C47'
 
-CheckUrl 'https://dev.funfair.io/api/networks/health?NetworkId=1' '1A0020E0'
+CheckUrl 'https://staging.funfair.io/api/networks/health?NetworkId=1' '1A0020E0'
 
-CheckUrl 'https://localhost:5001/api/networks/health?NetworkId=1984' '1A00230B'
+CheckUrl 'https://dev.funfair.io/api/networks/health?NetworkId=1' '1A00230B'
 
