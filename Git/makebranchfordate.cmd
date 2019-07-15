@@ -1,6 +1,6 @@
 @echo off
 SET WHEN=
-FOR /F "tokens=1,2,3 delims=/" %%a in ("%DATE%") DO SET WHEN=%%c-%%d-%%a
+FOR /F "tokens=1,2,3 delims=/" %%a in ("%DATE%") DO SET WHEN=%%c-%%b-%%a
 
 
 git fetch
