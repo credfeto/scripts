@@ -7,5 +7,5 @@ git fetch
 git checkout master
 git pull
 git checkout -b backup/%WHEN%
-git push --set-upstream origin backup/backup/%WHEN%
+git push --set-upstream origin backup/%WHEN%
 git checkout master
