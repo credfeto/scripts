@@ -36,7 +36,9 @@ goto :eof
 
 :pull
 echo * Pulling....
-git pull
+git fetch
+git rebase
+git rebase --abort
 echo * Pruning unreachable...
 git prune
 echo * Running GC...
