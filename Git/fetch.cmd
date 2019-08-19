@@ -35,8 +35,7 @@ popd
 goto :eof
 
 :pull
-echo * Pulling....
-git fetch
+echo * Rebasing....
 git rebase
 git rebase --abort
 echo * Pruning unreachable...
