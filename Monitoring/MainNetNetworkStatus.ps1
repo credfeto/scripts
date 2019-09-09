@@ -34,7 +34,7 @@ CheckUrl 'https://cryptocasino.com/api/networks/health?NetworkId=1' '1A001BBB'
 
 CheckUrl 'https://showcase.funfair.io/api/networks/health?NetworkId=4' '1A001C47'
 
-CheckUrl 'https://staging.funfair.io/api/networks/health?NetworkId=1' '1A0020E0'
+CheckUrl 'https://staging.casinofair.io/api/networks/health?NetworkId=1' '1A0020E0'
 
 CheckUrl 'https://dev.funfair.io/api/networks/health?NetworkId=1' '1A00230B'
 
