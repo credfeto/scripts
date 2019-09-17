@@ -18,6 +18,7 @@ git config --global pull.rebase true
 git config --global merge.ff false
 git config --global rebase.autosquash true
 git config --global core.autocrlf true
+git config --global core.ignorecase false
 
 REM Git Performance
 git config --global core.preloadindex true
