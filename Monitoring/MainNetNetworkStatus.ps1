@@ -22,7 +22,6 @@ function SetLedStatus($led, $status) {
     }
     else
     {
-        write-Output "Status = $status"
         blink1-tool --id $led --red --blink 5 -q
         blink1-tool --id $led --red -q
     }
@@ -73,6 +72,6 @@ Catch {
     Write-Error "$uri : Error"
 
     foreach ($led in $lights) {
-        SetLedStatus $led, -1
+        SetLedStatus $led 0
     }
 }
