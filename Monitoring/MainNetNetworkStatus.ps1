@@ -1,40 +1,78 @@
-﻿function CheckUrl($uri, $led) {
-    Try {
-
-        $status = Invoke-WebRequest -Uri $uri | Select-Object -ExpandProperty Content 
-
-
-
-        if($status -eq "2") {
-    	    Write-Output "$uri : $status"
-            blink1-tool --id $led --green
-        } elseif ($status -eq "1") {
-    	    Write-Warning "$uri : $status"
-            blink1-tool --id $led --rgb FF9900 --blink 5
-            blink1-tool --id $led --rgb FF9900
-        }
-        else
-        {
-    	    Write-Error "$uri : $status"
-            blink1-tool --id $led --red --blink 5
-            blink1-tool --id $led --red
-        }
+﻿function GetStatusName($status) {
+    if($status -eq 2) {
+        return "HAPPY"
+    } elseif ($status -eq 1) {
+        return "UNWELL"
     }
-    Catch {
-  	Write-Error "$uri : Error"
-        blink1-tool --id $led --red --blink 5
-        blink1-tool --id $led --red
+    else
+    {
+        return "DEAD"
     }
 }
 
+function SetLedStatus($led, $status) {
+    $statusName = GetStatusName($status)
+    
+    Write-Output " => Setting LED ($led) to Show status '$statusName'"
+    if($status -eq 2) {
+        blink1-tool --id $led --green -q
+    } elseif ($status -eq 1) {
+        blink1-tool --id $led --rgb FF9900 --blink 5 -q
+        blink1-tool --id $led --rgb FF9900 -q
+    }
+    else
+    {
+        write-Output "Status = $status"
+        blink1-tool --id $led --red --blink 5 -q
+        blink1-tool --id $led --red -q
+    }
+}
 
-CheckUrl 'https://casinofair.com/api/networks/health?NetworkId=1' '1A0011F8'
+$lights = '1A0011F8', '1A001BBB', '1A001C47', '1A0020E0', '1A00230B'
 
-CheckUrl 'https://cryptocasino.com/api/networks/health?NetworkId=1' '1A001BBB'
+$uri = "https://ihrh8ibm9c.execute-api.eu-west-1.amazonaws.com/dev"
 
-CheckUrl 'https://showcase.funfair.io/api/networks/health?NetworkId=4' '1A001C47'
+Try {
+    $status = Invoke-WebRequest -Uri $uri | Select-Object -ExpandProperty Content | ConvertFrom-Json 
 
-CheckUrl 'https://staging.casinofair.io/api/networks/health?NetworkId=1' '1A0020E0'
+    $currentLight = 0
 
-CheckUrl 'https://dev.funfair.io/api/networks/health?NetworkId=1' '1A00230B'
+    foreach($env in $status) {
+        $envName = $env[0].environment
+        
+        
+        foreach($network in $env[0].networks) {
+            $netName = $network[0].network
+            foreach($tenant in $network[0].tenants) {
+                $tenantName = $tenant[0].tenant
 
+                
+        
+                foreach($domain in $tenant[0].domains) {
+                    $domainName = $domain[0].domain
+                    $status = $domain[0].status
+
+                    $statusName = GetStatusName($status)
+                    Write-Output "Casino $envName/$netName/$tenantName/$domainName : $statusName"
+
+                    if($currentLight -lt $lights.length) {
+                        $led = $lights[$currentLight]
+                        
+                        SetLedStatus $led $status
+
+                        $currentLight += 1
+                    }
+            
+                }
+            }
+        }
+    }
+    
+}
+Catch {
+    Write-Error "$uri : Error"
+
+    foreach ($led in $lights) {
+        SetLedStatus $led, -1
+    }
+}
