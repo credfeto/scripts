@@ -22,7 +22,7 @@ git checkout master
 git reset head --hard
 git clean -f -x -d
 
-rem %ROOT%\UpdatePackages\UpdatePackages\bin\Release\netcoreapp3.0\UpdatePackages.exe -folder %FOLDER% -prefix %PACKAGE%
+%ROOT%\UpdatePackages\UpdatePackages\bin\Release\netcoreapp3.0\UpdatePackages.exe -folder %FOLDER% -prefix %PACKAGE%
 if exist src\*.sln cd src
 
 dotnet build --configuration Release
@@ -33,8 +33,10 @@ goto :EOF
 
 :commit
 echo *************************** UPDATE %1 ***************************
-REM git add *.csproj
-REM git commit -m"FF-1429 Updated Code %1 analysis package to latest version"
+git add -A
+git commit -m"FF-1429 Updated Code %1 analysis package to latest version"
+git push
+echo *************************** UPDATE %1 ***************************
 
 goto :EOF
 
