@@ -7,6 +7,16 @@ FOR /F %%a IN (%ROOT%\repos.lst) DO CALL :checkrepo %%a
 
 GOTO :finish
 
+:commit
+ECHO ************************ UPDATES FOUND *************************
+git add -A
+git commit -m"FF-1429 Updated Code %PACKAGE% analysis package to latest version"
+git push
+
+ECHO *********************** UPDATE COMMITTED ***********************
+
+GOTO :EOF
+
 :updatepackage
 SETLOCAL ENABLEDELAYEDEXPANSION
 SET PACKAGE=%1
@@ -22,11 +32,15 @@ git reset head --hard
 git clean -f -x -d
 
 %ROOT%\UpdatePackages\UpdatePackages\bin\Release\netcoreapp3.0\UpdatePackages.exe -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
-IF NOT ERRORLEVEL == 0 GOTO :noupdate
+SET RC=%ERRORLEVEL%
+ECHO Update Code: %RC%
+IF NOT %RC% == 0 GOTO :noupdate
 IF EXIST src\*.sln CD src
 
 dotnet build --configuration Release
-IF ERRORLEVEL == 0 call :commit %PACKAGE%
+SET RC=%ERRORLEVEL%
+ECHO Build Code: %RC%
+IF %RC% == 0 call :commit %PACKAGE%
 
 GOTO :completed
 
@@ -37,15 +51,7 @@ ECHO ########################### NO UPDATE ##########################
 ENDLOCAL
 GOTO :EOF
 
-:commit
-ECHO ************************ UPDATES FOUND *************************
-git add -A
-git commit -m"FF-1429 Updated Code %PACKAGE% analysis package to latest version"
-git push
 
-ECHO *********************** UPDATE COMMITTED ***********************
-
-GOTO :EOF
 
 
 :checkrepo
