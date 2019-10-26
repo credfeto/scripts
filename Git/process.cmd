@@ -22,7 +22,7 @@ git checkout master
 git reset head --hard
 git clean -f -x -d
 
-%ROOT%\UpdatePackages\UpdatePackages\bin\Release\netcoreapp3.0\UpdatePackages.exe -folder %FOLDER% -prefix %PACKAGE%
+%ROOT%\UpdatePackages\UpdatePackages\bin\Release\netcoreapp3.0\UpdatePackages.exe -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
 if exist src\*.sln cd src
 
 dotnet build --configuration Release
