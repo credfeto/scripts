@@ -1,20 +1,19 @@
-@echo off
-
-
-rem git@github.com:funfair-tech/funfair-build-check.git
+@ECHO OFF
 
 SET ROOT=%CD%
-echo %ROOT%
+ECHO %ROOT%
 
-for /F %%a in (%ROOT%\repos.lst) do call :checkrepo %%a
+FOR /F %%a IN (%ROOT%\repos.lst) DO CALL :checkrepo %%a
 
-goto :finish
+GOTO :finish
 
 :updatepackage
-setlocal ENABLEDELAYEDEXPANSION
-set PACKAGE=%1
+SETLOCAL ENABLEDELAYEDEXPANSION
+SET PACKAGE=%1
 
-ECHO * %PACKAGE%
+ECHO.
+ECHO *************************** CHECKING ***************************
+ECHO * %PACKAGE% 
 
 git reset head --hard
 git clean -f -x -d
@@ -23,33 +22,46 @@ git reset head --hard
 git clean -f -x -d
 
 %ROOT%\UpdatePackages\UpdatePackages\bin\Release\netcoreapp3.0\UpdatePackages.exe -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
-if exist src\*.sln cd src
+IF NOT ERRORLEVEL == 0 GOTO :noupdate
+IF EXIST src\*.sln CD src
 
 dotnet build --configuration Release
 IF ERRORLEVEL == 0 call :commit %PACKAGE%
 
-endlocal
-goto :EOF
+GOTO :completed
+
+:noupdate
+ECHO ########################### NO UPDATE ##########################
+
+:completed
+ENDLOCAL
+GOTO :EOF
 
 :commit
-echo *************************** UPDATE %1 ***************************
+ECHO ************************ UPDATES FOUND *************************
 git add -A
-git commit -m"FF-1429 Updated Code %1 analysis package to latest version"
+git commit -m"FF-1429 Updated Code %PACKAGE% analysis package to latest version"
 git push
-echo *************************** UPDATE %1 ***************************
 
-goto :EOF
+ECHO *********************** UPDATE COMMITTED ***********************
+
+GOTO :EOF
 
 
 :checkrepo
-setlocal
+SETLOCAL
 SET REPO=%1
 echo.
-echo Repo: %REPO%
+ECHO Repo: %REPO%
 SET FOLDER=
-for /F "tokens=1,2,3 delims=:/" %%b in ("%1") do set FOLDER=%%d
+FOR /F "tokens=1,2,3 delims=:/" %%b IN ("%1") DO SET FOLDER=%%d
 SET FOLDER=%FOLDER:~0,-4%
-echo %FOLDER%
+ECHO %FOLDER%
+
+ECHO.
+ECHO ================================================================
+ECHO ================================================================
+ECHO = %FOLDER%
 
 IF NOT EXIST %ROOT%\%FOLDER%\.git\HEAD git clone %REPO%
 cd /d %ROOT%
@@ -59,19 +71,20 @@ ECHO %CD%
 git fetch
 git rebase
 
-call :updatepackage AsyncFixer
-call :updatepackage NSubstitute.Analyzers.CSharp
-call :updatepackage Microsoft.CodeAnalysis.FxCopAnalyzers
-call :updatepackage SonarAnalyzer.CSharp
-call :updatepackage xunit.analyzers
-call :updatepackage SourceLink.Create.CommandLine
+CALL :updatepackage AsyncFixer
+CALL :updatepackage NSubstitute.Analyzers.CSharp
+CALL :updatepackage Microsoft.CodeAnalysis.FxCopAnalyzers
+CALL :updatepackage SonarAnalyzer.CSharp
+CALL :updatepackage xunit.analyzers
+CALL :updatepackage SourceLink.Create.CommandLine
+
+ECHO.
 
 POPD
 
-REM rd /s /q %ROOT%\%FOLDER%
 
-endlocal
-goto :EOF
+ENDLOCAL
+GOTO :EOF
 
 
 
