@@ -3,6 +3,14 @@
 SET ROOT=%CD%
 ECHO %ROOT%
 
+rd /s /q %ROOT%\tools
+md %ROOT%\tools
+cd %ROOT%\tools
+nuget.exe install Credfeto.UpdatePackages -ExcludeVersion -Source https://www.myget.org/F/credfeto/api/v3/index.json
+cd %ROOT%
+
+IF NOT EXIST %ROOT%\tools\Credfeto.UpdatePackages\lib\UpdatePackages.dll GOTO :finish
+
 FOR /F %%a IN (%ROOT%\repos.lst) DO CALL :checkrepo %%a
 
 GOTO :finish
@@ -31,7 +39,7 @@ git checkout master
 git reset head --hard
 git clean -f -x -d
 
-%ROOT%\UpdatePackages\UpdatePackages\bin\Release\netcoreapp3.0\UpdatePackages.exe -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
+dotnet %ROOT%\tools\Credfeto.UpdatePackages\lib\UpdatePackages.dll -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
 SET RC=%ERRORLEVEL%
 ECHO Update Code: %RC%
 IF NOT %RC% == 0 GOTO :noupdate
