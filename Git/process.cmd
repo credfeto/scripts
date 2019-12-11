@@ -86,11 +86,15 @@ git fetch
 git rebase
 
 CALL :updatepackage AsyncFixer
+CALL :updatepackage DisableDateTimeNow
 CALL :updatepackage NSubstitute.Analyzers.CSharp
 CALL :updatepackage Microsoft.CodeAnalysis.FxCopAnalyzers
 CALL :updatepackage SonarAnalyzer.CSharp
 CALL :updatepackage xunit.analyzers
 CALL :updatepackage SourceLink.Create.CommandLine
+CALL :updatepackage Microsoft.NET.Test.Sdk
+CALL :updatepackage TeamCity.VSTest.TestAdapter
+CALL :updatepackage xunit.runner.visualstudio
 
 ECHO.
 
