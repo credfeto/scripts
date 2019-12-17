@@ -18,7 +18,7 @@ GOTO :finish
 :commit
 ECHO ************************ UPDATES FOUND *************************
 git add -A
-git commit -m"FF-1429 Updated Code %PACKAGE% analysis package to latest version"
+git commit -m"FF-1429 Updated Code analysis package (%PACKAGE%) to latest version"
 git push
 
 ECHO *********************** UPDATE COMMITTED ***********************
@@ -95,6 +95,7 @@ CALL :updatepackage SourceLink.Create.CommandLine
 CALL :updatepackage Microsoft.NET.Test.Sdk
 CALL :updatepackage TeamCity.VSTest.TestAdapter
 CALL :updatepackage xunit.runner.visualstudio
+CALL :updatepackage FunFair.CodeAnalysis
 
 ECHO.
 
