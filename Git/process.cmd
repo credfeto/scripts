@@ -18,7 +18,7 @@ GOTO :finish
 :commit
 ECHO ************************ UPDATES FOUND *************************
 git add -A
-git commit -m"FF-1429 Updated Code analysis package (%PACKAGE%) to latest version"
+git commit -m"FF-1429 Updated %WHAT% package (%PACKAGE%) to latest version"
 git push
 
 ECHO *********************** UPDATE COMMITTED ***********************
@@ -28,6 +28,7 @@ GOTO :EOF
 :updatepackage
 SETLOCAL ENABLEDELAYEDEXPANSION
 SET PACKAGE=%1
+Set WHAT=%2
 
 ECHO.
 ECHO *************************** CHECKING ***************************
@@ -48,7 +49,7 @@ IF EXIST src\*.sln CD src
 dotnet build --configuration Release
 SET RC=%ERRORLEVEL%
 ECHO Build Code: %RC%
-IF %RC% == 0 call :commit %PACKAGE%
+IF %RC% == 0 call :commit %PACKAGE% %WHAT%
 
 GOTO :completed
 
@@ -85,17 +86,20 @@ ECHO %CD%
 git fetch
 git rebase
 
-CALL :updatepackage AsyncFixer
-CALL :updatepackage DisableDateTimeNow
-CALL :updatepackage NSubstitute.Analyzers.CSharp
-CALL :updatepackage Microsoft.CodeAnalysis.FxCopAnalyzers
-CALL :updatepackage SonarAnalyzer.CSharp
-CALL :updatepackage xunit.analyzers
-CALL :updatepackage SourceLink.Create.CommandLine
-CALL :updatepackage Microsoft.NET.Test.Sdk
-CALL :updatepackage TeamCity.VSTest.TestAdapter
-CALL :updatepackage xunit.runner.visualstudio
-CALL :updatepackage FunFair.CodeAnalysis
+CALL :updatepackage AsyncFixer "Code analysis"
+CALL :updatepackage DisableDateTimeNow "Code analysis"
+CALL :updatepackage NSubstitute.Analyzers.CSharp "Code analysis"
+CALL :updatepackage Microsoft.CodeAnalysis.FxCopAnalyzers "Code analysis"
+CALL :updatepackage SonarAnalyzer.CSharp "Code analysis"
+CALL :updatepackage xunit.analyzers "Code analysis"
+CALL :updatepackage FunFair.CodeAnalysis "Code analysis"
+
+CALL :updatepackage SourceLink.Create.CommandLine "Source Link"
+
+CALL :updatepackage Microsoft.NET.Test.Sdk "Test Infrastructure"
+CALL :updatepackage TeamCity.VSTest.TestAdapter "Test Infrastructure"
+CALL :updatepackage xunit.runner.visualstudio "Test Infrastructure"
+CALL :updatepackage FunFair.Test.Common "Test Infrastructure"
 
 ECHO.
 
