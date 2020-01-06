@@ -27,12 +27,13 @@ GOTO :EOF
 
 :updatepackage
 SETLOCAL ENABLEDELAYEDEXPANSION
-SET PACKAGE=%1
-Set WHAT=%2
+SET PACKAGE=%~1
+Set WHAT=%~2
 
 ECHO.
 ECHO *************************** CHECKING ***************************
-ECHO * %PACKAGE% 
+ECHO * Folder: %FOLDER%
+ECHO * Looking for updates of %WHAT%:%PACKAGE% 
 
 git reset head --hard
 git clean -f -x -d
