@@ -28,7 +28,7 @@ GOTO :EOF
 :branch
 ECHO ************************ UPDATES FOUND *************************
 ECHO * Committing to a separate branch!
-SET BRANCHNAME=depends/ff-1249-update-%PACKAGE%
+SET BRANCHNAME=depends/ff-1429-update-%PACKAGE%
 git branch -D %BRANCHNAME%
 git checkout -b %BRANCHNAME%
 IF NOT %ERRORLEVEL% == 0 goto :branchalreadyexists
