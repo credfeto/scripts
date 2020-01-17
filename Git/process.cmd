@@ -28,13 +28,12 @@ GOTO :EOF
 :branch
 ECHO ************************ UPDATES FOUND *************************
 ECHO * Committing to a separate branch!
-SET BRANCHNAME=depends/ff-1429-update-%PACKAGE%
 git branch -D %BRANCHNAME%
 git checkout -b %BRANCHNAME%
 IF NOT %ERRORLEVEL% == 0 goto :branchalreadyexists
 git add -A
 git commit -m"FF-1429 Updated %WHAT% package (%PACKAGE%) to latest version"
-git push -f --set-upstream origin %BRANCHNAME%
+git push --set-upstream origin %BRANCHNAME%
 git checkout master
 git branch -D %BRANCHNAME%
 
@@ -61,6 +60,10 @@ git clean -f -x -d
 git checkout master
 git reset head --hard
 git clean -f -x -d
+
+SET BRANCHNAME=depends/ff-1429-update-%PACKAGE%
+git checkout %BRANCHNAME%
+
 
 dotnet %ROOT%\tools\Credfeto.UpdatePackages\lib\UpdatePackages.dll -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
 SET RC=%ERRORLEVEL%
