@@ -69,8 +69,10 @@ git clean -f -x -d
 REM ALways overwrite
 copy /y /z %TEMPLATE%\.editorconfig "%ROOT%\%FOLDER%\.editorconfig"
 copy /y /z %TEMPLATE%\src\CodeAnalysis.ruleset "%ROOT%\%FOLDER%\src\CodeAnalysis.ruleset"
-REM copy /y /z %TEMPLATE%\src\global.json "%ROOT%\%FOLDER%\src\global.json"
-IF NOT EXIST "%ROOT%\%FOLDER%\.github\labeler.yml" copy /y /z %TEMPLATE%\.github\labeler.yml "%ROOT%\%FOLDER%\.github\labeler.yml"
+copy /y /z %TEMPLATE%\src\global.json "%ROOT%\%FOLDER%\src\global.json"
+copy /y /z %TEMPLATE%\.github\labeler.yml "%ROOT%\%FOLDER%\.github\labeler.yml"
+IF EXIST "%ROOT%\%FOLDER%\.github\labeler.project-specific.yml" copy /y /z %TEMPLATE%\.github\labeler.yml + "%ROOT%\%FOLDER%\.github\labeler.project-specific.yml" "%ROOT%\%FOLDER%\.github\labeler.yml"
+
 copy /y /z %TEMPLATE%\.github\CODEOWNERS "%ROOT%\%FOLDER%\.github\CODEOWNERS"
 copy /y /z %TEMPLATE%\.github\PULL_REQUEST_TEMPLATE.md "%ROOT%\%FOLDER%\.github\PULL_REQUEST_TEMPLATE.md"
 md "%ROOT%\%FOLDER%\.github\workflows"
