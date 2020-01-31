@@ -61,7 +61,9 @@ git checkout master
 git reset head --hard
 git clean -f -x -d
 
+
 SET BRANCHNAME=depends/ff-1429-update-%PACKAGE%
+git branch -D %BRANCHNAME%
 git checkout %BRANCHNAME%
 
 
