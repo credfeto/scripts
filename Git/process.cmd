@@ -28,9 +28,14 @@ GOTO :EOF
 :branch
 ECHO ************************ UPDATES FOUND *************************
 ECHO * Committing to a separate branch!
+
+IF "%BRANCHNAME%" EQU "%GITBRANCH%" GOTO :updateinexistingbranch
+
 git branch -D %BRANCHNAME%
 git checkout -b %BRANCHNAME%
 IF NOT %ERRORLEVEL% == 0 goto :branchalreadyexists
+
+:updateinexistingbranch
 git add -A
 git commit -m"FF-1429 Updated %WHAT% package (%PACKAGE%) to latest version"
 git push --set-upstream origin %BRANCHNAME%
@@ -66,6 +71,8 @@ SET BRANCHNAME=depends/ff-1429-update-%PACKAGE%
 git branch -D %BRANCHNAME%
 git checkout %BRANCHNAME%
 
+set GITBRANCH=
+for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
 
 dotnet %ROOT%\tools\Credfeto.UpdatePackages\lib\UpdatePackages.dll -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
 SET RC=%ERRORLEVEL%
