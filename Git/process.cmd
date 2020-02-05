@@ -132,7 +132,8 @@ git clean -f -x -d
 git fetch
 git rebase
 git remote update origin --prune
-git gc --aggressive
+git prune
+git gc --aggressive --prune
 
 CALL :updatepackage AsyncFixer "Code analysis"
 CALL :updatepackage DisableDateTimeNow "Code analysis"
