@@ -29,8 +29,11 @@ GOTO :EOF
 ECHO ************************ UPDATES FOUND *************************
 ECHO * Committing to a separate branch!
 
-IF "%BRANCHNAME%" EQU "%GITBRANCH%" GOTO :updateinexistingbranch
+ECHO Current Branch: %GITBRANCH%
+ECHO New Branch    : %BRANCHNAME%
+IF "%BRANCHNAME%" == "%GITBRANCH%" GOTO :updateinexistingbranch
 
+git remote update origin --prune
 git branch -D %BRANCHNAME%
 git checkout -b %BRANCHNAME%
 IF NOT %ERRORLEVEL% == 0 goto :branchalreadyexists
@@ -41,6 +44,7 @@ git commit -m"FF-1429 Updated %WHAT% package (%PACKAGE%) to latest version"
 git push --set-upstream origin %BRANCHNAME%
 git checkout master
 git branch -D %BRANCHNAME%
+git remote update origin --prune
 
 ECHO *********************** UPDATE COMMITTED ***********************
 
@@ -68,11 +72,13 @@ git clean -f -x -d
 
 
 SET BRANCHNAME=depends/ff-1429-update-%PACKAGE%
+git remote update origin --prune
 git branch -D %BRANCHNAME%
 git checkout %BRANCHNAME%
 
 set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
+echo Current Branch: %GITBRANCH%
 
 dotnet %ROOT%\tools\Credfeto.UpdatePackages\lib\UpdatePackages.dll -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
 SET RC=%ERRORLEVEL%
@@ -118,8 +124,15 @@ cd /d %ROOT%
 PUSHD %ROOT%\%FOLDER%
 ECHO %CD%
 
+git reset head --hard
+git clean -f -x -d
+git checkout master
+git reset head --hard
+git clean -f -x -d
 git fetch
 git rebase
+git remote update origin --prune
+git gc --aggressive
 
 CALL :updatepackage AsyncFixer "Code analysis"
 CALL :updatepackage DisableDateTimeNow "Code analysis"

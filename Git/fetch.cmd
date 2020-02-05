@@ -24,6 +24,7 @@ git remote get-url origin
 echo.
 echo * Fetching...
 git fetch
+git remote update origin --prune
 
 rem determine whether to pull changes (i.e. if there is no changes in the workspace)
 git status > "%TEMP%\gitfetch.log"
