@@ -3,8 +3,9 @@
 REM TODO: Get these externally configured
 SET LOGFILE=C:\LOGS\Gallery.log
 SET REPOSITORY=C:\PhotoDB
-SET OUTPUTBUILDER=C:\Development\GallerySync\OutputBuilderClient\bin\Release\OutputBuilderClient.exe
-SET BUILDSITEINDEX=C:\Development\GallerySync\BuildSiteIndex\bin\Release\BuildSiteIndex.exe
+SET OUTPUTBUILDER="C:\Program Files\dotnet\dotnet.exe" C:/Work/GallerySync/OutputBuilderClient/bin/Release/netcoreapp2.2/OutputBuilderClient.dll -source I:\Photos\Sorted -output C:\PhotoDb\Source -imageoutput \\nas-01\GalleryUpload -brokenImages C:\PhotoDb\BrokenImages.csv -shortUrls C:\PhotoDb\ShortUrls.json -watermark C:\Work\GallerySync\Watermark\Watermark.png -thumbnailSize 150 -quality 100 -resizes 400,600,800,1024,1600
+
+SET BUILDSITEINDEX="C:\Program Files\dotnet\dotnet.exe" C:/Work/GallerySync/BuildSiteIndex/bin/Release/netcoreapp2.2/BuildSiteIndex.dll
 SET STARTTIME=%DATE% %TIME%
 C:
 PUSHD %REPOSITORY%
@@ -21,7 +22,7 @@ call :updateshorturls
 call :updateall "Metadata"
 
 echo %DATE% %TIME% Updating Site Index...
-%BUILDSITEINDEX% >> %LOGFILE%
+rem %BUILDSITEINDEX% >> %LOGFILE%
  
 call :updateshorturls
 call :updateall "Site Index"
