@@ -142,6 +142,7 @@ CALL :updatepackage Microsoft.CodeAnalysis.FxCopAnalyzers "Code analysis"
 CALL :updatepackage SonarAnalyzer.CSharp "Code analysis"
 CALL :updatepackage xunit.analyzers "Code analysis"
 CALL :updatepackage FunFair.CodeAnalysis "Code analysis"
+CALL :updatepackage Microsoft.VisualStudio.Threading.Analyzers "Code analysis"
 
 CALL :updatepackage SourceLink.Create.CommandLine "Source Link"
 
