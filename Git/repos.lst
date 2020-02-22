@@ -1,3 +1,6 @@
+git@github.com:credfeto/UpdatePackages.git
+git@github.com:credfeto/ImageLoader.git
+git@github.com:credfeto/GallerySync.git
 git@github.com:funfair-tech/funfair-build-check.git
 git@github.com:funfair-tech/funfair-build-version.git
 git@github.com:funfair-tech/funfair-server-swagger.git
@@ -7,8 +10,9 @@ git@github.com:funfair-tech/funfair-server-content-package.git
 git@github.com:funfair-tech/funfair-server-content-package-management.git
 git@github.com:funfair-tech/funfair-server-content-package-builder.git
 git@github.com:funfair-tech/funfair-server-alerts.git
-git@github.com:funfair-tech/funfair-server-monitoring.git
 git@github.com:funfair-tech/funfair-server-random.git
 git@github.com:funfair-tech/funfair-server-contracts.git
 git@github.com:funfair-tech/funfair-casino-server.git
 git@github.com:funfair-tech/funfair-wallet-server.git
+git@github.com:funfair-tech/BuildBot.git
+git@github.com:funfair-tech/CoinBot.git
