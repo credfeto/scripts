@@ -168,7 +168,6 @@ cd /d %ROOT%
 PUSHD %ROOT%\%FOLDER%
 scalar register 
 popd
-pause
 
 goto :EOF
 
