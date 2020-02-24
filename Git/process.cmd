@@ -151,6 +151,8 @@ CALL :updatepackage TeamCity.VSTest.TestAdapter "Test Infrastructure"
 CALL :updatepackage xunit.runner.visualstudio "Test Infrastructure"
 CALL :updatepackage FunFair.Test.Common "Test Infrastructure"
 
+CALL :updatepackage LibGit2Sharp "Build Infrastructure"
+
 ECHO.
 
 POPD
