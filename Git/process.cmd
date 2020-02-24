@@ -119,7 +119,7 @@ ECHO ================================================================
 ECHO ================================================================
 ECHO = %FOLDER%
 
-IF NOT EXIST %ROOT%\%FOLDER%\.git\HEAD git clone %REPO%
+IF NOT EXIST %ROOT%\%FOLDER%\.git\HEAD call :clone
 cd /d %ROOT%
 PUSHD %ROOT%\%FOLDER%
 ECHO %CD%
@@ -159,7 +159,16 @@ POPD
 ENDLOCAL
 GOTO :EOF
 
+:clone
+git clone %REPO%
+rem attempt to register with scalar
+cd /d %ROOT%
+PUSHD %ROOT%\%FOLDER%
+scalar register 
+popd
+pause
 
+goto :EOF
 
 
 :finish
