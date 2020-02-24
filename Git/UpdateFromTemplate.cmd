@@ -1,6 +1,6 @@
 @echo off
 SETLOCAL
-SET TEMPLATE=D:\Work\funfair-server-template
+IF "%TEMPLATE%" EQU "" SET TEMPLATE=D:\Work\funfair-server-template
 SET ROOT=%CD%
 ECHO %ROOT%
 
