@@ -23,7 +23,7 @@ GOTO :finish
 :commit
 ECHO ************************ UPDATES FOUND *************************
 git add -A
-git commit -m"FF-1429 Updating to match the template file"
+git commit -m"[FF-1429] Updating to match the template file"
 git push
 
 ECHO *********************** UPDATE COMMITTED ***********************
