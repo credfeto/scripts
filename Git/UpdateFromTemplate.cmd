@@ -80,7 +80,7 @@ echo * Update R# DotSettings
 for %%g in ("%ROOT%\%FOLDER%\src\*.sln") do copy /y /z %TEMPLATE%\src\FunFair.Template.sln.DotSettings %%g.DotSettings
 
 ECHO * update .github\pr-lint.yml
-copy %TEMPLATE%\.github\pr-lint.yml > "%ROOT%\%FOLDER%\.github\pr-lint.yml"
+copy %TEMPLATE%\.github\pr-lint.yml "%ROOT%\%FOLDER%\.github\pr-lint.yml"
 
 ECHO * update .github\labeler.yml
 type %TEMPLATE%\.github\labeler.yml > "%ROOT%\%FOLDER%\.github\labeler.yml"
