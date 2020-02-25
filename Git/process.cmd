@@ -40,7 +40,7 @@ IF NOT %ERRORLEVEL% == 0 goto :branchalreadyexists
 
 :updateinexistingbranch
 git add -A
-git commit -m"FF-1429 Updated %WHAT% package (%PACKAGE%) to latest version"
+git commit -m"[FF-1429] Updated %WHAT% package (%PACKAGE%) to latest version"
 git push --set-upstream origin %BRANCHNAME%
 git checkout master
 git branch -D %BRANCHNAME%
