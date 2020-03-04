@@ -38,6 +38,6 @@ jobs:
     - name: Commit GEOIP files
       run: |
         git add -A geoip
-        git commit -m"[FF-368] - Updated GEOIP DB from MaxMind"
+        git commit -m"[FF-368] - Updated GEOIP DB from MaxMind" --author "Mark Ridgwell <credfeto@users.noreply.github.com>"
         git push
 
