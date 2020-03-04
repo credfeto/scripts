@@ -37,7 +37,9 @@ jobs:
         geoipupdate --config-file GeoIP.conf --database-directory geoip
     - name: Commit GEOIP files
       run: |
-        git add -A geoip
+        git add -A geoip --author "Mark Ridgwell <credfeto@users.noreply.github.com>"
         git commit -m"[FF-368] - Updated GEOIP DB from MaxMind" --author "Mark Ridgwell <credfeto@users.noreply.github.com>"
+    - name: Push committed files
+      run: |
         git push
 
