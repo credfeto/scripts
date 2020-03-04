@@ -29,7 +29,7 @@ jobs:
       run: sudo apt install geoipupdate
     - name: Define GeoIP.conf
       run: |
-        echo AccountID ${{secrets.MAXMIND_ACCOUNT_ID }}> GeoIP.conf
+        echo AccountID ${{secrets.MAXMIND_ACCOUNT_ID }} > GeoIP.conf
         echo EditionIDs GeoLite2-Country >> GeoIP.conf
     - name: Update Download GEOIP
       run: |
