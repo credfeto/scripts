@@ -23,8 +23,8 @@ jobs:
           echo ::set-env name=GIT_BRANCH::$GITHUB_REF
     - name: Define GeoIP.conf
       run: |
-        echo AccountID ${{secrets.MAXMIND_ACCOUNT_ID }} > GeoIP.conf
-        echo LicenseKey ${{secrets.MAXMIND_LICENSE_KEY }} >> GeoIP.conf
+        echo AccountID ${{ secrets.MAXMIND_ACCOUNT_ID }} > GeoIP.conf
+        echo LicenseKey ${{ secrets.MAXMIND_LICENSE_KEY }} >> GeoIP.conf
         echo EditionIDs GeoLite2-Country >> GeoIP.conf
     - name: Setup Maxmind Updater PPA
       run: sudo add-apt-repository ppa:maxmind/ppa
@@ -35,3 +35,9 @@ jobs:
     - name: Download GEOIP files
       run: |
         geoipupdate --config-file GeoIP.conf --database-directory geoip
+    - name: Commit GEOIP files
+      run: |
+        git add -A geoip
+        git commit -m"git commit -m"[FF-368] - Updated GEOIP DB from MaxMind"
+        git push
+
