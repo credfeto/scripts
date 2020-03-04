@@ -24,6 +24,7 @@ jobs:
     - name: Define GeoIP.conf
       run: |
         echo AccountID ${{secrets.MAXMIND_ACCOUNT_ID }} > GeoIP.conf
+        echo LicenseKey ${{secrets.MAXMIND_LICENSE_KEY }} >> GeoIP.conf
         echo EditionIDs GeoLite2-Country >> GeoIP.conf
     - name: Setup Maxmind Updater PPA
       run: sudo add-apt-repository ppa:maxmind/ppa
