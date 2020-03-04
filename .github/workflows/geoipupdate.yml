@@ -21,16 +21,16 @@ jobs:
           echo REF: $GITHUB_REF
           echo SHA: $GITHUB_SHA
           echo ::set-env name=GIT_BRANCH::$GITHUB_REF
+    - name: Define GeoIP.conf
+      run: |
+        echo AccountID ${{secrets.MAXMIND_ACCOUNT_ID }} > GeoIP.conf
+        echo EditionIDs GeoLite2-Country >> GeoIP.conf
     - name: Setup Maxmind Updater PPA
       run: sudo add-apt-repository ppa:maxmind/ppa
     - name: Update Repos
       run: sudo apt update
     - name: Install geoip update
       run: sudo apt install geoipupdate
-    - name: Define GeoIP.conf
+    - name: Download GEOIP files
       run: |
-        echo AccountID ${{secrets.MAXMIND_ACCOUNT_ID }} > GeoIP.conf
-        echo EditionIDs GeoLite2-Country >> GeoIP.conf
-    - name: Update Download GEOIP
-      run: |
-        geoipupdate ./GeoIP.conf
+        geoipupdate --config-file GeoIP.conf --database-directory geoip
