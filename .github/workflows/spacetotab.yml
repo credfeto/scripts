@@ -23,7 +23,7 @@ jobs:
         sudo apt-get install moreutils
     - name: Convert tabs to spaces
       run: |
-        find ./ -iname '*.cmd' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
+        find ./ -iname '*.sql' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
     - name: Commit files
       run: |
         git commit --all -m"Converted Tabs to spaces"
