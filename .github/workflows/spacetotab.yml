@@ -27,6 +27,7 @@ jobs:
     - name: Commit files
       run: |
         git commit --all -m"Converted Tabs to spaces"
+        echo Converted
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
