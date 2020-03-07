@@ -3,7 +3,6 @@ name: Convert Tabs to spaces on SQL files
 on:
   push:
     branches-ignore:
-    - master
     - "release/*"
     - "hotfix/*"
     - "feature/*"
