@@ -1,0 +1,34 @@
+name: Perform Maxmind GEOIP Updates
+
+on:
+  push:
+    branches-ignore:
+    - master
+    - "release/*"
+    - "hotfix/*"
+    - "feature/*"
+
+jobs:
+  tabs-to-spaces:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Configure Git
+      run: |
+        git config --local user.email "credfeto@users.noreply.github.com"
+        git config --local user.name "Mark Ridgwell"
+    - name: Install MoreUtils
+      run: |
+        sudo apt-get install moreutils
+    - name: Download GEOIP files
+      run: |
+        find ./ -iname '*.cmd' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
+    - name: Commit files
+      run: |
+        git commit -all -m"Converted Tabs to spaces"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
