@@ -22,7 +22,7 @@ jobs:
     - name: Install MoreUtils
       run: |
         sudo apt-get install moreutils
-    - name: Download GEOIP files
+    - name: Convert tabs to spaces
       run: |
         find ./ -iname '*.cmd' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
     - name: Commit files
