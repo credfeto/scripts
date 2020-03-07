@@ -1,4 +1,4 @@
-name: Perform Maxmind GEOIP Updates
+name: Convert Tabs to spaces on SQL files
 
 on:
   push:
