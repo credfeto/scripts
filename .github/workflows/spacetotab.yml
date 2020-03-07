@@ -26,7 +26,7 @@ jobs:
         find ./ -iname '*.cmd' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
     - name: Commit files
       run: |
-        git commit -all -m"Converted Tabs to spaces"
+        git commit --all -m"Converted Tabs to spaces"
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
