@@ -26,16 +26,9 @@ jobs:
         find ./ -iname '*.sql' -type f -exec bash -c 'expand -t 4 "$0" | sponge "$0"' {} \;
     - name: Commit files
       run: |
-        git commit --all -m"Converted Tabs to spaces"
+        git commit --all -m"Converted Tabs to spaces" || true
         echo Converted
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
- # https://github.community/t5/GitHub-Actions/Workflow-is-failing-if-no-job-can-be-ran-due-to-condition/m-p/38186#M3250
-  always_job:
-    name: Aways run job
-    runs-on: ubuntu-latest
-    steps:
-      - name: Always run
-        run: echo "This job is used to prevent the workflow to fail when all other jobs are skipped [MR1]."
