@@ -1,0 +1,12 @@
+name: Test-PR Lint
+on: [pull_request]
+jobs:
+  include-JIRA-ticket:
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo "Head Ref: ${{github.head_ref}}"
+    - uses: vijaykramesh/pr-lint-action@v1.0
+      if: !startsWith(github.head_ref, "release/") && !startsWith(github.head_ref, "hotfix/")
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
