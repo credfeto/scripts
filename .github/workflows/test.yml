@@ -6,7 +6,7 @@ jobs:
     steps:
     - name: Branch
       run: echo Head Ref ${{ github.head_ref }}
-    - uses: vijaykramesh/pr-lint-action@v1.0
-      if: !startsWith(github.head_ref, "release/") && !startsWith(github.head_ref, "hotfix/")
+    - if: !startsWith(github.head_ref, "release/") && !startsWith(github.head_ref, "hotfix/")
+      uses: vijaykramesh/pr-lint-action@v1.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
