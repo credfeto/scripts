@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Nello
-      run: echo Head Ref: ${{ GITHUB_HEAD_REF }}
+      run: echo Head Ref ${{ GITHUB_HEAD_REF }}
     - uses: vijaykramesh/pr-lint-action@v1.0
 #      if: !startsWith(github.head_ref, "release/") && !startsWith(github.head_ref, "hotfix/")
       env:
