@@ -86,7 +86,14 @@ ECHO Update Code: %RC%
 IF NOT %RC% == 0 GOTO :noupdate
 IF EXIST src\*.sln CD src
 
-dotnet build --configuration Release
+dotnet clean --configuration=Release 
+
+dotnet restore
+SET RC=%ERRORLEVEL%
+ECHO Build Code: %RC%
+IF NOT %RC% == 0 goto :noupdate
+
+dotnet build --configuration=Release --no-restore -warnAsError
 SET RC=%ERRORLEVEL%
 ECHO Build Code: %RC%
 IF %RC% == 0 call :commit %PACKAGE% %WHAT%
