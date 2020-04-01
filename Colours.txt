@@ -11,9 +11,9 @@ Migration Script #b680e5
 Legal Text #facef0
 Static Code Analysis Rules #00dead
 .NET Update #a870c9
-Config Change #03bc9d
 no-pr-activity #ffff00
 Read Me #5319e7
 !!! WAITING FOR CLIENT PR #ffff00
 !!! WAITING FOR WALLET PR #ffff00
+!!! WAITING FOR SERVER PR #ffff00
 !!! WAITING FOR QA SIGNOFF #ffff00
