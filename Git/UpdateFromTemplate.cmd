@@ -4,8 +4,9 @@ IF "%TEMPLATE%" EQU "" SET TEMPLATE=D:\Work\funfair-server-template
 SET ROOT=%CD%
 ECHO %ROOT%
 
-echo Updating Template
+echo Updating Template from %TEMPLATE%
 PUSHD %TEMPLATE%
+git fetch
 git reset head --hard
 git clean -f -x -d
 git checkout master
