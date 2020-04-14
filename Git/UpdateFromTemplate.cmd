@@ -66,44 +66,59 @@ git reset head --hard
 git clean -f -x -d
 
 REM ALways overwrite
+ECHO.
 echo * Update .editorconfig
 copy /y /z %TEMPLATE%\.editorconfig "%ROOT%\%FOLDER%\.editorconfig"
 call :commit ".editorconfig"
 
+ECHO.
 echo * Update src\CodeAnalysis.ruleset
 copy /y /z %TEMPLATE%\src\CodeAnalysis.ruleset "%ROOT%\%FOLDER%\src\CodeAnalysis.ruleset"
 call :commit "CodeAnalysis.ruleset"
 
+ECHO.
 echo * Update src\global.json
 copy /y /z %TEMPLATE%\src\global.json "%ROOT%\%FOLDER%\src\global.json"
 call :commit "global.json"
 
+ECHO.
 echo * Update R# DotSettings
 for %%g in ("%ROOT%\%FOLDER%\src\*.sln") do copy /y /z %TEMPLATE%\src\FunFair.Template.sln.DotSettings %%g.DotSettings
 call :commit "Jetbrains DotSettings"
 
+ECHO.
 ECHO * update .github\pr-lint.yml
 copy %TEMPLATE%\.github\pr-lint.yml "%ROOT%\%FOLDER%\.github\pr-lint.yml"
 call :commit "PR Lint Settings"
 
+ECHO.
 ECHO * update .github\labeler.yml
 type %TEMPLATE%\.github\labeler.yml > "%ROOT%\%FOLDER%\.github\labeler.yml"
 echo. >> "%ROOT%\%FOLDER%\.github\labeler.yml"
 IF EXIST "%ROOT%\%FOLDER%\.github\labeler.project-specific.yml" type "%ROOT%\%FOLDER%\.github\labeler.project-specific.yml" >> "%ROOT%\%FOLDER%\.github\labeler.yml"
 call :commit "Labeller Config"
 
+ECHO.
 ECHO * Update .github\CODEOWNERS
 copy /y /z %TEMPLATE%\.github\CODEOWNERS "%ROOT%\%FOLDER%\.github\CODEOWNERS"
 call :commit "Codeowners"
 
+ECHO.
 ECHO * Update .github\PULL_REQUEST_TEMPLATE.md
 copy /y /z %TEMPLATE%\.github\PULL_REQUEST_TEMPLATE.md "%ROOT%\%FOLDER%\.github\PULL_REQUEST_TEMPLATE.md"
 call :commit "PULL_REQUEST_TEMPLATE.md"
 
+ECHO.
 ECHO * Update .github\workflows
 md "%ROOT%\%FOLDER%\.github\workflows"
 xcopy /s /e /c /y %TEMPLATE%\.github\workflows "%ROOT%\%FOLDER%\.github\workflows"
 call :commit "Workflows"
+
+ECHO.
+ECHO * Update .dependabot
+md "%ROOT%\%FOLDER%\.dependabot"
+xcopy /s /e /c /y %TEMPLATE%\.dependabot "%ROOT%\%FOLDER%\.dependabot"
+call :commit "Dependabot"
 
 git push
 
