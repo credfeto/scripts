@@ -23,7 +23,7 @@ GOTO :finish
 :commit
 ECHO ************************ UPDATES FOUND *************************
 git add -A
-git commit -m"[FF-1429] Updating %~1 to match the template file"
+git commit -m"[FF-1429] Updating %~1 to match the template repo"
 
 ECHO *********************** UPDATE COMMITTED ***********************
 
@@ -70,6 +70,11 @@ ECHO.
 echo * Update .editorconfig
 copy /y /z %TEMPLATE%\.editorconfig "%ROOT%\%FOLDER%\.editorconfig"
 call :commit ".editorconfig"
+
+ECHO.
+echo * Update .gitleaks.toml
+copy /y /z %TEMPLATE%\.gitleaks.toml "%ROOT%\%FOLDER%\.gitleaks.toml"
+call :commit ".gitleaks.toml"
 
 ECHO.
 echo * Update src\CodeAnalysis.ruleset
