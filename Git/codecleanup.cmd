@@ -80,7 +80,7 @@ ECHO Build Code: %RC%
 IF NOT %RC% == 0 goto :noupdate
 
 REM Cleanup code
-cleanupcode.exe --profile="Built-in: Full Cleanup" %1 --properties:Configuration=Release
+cleanupcode.exe --profile="Full Cleanup" %1 --properties:Configuration=Release
 
 dotnet build --configuration=Release --no-restore -warnAsError
 SET RC=%ERRORLEVEL%
