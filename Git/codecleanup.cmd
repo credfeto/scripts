@@ -22,7 +22,7 @@ IF NOT %ERRORLEVEL% == 0 goto :branchalreadyexists
 
 :updateinexistingbranch
 git add -A
-git commit -m"[FF-1429] Code Cleanup on %SOLUTIONFILE%"
+git commit -m"[FF-2244] Code Cleanup on %SOLUTIONFILE%"
 SET RC=%ERRORLEVEL%
 ECHO Commit Code: %RC%
 IF NOT %RC% == 0 goto :branchalreadyexists
@@ -57,7 +57,7 @@ git reset head --hard
 git clean -f -x -d
 
 
-SET BRANCHNAME=cleanup/ff-1429-%SOLUTIONFILE%
+SET BRANCHNAME=cleanup/ff-2244-%SOLUTIONFILE%
 git remote update origin --prune
 git branch -D %BRANCHNAME%
 git remote update origin --prune
