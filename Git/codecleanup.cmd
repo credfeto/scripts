@@ -134,7 +134,7 @@ git prune
 git gc --aggressive --prune
 
 
-FOR /r %%F IN (*.sln) do CALL :cleanup %%F
+FOR %%F IN (src/*.sln) do CALL :cleanup %%~dpnxF
 
 ECHO.
 
