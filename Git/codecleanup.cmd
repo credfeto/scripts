@@ -49,7 +49,8 @@ SET SOLUTIONFILE=%~nx1
 ECHO * Performing code cleanup on %SOLUTIONFILE% 
 ECHO * In folder: %SOLUTIONFOLDER%
 pushd %SOLUTIONFOLDER%
-
+SET CACHESFOLDER=%TEMP%/%~pn1
+SET SETTINGSFILE=%~dpnx1.DotSettings
 git reset head --hard
 git clean -f -x -d
 git checkout master
@@ -80,7 +81,7 @@ ECHO Build Code: %RC%
 IF NOT %RC% == 0 goto :noupdate
 
 REM Cleanup code
-cleanupcode.exe --profile="Full Cleanup" %1 --properties:Configuration=Release
+cleanupcode.exe --profile="Full Cleanup" %1 --properties:Configuration=Release --caches-home:"%CACHESFOLDER%" --settings:"%SETTINGSFILE%" --verbosity:WARN --no-buildin-settings --no-builtin-settings
 
 dotnet build --configuration=Release --no-restore -warnAsError
 SET RC=%ERRORLEVEL%
@@ -134,7 +135,7 @@ git prune
 git gc --aggressive --prune
 
 
-FOR %%F IN (src/*.sln) do CALL :cleanup %%~dpnxF
+FOR %%F IN (src\*.sln) do CALL :cleanup %%~dpnxF
 
 ECHO.
 
