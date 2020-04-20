@@ -113,6 +113,7 @@ call :killfileandcommit .github\workflows\editorconfig.yml
 call :killfileandcommit .github\workflows\mergeconflicts.yml
 call :killfileandcommit .github\workflows\label.yml
 call :killfileandcommit .github\workflows\PRAssigner.yml
+call :killfileandcommit .github\workflows\dependabot-auto-merge.yml
 
 REM #########################################################
 REM # COMPLICATED UPDATES
