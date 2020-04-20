@@ -111,6 +111,8 @@ call ::updatefileandcommit .github\workflows\dependabot-auto-merge.yml
 for %%w in (%TEMPLATE%\.github\workflows\*.yml) DO call ::updatefileandcommit .github\workflows\%%~nxw
 call :killfileandcommit .github\workflows\editorconfig.yml
 call :killfileandcommit .github\workflows\mergeconflicts.yml
+call :killfileandcommit .github\workflows\label.yml
+call :killfileandcommit .github\workflows\PRAssigner.yml
 
 REM #########################################################
 REM # COMPLICATED UPDATES
