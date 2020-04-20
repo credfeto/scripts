@@ -1,5 +1,5 @@
 @echo off
-SETLOCAL
+SETLOCAL ENABLEDELAYEDEXPANSION
 IF "%TEMPLATE%" EQU "" SET TEMPLATE=D:\Work\funfair-server-template
 SET ROOT=%CD%
 ECHO %ROOT%
@@ -21,21 +21,51 @@ FOR /F %%a IN (%ROOT%\repos.lst) DO CALL :checkrepo %%a
 
 GOTO :finish
 
-:commit
-ECHO ************************ UPDATES FOUND *************************
-git add -A
-git commit -m"[FF-1429] Updating %~1 to match the template repo"
+:updatefile
+SET FILENAME=%~1
+SET TARGETFILE="%ROOT%\%FOLDER%\%FILENAME%"
+SET TARGETFOLDER=
+FOR %%f in (%TARGETFILE%) DO SET TARGETFOLDER=%%~dpf
+MD %TARGETFOLDER% > NUL 2>&1
+copy /y /z %TEMPLATE%\%FILENAME% "%TARGETFILE%"
+goto :EOF
 
-ECHO *********************** UPDATE COMMITTED ***********************
+:killfile
+SET FILENAME=%~1
+SET TARGETFILE="%ROOT%\%FOLDER%\%FILENAME%"
+del "%TARGETFILE%"
+goto :EOF
+
+
+:updatefileandcommit
+ECHO.
+echo ***********************************************************************
+echo * Update %1
+call :updatefile %1
+call :commit %1 Updating
+echo ***********************************************************************
+goto :EOF
+
+
+:killfileandcommit
+ECHO.
+echo ***********************************************************************
+echo * Kill %1
+call :killfile %1
+call :commit %1 Removing
+echo ***********************************************************************
+goto :EOF
+
+
+:commit
+git add -A
+git commit -m"[FF-1429] %2 %~1 to match the template repo"
 
 GOTO :EOF
 
 :completed
 ENDLOCAL
 GOTO :EOF
-
-
-
 
 :checkrepo
 SETLOCAL
@@ -66,36 +96,29 @@ git checkout master
 git reset head --hard
 git clean -f -x -d
 
-REM ALways overwrite
-ECHO.
-echo * Update .editorconfig
-copy /y /z %TEMPLATE%\.editorconfig "%ROOT%\%FOLDER%\.editorconfig"
-call :commit ".editorconfig"
+REM #########################################################
+REM # SIMPLE OVERWRITE UPDATES
+call :updatefileandcommit .editorconfig
+call :updatefileandcommit .gitleaks.toml
+call ::updatefileandcommit src\CodeAnalysis.ruleset
+call ::updatefileandcommit src\global.json
+call ::updatefileandcommit .github\pr-lint.yml
+call ::updatefileandcommit .github\CODEOWNERS
+call ::updatefileandcommit .github\PULL_REQUEST_TEMPLATE.md
+call ::updatefileandcommit .dependabot\config.yml
+call ::updatefileandcommit .github\workflows\cc.yml
+call ::updatefileandcommit .github\workflows\dependabot-auto-merge.yml
+for %%w in (%TEMPLATE%\.github\workflows\*.yml) DO call ::updatefileandcommit .github\workflows\%%~nxw
+call :killfileandcommit .github\workflows\editorconfig.yml
+call :killfileandcommit .github\workflows\mergeconflicts.yml
 
-ECHO.
-echo * Update .gitleaks.toml
-copy /y /z %TEMPLATE%\.gitleaks.toml "%ROOT%\%FOLDER%\.gitleaks.toml"
-call :commit ".gitleaks.toml"
-
-ECHO.
-echo * Update src\CodeAnalysis.ruleset
-copy /y /z %TEMPLATE%\src\CodeAnalysis.ruleset "%ROOT%\%FOLDER%\src\CodeAnalysis.ruleset"
-call :commit "CodeAnalysis.ruleset"
-
-ECHO.
-echo * Update src\global.json
-copy /y /z %TEMPLATE%\src\global.json "%ROOT%\%FOLDER%\src\global.json"
-call :commit "global.json"
-
+REM #########################################################
+REM # COMPLICATED UPDATES
 ECHO.
 echo * Update R# DotSettings
 for %%g in ("%ROOT%\%FOLDER%\src\*.sln") do copy /y /z %TEMPLATE%\src\FunFair.Template.sln.DotSettings %%g.DotSettings
 call :commit "Jetbrains DotSettings"
 
-ECHO.
-ECHO * update .github\pr-lint.yml
-copy %TEMPLATE%\.github\pr-lint.yml "%ROOT%\%FOLDER%\.github\pr-lint.yml"
-call :commit "PR Lint Settings"
 
 ECHO.
 ECHO * update .github\labeler.yml
@@ -103,28 +126,6 @@ type %TEMPLATE%\.github\labeler.yml > "%ROOT%\%FOLDER%\.github\labeler.yml"
 echo. >> "%ROOT%\%FOLDER%\.github\labeler.yml"
 IF EXIST "%ROOT%\%FOLDER%\.github\labeler.project-specific.yml" type "%ROOT%\%FOLDER%\.github\labeler.project-specific.yml" >> "%ROOT%\%FOLDER%\.github\labeler.yml"
 call :commit "Labeller Config"
-
-ECHO.
-ECHO * Update .github\CODEOWNERS
-copy /y /z %TEMPLATE%\.github\CODEOWNERS "%ROOT%\%FOLDER%\.github\CODEOWNERS"
-call :commit "Codeowners"
-
-ECHO.
-ECHO * Update .github\PULL_REQUEST_TEMPLATE.md
-copy /y /z %TEMPLATE%\.github\PULL_REQUEST_TEMPLATE.md "%ROOT%\%FOLDER%\.github\PULL_REQUEST_TEMPLATE.md"
-call :commit "PULL_REQUEST_TEMPLATE.md"
-
-ECHO.
-ECHO * Update .github\workflows
-md "%ROOT%\%FOLDER%\.github\workflows"
-xcopy /s /e /c /y %TEMPLATE%\.github\workflows "%ROOT%\%FOLDER%\.github\workflows"
-call :commit "Workflows"
-
-ECHO.
-ECHO * Update .dependabot
-md "%ROOT%\%FOLDER%\.dependabot"
-xcopy /s /e /c /y %TEMPLATE%\.dependabot "%ROOT%\%FOLDER%\.dependabot"
-call :commit "Dependabot"
 
 git push
 
@@ -134,10 +135,10 @@ ECHO.
 POPD
 
 
-ENDLOCAL
 GOTO :EOF
 
 
 
 
 :finish
+ENDLOCAL
