@@ -4,8 +4,8 @@ SET LOGFILE=C:\LOGS\Gallery.log
 SET REPOSITORY=C:\PhotoDB
 SET PHOTOSSOURCE=\\nas-01\Photos\Photos\Sorted
 SET METADATAOUTPUT=%REPOSITORY%\Source
-REM SET IMAGEOUTPUT=\\nas-02\GalleryUpload 
-SET IMAGEOUTPUT=C:\Gallery\ImageOutput
+SET IMAGEOUTPUT=\\nas-02\GalleryUpload 
+rem SET IMAGEOUTPUT=C:\Gallery\ImageOutput
 SET BROKENIMAGES=%REPOSITORY%\BrokenImages.csv
 SET SHORTURLS=%REPOSITORY%\ShortUrls.json
 SET WATERMARK=%REPOSITORY%\Watermark\XXWatermark.png
@@ -35,6 +35,7 @@ C:
 PUSHD %REPOSITORY%
 call :updateshorturls
 git reset head --hard
+git clean -f -x -d
 
 echo %DATE% %TIME% Getting latest source...
 git pull
