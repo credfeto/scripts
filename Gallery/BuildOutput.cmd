@@ -29,7 +29,7 @@ IF NOT EXIST %ROOT%\tools\Credfeto.Gallery.SiteIndexBuilder\lib\BuildSiteIndex.d
 
 SET STARTTIME=%DATE% %TIME%
 
-SET OUTPUTBUILDER="C:\Program Files\dotnet\dotnet.exe" "%ROOT%\tools\Credfeto.Gallery.OutputBuilder\lib\OutputBuilderClient.dll" -source %PHOTOSSOURCE% -output %METADATAOUTPUT% -imageoutput %IMAGEOUTPUT% -brokenImages %BROKENIMAGES% -shortUrls %SHORTURLS% -watermark %WATERMARK% -thumbnailSize %THUMBNAILSIZE% -quality JPEGQUALITY -resizes %RESIZES%
+SET OUTPUTBUILDER="C:\Program Files\dotnet\dotnet.exe" "%ROOT%\tools\Credfeto.Gallery.OutputBuilder\lib\OutputBuilderClient.dll" -source %PHOTOSSOURCE% -output %METADATAOUTPUT% -imageoutput %IMAGEOUTPUT% -brokenImages %BROKENIMAGES% -shortUrls %SHORTURLS% -watermark %WATERMARK% -thumbnailSize %THUMBNAILSIZE% -quality %JPEGQUALITY% -resizes %RESIZES%
 SET BUILDSITEINDEX="C:\Program Files\dotnet\dotnet.exe" "%ROOT%\tools\Credfeto.Gallery.SiteIndexBuilder\lib\BuildSiteIndex.dll"
 
 
