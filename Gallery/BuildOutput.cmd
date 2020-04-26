@@ -17,7 +17,6 @@ SET ROOT=%CD%
 ECHO %ROOT%
 
 if not exist %ROOT%\.config\dotnet-tools.json dotnet new tool-manifest
-dotnet tool update --local
 dotnet tool update --local Credfeto.Gallery.OutputBuilder
 dotnet tool update --local Credfeto.Gallery.SiteIndexBuilder
 
@@ -27,14 +26,10 @@ dotnet tool install --local Credfeto.Gallery.SiteIndexBuilder
 dotnet tool list --local
 
 
-rem IF NOT EXIST %ROOT%\tools\Credfeto.Gallery.OutputBuilder\lib\OutputBuilderClient.dll GOTO :finish
-rem IF NOT EXIST %ROOT%\tools\Credfeto.Gallery.SiteIndexBuilder\lib\BuildSiteIndex.dll GOTO :finish
-
 SET STARTTIME=%DATE% %TIME%
 
-SET OUTPUTBUILDER="C:\Program Files\dotnet\dotnet.exe" buildgalleryoutput -source %PHOTOSSOURCE% -output %METADATAOUTPUT% -imageoutput %IMAGEOUTPUT% -brokenImages %BROKENIMAGES% -shortUrls %SHORTURLS% -watermark %WATERMARK% -thumbnailSize %THUMBNAILSIZE% -quality %JPEGQUALITY% -resizes %RESIZES%
-SET BUILDSITEINDEX="C:\Program Files\dotnet\dotnet.exe" buildgallerysiteindex"
-
+SET OUTPUTBUILDER="dotnet buildgalleryoutput -source %PHOTOSSOURCE% -output %METADATAOUTPUT% -imageoutput %IMAGEOUTPUT% -brokenImages %BROKENIMAGES% -shortUrls %SHORTURLS% -watermark %WATERMARK% -thumbnailSize %THUMBNAILSIZE% -quality %JPEGQUALITY% -resizes %RESIZES%
+SET BUILDSITEINDEX=dotnet buildgallerysiteindex
 
 SET STARTTIME=%DATE% %TIME%
 C:
