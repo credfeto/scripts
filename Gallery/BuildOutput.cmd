@@ -19,16 +19,12 @@ ECHO %ROOT%
 if not exist %ROOT%\.config\dotnet-tools.json dotnet new tool-manifest
 dotnet tool update --local Credfeto.Gallery.OutputBuilder
 dotnet tool update --local Credfeto.Gallery.SiteIndexBuilder
-
-dotnet tool install --local Credfeto.Gallery.OutputBuilder
-dotnet tool install --local Credfeto.Gallery.SiteIndexBuilder
-
 dotnet tool list --local
 
 
 SET STARTTIME=%DATE% %TIME%
 
-SET OUTPUTBUILDER="dotnet buildgalleryoutput -source %PHOTOSSOURCE% -output %METADATAOUTPUT% -imageoutput %IMAGEOUTPUT% -brokenImages %BROKENIMAGES% -shortUrls %SHORTURLS% -watermark %WATERMARK% -thumbnailSize %THUMBNAILSIZE% -quality %JPEGQUALITY% -resizes %RESIZES%
+SET OUTPUTBUILDER=dotnet buildgalleryoutput -source %PHOTOSSOURCE% -output %METADATAOUTPUT% -imageoutput %IMAGEOUTPUT% -brokenImages %BROKENIMAGES% -shortUrls %SHORTURLS% -watermark %WATERMARK% -thumbnailSize %THUMBNAILSIZE% -quality %JPEGQUALITY% -resizes %RESIZES%
 SET BUILDSITEINDEX=dotnet buildgallerysiteindex
 
 SET STARTTIME=%DATE% %TIME%
@@ -42,14 +38,17 @@ echo %DATE% %TIME% Getting latest source...
 git pull
 
 echo %DATE% %TIME% Updating Output...
+PUSHD %ROOT%
 %OUTPUTBUILDER% > %LOGFILE%
+POPD
 
 call :updateshorturls
 call :updateall "Metadata"
 
 echo %DATE% %TIME% Updating Site Index...
+PUSHD %ROOT%
 rem %BUILDSITEINDEX% >> %LOGFILE%
- 
+POPD 
 call :updateshorturls
 call :updateall "Site Index"
 
