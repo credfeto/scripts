@@ -16,21 +16,24 @@ SET JPEGQUALITY=100
 SET ROOT=%CD%
 ECHO %ROOT%
 
-rd /s /q %ROOT%\tools
-md %ROOT%\tools
-cd %ROOT%\tools
-nuget.exe install Credfeto.Gallery.OutputBuilder -PreRelease -ExcludeVersion -Source https://www.myget.org/F/credfeto/api/v3/index.json
-nuget.exe install Credfeto.Gallery.SiteIndexBuilder -PreRelease -ExcludeVersion -Source https://www.myget.org/F/credfeto/api/v3/index.json
+if not exist %ROOT%\.config\dotnet-tools.json dotnet new tool-manifest
+dotnet tool update --local
+dotnet tool update --local Credfeto.Gallery.OutputBuilder
+dotnet tool update --local Credfeto.Gallery.SiteIndexBuilder
 
-cd %ROOT%
+dotnet tool install --local Credfeto.Gallery.OutputBuilder
+dotnet tool install --local Credfeto.Gallery.SiteIndexBuilder
 
-IF NOT EXIST %ROOT%\tools\Credfeto.Gallery.OutputBuilder\lib\OutputBuilderClient.dll GOTO :finish
-IF NOT EXIST %ROOT%\tools\Credfeto.Gallery.SiteIndexBuilder\lib\BuildSiteIndex.dll GOTO :finish
+dotnet tool list --local
+
+
+rem IF NOT EXIST %ROOT%\tools\Credfeto.Gallery.OutputBuilder\lib\OutputBuilderClient.dll GOTO :finish
+rem IF NOT EXIST %ROOT%\tools\Credfeto.Gallery.SiteIndexBuilder\lib\BuildSiteIndex.dll GOTO :finish
 
 SET STARTTIME=%DATE% %TIME%
 
-SET OUTPUTBUILDER="C:\Program Files\dotnet\dotnet.exe" "%ROOT%\tools\Credfeto.Gallery.OutputBuilder\lib\OutputBuilderClient.dll" -source %PHOTOSSOURCE% -output %METADATAOUTPUT% -imageoutput %IMAGEOUTPUT% -brokenImages %BROKENIMAGES% -shortUrls %SHORTURLS% -watermark %WATERMARK% -thumbnailSize %THUMBNAILSIZE% -quality %JPEGQUALITY% -resizes %RESIZES%
-SET BUILDSITEINDEX="C:\Program Files\dotnet\dotnet.exe" "%ROOT%\tools\Credfeto.Gallery.SiteIndexBuilder\lib\BuildSiteIndex.dll"
+SET OUTPUTBUILDER="C:\Program Files\dotnet\dotnet.exe" buildgalleryoutput -source %PHOTOSSOURCE% -output %METADATAOUTPUT% -imageoutput %IMAGEOUTPUT% -brokenImages %BROKENIMAGES% -shortUrls %SHORTURLS% -watermark %WATERMARK% -thumbnailSize %THUMBNAILSIZE% -quality %JPEGQUALITY% -resizes %RESIZES%
+SET BUILDSITEINDEX="C:\Program Files\dotnet\dotnet.exe" buildgallerysiteindex"
 
 
 SET STARTTIME=%DATE% %TIME%
