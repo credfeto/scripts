@@ -3,13 +3,9 @@
 SET ROOT=%CD%
 ECHO %ROOT%
 
-rd /s /q %ROOT%\tools
-md %ROOT%\tools
-cd %ROOT%\tools
-nuget.exe install Credfeto.UpdatePackages -ExcludeVersion -Source https://www.myget.org/F/credfeto/api/v3/index.json
-cd %ROOT%
-
-IF NOT EXIST %ROOT%\tools\Credfeto.UpdatePackages\lib\UpdatePackages.dll GOTO :finish
+if not exist %ROOT%\.config\dotnet-tools.json dotnet new tool-manifest
+dotnet tool update --local Credfeto.Package.Update
+dotnet tool install --local Credfeto.Package.Update
 
 FOR /F %%a IN (%ROOT%\repos.lst) DO CALL :checkrepo %%a
 
@@ -80,7 +76,7 @@ set GITBRANCH=
 for /f %%I in ('git.exe rev-parse --abbrev-ref HEAD 2^> NUL') do set GITBRANCH=%%I
 echo Current Branch: %GITBRANCH%
 
-dotnet %ROOT%\tools\Credfeto.UpdatePackages\lib\UpdatePackages.dll -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
+dotnet updatepackages -folder "%ROOT%\%FOLDER%" -prefix "%PACKAGE%"
 SET RC=%ERRORLEVEL%
 ECHO Update Code: %RC%
 IF NOT %RC% == 0 GOTO :noupdate
