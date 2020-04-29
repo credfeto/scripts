@@ -133,7 +133,8 @@ git checkout master
 git reset head --hard
 git clean -f -x -d
 git fetch
-git rebase
+REM NOTE Loses all local commmits on master
+git reset --hard origin/master
 git remote update origin --prune
 git prune
 git gc --aggressive --prune
