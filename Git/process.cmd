@@ -15,7 +15,7 @@ GOTO :finish
 ECHO ************************ UPDATES FOUND *************************
 git add -A
 git commit -m"FF-1429 Updated %WHAT% package (%PACKAGE%) to latest version"
-git push
+git push -v
 
 ECHO *********************** UPDATE COMMITTED ***********************
 
@@ -37,7 +37,7 @@ IF NOT %ERRORLEVEL% == 0 goto :branchalreadyexists
 :updateinexistingbranch
 git add -A
 git commit -m"[FF-1429] Updated %WHAT% package (%PACKAGE%) to latest version"
-git push --set-upstream origin %BRANCHNAME%
+git push --set-upstream origin %BRANCHNAME% -v
 git checkout master
 git branch -D %BRANCHNAME%
 git remote update origin --prune
