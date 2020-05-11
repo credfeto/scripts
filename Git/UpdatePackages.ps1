@@ -212,12 +212,6 @@ function processRepo($repo, $packages) {
 $repoList = Get-Content $repos | Select-Object
 $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
 
-Write-Host $packages.Length
-for($i = 0; $i -lt $packages.Length; ++$i){
-    Write-Host $packages[$i].packageId
-}
-
-
 ForEach($repo in $repoList) {
     processRepo -repo $repo -packages $packages
 }
