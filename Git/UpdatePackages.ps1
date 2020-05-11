@@ -1,10 +1,15 @@
 ﻿#########################################################################
 
+$ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = "False"
 $repos = "repos.lst"
 $packagesToUpdate = "packages.json" 
+$root = Get-Location
+$git="git"
+Write-Host $root
 
+$env:GIT_REDIRECT_STDERR="2>&1"
 
 #########################################################################
 
@@ -86,16 +91,120 @@ if($installed -eq $false) {
    
 }
 
-function processRepo($repo, $packages) {
-    Write-Host $repo
+function resetToMaster() {
 
-#    for($i = 0; $i -lt $packages.Length; ++$i){
-#        $package = $packages[$i]
-#        Write-Host $packages.packageId
-#    }
+    # junk any existing checked out files
+    & $git reset head --hard
+    & $git clean -f -x -d
+    & $git checkout master
+    & $git reset head --hard
+    & $git clean -f -x -d
+    & $git fetch
+
+    # NOTE Loses all local commmits on master
+    & $git reset --hard origin/master
+    & $git remote update origin --prune
+    & $git prune
+    & $git gc --aggressive --prune
+}
+
+function ensureSynchronised($repo, $repofolder) {
+
+    $githead = Join-Path -Path $repoFolder -ChildPath ".git" 
+    $githead = Join-Path -Path $githead -ChildPath "HEAD" 
+    
+    Write-Host $githead
+    $gitHeadCloned = Test-Path -path $githead
+
+    if ($gitHeadCloned -eq $True) {
+        Write-Host "Already Cloned"
+        Set-Location $repofolder
+
+        resetToMaster
+    }
+    else
+    {
+        & $git clone $repo
+        
+    }
+}
+
+function buildSolution($repoFolder) {
+
+    $srcFolder = Join-Path -Path $repoFolder -ChildPath "src"
+    Set-Location $srcFolder
+
+    Write-Host "Building Source in $srcFolder"
+    Write-Host " * Cleaning"
+    dotnet clean --configuration=Release 
+    if(!$?) {
+        # Didn't Build
+        return $false;
+    }
+
+    Write-Host " * Restoring"
+    dotnet restore
+    if(!$?) {
+        # Didn't Build
+        return $false;
+    }
+
+    Write-Host " * Building"
+    dotnet build --configuration=Release --no-restore -warnAsError
+    if(!$?) {
+        # Didn't Build
+        return $false;
+    }
+
+    # Should test here too?
+
+    return $true;
+}
+
+function checkForUpdates($repoFolder, $packageId) {
+
+    dotnet updatepackages -folder $repoFolder -prefix $packageId 
+
+    if($?) {
+        # has updates
+    }
+
+    return $null
+}
+
+function processRepo($repo, $packages) {
+    
+    Set-Location $root
+    
+    Write-Host "Processing Repo: $repo"
+
+    # Extract the folder from the repo name
+    $folder = $repo.Substring($repo.LastIndexOf("/")+1)
+    $folder = $folder.SubString(0, $folder.LastIndexOf("."))
+
+    Write-Host "Folder: $folder"
+    $repoFolder = Join-Path -Path $root -ChildPath $folder
+
+    ensureSynchronised -repo $repo -repofolder $repoFolder
+
+    $srcPath = $srcFolder = Join-Path -Path $repoFolder -ChildPath "src"
+    $srcExists = Test-Path -Path $srcPath
+    if($srcExists -eq $false) {
+        # no source to update
+        return;
+    }
+
+    $codeOK = buildSolution -repoFolder $repoFolder
+    if( $codeOk -eq $false) {
+        # no point updating
+        return;
+    }
+
 
     ForEach($package in $packages) {
-        Write-Host ' -> ' $package.packageId
+        Write-Host 'Looking for updates of' $package.packageId
+        $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId
+        Write-Host $update
     }
 }
 
@@ -112,6 +221,8 @@ for($i = 0; $i -lt $packages.Length; ++$i){
 ForEach($repo in $repoList) {
     processRepo -repo $repo -packages $packages
 }
+
+Set-Location $root
 
 
 
