@@ -1,4 +1,4 @@
-function buildSolution($repoFolder) {
+function buildSolution($repoFolder, $runTests = $true, $includeIntegrationTests = $false) {
 
     $srcFolder = Join-Path -Path $repoFolder -ChildPath "src"
     Set-Location $srcFolder
@@ -25,7 +25,24 @@ function buildSolution($repoFolder) {
         return $false;
     }
 
-    # Should test here too?
+    if($runTests -eq $true) {
+        if($includeIntegrationTests -eq $false) {
+            Write-Host " * Unit Tests"    
+            dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration
+            if(!$?) {
+                # Didn't Build
+                return $false;
+            }
+        }
+        else {
+            Write-Host " * Unit Tests and Integration Tests"    
+            dotnet test --configuration Release --no-build --no-restore
+            if(!$?) {
+                # Didn't Build
+                return $false;
+            }
+        }
+    }
 
     return $true;
 }

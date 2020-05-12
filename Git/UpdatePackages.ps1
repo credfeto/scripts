@@ -27,24 +27,23 @@ catch {
 #endregion
 
 
-$installed = installTool -packageId $packageIdToInstall -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']
-   } else {
-   Write-Host "#teamcity[buildStatus status='SUCCESS' text='Package $packageIdToInstall installed']
-   
-}
-
-
-
 function checkForUpdates($repoFolder, $packageId) {
 
-    dotnet updatepackages -folder $repoFolder -prefix $packageId 
+    $results = dotnet updatepackages -folder $repoFolder -prefix $packageId 
 
     if($?) {
+        
         # has updates
+        $packageIdAsRegex = $packageId.Replace(".", "\.")
+
+        if($results -match "^echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$") {
+            Write-Host " * Found" $Matches.Version
+            return $Matches.Version
+        }
+        else {
+            Write-Host " * Updates found"
+            return "latest"
+        }
     }
 
     return $null
@@ -80,12 +79,30 @@ function processRepo($repo, $packages) {
 
 
     ForEach($package in $packages) {
-        Write-Host 'Looking for updates of' $package.packageId
+        $packageId = $package.packageId
+        $type = $package.type
+
+        Write-Host 'Looking for updates of $packageId' 
         $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId
         Write-Host $update
+
+        $codeOK = buildSolution -repoFolder $repoFolder
+        if($codeOK -eq $true) {
+            commit -message "[FF-1429] Updating $packageId ($type) to $update"
+            push
+        }
     }
 }
 
+#########################################################################
+
+
+$installed = installTool -packageId $packageIdToInstall -preReleaseVersion $preRelease
+
+if($installed -eq $false) {
+    Write-Error ""
+	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
+}
 
 
 $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json

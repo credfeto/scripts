@@ -36,6 +36,17 @@ function ensureSynchronised($repo, $repofolder) {
     }
 }
 
+
+function commit($message) {
+    git add -A
+    git commit -m"$message"
+}
+
+function push()
+{
+    git push
+}
+
 function loadRepoList($repoFile) {
    return Get-Content $repos | Select-Object
 }
