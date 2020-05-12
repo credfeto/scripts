@@ -17,10 +17,9 @@ $env:GIT_REDIRECT_STDERR="2>&1"
 #
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 try {
-    . ("$ScriptDirectory\DotNetTool.ps1")
-    . ("$ScriptDirectory\GitUtils.ps1")
-    . ("$ScriptDirectory\DotNetBuild.ps1")
-#    . ("$ScriptDirectory\YourFile4.ps1")
+    . ( Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.ps1")
+    . (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.ps1")
+    . (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.ps1")
 }
 catch {
     Write-Host "Error while loading supporting PowerShell Scripts" 
