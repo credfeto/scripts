@@ -13,73 +13,20 @@ $env:GIT_REDIRECT_STDERR="2>&1"
 
 #########################################################################
 
-function findPreReleasePackageVersion( $packageId) {
-
-    Write-Host "Looking for latest version of $packageId (Includes pre-release)"
-
-    $packageIdRegex = $packageId.Replace(".", "\.")
-
-    $entry = &%teamcity.tool.NuGet.CommandLine.DEFAULT%\tools\nuget.exe list PackageId:$packageId -prerelease | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
-    
-    if($entry -eq $null) {
-        return $null
-    }
-
-
-    $splitEntry = $entry.Split(' ')
-    $id = $splitEntry[0]
-    $version = $splitEntry[1]
-
-    return $version
+# region Include required files
+#
+$ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+try {
+    . ("$ScriptDirectory\DotNetTool.ps1")
+    . ("$ScriptDirectory\GitUtils.ps1")
+    . ("$ScriptDirectory\DotNetBuild.ps1")
+#    . ("$ScriptDirectory\YourFile4.ps1")
 }
-
-function isInstalled($packageId) {
-    $packageIdRegex = $packageId.Replace(".", "\.").ToLowerInvariant();
-
-    $entry = &dotnet tool list --local | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
-
-	Write-Host "Found: $entry"
-    return $entry -ne $null;
+catch {
+    Write-Host "Error while loading supporting PowerShell Scripts" 
 }
+#endregion
 
-function removeTool($packageId) {
-
-    if(isInstalled -packageId $packageId) {
-
-        Write-Host "Removing currently installed $packageId"
-        dotnet tool uninstall --local $packageId
-    }
-}
-
-
-function installTool($packageId, $preReleaseVersion) {
-
-    $manifestExists = Test-Path -path '.config\dotnet-tools.json'
-    if ($manifestExists -ne $true)
-    {
-        dotnet new tool-manifest
-    }
-
-    removeTool -packageId $packageId
-
-    if($preReleaseVersion -eq $true) {
-        $version = findPreReleasePackageVersion -packageId $packageId
-
-        if( $version -ne $null) {
-            Write-Host "Installing $version of $packageId"
-            dotnet tool install --local $packageId --version $version
-            
-            $installed = isInstalled -packageId $packageId
-			return $installed
-        }
-    }
-
-    Write-Host "Installing latest release version of $packageId"
-    dotnet tool install --local $packageId
-    
-    $installed = isInstalled -packageId $packageId
-	return $installed
-}
 
 $installed = installTool -packageId $packageIdToInstall -preReleaseVersion $preRelease
 
@@ -91,75 +38,7 @@ if($installed -eq $false) {
    
 }
 
-function resetToMaster() {
 
-    # junk any existing checked out files
-    & $git reset head --hard
-    & $git clean -f -x -d
-    & $git checkout master
-    & $git reset head --hard
-    & $git clean -f -x -d
-    & $git fetch
-
-    # NOTE Loses all local commmits on master
-    & $git reset --hard origin/master
-    & $git remote update origin --prune
-    & $git prune
-    & $git gc --aggressive --prune
-}
-
-function ensureSynchronised($repo, $repofolder) {
-
-    $githead = Join-Path -Path $repoFolder -ChildPath ".git" 
-    $githead = Join-Path -Path $githead -ChildPath "HEAD" 
-    
-    Write-Host $githead
-    $gitHeadCloned = Test-Path -path $githead
-
-    if ($gitHeadCloned -eq $True) {
-        Write-Host "Already Cloned"
-        Set-Location $repofolder
-
-        resetToMaster
-    }
-    else
-    {
-        & $git clone $repo
-        
-    }
-}
-
-function buildSolution($repoFolder) {
-
-    $srcFolder = Join-Path -Path $repoFolder -ChildPath "src"
-    Set-Location $srcFolder
-
-    Write-Host "Building Source in $srcFolder"
-    Write-Host " * Cleaning"
-    dotnet clean --configuration=Release 
-    if(!$?) {
-        # Didn't Build
-        return $false;
-    }
-
-    Write-Host " * Restoring"
-    dotnet restore
-    if(!$?) {
-        # Didn't Build
-        return $false;
-    }
-
-    Write-Host " * Building"
-    dotnet build --configuration=Release --no-restore -warnAsError
-    if(!$?) {
-        # Didn't Build
-        return $false;
-    }
-
-    # Should test here too?
-
-    return $true;
-}
 
 function checkForUpdates($repoFolder, $packageId) {
 
