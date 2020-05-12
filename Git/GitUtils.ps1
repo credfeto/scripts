@@ -35,3 +35,7 @@ function ensureSynchronised($repo, $repofolder) {
         
     }
 }
+
+function loadRepoList($repoFile) {
+   return Get-Content $repos | Select-Object
+}

@@ -88,9 +88,10 @@ function processRepo($repo, $packages) {
 }
 
 
-$repoList = Get-Content $repos | Select-Object
+
 $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
 
+$repoList = loadRepoList -repos $repos
 ForEach($repo in $repoList) {
     processRepo -repo $repo -packages $packages
 }
