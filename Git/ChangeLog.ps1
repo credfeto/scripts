@@ -1,4 +1,4 @@
-﻿function extractReleaseNotes($changeLog, $buildNumber) {
+﻿function extractReleaseNotes($fileName, $buildNumber) {
     if($buildNumber.Contains('-'))
     {
         $buildNumber = "unreleased"
@@ -10,7 +10,7 @@
 
     #Write-Host "Source Build:" $buildNumber
 
-    $text = Get-Content $changeLog
+    $text = Get-Content $fileName
 
     $foundStart = -1
     $foundEnd = -1
@@ -75,6 +75,70 @@
     return $releaseNotes.Trim()
 }
 
+function CreateEmptyChangelog($fileName) {
+
+$output = "# Changelog
+All notable changes to this project will be documented in this file.
+
+<!--
+Please ADD ALL Changes to the UNRELASED SECTION and not a specific release
+-->
+
+## [Unreleased]
+### Added
+### Fixed
+### Changed
+### Removed
+### Deployment Changes
+
+<!-- 
+Releases that have at least been deployed to staging, BUT NOT necessarily released to live.  Changes should be moved from [Unreleased] into here as they are merged into the appropriate release branch
+-->
+## [0.0.0] - Project created
+"
+
+    Set-Content -Path $fileName -Value $output
+}
+
 function UpdateChangelog($fileName, $entryType, $code, $message) {
-# todo
+    $changeLogExists = Test-Path -path $fileName
+    if ($changeLogExists -ne $true)
+    {
+        CreateEmptyChangelog -fileName $fileName
+    }
+
+
+    $text = Get-Content $fileName
+
+    $output = ""
+    $foundUnreleased = $false
+    $done = $false
+
+    for($i=1; $i -lt $text.Length; $i++)
+    {
+        $line = $text[$i].TrimEnd()
+        $output = $output + $line + "`n"
+        if($done -eq $true) {
+            Continue
+        }
+
+        if($foundUnreleased -eq $false) {
+            if($line -eq "## [Unreleased]") {
+                $foundUnreleased = $true
+                Continue
+            }
+        }
+        else {
+            if( $line -eq "### $entryType") {
+                Write-Host "*** Changing Changelog ***"
+                $output = $output + "- $code - $message`n"
+                $done = $true;
+            }
+        }
+    }
+
+    Set-Content -Path $fileName -Value $output
 } 
+
+
+#updateChangeLog -fileName "C:\Work\funfair-casino-server\CHANGELOG.md" -entryType "Changed" -code "FF-1234" -message "Updated it"

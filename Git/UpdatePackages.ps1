@@ -47,6 +47,7 @@ function checkForUpdates($repoFolder, $packageId) {
         }
     }
 
+    Write-Host " * No Changes"
     return $null
 }
 
@@ -87,6 +88,9 @@ function processRepo($repo, $packages) {
 
         Write-Host "Looking for updates of $packageId"
         $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId
+        if($update -eq $null) {
+            Continue
+        }
         Write-Host $update
 
         $codeOK = buildSolution -repoFolder $repoFolder
