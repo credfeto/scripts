@@ -20,6 +20,7 @@ try {
     . ( Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.ps1")
     . (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.ps1")
     . (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.ps1")
+    . (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.ps1")
 }
 catch {
     Write-Host "Error while loading supporting PowerShell Scripts" 
@@ -82,7 +83,7 @@ function processRepo($repo, $packages) {
         $packageId = $package.packageId
         $type = $package.type
 
-        Write-Host 'Looking for updates of $packageId' 
+        Write-Host "Looking for updates of $packageId"
         $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId
         Write-Host $update
 
