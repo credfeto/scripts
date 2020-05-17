@@ -36,16 +36,25 @@ function ensureSynchronised($repo, $repofolder) {
     }
 }
 
+function createBanch($branchName) {
+    $el = git checkout -b $branchName
+    return $el -eq 0
+}
 
 function commit($message) {
     git add -A
     git commit -m"$message"
 }
 
-function push()
+function push() 
 {
     git push
 }
+
+function pushOrigin($branchName) {
+    git push --set-upstream origin $branchName -v
+}
+
 
 function loadRepoList($repoFile) {
    return Get-Content $repos | Select-Object

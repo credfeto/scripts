@@ -91,6 +91,16 @@ function processRepo($repo, $packages) {
             commit -message "[FF-1429] Updating $packageId ($type) to $update"
             push
         }
+        else {
+            $branchName = "depends/ff-1429-update-$packageId/$update"
+            $branchOk = createBranch -name $branchName
+            if($branchOk -eq $true) {
+                commit 
+                pushOrigin 
+            }
+
+            resetToMaster
+        }
     }
 }
 
