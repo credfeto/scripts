@@ -65,12 +65,14 @@ function processRepo($repo, $packages) {
 
     ensureSynchronised -repo $repo -repofolder $repoFolder
 
-    $srcPath = $srcFolder = Join-Path -Path $repoFolder -ChildPath "src"
+    $srcPath = Join-Path -Path $repoFolder -ChildPath "src"
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $false) {
         # no source to update
         return;
     }
+
+    $changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
 
     $codeOK = buildSolution -repoFolder $repoFolder
     if( $codeOk -eq $false) {
@@ -89,6 +91,7 @@ function processRepo($repo, $packages) {
 
         $codeOK = buildSolution -repoFolder $repoFolder
         if($codeOK -eq $true) {
+            UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
             commit -message "[FF-1429] Updating $packageId ($type) to $update"
             push
         }
@@ -96,6 +99,7 @@ function processRepo($repo, $packages) {
             $branchName = "depends/ff-1429-update-$packageId/$update"
             $branchOk = createBranch -name $branchName
             if($branchOk -eq $true) {
+                UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                 commit 
                 pushOrigin 
             }
