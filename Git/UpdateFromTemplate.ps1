@@ -1,7 +1,7 @@
 ﻿#########################################################################
 
 $ErrorActionPreference = "Stop" 
-$templateRepo = "%TEMPLATE%"
+$templateRepo = "git@github.com:funfair-tech/funfair-server-template.git"
 $repos = "repos.lst"
 $root = Get-Location
 $git="git"
@@ -25,7 +25,18 @@ catch {
 }
 #endregion
 
-function updateFileAndCommit($srcRepo, $targetRepo, $filename, $message) {
+function updateFileAndCommit($sourceRepo, $targetRepo, $filename) {
+
+    Write-Host $filename
+
+    $srcPath = Join-Path -Path $sourceRepo -ChildPath $filename
+    $trgPath = Join-Path -Path $targetRepo -ChildPath $filename
+
+    Write-Host $srcPath
+    Write-Host $trgPath
+
+    #$cp = Copy-Item $srcPath -Destination $trgPath
+    #Write-Host $cp
 }
 
 function processRepo($srcRepo, $repo) {
@@ -54,16 +65,16 @@ function processRepo($srcRepo, $repo) {
 
     #########################################################
     # SIMPLE OVERWRITE UPDATES
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName ".editorconfig"
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName ".gitleaks.toml"
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName "src\CodeAnalysis.ruleset"
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName "src\global.json"
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName ".github\pr-lint.yml"
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName ".github\CODEOWNERS"
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName ".github\PULL_REQUEST_TEMPLATE.md"
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName ".dependabot\config.yml"
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName ".github\workflows\cc.yml"
-    updatefileandcommit -srcRepo $srcRepo -targetRepo $folder -fileName ".github\workflows\dependabot-auto-merge.yml"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".editorconfig"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".gitleaks.toml"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\pr-lint.yml"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\CODEOWNERS"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\PULL_REQUEST_TEMPLATE.md"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".dependabot\config.yml"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\workflows\cc.yml"
+    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\workflows\dependabot-auto-merge.yml"
 
     # for %%w in (%TEMPLATE%\.github\workflows\*.yml) DO call ::updatefileandcommit .github\workflows\%%~nxw
 
@@ -86,8 +97,25 @@ function processRepo($srcRepo, $repo) {
 
 
 $repoList = loadRepoList -repos $repos
+
+
+Set-Location $root
+    
+Write-Host "Loading template: $templateRepo"
+
+# Extract the folder from the repo name
+$templateFolder = $templateRepo.Substring($templateRepo.LastIndexOf("/")+1)
+$templateFolder = $templateFolder.SubString(0, $templateFolder.LastIndexOf("."))
+
+Write-Host "Template Folder: $templateFolder"
+$templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
+
+ensureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
+
+Set-Location $root
+
 ForEach($repo in $repoList) {
-    processRepo -template $template -repo $repo -packages $packages
+    processRepo -srcRepo $templateRepoFolder -repo $repo
 }
 
 Set-Location $root
