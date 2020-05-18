@@ -35,6 +35,16 @@ function updateFileAndCommit($sourceRepo, $targetRepo, $filename) {
     Write-Host $srcPath
     Write-Host $trgPath
 
+    $srcExists = Test-Path -Path $srcPath
+    $trgExists = Test-Path -Path $trgPath
+
+    if($srcExists -eq $true) {
+        Write-Host "---Copy"
+    }
+    elseif($trgExists -eq $true) {
+        Write-Host "---Delete"
+    }
+
     #$cp = Copy-Item $srcPath -Destination $trgPath
     #Write-Host $cp
 }
@@ -73,10 +83,16 @@ function processRepo($srcRepo, $repo) {
     updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\CODEOWNERS"
     updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\PULL_REQUEST_TEMPLATE.md"
     updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".dependabot\config.yml"
-    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\workflows\cc.yml"
-    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\workflows\dependabot-auto-merge.yml"
 
+    
     # for %%w in (%TEMPLATE%\.github\workflows\*.yml) DO call ::updatefileandcommit .github\workflows\%%~nxw
+
+    $workflows = Join-Path -Path $srcRepo -ChildPath ".github\workflows"
+    $files = Get-ChildItem -Path $workflows -Filter *.yml
+    ForEach($file in $files) {
+	    $fileToUpdate = ".github\workflows\$file"
+        updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
+    }
 
 
     #REM #########################################################
