@@ -128,6 +128,10 @@ $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
 
 $repoList = loadRepoList -repos $repos
 ForEach($repo in $repoList) {
+    if($repo.Trim() -eq "") {
+        continue
+    }
+
     processRepo -repo $repo -packages $packages
 }
 
