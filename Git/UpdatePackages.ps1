@@ -33,10 +33,14 @@ function checkForUpdates($repoFolder, $packageId) {
     $results = dotnet updatepackages -folder $repoFolder -prefix $packageId 
 
     if($?) {
+
+        Write-Host $results
         
         # has updates
         $packageIdAsRegex = $packageId.Replace(".", "\.")
-        if($results -match "^echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$") {
+        $regex = "^echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
+        Write-Host $regex
+        if($results -match $regex) {
             Write-Host " * Found" $Matches.Version
             return $Matches.Version
         }
@@ -46,7 +50,7 @@ function checkForUpdates($repoFolder, $packageId) {
         }
     }
 
-    Write-Host $results
+    
 
     Write-Host " * No Changes"    
     return $null

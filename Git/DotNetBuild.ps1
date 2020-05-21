@@ -8,6 +8,7 @@ function buildSolution($repoFolder, $runTests = $true, $includeIntegrationTests 
     dotnet clean --configuration=Release 
     if(!$?) {
         # Didn't Build
+        Write-Host ">>> Clean Failed"
         return $false;
     }
 
@@ -15,12 +16,14 @@ function buildSolution($repoFolder, $runTests = $true, $includeIntegrationTests 
     dotnet restore
     if(!$?) {
         # Didn't Build
+        Write-Host ">>> Restore Failed"
         return $false;
     }
 
     Write-Host " * Building"
     dotnet build --configuration=Release --no-restore -warnAsError
     if(!$?) {
+        Write-Host ">>> Build Failed"
         # Didn't Build
         return $false;
     }
@@ -33,6 +36,7 @@ function buildSolution($repoFolder, $runTests = $true, $includeIntegrationTests 
                 dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration
                 if(!$?) {
                     # Didn't Build
+                    Write-Host ">>> Tests Failed"
                     return $false;
                 }
             }
@@ -41,11 +45,13 @@ function buildSolution($repoFolder, $runTests = $true, $includeIntegrationTests 
                 dotnet test --configuration Release --no-build --no-restore
                 if(!$?) {
                     # Didn't Build
+                    Write-Host ">>> Tests Failed"
                     return $false;
                 }
             }
          } catch  {
             # Didn't Build
+            Write-Host ">>> Tests Failed"
             return $false;
         }
     }
