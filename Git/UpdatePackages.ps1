@@ -75,7 +75,7 @@ function processRepo($repo, $packages) {
         return;
     }
 
-    $projects = Get-ChildItem -Path $srcPath -Filter *.csproj
+    $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
     if($projects.Length -eq 0) {
         # no source to update
         Write-Host "* No C# projects in repo"
