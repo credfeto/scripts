@@ -36,7 +36,7 @@ function ensureSynchronised($repo, $repofolder) {
     }
 }
 
-function createBanch($branchName) {
+function createBranch($branchName) {
     $el = git checkout -b $branchName
     return $el -eq 0
 }
