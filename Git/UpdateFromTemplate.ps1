@@ -163,6 +163,22 @@ function processRepo($srcRepo, $repo) {
 	    $fileToUpdate = ".github\workflows\$file"
         updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
     }
+
+
+    #########################################################
+    # COMPLICATED UPDATES
+    #echo * Update R# DotSettings
+    #for %%g in ("%ROOT%\%FOLDER%\src\*.sln") do copy /y /z %TEMPLATE%\src\FunFair.Template.sln.DotSettings %%g.DotSettings
+    #call :commit "Jetbrains DotSettings"
+    #
+    #
+    #ECHO.
+    #ECHO * update .github\labeler.yml
+    #type %TEMPLATE%\.github\labeler.yml > "%ROOT%\%FOLDER%\.github\labeler.yml"
+    #echo. >> "%ROOT%\%FOLDER%\.github\labeler.yml"
+    #IF EXIST "%ROOT%\%FOLDER%\.github\labeler.project-specific.yml" type "%ROOT%\%FOLDER%\.github\labeler.project-specific.yml" >> "%ROOT%\%FOLDER%\.github\labeler.yml"
+    #call :commit "Labeller Config"
+
 }
 
 
