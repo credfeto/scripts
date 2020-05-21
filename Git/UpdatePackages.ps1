@@ -46,6 +46,8 @@ function checkForUpdates($repoFolder, $packageId) {
         }
     }
 
+    Write-Host $results
+
     Write-Host " * No Changes"    
     return $null
 }
