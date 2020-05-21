@@ -71,8 +71,17 @@ function processRepo($repo, $packages) {
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $false) {
         # no source to update
+        Write-Host "* No src folder in repo"
         return;
     }
+
+    $projects = Get-ChildItem -Path $srcPath -Filter *.csproj
+    if($projects.Length -eq 0) {
+        # no source to update
+        Write-Host "* No C# projects in repo"
+        return;
+    }
+
 
     $changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
 
