@@ -117,7 +117,7 @@ function UpdateChangelog($fileName, $entryType, $code, $message) {
     $foundUnreleased = $false
     $done = $false
 
-    for($i=1; $i -lt $text.Length; $i++)
+    for($i=0; $i -lt $text.Length; $i++)
     {
         $line = $text[$i].TrimEnd()
         $output = $output + $line + "`n"
