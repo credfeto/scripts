@@ -86,6 +86,7 @@ function processRepo($repo, $packages) {
     $codeOK = buildSolution -repoFolder $repoFolder
     if( $codeOk -eq $false) {
         # no point updating
+        Write-Host "* Solution doesn't build without any changes - no point in trying to update packages"
         return;
     }
 
