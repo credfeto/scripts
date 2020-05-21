@@ -32,8 +32,6 @@ function checkForUpdates($repoFolder, $packageId) {
 
     $results = dotnet updatepackages -folder $repoFolder -prefix $packageId 
 
-    Write-Host $results
-
     if($?) {
         
         # has updates

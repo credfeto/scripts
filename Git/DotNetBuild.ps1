@@ -26,21 +26,27 @@ function buildSolution($repoFolder, $runTests = $true, $includeIntegrationTests 
     }
 
     if($runTests -eq $true) {
-        if($includeIntegrationTests -eq $false) {
-            Write-Host " * Unit Tests"    
-            dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration
-            if(!$?) {
-                # Didn't Build
-                return $false;
+        try
+        {
+            if($includeIntegrationTests -eq $false) {
+                Write-Host " * Unit Tests"    
+                dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration
+                if(!$?) {
+                    # Didn't Build
+                    return $false;
+                }
             }
-        }
-        else {
-            Write-Host " * Unit Tests and Integration Tests"    
-            dotnet test --configuration Release --no-build --no-restore
-            if(!$?) {
-                # Didn't Build
-                return $false;
+            else {
+                Write-Host " * Unit Tests and Integration Tests"    
+                dotnet test --configuration Release --no-build --no-restore
+                if(!$?) {
+                    # Didn't Build
+                    return $false;
+                }
             }
+         } catch  {
+            # Didn't Build
+            return $false;
         }
     }
 
