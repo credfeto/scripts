@@ -97,10 +97,13 @@ Releases that have at least been deployed to staging, BUT NOT necessarily releas
 ## [0.0.0] - Project created
 "
 
+    Write-Host "* Creating Empty Changelog"
     Set-Content -Path $fileName -Value $output
 }
 
 function UpdateChangelog($fileName, $entryType, $code, $message) {
+    Write-Host ">>> Updating Changelog <<<"
+
     $changeLogExists = Test-Path -path $fileName
     if ($changeLogExists -ne $true)
     {
@@ -130,15 +133,19 @@ function UpdateChangelog($fileName, $entryType, $code, $message) {
         }
         else {
             if( $line -eq "### $entryType") {
-                Write-Host "*** Changing Changelog ***"
+                Write-Host "* Changelog Insert position added"
                 $output = $output + "- $code - $message`n"
                 $done = $true;
             }
         }
     }
 
-    Set-Content -Path $fileName -Value $output
-} 
+    if($done -eq $true) {
+        Write-Host "* Saving Changelog"
+        Set-Content -Path $fileName -Value $output
+    }
+    else {
+        Write-Host "* Changelog NOT Updated"
+    }
 
-
-#updateChangeLog -fileName "C:\Work\funfair-casino-server\CHANGELOG.md" -entryType "Changed" -code "FF-1234" -message "Updated it"
+}
