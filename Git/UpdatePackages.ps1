@@ -37,19 +37,18 @@ function checkForUpdates($repoFolder, $packageId) {
         Write-Host $results
         
         # has updates
-        $packageIdAsRegex = $packageId.Replace(".", "\.")
-        $regex = "^echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
-        Write-Host $regex
-        if($results -match $regex) {
-            Write-Host " * Found" $Matches.Version
-            return $Matches.Version
-        }
-        else {
-            Write-Host " * Updates found"
-            return "latest"
+        $packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
+        $regexPattern = "echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
+        Write-Host $regexPattern
+
+        $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
+        $matches = $regex.Matches($results.ToLower());
+        if($matches.Count -gt 0) {
+            $version = $matches[0].Groups["Version"].Value
+            Write-Host "Found: $version"
+            return $version
         }
     }
-
     
 
     Write-Host " * No Changes"    
@@ -95,7 +94,6 @@ function processRepo($repo, $packages) {
         Write-Host "* Solution doesn't build without any changes - no point in trying to update packages"
         return;
     }
-
 
     ForEach($package in $packages) {
         $packageId = $package.packageId
