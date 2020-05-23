@@ -25,33 +25,37 @@ catch {
 }
 #endregion
 
-function updateFile($sourceRepo, $targetRepo, $filename) {
-    Write-Host "Checking $filename"
-
-    $srcPath = Join-Path -Path $sourceRepo -ChildPath $filename
-    $trgPath = Join-Path -Path $targetRepo -ChildPath $filename
-
-    $srcExists = Test-Path -Path $srcPath
-    $trgExists = Test-Path -Path $trgPath
+function updateOneFile($sourceFileName, $targetFileName) {
+    $srcExists = Test-Path -Path $sourceFileName
+    $trgExists = Test-Path -Path $targetFileName
 
     if($srcExists -eq $true) {
-        $srcHash = Get-FileHash -Path $srcPath -Algorithm SHA512
-        $trgHash = Get-FileHash -Path $trgPath -Algorithm SHA512
+        $srcHash = Get-FileHash -Path $sourceFileName -Algorithm SHA512
+        $trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
         
         if($srcHash -ne $trgHash) {
             Write-Host "--- Copy"
-            Copy-Item $srcPath -Destination $trgPath
+            Copy-Item $sourceFileName -Destination $targetFileName
             return $true
         }
     }
     elseif($trgExists -eq $true) {
         Write-Host "--- Delete"
-        Remove-Item -Path $trgPath
+        Remove-Item -Path $targetFileName
 
         return $null
     }
 
     return $false;
+}
+
+function updateFile($sourceRepo, $targetRepo, $filename) {
+    Write-Host "Checking $filename"
+
+    $sourceFileName = Join-Path -Path $sourceRepo -ChildPath $filename
+    $targetFileName = Join-Path -Path $targetRepo -ChildPath $filename
+
+    return updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
 }
 
 function doCommit($fileName) {
@@ -122,6 +126,22 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $filename) {
     return $false;
 }
 
+function updateResharperSettings($srcRepo, $trgRepo) {
+    $sourceFileName = Join-Path -Path $srcRepo -ChildPath "src\FunFair.Template.sln.DotSettings"
+    $files = Get-ChildItem -Path $repoFolder -Filter *.sln -Recurse
+    ForEach($file in $files) {
+        $targetFileName = $file.FullName
+        $targetFileName = $targetFileName + ".DotSettings"
+
+        Write-Host "Update $targetFileName"
+        $ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
+        if($ret -ne $null) {
+            doCommit -message "Resharper settings"
+            push
+        }
+    }
+}
+
 function processRepo($srcRepo, $repo) {
     
     Set-Location $root
@@ -168,6 +188,8 @@ function processRepo($srcRepo, $repo) {
     #########################################################
     # COMPLICATED UPDATES
     #echo * Update R# DotSettings
+    updateResharperSettings -srcRepo $srcRepo -trgRepo $repoFolder
+
     #for %%g in ("%ROOT%\%FOLDER%\src\*.sln") do copy /y /z %TEMPLATE%\src\FunFair.Template.sln.DotSettings %%g.DotSettings
     #call :commit "Jetbrains DotSettings"
     #
