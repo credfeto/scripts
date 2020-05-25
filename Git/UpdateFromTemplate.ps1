@@ -49,25 +49,25 @@ function updateOneFile($sourceFileName, $targetFileName) {
     return $false;
 }
 
-function updateFile($sourceRepo, $targetRepo, $filename) {
-    Write-Host "Checking $filename"
+function updateFile($sourceRepo, $targetRepo, $fileName) {
+    Write-Host "Checking $fileName"
 
-    $sourceFileName = Join-Path -Path $sourceRepo -ChildPath $filename
-    $targetFileName = Join-Path -Path $targetRepo -ChildPath $filename
+    $sourceFileName = Join-Path -Path $sourceRepo -ChildPath $fileName
+    $targetFileName = Join-Path -Path $targetRepo -ChildPath $fileName
 
     return updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
 }
 
 function doCommit($fileName) {
-    commit -message "[FF-1429] - Update $filename to match the template repo"
+    commit -message "[FF-1429] - Update $fileName to match the template repo"
 }
 
-function updateFileAndCommit($sourceRepo, $targetRepo, $filename) {
+function updateFileAndCommit($sourceRepo, $targetRepo, $fileName) {
 
-    $ret = updateFile -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $filename
+    $ret = updateFile -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $fileName
 
     if($ret -ne $null) {
-        doCommit -message $filename
+        doCommit -message $fileName
         push
     }    
 }
@@ -91,26 +91,26 @@ function hasCodeToBuild($targetRepo) {
     return $true
 }
 
-function updateFileBuildAndCommit($sourceRepo, $targetRepo, $filename) {
+function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
     $canBuild = hasCodeToBuild -targetRepo $targetRepo
     if($canBuild -eq $false) {
-        return updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $filename
+        return updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $fileName
     }
 
-    $ret = updateFile -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $filename
+    $ret = updateFile -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $fileName
     if($ret -ne $null) {
         
         if($ret -eq $true) {
             $codeOK = buildSolution -repoFolder $repoFolder
             if($codeOK -eq $true) {
-                doCommit -fileName $filename
+                doCommit -fileName $fileName
                 push
             }
             else {
-                $branchName = "template/ff-1429-$filename".Replace("\", "/")
+                $branchName = "template/ff-1429-$fileName".Replace("\", "/")
                 $branchOk = createBranch -name $branchName
                 if($branchOk -eq $true) {
-                    doCommit -fileName $filename
+                    doCommit -fileName $fileName
                     pushOrigin 
                 }
 
@@ -119,7 +119,7 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $filename) {
             
         }
 
-        doCommit -message $filename
+        doCommit -message $fileName
         return $true;
     }
 
@@ -142,6 +142,30 @@ function updateResharperSettings($srcRepo, $trgRepo) {
     }
 }
 
+function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileName) {
+    
+    $targetFileName = Join-Path -Path $trgRepo -ChildPath $fileName
+    $targetMergeFileName = Join-Path -Path $trgRepo -ChildPath $mergeFileName
+
+    $targetMergeFileNameExists = Test-Path -Path $targetMergeFileName
+    if($targetMergeFileNameExists -eq $true) {
+        Write-Host "Found $mergeFileName"
+        $sourceFileName = Join-Path -Path $srcRepo -ChildPath $fileName
+        $srcContent = Get-Content -Path $sourceFileName
+        $mergeContent = Get-Content -Path $targetMergeFileName
+
+        $trgContent =$srcRepo + "'n" + $mergeContent + "'n"
+
+        Set-Content -Path $trgContent -Value $trgContent
+        doCommit -message $fileName
+
+
+    } else {
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $fileName
+    }
+
+}
+
 function processRepo($srcRepo, $repo) {
     
     Set-Location $root
@@ -162,34 +186,37 @@ function processRepo($srcRepo, $repo) {
     if($srcExists -eq $true) {
         
         # Process files in src folder
-        updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
-        updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
     
     }
 
 
     #########################################################
     # SIMPLE OVERWRITE UPDATES
-    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".editorconfig"
-    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".gitleaks.toml"
-    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\pr-lint.yml"
-    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\CODEOWNERS"
-    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\PULL_REQUEST_TEMPLATE.md"
-    updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".dependabot\config.yml"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".editorconfig"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".gitleaks.toml"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\pr-lint.yml"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\CODEOWNERS"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\PULL_REQUEST_TEMPLATE.md"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".dependabot\config.yml"
 
     $workflows = Join-Path -Path $srcRepo -ChildPath ".github\workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml
     ForEach($file in $files) {
 	    $fileToUpdate = ".github\workflows\$file"
-        updatefileandcommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
     }
 
 
     #########################################################
     # COMPLICATED UPDATES
-    #echo * Update R# DotSettings
+    
+    # Update R# DotSettings
     updateResharperSettings -srcRepo $srcRepo -trgRepo $repoFolder
 
+
+    updateAndMergeFileAndComit -srcRepo $srcRepo -trgRepo $repoFolder -fileName ".github\labeler.yml" -mergeFileName ".github\labeler.project-specific.yml"
     #for %%g in ("%ROOT%\%FOLDER%\src\*.sln") do copy /y /z %TEMPLATE%\src\FunFair.Template.sln.DotSettings %%g.DotSettings
     #call :commit "Jetbrains DotSettings"
     #
