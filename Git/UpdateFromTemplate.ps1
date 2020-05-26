@@ -261,6 +261,10 @@ ensureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 Set-Location $root
 
 ForEach($repo in $repoList) {
+    if($repo.Trim() -eq "") {
+        continue
+    }
+
     processRepo -srcRepo $templateRepoFolder -repo $repo
 }
 
