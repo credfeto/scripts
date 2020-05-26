@@ -58,6 +58,8 @@ function updateFile($sourceRepo, $targetRepo, $fileName) {
     Write-Host "Checking $fileName"
 
     $sourceFileName = Join-Path -Path $sourceRepo -ChildPath $fileName
+
+    Write-Host "Checking $fileName (2)"
     $targetFileName = Join-Path -Path $targetRepo -ChildPath $fileName
 
     return updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
@@ -171,6 +173,14 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
 
 }
 
+function ensureFolderExists($baseFolder, $subFolder) {
+    $fullPath = Join-Path -Path $baseFolder -ChildPath $subFolder
+    $exists = Test-Path -Path $fullPath -PathType Container
+    if($exists -eq $false) {
+        New-Item -Path $baseFolder -Name $subFolder -ItemType "directory"
+    }
+}
+
 function processRepo($srcRepo, $repo) {
     
     Set-Location $root
@@ -186,6 +196,16 @@ function processRepo($srcRepo, $repo) {
 
     ensureSynchronised -repo $repo -repofolder $repoFolder
 
+    #########################################################
+    # CREATE ANY FOLDERS THAT ARE NEEDED
+    ensureFolderExists -baseFolder $repoFolder -subFolder "src"
+    ensureFolderExists -baseFolder $repoFolder -subFolder ".github"
+    ensureFolderExists -baseFolder $repoFolder -subFolder ".github\workflows"
+    ensureFolderExists -baseFolder $repoFolder -subFolder ".dependabot"
+
+
+    #########################################################
+    # C# file updates
     $srcPath = Join-Path -Path $repoFolder -ChildPath "src"
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $true) {
@@ -195,7 +215,6 @@ function processRepo($srcRepo, $repo) {
         updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
     
     }
-
 
     #########################################################
     # SIMPLE OVERWRITE UPDATES
