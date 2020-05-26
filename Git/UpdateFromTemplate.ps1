@@ -58,8 +58,6 @@ function updateFile($sourceRepo, $targetRepo, $fileName) {
     Write-Host "Checking $fileName"
 
     $sourceFileName = Join-Path -Path $sourceRepo -ChildPath $fileName
-
-    Write-Host "Checking $fileName (2)"
     $targetFileName = Join-Path -Path $targetRepo -ChildPath $fileName
 
     return updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
