@@ -1,8 +1,13 @@
 ﻿#########################################################################
 
+param(
+    [string] $repos = $(throw "repos.lst file containing list of repositories"),
+    [string] $templateRepo = $(throw "Template repo")
+)
+
 $ErrorActionPreference = "Stop" 
-$templateRepo = "git@github.com:funfair-tech/funfair-server-template.git"
-$repos = "repos.lst"
+#$templateRepo = "git@github.com:funfair-tech/funfair-server-template.git"
+#$repos = "repos.lst"
 $root = Get-Location
 $git="git"
 Write-Host $root

@@ -1,10 +1,15 @@
 ﻿#########################################################################
 
+param(
+    [string] $repos = $(throw "repos.lst file containing list of repositories"),
+    [string] $packagesToUpdate = $(throw "Packages.json file to load")
+)
+
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = "False"
-$repos = "repos.lst"
-$packagesToUpdate = "packages.json" 
+#$repos = "repos.lst"
+#$packagesToUpdate = "packages.json" 
 $root = Get-Location
 $git="git"
 Write-Host $root
