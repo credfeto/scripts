@@ -106,7 +106,6 @@ function processRepo($repo, $packages) {
         if($update -eq $null) {
             Continue
         }
-        Write-Host $update
 
         $codeOK = buildSolution -repoFolder $repoFolder
         if($codeOK -eq $true) {
@@ -122,6 +121,8 @@ function processRepo($repo, $packages) {
                 UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                 commit 
                 pushOrigin 
+            } else {
+                Write-Host ">>> FAILED TO CREATE BRANCH <<<"
             }
 
             resetToMaster
