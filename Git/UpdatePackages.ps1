@@ -61,6 +61,12 @@ function processRepo($repo, $packages) {
     
     Set-Location $root
     
+    Write-Host ""
+    Write-Host "***********************************************************************************"
+    Write-Host "***********************************************************************************"
+    Write-Host "***********************************************************************************"
+    Write-Host "***********************************************************************************"
+    Write-Host ""
     Write-Host "Processing Repo: $repo"
 
     # Extract the folder from the repo name
@@ -101,6 +107,8 @@ function processRepo($repo, $packages) {
         $packageId = $package.packageId
         $type = $package.type
 
+        Write-Host ""
+        Write-Host "------------------------------------------------"
         Write-Host "Looking for updates of $packageId"
         $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId
         if($update -eq $null) {
