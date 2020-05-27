@@ -155,6 +155,8 @@ ForEach($repo in $repoList) {
 
 Set-Location $root
 
+Write-Host ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
+
 
 
 
