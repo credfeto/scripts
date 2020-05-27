@@ -37,8 +37,13 @@ function ensureSynchronised($repo, $repofolder) {
 }
 
 function createBranch($branchName) {
-    $el = git checkout -b $branchName
-    return $el -eq 0
+    git checkout -b $branchName
+    if(!$?) {
+        Write-Host "Failed to create branch $branchName"
+        return $false;
+    }
+    
+    return $true;
 }
 
 function commit($message) {

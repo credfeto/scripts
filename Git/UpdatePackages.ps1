@@ -91,7 +91,7 @@ function processRepo($repo, $packages) {
     $changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
 
     $codeOK = buildSolution -repoFolder $repoFolder
-    if( $codeOk -eq $false) {
+    if($codeOk -eq $false) {
         # no point updating
         Write-Host "* Solution doesn't build without any changes - no point in trying to update packages"
         return;
@@ -116,6 +116,7 @@ function processRepo($repo, $packages) {
         }
         else {
             $branchName = "depends/ff-1429-update-$packageId/$update"
+            Write-Host "Create Branch $branchName"
             $branchOk = createBranch -name $branchName
             if($branchOk -eq $true) {
                 UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
