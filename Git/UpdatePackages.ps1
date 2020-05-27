@@ -107,6 +107,7 @@ function processRepo($repo, $packages) {
             Continue
         }
 
+        Write-Host ">>>> Checking to see if code builds against $packageId $update <<<<"
         $codeOK = buildSolution -repoFolder $repoFolder
         if($codeOK -eq $true) {
             UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
@@ -122,7 +123,7 @@ function processRepo($repo, $packages) {
                 commit 
                 pushOrigin 
             } else {
-                Write-Host ">>> FAILED TO CREATE BRANCH <<<"
+                Write-Host ">>> ERROR: FAILED TO CREATE BRANCH <<<"
             }
 
             resetToMaster
