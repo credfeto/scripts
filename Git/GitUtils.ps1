@@ -31,15 +31,17 @@ function ensureSynchronised($repo, $repofolder) {
     }
     else
     {
-        & $git clone $repo
-        
+        & $git clone $repo        
     }
 }
 
 function createBranch($branchName) {
-    git checkout -b $branchName
-    if(!$?) {
+    $out = git checkout -b $branchName
+    $exit = $?
+    if($exit -ne 0) {
         Write-Host "Failed to create branch $branchName"
+        Write-Host $out
+        Write-Host "Exit: $exit"
         return $false;
     }
     
@@ -47,20 +49,38 @@ function createBranch($branchName) {
 }
 
 function commit($message) {
-    git add -A
-    git commit -m"$message"
+    & $git  add -A
+    & $git commit -m"$message"
 }
 
 function push() 
 {
-    git push
+    & $git push
 }
 
 function pushOrigin($branchName) {
-    git push --set-upstream origin $branchName -v
+    & $git push --set-upstream origin $branchName -v
 }
 
 
 function loadRepoList($repoFile) {
    return Get-Content $repos | Select-Object
+}
+
+function doesBranchExist($branchName) {
+    $result = git branch --remote
+
+    $regex = $branchName.replace(".", "\.") + "$"
+
+    $result -match $regex
+    $result = $result.Trim()
+    if($result -eq $branchName) {
+        return $true
+    }
+
+    if($result -eq "origin/$branchName") {
+        return $true
+    }
+
+    return $false
 }

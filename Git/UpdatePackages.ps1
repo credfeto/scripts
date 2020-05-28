@@ -115,27 +115,34 @@ function processRepo($repo, $packages) {
             Continue
         }
 
-        Write-Host ">>>> Checking to see if code builds against $packageId $update <<<<"
-        $codeOK = buildSolution -repoFolder $repoFolder
-        if($codeOK -eq $true) {
-            UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-            commit -message "[FF-1429] Updating $packageId ($type) to $update"
-            push
+        $branchName = "depends/ff-1429-update-$packageId/$update"
+        $branchExists = doesBranchExist -branchName $branchName
+        if($branchExists -ne $true) {
+
+            Write-Host ">>>> Checking to see if code builds against $packageId $update <<<<"
+            $codeOK = buildSolution -repoFolder $repoFolder
+            if($codeOK -eq $true) {
+                UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
+                commit -message "[FF-1429] Updating $packageId ($type) to $update"
+                push
+            }
+            else {
+                Write-Host "Create Branch $branchName"
+                $branchOk = createBranch -name $branchName
+                if($branchOk -eq $true) {
+                    UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
+                    commit -message "[FF-1429] Updating $packageId ($type) to $update"
+                    pushOrigin 
+                } else {
+                    Write-Host ">>> ERROR: FAILED TO CREATE BRANCH <<<"
+                }
+            }
         }
         else {
-            $branchName = "depends/ff-1429-update-$packageId/$update"
-            Write-Host "Create Branch $branchName"
-            $branchOk = createBranch -name $branchName
-            if($branchOk -eq $true) {
-                UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-                commit 
-                pushOrigin 
-            } else {
-                Write-Host ">>> ERROR: FAILED TO CREATE BRANCH <<<"
-            }
-
-            resetToMaster
+                Write-Host "Branch $branchName already exists - skipping"
         }
+ 
+        resetToMaster        
     }
 }
 

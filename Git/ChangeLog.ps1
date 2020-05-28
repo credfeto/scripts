@@ -117,10 +117,12 @@ function UpdateChangelog($fileName, $entryType, $code, $message) {
     $foundUnreleased = $false
     $done = $false
 
+    $newline = "`n"
+
     for($i=0; $i -lt $text.Length; $i++)
     {
         $line = $text[$i].TrimEnd()
-        $output = $output + $line + "`n"
+        $output = $output + $line + $newline
         if($done -eq $true) {
             Continue
         }
@@ -134,7 +136,7 @@ function UpdateChangelog($fileName, $entryType, $code, $message) {
         else {
             if( $line -eq "### $entryType") {
                 Write-Host "* Changelog Insert position added"
-                $output = $output + "- $code - $message`n"
+                $output = $output + "- $code - $message" + $newline 
                 $done = $true;
             }
         }
