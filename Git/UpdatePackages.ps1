@@ -132,7 +132,7 @@ function processRepo($repo, $packages) {
                 if($branchOk -eq $true) {
                     UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                     commit -message "[FF-1429] Updating $packageId ($type) to $update"
-                    pushOrigin 
+                    pushOrigin -branchName $branchName
                 } else {
                     Write-Host ">>> ERROR: FAILED TO CREATE BRANCH <<<"
                 }
