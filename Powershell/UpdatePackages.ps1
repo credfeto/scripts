@@ -9,24 +9,24 @@ Remove-Module *
 
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
-$preRelease = "False"
+$preRelease = $False
 #$repos = "repos.lst"
 #$packagesToUpdate = "packages.json" 
 $root = Get-Location
 Write-Host $root
 
-$env:GIT_REDIRECT_STDERR="2>&1"
 
 #########################################################################
 
 # region Include required files
 #
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+$ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib" 
 try {
-    . (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.ps1") -Force
-    . (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.ps1") -Force
-    . (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.ps1") -Force
-    . (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.ps1") -Force
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.psm1") -Force
 }
 catch {
     Throw "Error while loading supporting PowerShell Scripts" 
@@ -77,7 +77,7 @@ function processRepo($repo, $packages) {
     Write-Host "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
 
-    ensureSynchronised -repo $repo -repofolder $repoFolder
+    Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
 
     $srcPath = Join-Path -Path $repoFolder -ChildPath "src"
     $srcExists = Test-Path -Path $srcPath
@@ -97,7 +97,7 @@ function processRepo($repo, $packages) {
 
     $changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
 
-    $codeOK = buildSolution -repoFolder $repoFolder
+    $codeOK = DotNet-BuildSolution -srcFolder $srcPath
     if($codeOk -eq $false) {
         # no point updating
         Write-Host "* WARNING: Solution doesn't build without any changes - no point in trying to update packages"
@@ -117,23 +117,23 @@ function processRepo($repo, $packages) {
         }
 
         $branchName = "depends/ff-1429-update-$packageId/$update"
-        $branchExists = doesBranchExist -branchName $branchName
+        $branchExists = Git-DoesBranchExist -branchName $branchName
         if($branchExists -ne $true) {
 
             Write-Host ">>>> Checking to see if code builds against $packageId $update <<<<"
-            $codeOK = buildSolution -repoFolder $repoFolder
+            $codeOK = DotNet-BuildSolution -baseFolder $repoFolder
             if($codeOK -eq $true) {
-                UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-                commit -message "[FF-1429] Updating $packageId ($type) to $update"
-                push
+                ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
+                Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
+                Git-Push
             }
             else {
                 Write-Host "Create Branch $branchName"
                 $branchOk = createBranch -name $branchName
                 if($branchOk -eq $true) {
-                    UpdateChangelog -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-                    commit -message "[FF-1429] Updating $packageId ($type) to $update"
-                    pushOrigin -branchName $branchName
+                    ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
+                    Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
+                    Git-PushOrigin -branchName $branchName
                 } else {
                     Write-Host ">>> ERROR: FAILED TO CREATE BRANCH <<<"
                 }
@@ -143,14 +143,14 @@ function processRepo($repo, $packages) {
                 Write-Host "Branch $branchName already exists - skipping"
         }
  
-        resetToMaster        
+        Git-ResetToMaster        
     }
 }
 
 #########################################################################
 
 
-$installed = installTool -packageId $packageIdToInstall -preReleaseVersion $preRelease
+$installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
 
 if($installed -eq $false) {
     Write-Error ""
@@ -160,7 +160,7 @@ if($installed -eq $false) {
 
 $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
 
-$repoList = loadRepoList -repos $repos
+$repoList = Git-LoadRepoList -repos $repos
 ForEach($repo in $repoList) {
     if($repo.Trim() -eq "") {
         continue

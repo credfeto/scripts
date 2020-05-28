@@ -1,4 +1,6 @@
-function resetToMaster() {
+$env:GIT_REDIRECT_STDERR="2>&1"
+
+function Git-ResetToMaster {
 
     # junk any existing checked out files
     git reset head --hard
@@ -15,19 +17,23 @@ function resetToMaster() {
     git gc --aggressive --prune
 }
 
-function ensureSynchronised($repo, $repofolder) {
+function Git-EnsureSynchronised {
+param(
+    [string] $repo, 
+    [string] $repofolder
+    )
 
     $gitHead = Join-Path -Path $repoFolder -ChildPath ".git" 
     $gitHead = Join-Path -Path $gitHead -ChildPath "HEAD" 
     
     Write-Host $gitHead
-    gitHeadCloned = Test-Path -path $gitHead
+    $gitHeadCloned = Test-Path -path $gitHead
 
-    if (gitHeadCloned -eq $True) {
+    if ($gitHeadCloned -eq $True) {
         Write-Host "Already Cloned"
         Set-Location $repofolder
 
-        resetToMaster
+        Git-ResetToMaster
     }
     else
     {
@@ -35,7 +41,11 @@ function ensureSynchronised($repo, $repofolder) {
     }
 }
 
-function createBranch($branchName) {
+function Git-CreateBranch {
+param(
+    [string] $branchName
+    )
+
     git checkout -b $branchName
     if(!$?) {
         Write-Host "Failed to create branch $branchName"
@@ -45,17 +55,25 @@ function createBranch($branchName) {
     return $true;
 }
 
-function commit($message) {
+function Git-Commit {
+param(
+    [string] $message
+    )
+
     git  add -A
     git commit -m"$message"
 }
 
-function push() 
+function Git-Push() 
 {
     git push
 }
 
-function pushOrigin($branchName) {
+function Git-PushOrigin {
+param(
+    [string] $branchName
+    )
+    
     if($branchName -eq $null) {
         throw "Invalid branch (null)"
     }
@@ -68,11 +86,11 @@ function pushOrigin($branchName) {
 }
 
 
-function loadRepoList($repoFile) {
-   return Get-Content $repos | Select-Object
-}
+function Git-DoesBranchExist {
+param(
+    [string] $branchName
+    )
 
-function doesBranchExist($branchName) {
     $result = git branch --remote
 
     $regex = $branchName.replace(".", "\.") + "$"
@@ -90,6 +108,21 @@ function doesBranchExist($branchName) {
     return $false
 }
 
-#$env:GIT_REDIRECT_STDERR="2>&1"
-#$result = createBranch -branchName "test1"
-#Write-Host $result
+
+function Git-LoadRepoList {
+param(
+    [string] $repoFile
+    )
+
+    return Get-Content $repos | Select-Object
+}
+
+Export-ModuleMember -Function Git-ResetToMaster
+Export-ModuleMember -Function Git-EnsureSynchronised
+Export-ModuleMember -Function Git-CreateBranch
+Export-ModuleMember -Function Git-Commit
+Export-ModuleMember -Function Git-CreateBranch
+Export-ModuleMember -Function Git-Push
+Export-ModuleMember -Function Git-PushOrigin
+Export-ModuleMember -Function Git-DoesBranchExist
+Export-ModuleMember -Function Git-LoadRepoList
