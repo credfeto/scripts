@@ -10,8 +10,6 @@ Remove-Module *
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = $False
-#$repos = "repos.lst"
-#$packagesToUpdate = "packages.json" 
 $root = Get-Location
 Write-Host $root
 
@@ -23,10 +21,10 @@ Write-Host $root
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib" 
 try {
-    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force
-    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force
-    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force
-    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.psm1") -Force
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.psm1") -Force -DisableNameChecking
 }
 catch {
     Throw "Error while loading supporting PowerShell Scripts" 
