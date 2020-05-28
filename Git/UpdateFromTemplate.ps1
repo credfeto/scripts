@@ -115,6 +115,7 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
                 $branchName = "template/ff-1429-$fileName".Replace("\", "/")
                 $branchOk = createBranch -name $branchName
                 if($branchOk -eq $true) {
+                    Write-Host "Create Branch $branchName"
                     doCommit -fileName $fileName
                     pushOrigin -branchName $branchName
                 }

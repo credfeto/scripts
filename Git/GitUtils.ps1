@@ -59,7 +59,15 @@ function push()
 }
 
 function pushOrigin($branchName) {
-    & $git push --set-upstream origin $branchName -v
+    if($branchName -eq $null) {
+        throw "Invalid branch (null)"
+    }
+
+    if($branchName -eq "") {
+        throw "Invalid branch: [$branchName]"
+    }
+
+    git push --set-upstream origin $branchName -v
 }
 
 
