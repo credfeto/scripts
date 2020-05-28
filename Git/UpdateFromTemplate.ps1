@@ -116,7 +116,7 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
                 $branchOk = createBranch -name $branchName
                 if($branchOk -eq $true) {
                     doCommit -fileName $fileName
-                    pushOrigin 
+                    pushOrigin -branchName $branchName
                 }
 
                 resetToMaster
