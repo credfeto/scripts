@@ -6,26 +6,23 @@ param(
 )
 
 $ErrorActionPreference = "Stop" 
-#$templateRepo = "git@github.com:funfair-tech/funfair-server-template.git"
-#$repos = "repos.lst"
 $root = Get-Location
 Write-Host $root
 
-$env:GIT_REDIRECT_STDERR="2>&1"
 
 #########################################################################
 
 # region Include required files
 #
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+$ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib" 
 try {
-    . ( Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.ps1")
-    . (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.ps1")
-    . (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.ps1")
-    . (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.ps1")
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Host "Error while loading supporting PowerShell Scripts" 
+    Throw "Error while loading supporting PowerShell Scripts" 
 }
 #endregion
 
@@ -63,7 +60,7 @@ function updateFile($sourceRepo, $targetRepo, $fileName) {
 }
 
 function doCommit($fileName) {
-    commit -message "[FF-1429] - Update $fileName to match the template repo"
+    Git-Commit -message "[FF-1429] - Update $fileName to match the template repo"
 }
 
 function updateFileAndCommit($sourceRepo, $targetRepo, $fileName) {
@@ -72,7 +69,7 @@ function updateFileAndCommit($sourceRepo, $targetRepo, $fileName) {
 
     if($ret -ne $null) {
         doCommit -message $fileName
-        push
+        Git-Push
     }    
 }
 
@@ -108,7 +105,7 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
             $codeOK = buildSolution -repoFolder $repoFolder
             if($codeOK -eq $true) {
                 doCommit -fileName $fileName
-                push
+                Git-Push
             }
             else {
                 $branchName = "template/ff-1429-$fileName".Replace("\", "/")
@@ -116,15 +113,14 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
                 if($branchOk -eq $true) {
                     Write-Host "Create Branch $branchName"
                     doCommit -fileName $fileName
-                    pushOrigin -branchName $branchName
+                    Git-PushOrigin -branchName $branchName
                 }
 
-                resetToMaster
+                Git-ResetToMaster
             }
             
         }
 
-        doCommit -message $fileName
         return $true;
     }
 
@@ -142,7 +138,7 @@ function updateResharperSettings($srcRepo, $trgRepo) {
         $ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
         if($ret -ne $null) {
             doCommit -message "Resharper settings"
-            push
+            Git-Push
         }
     }
 }
@@ -192,7 +188,7 @@ function processRepo($srcRepo, $repo) {
     Write-Host "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
 
-    ensureSynchronised -repo $repo -repofolder $repoFolder
+    Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
 
     #########################################################
     # CREATE ANY FOLDERS THAT ARE NEEDED
@@ -242,7 +238,7 @@ function processRepo($srcRepo, $repo) {
 }
 
 
-$repoList = loadRepoList -repos $repos
+$repoList = Git-LoadRepoList -repos $repos
 
 
 Set-Location $root
@@ -256,7 +252,7 @@ $templateFolder = $templateFolder.SubString(0, $templateFolder.LastIndexOf("."))
 Write-Host "Template Folder: $templateFolder"
 $templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
 
-ensureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
+Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
 Set-Location $root
 
