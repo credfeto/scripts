@@ -1,5 +1,15 @@
 $env:GIT_REDIRECT_STDERR="2>&1"
 
+function Git-RemoveAllLocalBranches {
+    $result = git branch
+    foreach($branch in $result) {
+        $branch = $branch.Trim()
+        if(!$branch.StartsWith("* ")) {
+            git branch -d $branch
+        }
+    }
+}
+
 function Git-ResetToMaster {
 
     # junk any existing checked out files
@@ -15,6 +25,8 @@ function Git-ResetToMaster {
     git remote update origin --prune
     git prune
     git gc --aggressive --prune
+
+    Git-RemoveAllLocalBranches
 }
 
 function Git-EnsureSynchronised {
@@ -117,6 +129,7 @@ param(
     return Get-Content $repos | Select-Object
 }
 
+Export-ModuleMember -Function Git-RemoveAllLocalBranches
 Export-ModuleMember -Function Git-ResetToMaster
 Export-ModuleMember -Function Git-EnsureSynchronised
 Export-ModuleMember -Function Git-CreateBranch
