@@ -127,7 +127,7 @@ function processRepo($repo, $packages) {
             }
             else {
                 Write-Host "Create Branch $branchName"
-                $branchOk = createBranch -name $branchName
+                $branchOk = Git-CreateBranch -name $branchName
                 if($branchOk -eq $true) {
                     ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                     Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
