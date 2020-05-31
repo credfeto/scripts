@@ -12,6 +12,12 @@ $clt = $env:RESHARPER_COMMAND_LINE_TOOLS
 if(clt -eq "") {
     throw "RESHARPER_COMMAND_LINE_TOOLS not defined"
 }
+if(clt -eq $null) {
+    throw "RESHARPER_COMMAND_LINE_TOOLS not defined"
+}
+
+$codeCleanup = Join-Path -Path $clt -ChildPath "codecleanup.exe"
+
 
 #########################################################################
 
@@ -32,20 +38,32 @@ catch {
 
 function runCodeCleanup($solutionFile) {
 
-    SET SOLUTIONFILE=%~nx1
-    ECHO * Performing code cleanup on %SOLUTIONFILE% 
-    ECHO * In folder: %SOLUTIONFOLDER%
-    pushd %SOLUTIONFOLDER%
-    SET CACHESFOLDER=%TEMP%/%~pn1
-    SET SETTINGSFILE=%~dpnx1.DotSettings
+    $sourceFolder = Split-Path -Path $solutionFile -Parent
+    $sourceFolderWithoutDrive = $sourceFolder.Substring(3)
+
+    #SET SOLUTIONFILE=%~nx1
+    $cachesFolder = Join-Path -Path $env:TEMP -ChildPath $sourceFolderWithoutDrive
+    $settingsFile = $solutionFile + ".DotSettings"
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
     if($buildOk -ne $true) {
-        return $true;
+        return $false;
     }
 
+    $codeCleanup = Join-Path 
 
-    cleanupcode.exe --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"%CACHESFOLDER%" --settings:"%SETTINGSFILE%" --verbosity:WARN --no-buildin-settings --no-builtin-settings
+    & $codeCleanup --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:WARN --no-buildin-settings --no-builtin-settings
+    if(!$?) {
+        Write-Host "Code Cleanup failed"
+        return $false
+    }
+
+    $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
+    if($buildOk -ne $true) {
+        return $false;
+    }
+
+    return $true
 }
 
 
@@ -72,13 +90,30 @@ function processRepo($srcRepo, $repo) {
         
         $solutions = Get-ChildItem -Path $srcPath -Filter "*.sln"
         foreach($solution in $solutions) {
+
             $solutionFile = $solution.FullName
+            $solutionName = $solution.Name
+            $branchName = "cleanup/ff-2244-$solutionName"
+            $branchExists = Git-DoesBranchExist -branchName $branchName
+            if($branchExists -ne $true) {
 
-        }
+                $cleaned = runCodeCleanup -solutionFile $solution.FullName
+                if$cleaned -eq $true) {
 
-    
+                    $hasChanges = Git-HasUnCommitedChanges
+                    if($hasChanges -eq $true) {
+                        Git-CreateBranch -branchName $branchName
+                        Git-Commit -message "[FF-2244] - Code cleanup on $solutionName"
+                        Git-PushOrigin -branchName $branchName
+                    }
+                }
+
+                Git-ResetToMaster
+            }
+        }    
     }
 }
+
 
 
 $repoList = Git-LoadRepoList -repos $repos
