@@ -5,11 +5,8 @@ git config --global user.name "Mark Ridgwell"
 git config --global user.email credfeto@users.noreply.github.com
 
 REM GPG Signing of commits/Tags etc
-REM WORK
-REM git config --global user.signingkey F2E608545D203528
-REM IRELAND
-REM git config --global user.signingkey 4897531CF5AE6253
-REM DESKTOP
+REM use the following to get the ykey:
+REM gpg --list-keys credfeto@users.noreply.github.com | grep -E "^\s\s\s\s\s\s([A-Z0-9]+)$"
 REM git config --global user.signingkey 4876FADA8731645D
 git config --global commit.gpgsign true
 
