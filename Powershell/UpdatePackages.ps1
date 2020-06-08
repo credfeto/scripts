@@ -18,16 +18,39 @@ Write-Host $root
 
 # region Include required files
 #
+
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib" 
+Write-Host "Loading Modules from $ScriptDirectory"
 try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
+}
+catch {
+    Throw "Error while loading supporting PowerShell Scripts: "DotNetTool" 
+}
+
+try
+{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
+}
+catch {
+    Throw "Error while loading supporting PowerShell Scripts: "GitUtils" 
+}
+
+try
+{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
+}
+catch {
+    Throw "Error while loading supporting PowerShell Scripts: "DotNetBuild" 
+}
+
+try
+{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.psm1") -Force -DisableNameChecking
 }
 catch {
-    Throw "Error while loading supporting PowerShell Scripts" 
+    Throw "Error while loading supporting PowerShell Scripts: Changelog" 
 }
 #endregion
 
