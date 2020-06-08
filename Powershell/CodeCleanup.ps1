@@ -100,7 +100,7 @@ function processRepo($srcRepo, $repo) {
                 $cleaned = runCodeCleanup -solutionFile $solution.FullName
                 if$cleaned -eq $true) {
 
-                    $hasChanges = Git-HasUnCommitedChanges
+                    $hasChanges = Git-HasUnCommittedChanges
                     if($hasChanges -eq $true) {
                         Git-CreateBranch -branchName $branchName
                         Git-Commit -message "[FF-2244] - Code cleanup on $solutionName"

@@ -26,7 +26,8 @@ try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
 }
 catch {
-    Throw "Error while loading supporting PowerShell Scripts: "DotNetTool" 
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: DotNetTool" 
 }
 
 try
@@ -34,7 +35,8 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
 }
 catch {
-    Throw "Error while loading supporting PowerShell Scripts: "GitUtils" 
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: GitUtils" 
 }
 
 try
@@ -42,7 +44,8 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
 }
 catch {
-    Throw "Error while loading supporting PowerShell Scripts: "DotNetBuild" 
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: DotNetBuild" 
 }
 
 try
@@ -50,6 +53,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.psm1") -Force -DisableNameChecking
 }
 catch {
+    Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: Changelog" 
 }
 #endregion

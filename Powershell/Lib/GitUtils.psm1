@@ -29,7 +29,7 @@ function Git-ResetToMaster {
     Git-RemoveAllLocalBranches
 }
 
-funtion Git-HasUnCommitedChanges {
+function Git-HasUnCommittedChanges {
     git diff --no-patch --exit-code
     if(!$?) {
         return $true
@@ -142,7 +142,7 @@ param(
 Export-ModuleMember -Function Git-RemoveAllLocalBranches
 Export-ModuleMember -Function Git-ResetToMaster
 Export-ModuleMember -Function Git-EnsureSynchronised
-Export-ModuleMember -Function Git-HasUnCommitedChanges
+Export-ModuleMember -Function Git-HasUnCommittedChanges
 Export-ModuleMember -Function Git-Commit
 Export-ModuleMember -Function Git-CreateBranch
 Export-ModuleMember -Function Git-Push
