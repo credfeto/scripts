@@ -133,12 +133,6 @@ param(
         return $false
     }
 
-    $branchExists = Git-DoesBranchExist -branchName $branchName
-    if($branchExists -eq $false) {
-        Write-Host "Failed to create branch $branchName - Create branch failed - Branch does not exist"
-        return $false
-    }
-
     Write-Host "Created branch $branchName"
 
     return $true;
