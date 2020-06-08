@@ -63,20 +63,6 @@ param(
     }
 }
 
-function Git-CreateBranch {
-param(
-    [string] $branchName
-    )
-
-    git checkout -b $branchName
-    if(!$?) {
-        Write-Host "Failed to create branch $branchName"
-        return $false;
-    }
-    
-    return $true;
-}
-
 function Git-Commit {
 param(
     [string] $message
@@ -128,6 +114,34 @@ param(
     }
 
     return $false
+}
+
+function Git-CreateBranch {
+param(
+    [string] $branchName
+    )
+
+    $branchExists = Git-DoesBranchExist -branchName $branchName
+    if($branchExists -eq $true) {
+        Write-Host "Failed to create branch $branchName - branch already exists"
+        return $false
+    }
+
+    git checkout -b $branchName
+    if(!$?) {
+        Write-Host "Failed to create branch $branchName - Create branch failed - Call failed."
+        return $false
+    }
+
+    $branchExists = Git-DoesBranchExist -branchName $branchName
+    if($branchExists -eq $false) {
+        Write-Host "Failed to create branch $branchName - Create branch failed - Branch does not exist"
+        return $false
+    }
+
+    Write-Host "Created branch $branchName"
+
+    return $true;
 }
 
 
