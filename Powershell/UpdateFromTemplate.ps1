@@ -26,6 +26,12 @@ catch {
 }
 #endregion
 
+function makePath($Path, $ChildPath) {
+    
+  return [System.IO.Path]::Combine($Path,$ChildPathl)
+}
+
+
 function updateOneFile($sourceFileName, $targetFileName) {
     $srcExists = Test-Path -Path $sourceFileName
     $trgExists = Test-Path -Path $targetFileName
@@ -35,8 +41,8 @@ function updateOneFile($sourceFileName, $targetFileName) {
         $trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
         
         if($srcHash -ne $trgHash) {
-            Write-Host "--- Copy"
-            Copy-Item $sourceFileName -Destination $targetFileName
+            Write-Host "--- Copy $sourceFileName to $targetFileName"
+            Copy-Item $sourceFileName -Destination $targetFileName -Force
             return $true
         }
     }
@@ -53,8 +59,8 @@ function updateOneFile($sourceFileName, $targetFileName) {
 function updateFile($sourceRepo, $targetRepo, $fileName) {
     Write-Host "Checking $fileName"
 
-    $sourceFileName = Join-Path -Path $sourceRepo -ChildPath $fileName
-    $targetFileName = Join-Path -Path $targetRepo -ChildPath $fileName
+    $sourceFileName = makePath -Path $sourceRepo -ChildPath $fileName
+    $targetFileName = makePath -Path $targetRepo -ChildPath $fileName
 
     return updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
 }
@@ -73,8 +79,9 @@ function updateFileAndCommit($sourceRepo, $targetRepo, $fileName) {
     }    
 }
 
+
 function hasCodeToBuild($targetRepo) {
-    $srcPath = Join-Path -Path $targetRepo -ChildPath "src"
+    $srcPath = makePath -Path $targetRepo -ChildPath "src"
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $false) {
         # no source to update
@@ -128,7 +135,7 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
 }
 
 function updateResharperSettings($srcRepo, $trgRepo) {
-    $sourceFileName = Join-Path -Path $srcRepo -ChildPath "src\FunFair.Template.sln.DotSettings"
+    $sourceFileName = makePath -Path $srcRepo -ChildPath "src\FunFair.Template.sln.DotSettings"
     $files = Get-ChildItem -Path $repoFolder -Filter *.sln -Recurse
     ForEach($file in $files) {
         $targetFileName = $file.FullName
@@ -145,17 +152,29 @@ function updateResharperSettings($srcRepo, $trgRepo) {
 
 function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileName) {
     
-    $targetFileName = Join-Path -Path $trgRepo -ChildPath $fileName
-    $targetMergeFileName = Join-Path -Path $trgRepo -ChildPath $mergeFileName
+    Write-Host "Merging ? $fileName"
+    $sourceFileName = makePath -Path $srcRepo -ChildPath $fileName
+    Write-Host "Source File: $sourceFileName"
+    $sourceFileNameExists = Test-Path -Path $sourceFileName -PathType Leaf
+    if($sourceFileNameExists -eq $false) {
+        Write-Host "Non-Existent Source File: $sourceFileName"
+        return
+    }
+
+    $targetFileName = makePath -Path $trgRepo -ChildPath $fileName
+    $targetMergeFileName = makePath -Path $trgRepo -ChildPath $mergeFileName
 
     $targetMergeFileNameExists = Test-Path -Path $targetMergeFileName
     if($targetMergeFileNameExists -eq $true) {
         Write-Host "Found $mergeFileName"
-        $sourceFileName = Join-Path -Path $srcRepo -ChildPath $fileName
+        
+        Write-Host "Source File: $sourceFileName"
         $srcContent = Get-Content -Path $sourceFileName
+        
+        Write-Host "Merge File: $targetMergeFileName"
         $mergeContent = Get-Content -Path $targetMergeFileName
 
-        $trgContent = $srcRepo + "'n" + $mergeContent + "'n"
+        $trgContent = $srcContent + "'n" + $mergeContent + "'n"
 
         Set-Content -Path $targetFileName -Value $trgContent
         doCommit -message $fileName
@@ -168,7 +187,7 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
 }
 
 function ensureFolderExists($baseFolder, $subFolder) {
-    $fullPath = Join-Path -Path $baseFolder -ChildPath $subFolder
+    $fullPath = makePath -Path $baseFolder -ChildPath $subFolder
     $exists = Test-Path -Path $fullPath -PathType Container
     if($exists -eq $false) {
         New-Item -Path $baseFolder -Name $subFolder -ItemType "directory"
@@ -200,7 +219,7 @@ function processRepo($srcRepo, $repo) {
 
     #########################################################
     # C# file updates
-    $srcPath = Join-Path -Path $repoFolder -ChildPath "src"
+    $srcPath = makePath -Path $repoFolder -ChildPath "src"
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $true) {
         
