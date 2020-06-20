@@ -28,7 +28,7 @@ catch {
 
 function makePath($Path, $ChildPath) {
     
-  return [System.IO.Path]::Combine($Path,$ChildPathl)
+  return [System.IO.Path]::Combine($Path,$ChildPath)
 }
 
 
