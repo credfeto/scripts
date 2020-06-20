@@ -33,14 +33,23 @@ function makePath($Path, $ChildPath) {
 
 
 function updateOneFile($sourceFileName, $targetFileName) {
-    $srcExists = Test-Path -Path $sourceFileName
-    $trgExists = Test-Path -Path $targetFileName
+    $srcExists = Test-Path -Path $sourceFileName -PathType Leaf
+    $trgExists = Test-Path -Path $targetFileName -PathType Leaf
 
-    if($srcExists -eq $true) {
+    if($srcExists -eq $false) {
         $srcHash = Get-FileHash -Path $sourceFileName -Algorithm SHA512
-        $trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
+
+        $copy = $true
+        if($trgExists -eq $true) {
+            $trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
         
-        if($srcHash -ne $trgHash) {
+            if($srcHash -eq $trgHash) {
+                $copy = $false;
+                Write-Host "--- Identical $sourceFileName to $targetFileName"
+            }
+        }
+                      
+        if($copy -eq $true) {
             Write-Host "--- Copy $sourceFileName to $targetFileName"
             Copy-Item $sourceFileName -Destination $targetFileName -Force
             return $true
