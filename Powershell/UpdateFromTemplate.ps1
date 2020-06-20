@@ -36,7 +36,7 @@ function updateOneFile($sourceFileName, $targetFileName) {
     $srcExists = Test-Path -Path $sourceFileName -PathType Leaf
     $trgExists = Test-Path -Path $targetFileName -PathType Leaf
 
-    if($srcExists -eq $false) {
+    if($srcExists -eq $true) {
         $srcHash = Get-FileHash -Path $sourceFileName -Algorithm SHA512
 
         $copy = $true
