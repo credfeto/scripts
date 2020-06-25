@@ -1,9 +1,6 @@
-# PR Details
-
 <!--- Provide a general summary of your changes in the Title above -->
 
 ## Description
-
 <!--- Describe your changes in detail -->
 
 ## Related Issue\Feature
@@ -12,6 +9,9 @@
 
 ## How Has This Been Tested
 
+- [ ] All unit tests pass.
+- [ ] All integration tests pass.
+- [ ] Manual Testing: 
 <!--- Please describe in detail how you tested your changes. -->
 <!--- Include details of your testing environment, and the tests you ran to -->
 <!--- see how your change affects other areas of the code, etc. -->
@@ -43,5 +43,8 @@
 - [ ] There are no Resharper\static code analysis errors anywhere in the solution.
 - [ ] I have run a code clean-up on any files I have modified to make sure they are in the correct format.
 - [ ] I have added tests to cover my changes.
+- [ ] I have run the code and quickly verified it all works to my satisfaction.
+- [ ] All new/modified code has sufficient logging to be able to diagnose what is wrong.
 - [ ] All new and existing tests passed.
-- [ ] Unreleased section of CHANGELOG.md has been updated with details of this PR
+- [ ] All new/modified public interfaces/classes have are documented with xmldoc comments.
+- [ ] Unreleased section of CHANGELOG.md has been updated with details of this PR.
