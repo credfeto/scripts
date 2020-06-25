@@ -38,7 +38,6 @@ function updateOneFile($sourceFileName, $targetFileName) {
 
     if($srcExists -eq $true) {
         
-
         $copy = $true
         if($trgExists -eq $true) {
             Write-Host "--- Files exist - checking hash"
@@ -59,9 +58,9 @@ function updateOneFile($sourceFileName, $targetFileName) {
     }
     elseif($trgExists -eq $true) {
         Write-Host "--- Delete"
-        Remove-Item -Path $targetFileName
+        #Remove-Item -Path $targetFileName
 
-        return $null
+        #return $null
     }
 
     return $false;
@@ -180,15 +179,15 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
         Write-Host "Found $mergeFileName"
         
         Write-Host "Source File: $sourceFileName"
-        $srcContent = Get-Content -Path $sourceFileName
+        $srcContent = Get-Content -Path $sourceFileName -Raw
         
         Write-Host "Merge File: $targetMergeFileName"
-        $mergeContent = Get-Content -Path $targetMergeFileName
+        $mergeContent = Get-Content -Path $targetMergeFileName -Raw
 
         $trgContent = $srcContent + "'n" + $mergeContent + "'n"
 
         Set-Content -Path $targetFileName -Value $trgContent
-        doCommit -message $fileName
+        doCommit -fileName $fileName
 
 
     } else {
@@ -196,6 +195,70 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
     }
 
 }
+
+function buildDependabotConfig($srcRepo, $trgRepo) {
+
+    $srcPath = makePath -Path $srcRepo -ChildPath ".dependabot"
+    write-host "$srcPath"
+    $targetFileName = makePath -Path $trgRepo -ChildPath ".dependabot\config.yml"
+
+    Write-Host "Building Dependabot Config:"
+    $trgContent = "version: 1
+update_configs:
+"
+
+    $templateFile = makePath -Path $srcPath -ChildPath 'config.template.dotnet'
+    $templateFileExists = Test-Path -Path $templateFile
+    if($templateFileExists -eq $true) {        
+        $files = Get-ChildItem -Path $trgRepo -Filter *.csprpj -Recurse
+        if($files -ne $null) {
+            Write-Host " --> Addning .NET"
+            $templateContent = Get-Content -Path $templateFile -Raw
+            $trgContent = $trgContent + '`n' + $templateContent
+        }
+    }
+
+    $templateFile = makePath -Path $srcPath -ChildPath 'config.template.javascript'
+    $templateFileExists = Test-Path -Path $templateFile
+    if($templateFileExists -eq $true) {
+        $files = Get-ChildItem -Path $trgRepo -Filter 'package.json' -Recurse
+        if($files -ne $null) {
+            Write-Host " --> Addning Javascript"
+            $templateContent = Get-Content -Path $templateFile -Raw
+            $trgContent = $trgContent + '`n' + $templateContent
+        }
+    }
+
+    $templateFile = makePath -Path $srcPath -ChildPath 'config.template.docker'
+    $templateFileExists = Test-Path -Path $templateFile
+    if($templateFileExists -eq $true) {
+        $files = Get-ChildItem -Path $trgRepo -Filter 'Dockerfile' -Recurse
+        if($files -ne $null) {
+            Write-Host " --> Adding Docker"
+            $templateContent = Get-Content -Path $templateFile -Raw
+            $trgContent = $trgContent + '`n' + $templateContent
+        }
+    }
+
+    $templateFile = makePath -Path $srcPath -ChildPath 'config.template.github_actions'
+    $templateFileExists = Test-Path -Path $templateFile
+    if($templateFileExists -eq $true) {
+    Write-Host "$templateFile"
+        $files = Get-ChildItem -Path $trgRepo -Filter *.yml -Recurse
+        Write-Host $files.Length
+        if($files -ne $null) {
+            Write-Host " --> Adding Github Actions"
+            $templateContent = Get-Content -Path $templateFile -Raw
+            $trgContent = $trgContent +  $templateContent
+        }
+    }
+
+    Write-Host " --> Done"
+    Set-Content -Path $targetFileName -Value $trgContent
+
+    doCommit -FileName ".dependabot/config.yml"
+}
+
 
 function ensureFolderExists($baseFolder, $subFolder) {
     $fullPath = makePath -Path $baseFolder -ChildPath $subFolder
@@ -247,7 +310,6 @@ function processRepo($srcRepo, $repo) {
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\pr-lint.yml"
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\CODEOWNERS"
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\PULL_REQUEST_TEMPLATE.md"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".dependabot\config.yml"
 
     $workflows = Join-Path -Path $srcRepo -ChildPath ".github\workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml
@@ -265,6 +327,8 @@ function processRepo($srcRepo, $repo) {
 
 
     updateAndMergeFileAndComit -srcRepo $srcRepo -trgRepo $repoFolder -fileName ".github\labeler.yml" -mergeFileName ".github\labeler.project-specific.yml"
+
+    buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder
 }
 
 
