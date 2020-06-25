@@ -243,9 +243,7 @@ update_configs:
     $templateFile = makePath -Path $srcPath -ChildPath 'config.template.github_actions'
     $templateFileExists = Test-Path -Path $templateFile
     if($templateFileExists -eq $true) {
-    Write-Host "$templateFile"
         $files = Get-ChildItem -Path $trgRepo -Filter *.yml -Recurse
-        Write-Host $files.Length
         if($files -ne $null) {
             Write-Host " --> Adding Github Actions"
             $templateContent = Get-Content -Path $templateFile -Raw
