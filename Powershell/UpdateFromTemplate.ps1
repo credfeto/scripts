@@ -210,7 +210,7 @@ update_configs:
     $templateFile = makePath -Path $srcPath -ChildPath 'config.template.dotnet'
     $templateFileExists = Test-Path -Path $templateFile
     if($templateFileExists -eq $true) {        
-        $files = Get-ChildItem -Path $trgRepo -Filter *.csprpj -Recurse
+        $files = Get-ChildItem -Path $trgRepo -Filter *.csproj -Recurse
         if($files -ne $null) {
             Write-Host " --> Addning .NET"
             $templateContent = Get-Content -Path $templateFile -Raw
