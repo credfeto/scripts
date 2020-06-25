@@ -214,7 +214,7 @@ update_configs:
         if($files -ne $null) {
             Write-Host " --> Addning .NET"
             $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent + '`n' + $templateContent
+            $trgContent = $trgContent + $templateContent
         }
     }
 
@@ -225,7 +225,7 @@ update_configs:
         if($files -ne $null) {
             Write-Host " --> Addning Javascript"
             $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent + '`n' + $templateContent
+            $trgContent = $trgContent + $templateContent
         }
     }
 
@@ -236,7 +236,7 @@ update_configs:
         if($files -ne $null) {
             Write-Host " --> Adding Docker"
             $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent + '`n' + $templateContent
+            $trgContent = $trgContent + $templateContent
         }
     }
 
