@@ -257,6 +257,7 @@ update_configs:
     Set-Content -Path $targetFileName -Value $trgContent
 
     doCommit -FileName ".dependabot/config.yml"
+    Git-Push
 }
 
 
