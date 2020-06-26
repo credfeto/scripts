@@ -84,7 +84,7 @@ function updateFileAndCommit($sourceRepo, $targetRepo, $fileName) {
     $ret = updateFile -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $fileName
 
     if($ret -ne $null) {
-        doCommit -message $fileName
+        doCommit -fileName $fileName
         Git-Push
     }    
 }
@@ -154,7 +154,7 @@ function updateResharperSettings($srcRepo, $trgRepo) {
         Write-Host "Update $targetFileName"
         $ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
         if($ret -ne $null) {
-            doCommit -message "Resharper settings"
+            doCommit -fileName "Resharper settings"
             Git-Push
         }
     }
