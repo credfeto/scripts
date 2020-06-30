@@ -125,7 +125,7 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
                 Git-Push
             }
             else {
-                $branchName = "template/ff-1429-$fileName".Replace("\", "/")
+                $branchName = "template/ff-1429/$fileName".Replace("\", "/")
                 $branchOk = createBranch -name $branchName
                 if($branchOk -eq $true) {
                     Write-Host "Create Branch $branchName"
