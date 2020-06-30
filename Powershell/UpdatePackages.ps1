@@ -141,7 +141,7 @@ function processRepo($repo, $packages) {
             Continue
         }
 
-        $branchName = "depends/ff-1429-update-$packageId/$update"
+        $branchName = "depends/ff-1429/update-$packageId/$update"
         $branchExists = Git-DoesBranchExist -branchName $branchName
         if($branchExists -ne $true) {
 
