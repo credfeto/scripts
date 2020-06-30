@@ -184,7 +184,7 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
         Write-Host "Merge File: $targetMergeFileName"
         $mergeContent = Get-Content -Path $targetMergeFileName -Raw
 
-        $trgContent = $srcContent + "'n" + $mergeContent + "'n"
+        $trgContent = $srcContent + $mergeContent
 
         Set-Content -Path $targetFileName -Value $trgContent
         doCommit -fileName $fileName
