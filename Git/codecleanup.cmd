@@ -58,7 +58,7 @@ git reset head --hard
 git clean -f -x -d
 
 
-SET BRANCHNAME=cleanup/ff-2244-%SOLUTIONFILE%
+SET BRANCHNAME=cleanup/ff-2244/%SOLUTIONFILE%
 git remote update origin --prune
 git branch -D %BRANCHNAME%
 git remote update origin --prune
