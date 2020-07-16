@@ -4,7 +4,7 @@ function findPreReleasePackageVersion( $packageId) {
 
     $packageIdRegex = $packageId.Replace(".", "\.")
 
-    $entry = &%teamcity.tool.NuGet.CommandLine.DEFAULT%\tools\nuget.exe list PackageId:$packageId -prerelease | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
+    $entry = &nuget.exe list PackageId:$packageId -prerelease | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
     
     if($entry -eq $null) {
         return $null
