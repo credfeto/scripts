@@ -8,7 +8,7 @@ Remove-Module *
 
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "JetBrains.ReSharper.GlobalTools"
-$preRelease = $False
+$preRelease = $True
 $root = Get-Location
 Write-Host $root
 
