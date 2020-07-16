@@ -60,9 +60,11 @@ function runCodeCleanup($solutionFile) {
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
     if($buildOk -ne $true) {
+        Write-Host ">>>>> Build Failed!"
         return $false;
     }
 
+    Write-Host "* Running Code Cleanup"
     jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:WARN --no-buildin-settings --no-builtin-settings
     if(!$?) {
         Write-Host "Code Cleanup failed"
@@ -140,21 +142,7 @@ if($installed -eq $false) {
 
 $repoList = Git-LoadRepoList -repos $repos
 
-
-Set-Location $root
-    
-Write-Host "Loading template: $templateRepo"
-
-# Extract the folder from the repo name
-$templateFolder = $templateRepo.Substring($templateRepo.LastIndexOf("/")+1)
-$templateFolder = $templateFolder.SubString(0, $templateFolder.LastIndexOf("."))
-
-Write-Host "Template Folder: $templateFolder"
-$templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
-
-Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
-
-Set-Location $root
+Set-Location $root   
 
 ForEach($repo in $repoList) {
     if($repo.Trim() -eq "") {
