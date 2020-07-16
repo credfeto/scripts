@@ -4,19 +4,13 @@ param(
     [string] $repos = $(throw "repos.lst file containing list of repositories")
 )
 
+Remove-Module *
+
 $ErrorActionPreference = "Stop" 
+$packageIdToInstall = "JetBrains.ReSharper.GlobalTools"
+$preRelease = $False
 $root = Get-Location
 Write-Host $root
-
-$clt = $env:RESHARPER_COMMAND_LINE_TOOLS
-if(clt -eq "") {
-    throw "RESHARPER_COMMAND_LINE_TOOLS not defined"
-}
-if(clt -eq $null) {
-    throw "RESHARPER_COMMAND_LINE_TOOLS not defined"
-}
-
-$codeCleanup = Join-Path -Path $clt -ChildPath "codecleanup.exe"
 
 
 #########################################################################
@@ -25,12 +19,31 @@ $codeCleanup = Join-Path -Path $clt -ChildPath "codecleanup.exe"
 #
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib" 
+Write-Host "Loading Modules from $ScriptDirectory"
 try {
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: DotNetTool" 
+}
+
+try
+{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: GitUtils" 
+}
+
+try
+{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
 }
 catch {
-    Throw "Error while loading supporting PowerShell Scripts" 
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: DotNetBuild" 
 }
 #endregion
 
@@ -50,9 +63,7 @@ function runCodeCleanup($solutionFile) {
         return $false;
     }
 
-    $codeCleanup = Join-Path 
-
-    & $codeCleanup --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:WARN --no-buildin-settings --no-builtin-settings
+    jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:WARN --no-buildin-settings --no-builtin-settings
     if(!$?) {
         Write-Host "Code Cleanup failed"
         return $false
@@ -93,12 +104,12 @@ function processRepo($srcRepo, $repo) {
 
             $solutionFile = $solution.FullName
             $solutionName = $solution.Name
-            $branchName = "cleanup/ff-2244-$solutionName"
+            $branchName = "cleanup/ff-2244/$solutionName"
             $branchExists = Git-DoesBranchExist -branchName $branchName
             if($branchExists -ne $true) {
 
                 $cleaned = runCodeCleanup -solutionFile $solution.FullName
-                if$cleaned -eq $true) {
+                if($cleaned -eq $true) {
 
                     $hasChanges = Git-HasUnCommittedChanges
                     if($hasChanges -eq $true) {
@@ -114,6 +125,17 @@ function processRepo($srcRepo, $repo) {
     }
 }
 
+
+
+#########################################################################
+
+
+$installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
+
+if($installed -eq $false) {
+    Write-Error ""
+	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
+}
 
 
 $repoList = Git-LoadRepoList -repos $repos
