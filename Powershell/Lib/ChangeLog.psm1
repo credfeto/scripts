@@ -129,6 +129,7 @@ Releases that have at least been deployed to staging, BUT NOT necessarily releas
 "
 
     Write-Host "* Creating Empty Changelog"
+    $output = $output.Trim()
     Set-Content -Path $fileName -Value $output
 }
 
@@ -201,6 +202,7 @@ param(
 
     if($done -eq $true) {
         Write-Host "* Saving Changelog"
+	$output = $output.Trim()
         Set-Content -Path $fileName -Value $output
     }
     else {
