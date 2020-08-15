@@ -1,3 +1,109 @@
+
+function DotNet-BuildClean {
+    try {
+        Write-Host " * Cleaning"
+        dotnet clean --configuration=Release 
+        if(!$?) {
+            Write-Host ">>> Clean Failed"
+            return $False
+        }
+
+        return $true
+    } catch  {
+        Write-Host ">>> Clean Failed"
+        return $False
+    }
+}
+
+function DotNet-BuildRestore {
+    try {
+        Write-Host " * Restoring"
+        dotnet restore
+        if(!$?) {
+            Write-Host ">>> Restore Failed"
+            return $False
+        }
+
+        return $true
+    } catch  {
+        Write-Host ">>> Restore Failed"
+        return $False
+    }
+}
+
+function DotNet-Build {
+    try {
+        Write-Host " * Building"
+        dotnet build --configuration=Release --no-restore -warnAsError
+        if(!$?) {
+            Write-Host ">>> Build Failed"
+            
+            return $False
+        }
+
+        return $true
+    } catch  {
+        Write-Host ">>> Build Failed"
+        return $False
+    }
+}
+
+function DotNet-BuildRunUnitTestsLinux {
+    try {
+        Write-Host " * Unit Tests"
+        dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName\!~Integration
+        if(!$?) {
+            Write-Host ">>> Tests Failed"
+            return $False
+        }
+
+        return $true
+    } catch  {
+        Write-Host ">>> Tests Failed"
+        return $False
+    }
+}
+
+function DotNet-BuildRunUnitTestsWindows {
+    try {
+
+        Write-Host " * Unit Tests"
+        dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration
+        if(!$?) {
+            # Didn't Build
+            Write-Host ">>> Tests Failed"
+            return $False
+        }
+
+        return $true
+    } catch  {
+        # Didn't Build
+        Write-Host ">>> Tests Failed"
+        return $False
+    }
+}
+
+
+function DotNet-BuildRunIntegrationTests {
+    try {
+
+        Write-Host " * Unit Tests and Integration Tests"    
+        dotnet test --configuration Release --no-build --no-restore
+        if(!$?) {
+            # Didn't Build
+            Write-Host ">>> Tests Failed"
+            return $False;
+        }
+
+        return $true
+    } catch  {
+        # Didn't Build
+        Write-Host ">>> Tests Failed"
+        return $False
+    }
+}
+
+
 <#
  .Synopsis
   Builds a .net core solution
@@ -25,70 +131,33 @@ param(
     Set-Location $srcFolder
 
     Write-Host "Building Source in $srcFolder"
-    Write-Host " * Cleaning"
-    dotnet clean --configuration=Release 
-    if(!$?) {
-        # Didn't Build
-        Write-Host ">>> Clean Failed"
-        return $false
+
+    $buildOk = DotNet-BuildClean
+    if($buildOk -ne $true) {
+        return $buildOk
     }
 
-    Write-Host " * Restoring"
-    dotnet restore
-    if(!$?) {
-        # Didn't Build
-        Write-Host ">>> Restore Failed"
-        return $false
+    $buildOk = DotNet-BuildRestore
+    if($buildOk -ne $true) {
+        return $buildOk
     }
 
-    Write-Host " * Building"
-    dotnet build --configuration=Release --no-restore -warnAsError
-    if(!$?) {
-        Write-Host ">>> Build Failed"
-        # Didn't Build
-        return $false
+
+    $buildOk = DotNet-Build
+    if($buildOk -ne $true) {
+        return $buildOk
     }
 
     if($runTests -eq $true) {
-        try
-        {
-            if($includeIntegrationTests -eq $false) {
-                Write-Host " * Unit Tests"    
-                
-		if($IsLinux -eq $True) {
-                    Write-Host "------ Linux"
-                    dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName\!~Integration
-                    if(!$?) {
-                        # Didn't Build
-                        Write-Host ">>> Tests Failed (linux)"
-                        return $false
-                    }
-		    return $True
-                }
-                else {
-                    Write-Host "---------- Windows"
-                    dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration                    
-                    if(!$?) {
-                        # Didn't Build
-                        Write-Host ">>> Tests Failed (Windows)"
-                        return $false
-                    }
-		    return $True
-                }
+        if($includeIntegrationTests -eq $false) {
+	        if($IsLinux -eq $true) {
+                return DotNet-BuildRunUnitTestsLinux
+            } else {
+                return DotNet-BuildRunUnitTestsWindows
             }
-            else {
-                Write-Host " * Unit Tests and Integration Tests"    
-                dotnet test --configuration Release --no-build --no-restore
-                if(!$?) {
-                    # Didn't Build
-                    Write-Host ">>> Tests Failed"
-                    return $false;
-                }
-            }
-         } catch  {
-            # Didn't Build
-            Write-Host ">>> Tests Failed"
-            return $false
+        }
+        else {
+            return DotNet-BuildRunIntegrationTests
         }
     }
 
