@@ -185,7 +185,7 @@ if($installed -eq $false) {
 
 $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
 
-$repoList = Git-LoadRepoList -repos $repos
+$repoList = Git-LoadRepoList -repoFile $repos
 ForEach($repo in $repoList) {
     if($repo.Trim() -eq "") {
         continue

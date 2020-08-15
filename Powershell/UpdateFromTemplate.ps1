@@ -331,7 +331,7 @@ function processRepo($srcRepo, $repo) {
 }
 
 
-$repoList = Git-LoadRepoList -repos $repos
+$repoList = Git-LoadRepoList -repoFile $repos
 
 
 Set-Location $root

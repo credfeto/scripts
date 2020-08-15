@@ -140,7 +140,7 @@ if($installed -eq $false) {
 }
 
 
-$repoList = Git-LoadRepoList -repos $repos
+$repoList = Git-LoadRepoList -repoFile $repos
 
 Set-Location $root   
 

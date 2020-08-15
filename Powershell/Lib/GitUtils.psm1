@@ -144,7 +144,9 @@ param(
     [string] $repoFile
     )
 
-    return Get-Content $repos | Select-Object
+    Write-Host "Loading Repos from $repoFile"
+
+    return Get-Content -Path $repoFile | Select-Object
 }
 
 Export-ModuleMember -Function Git-RemoveAllLocalBranches
