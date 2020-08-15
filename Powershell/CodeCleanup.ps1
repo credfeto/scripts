@@ -51,11 +51,13 @@ catch {
 
 function runCodeCleanup($solutionFile) {
 
+    $tempFolder = [System.IO.Path]::GetTempPath()
+
     $sourceFolder = Split-Path -Path $solutionFile -Parent
     $sourceFolderWithoutDrive = $sourceFolder.Substring(3)
 
     #SET SOLUTIONFILE=%~nx1
-    $cachesFolder = Join-Path -Path $env:TEMP -ChildPath $sourceFolderWithoutDrive
+    $cachesFolder = Join-Path -Path $tempFolder -ChildPath $sourceFolderWithoutDrive
     $settingsFile = $solutionFile + ".DotSettings"
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder

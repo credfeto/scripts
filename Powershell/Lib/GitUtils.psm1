@@ -13,10 +13,10 @@ function Git-RemoveAllLocalBranches {
 function Git-ResetToMaster {
 
     # junk any existing checked out files
-    git reset head --hard
+    git reset HEAD --hard
     git clean -f -x -d
     git checkout master
-    git reset head --hard
+    git reset HEAD --hard
     git clean -f -x -d
     git fetch
 
@@ -104,6 +104,9 @@ param(
     $regex = $branchName.replace(".", "\.") + "$"
 
     $result -match $regex
+    if($result -eq $null) {
+	return $false;
+    }
     $result = $result.Trim()
     if($result -eq $branchName) {
         return $true
