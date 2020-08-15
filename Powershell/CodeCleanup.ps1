@@ -63,7 +63,7 @@ function runCodeCleanup($solutionFile) {
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
     if($buildOk -eq $true) {
         Write-Host "* Running Code Cleanup"
-        jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:WARN --no-buildin-settings --no-builtin-settings
+        dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:WARN --no-buildin-settings --no-builtin-settings
         if(!$?) {
             Write-Host ">>>>> Code Cleanup failed"
             return $false
