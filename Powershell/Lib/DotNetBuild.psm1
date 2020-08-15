@@ -30,7 +30,7 @@ param(
     if(!$?) {
         # Didn't Build
         Write-Host ">>> Clean Failed"
-        return $false;
+        return $false
     }
 
     Write-Host " * Restoring"
@@ -38,7 +38,7 @@ param(
     if(!$?) {
         # Didn't Build
         Write-Host ">>> Restore Failed"
-        return $false;
+        return $false
     }
 
     Write-Host " * Building"
@@ -46,7 +46,7 @@ param(
     if(!$?) {
         Write-Host ">>> Build Failed"
         # Didn't Build
-        return $false;
+        return $false
     }
 
     if($runTests -eq $true) {
@@ -54,11 +54,26 @@ param(
         {
             if($includeIntegrationTests -eq $false) {
                 Write-Host " * Unit Tests"    
-                dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration
-                if(!$?) {
-                    # Didn't Build
-                    Write-Host ">>> Tests Failed"
-                    return $false;
+                
+		if($IsLinux -eq $True) {
+                    Write-Host "------ Linux"
+                    dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName\!~Integration
+                    if(!$?) {
+                        # Didn't Build
+                        Write-Host ">>> Tests Failed (linux)"
+                        return $false
+                    }
+		    return $True
+                }
+                else {
+                    Write-Host "---------- Windows"
+                    dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration                    
+                    if(!$?) {
+                        # Didn't Build
+                        Write-Host ">>> Tests Failed (Windows)"
+                        return $false
+                    }
+		    return $True
                 }
             }
             else {
@@ -73,11 +88,11 @@ param(
          } catch  {
             # Didn't Build
             Write-Host ">>> Tests Failed"
-            return $false;
+            return $false
         }
     }
 
-    return $true;
+    return $true
 }
 
 Export-ModuleMember -Function DotNet-BuildSolution

@@ -62,6 +62,7 @@ function runCodeCleanup($solutionFile) {
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
     if($buildOk -ne $true) {
+	Write-Host $buildOk
         Write-Host ">>>>> Build Failed!"
         return $false;
     }
