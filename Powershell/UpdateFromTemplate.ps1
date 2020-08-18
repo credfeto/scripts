@@ -31,8 +31,19 @@ function makePath($Path, $ChildPath) {
   return [System.IO.Path]::Combine($Path,$ChildPath)
 }
 
+function convertToOsPath($path) {
+    if($IsLinux -eq $true) {
+        return $path.Replace("\", "/")
+    }
+
+    return $path
+}
+
 
 function updateOneFile($sourceFileName, $targetFileName) {
+    $sourceFileName = convertToOsPath -path $sourceFileName
+    $targetFileName = convertToOsPath -path $targetFileName
+
     $srcExists = Test-Path -Path $sourceFileName
     $trgExists = Test-Path -Path $targetFileName
 
@@ -67,6 +78,8 @@ function updateOneFile($sourceFileName, $targetFileName) {
 }
 
 function updateFile($sourceRepo, $targetRepo, $fileName) {
+    $fileName = convertToOsPath -path $fileName
+
     Write-Host "Checking $fileName"
 
     $sourceFileName = makePath -Path $sourceRepo -ChildPath $fileName
@@ -110,6 +123,8 @@ function hasCodeToBuild($targetRepo) {
 }
 
 function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
+    $fileName = convertToOsPath -path $fileName
+
     $canBuild = hasCodeToBuild -targetRepo $targetRepo
     if($canBuild -eq $false) {
         return updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $fileName
@@ -145,7 +160,9 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
 }
 
 function updateResharperSettings($srcRepo, $trgRepo) {
-    $sourceFileName = makePath -Path $srcRepo -ChildPath "src\FunFair.Template.sln.DotSettings"
+    $sourceTemplateFile = convertToOsPath -path "src\FunFair.Template.sln.DotSettings"
+
+    $sourceFileName = makePath -Path $srcRepo -ChildPath $sourceTemplateFile
     $files = Get-ChildItem -Path $repoFolder -Filter *.sln -Recurse
     ForEach($file in $files) {
         $targetFileName = $file.FullName
@@ -161,6 +178,8 @@ function updateResharperSettings($srcRepo, $trgRepo) {
 }
 
 function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileName) {
+    $fileName = $fileName.Replace("\", "/")
+    $mergeFileName = $mergeFileName.Replace("\", "/")
     
     Write-Host "Merging ? $fileName"
     $sourceFileName = makePath -Path $srcRepo -ChildPath $fileName
@@ -260,6 +279,7 @@ update_configs:
 
 
 function ensureFolderExists($baseFolder, $subFolder) {
+    $subFolder = $subFolder.Replace("\", "/")
     $fullPath = makePath -Path $baseFolder -ChildPath $subFolder
     $exists = Test-Path -Path $fullPath -PathType Container
     if($exists -eq $false) {
