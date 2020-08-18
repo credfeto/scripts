@@ -50,7 +50,7 @@ catch {
 
 try
 {
-    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.psm1") -Force -DisableNameChecking
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "ChangeLog.psm1") -Force -DisableNameChecking
 }
 catch {
     Write-Error $Error[0]

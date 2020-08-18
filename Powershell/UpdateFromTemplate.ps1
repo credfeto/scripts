@@ -19,7 +19,7 @@ $ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib"
 try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
-    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Changelog.psm1") -Force -DisableNameChecking
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "ChangeLog.psm1") -Force -DisableNameChecking
 }
 catch {
     Throw "Error while loading supporting PowerShell Scripts" 
