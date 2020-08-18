@@ -136,7 +136,7 @@ param(
     )
 
     
-    Set-Location $srcFolder
+    Set-Location -Path $srcFolder
 
     Write-Host "Building Source in $srcFolder"
 

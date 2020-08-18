@@ -85,7 +85,7 @@ function checkForUpdates($repoFolder, $packageId) {
 
 function processRepo($repo, $packages) {
     
-    Set-Location $root
+    Set-Location -Path $root
     
     Write-Host ""
     Write-Host "***********************************************************************************"

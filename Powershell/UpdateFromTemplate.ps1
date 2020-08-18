@@ -290,7 +290,7 @@ function ensureFolderExists($baseFolder, $subFolder) {
 
 function processRepo($srcRepo, $repo) {
     
-    Set-Location $root
+    Set-Location -Path $root
     
     Write-Host "Processing Repo: $repo"
 
@@ -301,7 +301,10 @@ function processRepo($srcRepo, $repo) {
     Write-Host "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
 
+    
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
+
+    Set-Location -Path $repoFolder
 
     #########################################################
     # CREATE ANY FOLDERS THAT ARE NEEDED
@@ -355,7 +358,7 @@ function processRepo($srcRepo, $repo) {
 $repoList = Git-LoadRepoList -repoFile $repos
 
 
-Set-Location $root
+Set-Location -Path $root
     
 Write-Host "Loading template: $templateRepo"
 
@@ -368,7 +371,7 @@ $templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
 
 Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
-Set-Location $root
+Set-Location -Path $root
 
 ForEach($repo in $repoList) {
     if($repo.Trim() -eq "") {
@@ -378,5 +381,5 @@ ForEach($repo in $repoList) {
     processRepo -srcRepo $templateRepoFolder -repo $repo
 }
 
-Set-Location $root
+Set-Location -Path $root
 

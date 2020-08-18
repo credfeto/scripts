@@ -53,13 +53,14 @@ param(
 
     if ($gitHeadCloned -eq $True) {
         Write-Host "Already Cloned"
-        Set-Location $repofolder
+        Set-Location -Path $repofolder
 
         Git-ResetToMaster
     }
     else
     {
-        git clone $repo        
+        git clone $repo
+        Set-Location -Path $repofolder
     }
 }
 
@@ -67,6 +68,8 @@ function Git-Commit {
 param(
     [string] $message
     )
+    
+
 
     git add -A
     git commit -m"$message"

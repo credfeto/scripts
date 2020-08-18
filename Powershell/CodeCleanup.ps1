@@ -87,7 +87,7 @@ function runCodeCleanup($solutionFile) {
 
 function processRepo($srcRepo, $repo) {
     
-    Set-Location $root
+    Set-Location -Path $root
     
     Write-Host "Processing Repo: $repo"
 
@@ -99,6 +99,8 @@ function processRepo($srcRepo, $repo) {
     $repoFolder = Join-Path -Path $root -ChildPath $folder
 
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
+
+    Set-Location -Path $repoFolder
 
     #########################################################
     # C# file updates
@@ -117,6 +119,8 @@ function processRepo($srcRepo, $repo) {
 
                 $cleaned = runCodeCleanup -solutionFile $solution.FullName
                 if($cleaned -eq $true) {
+
+                    Set-Location -Path $repoFolder
 
                     $hasChanges = Git-HasUnCommittedChanges
                     if($hasChanges -eq $true) {
@@ -147,7 +151,7 @@ if($installed -eq $false) {
 
 $repoList = Git-LoadRepoList -repoFile $repos
 
-Set-Location $root   
+Set-Location -Path $root   
 
 ForEach($repo in $repoList) {
     if($repo.Trim() -eq "") {
@@ -157,5 +161,5 @@ ForEach($repo in $repoList) {
     processRepo -srcRepo $templateRepoFolder -repo $repo
 }
 
-Set-Location $root
+Set-Location -Path $root
 
