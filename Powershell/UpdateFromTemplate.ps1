@@ -27,8 +27,9 @@ catch {
 #endregion
 
 function makePath($Path, $ChildPath) {
-    
-  return [System.IO.Path]::Combine($Path,$ChildPath)
+    $ChildPath = convertToOsPath -path $ChildPath
+
+    return [System.IO.Path]::Combine($Path,$ChildPath)
 }
 
 function convertToOsPath($path) {
@@ -178,8 +179,8 @@ function updateResharperSettings($srcRepo, $trgRepo) {
 }
 
 function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileName) {
-    $fileName = $fileName.Replace("\", "/")
-    $mergeFileName = $mergeFileName.Replace("\", "/")
+    $fileName = convertToOsPath -path $fileName
+    $mergeFileName = convertToOsPath -path $mergeFileName
     
     Write-Host "Merging ? $fileName"
     $sourceFileName = makePath -Path $srcRepo -ChildPath $fileName
@@ -262,7 +263,8 @@ update_configs:
     $templateFile = makePath -Path $srcPath -ChildPath 'config.template.github_actions'
     $templateFileExists = Test-Path -Path $templateFile
     if($templateFileExists -eq $true) {
-        $files = Get-ChildItem -Path $trgRepo -Filter *.yml -Recurse
+        $actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
+        $files = Get-ChildItem -Path $actionsTargetPath -Filter *.yml -Recurse
         if($files -ne $null) {
             Write-Host " --> Adding Github Actions"
             $templateContent = Get-Content -Path $templateFile -Raw
@@ -279,7 +281,6 @@ update_configs:
 
 
 function ensureFolderExists($baseFolder, $subFolder) {
-    $subFolder = $subFolder.Replace("\", "/")
     $fullPath = makePath -Path $baseFolder -ChildPath $subFolder
     $exists = Test-Path -Path $fullPath -PathType Container
     if($exists -eq $false) {
