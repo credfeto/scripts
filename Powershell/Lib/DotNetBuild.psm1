@@ -5,13 +5,15 @@ function DotNet-BuildClean {
         dotnet clean --configuration=Release 
         if(!$?) {
             Write-Host ">>> Clean Failed"
-            return $False
+            return $false
         }
+        
+        Write-Host "   - Clean Succeded"
 
         return $true
     } catch  {
         Write-Host ">>> Clean Failed"
-        return $False
+        return $false
     }
 }
 
@@ -21,13 +23,14 @@ function DotNet-BuildRestore {
         dotnet restore
         if(!$?) {
             Write-Host ">>> Restore Failed"
-            return $False
+            return $false
         }
 
+        Write-Host "   - Restore Succeded"
         return $true
     } catch  {
         Write-Host ">>> Restore Failed"
-        return $False
+        return $false
     }
 }
 
@@ -38,13 +41,15 @@ function DotNet-Build {
         if(!$?) {
             Write-Host ">>> Build Failed"
             
-            return $False
+            return $false
         }
+
+        Write-Host "   - Build Succeded"
 
         return $true
     } catch  {
         Write-Host ">>> Build Failed"
-        return $False
+        return $false
     }
 }
 
@@ -54,13 +59,14 @@ function DotNet-BuildRunUnitTestsLinux {
         dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName\!~Integration
         if(!$?) {
             Write-Host ">>> Tests Failed"
-            return $False
+            return $false
         }
 
+        Write-Host "   - Tests Succeded"
         return $true
     } catch  {
         Write-Host ">>> Tests Failed"
-        return $False
+        return $false
     }
 }
 
@@ -72,14 +78,15 @@ function DotNet-BuildRunUnitTestsWindows {
         if(!$?) {
             # Didn't Build
             Write-Host ">>> Tests Failed"
-            return $False
+            return $false
         }
 
+        Write-Host "   - Tests Succeded"
         return $true
     } catch  {
         # Didn't Build
         Write-Host ">>> Tests Failed"
-        return $False
+        return $false
     }
 }
 
@@ -92,14 +99,15 @@ function DotNet-BuildRunIntegrationTests {
         if(!$?) {
             # Didn't Build
             Write-Host ">>> Tests Failed"
-            return $False;
+            return $false;
         }
 
+        Write-Host "   - Tests Succeded"
         return $true
     } catch  {
         # Didn't Build
         Write-Host ">>> Tests Failed"
-        return $False
+        return $false
     }
 }
 
@@ -133,35 +141,30 @@ param(
     Write-Host "Building Source in $srcFolder"
 
     $buildOk = DotNet-BuildClean
-    if($buildOk -ne $true) {
-        return $buildOk
-    }
-
-    $buildOk = DotNet-BuildRestore
-    if($buildOk -ne $true) {
-        return $buildOk
-    }
-
-
-    $buildOk = DotNet-Build
-    if($buildOk -ne $true) {
-        return $buildOk
-    }
-
-    if($runTests -eq $true) {
-        if($includeIntegrationTests -eq $false) {
-	        if($IsLinux -eq $true) {
-                return DotNet-BuildRunUnitTestsLinux
-            } else {
-                return DotNet-BuildRunUnitTestsWindows
+    if($buildOk -eq $true) {
+        $buildOk = DotNet-BuildRestore
+        if($buildOk -eq $true) {
+            $buildOk = DotNet-Build
+            if($buildOk -eq $true) {
+                if($runTests -eq $true) {
+                    if($includeIntegrationTests -eq $false) {
+	                    if($IsLinux -eq $true) {
+                            return DotNet-BuildRunUnitTestsLinux
+                        } else {
+                            return DotNet-BuildRunUnitTestsWindows
+                        }
+                    }
+                    else {
+                        return DotNet-BuildRunIntegrationTests
+                    }
+                } else {
+                    return $true
+                }
             }
         }
-        else {
-            return DotNet-BuildRunIntegrationTests
-        }
     }
 
-    return $true
+    return $false
 }
 
 Export-ModuleMember -Function DotNet-BuildSolution
