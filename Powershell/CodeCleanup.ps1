@@ -54,7 +54,10 @@ function runCodeCleanup($solutionFile) {
     $tempFolder = [System.IO.Path]::GetTempPath()
 
     $sourceFolder = Split-Path -Path $solutionFile -Parent
-    $sourceFolderWithoutDrive = $sourceFolder.Substring(3)
+    $sourceFolderWithoutDrive = $sourceFolder;
+    if($sourceFolder[1] -eq ":") { 
+        $sourceFolderWithoutDrive = $sourceFolder.Substring(3)
+    }    
 
     #SET SOLUTIONFILE=%~nx1
     $cachesFolder = Join-Path -Path $tempFolder -ChildPath $sourceFolderWithoutDrive
@@ -63,6 +66,10 @@ function runCodeCleanup($solutionFile) {
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
     if($buildOk -eq $true) {
         Write-Host "* Running Code Cleanup"
+        Write-Host "  - Solution: $Solution"
+        Write-Host "  - Cache Folder: $cachesFolder"
+        Write-Host "  - Settings File: $settingsFile"
+
         dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:WARN --no-buildin-settings --no-builtin-settings
         if(!$?) {
             Write-Host ">>>>> Code Cleanup failed"
