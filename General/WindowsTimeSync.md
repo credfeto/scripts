@@ -13,3 +13,5 @@ w32tm /config /update /manualpeerlist:"uk.pool.ntp.org"
 
 w32tm /resync
 ```
+
+Then set the ``Windows Time`` service to start automatically
