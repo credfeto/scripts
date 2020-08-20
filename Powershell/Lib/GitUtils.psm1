@@ -69,9 +69,24 @@ param(
     [string] $message
     )
     
-
-
     git add -A
+    git commit -m"$message"
+}
+
+function Git-Commit-Named {
+param(
+    [string] $message,
+    [String[]] $files
+    )
+    
+
+    foreach($file in $files) {
+        $fileUnix = $file.Replace("\", "/")
+        Write-Host "Staging $fileUnix"
+        git add $fileUnix
+    }
+
+    
     git commit -m"$message"
 }
 
@@ -160,6 +175,7 @@ Export-ModuleMember -Function Git-ResetToMaster
 Export-ModuleMember -Function Git-EnsureSynchronised
 Export-ModuleMember -Function Git-HasUnCommittedChanges
 Export-ModuleMember -Function Git-Commit
+Export-ModuleMember -Function Git-Commit-Named
 Export-ModuleMember -Function Git-CreateBranch
 Export-ModuleMember -Function Git-Push
 Export-ModuleMember -Function Git-PushOrigin

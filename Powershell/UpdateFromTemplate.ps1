@@ -90,6 +90,7 @@ function updateFile($sourceRepo, $targetRepo, $fileName) {
 }
 
 function doCommit($fileName) {
+    Write-Host "Staging $fileName"
     Git-Commit -message "[FF-1429] - Update $fileName to match the template repo"
 }
 
@@ -169,10 +170,12 @@ function updateResharperSettings($srcRepo, $trgRepo) {
         $targetFileName = $file.FullName
         $targetFileName = $targetFileName + ".DotSettings"
 
+        $fileNameForCommit = $targetFileName.SubString(0, $trgRepo.Length + 1)
+
         Write-Host "Update $targetFileName"
         $ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
         if($ret -ne $null) {
-            doCommit -fileName "Resharper settings"
+            doCommit -fileName $fileNameForCommit
             Git-Push
         }
     }
