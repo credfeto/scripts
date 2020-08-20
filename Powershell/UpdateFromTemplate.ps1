@@ -91,7 +91,8 @@ function updateFile($sourceRepo, $targetRepo, $fileName) {
 
 function doCommit($fileName) {
     Write-Host "Staging $fileName"
-    Git-Commit -message "[FF-1429] - Update $fileName to match the template repo"
+    [String[]] $files = $filename.Replace("\", "/")
+    Git-Commit-Named -message "[FF-1429] - Update $fileName to match the template repo" -files $fileName
 }
 
 function updateFileAndCommit($sourceRepo, $targetRepo, $fileName) {
