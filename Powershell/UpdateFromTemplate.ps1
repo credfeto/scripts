@@ -170,7 +170,7 @@ function updateResharperSettings($srcRepo, $trgRepo) {
         $targetFileName = $file.FullName
         $targetFileName = $targetFileName + ".DotSettings"
 
-        $fileNameForCommit = $targetFileName.SubString(0, $trgRepo.Length + 1)
+        $fileNameForCommit = $targetFileName.SubString($trgRepo.Length + 1)
 
         Write-Host "Update $targetFileName"
         $ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
@@ -337,10 +337,14 @@ function processRepo($srcRepo, $repo) {
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\CODEOWNERS"
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\PULL_REQUEST_TEMPLATE.md"
 
-    $workflows = Join-Path -Path $srcRepo -ChildPath ".github\workflows"
+    
+    $workflows = makePath -Path $srcRepo -ChildPath ".github\workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml
     ForEach($file in $files) {
-	    $fileToUpdate = ".github\workflows\$file"
+        $srcFileName = $file.FullName
+        $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
+
+	    $fileToUpdate = $srcFileName
         updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
     }
 
