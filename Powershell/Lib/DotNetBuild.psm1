@@ -2,9 +2,10 @@
 function DotNet-BuildClean {
     try {
         Write-Host " * Cleaning"
-        dotnet clean --configuration=Release 
+        $result = dotnet clean --configuration=Release 
         if(!$?) {
             Write-Host ">>> Clean Failed"
+            Write-Host $result
             return $false
         }
         
