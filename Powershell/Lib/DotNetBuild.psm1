@@ -158,6 +158,7 @@ param(
                     else {
                         $buildOk =  DotNet-BuildRunIntegrationTests
                     }
+                }
             }
         }
     }
