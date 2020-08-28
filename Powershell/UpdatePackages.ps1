@@ -147,6 +147,7 @@ function processRepo($repo, $packages) {
 
             Write-Host ">>>> Checking to see if code builds against $packageId $update <<<<"
             $codeOK = DotNet-BuildSolution -baseFolder $repoFolder
+            Set-Location -Path $repoFolder
             if($codeOK -eq $true) {
                 ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                 Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"

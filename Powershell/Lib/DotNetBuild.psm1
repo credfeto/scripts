@@ -136,6 +136,7 @@ param(
     )
 
     
+    $originalPath = (Get-Location).Path
     Set-Location -Path $srcFolder
 
     Write-Host "Building Source in $srcFolder"
@@ -149,22 +150,22 @@ param(
                 if($runTests -eq $true) {
                     if($includeIntegrationTests -eq $false) {
 	                    if($IsLinux -eq $true) {
-                            return DotNet-BuildRunUnitTestsLinux
+                            $buildOk = DotNet-BuildRunUnitTestsLinux
                         } else {
-                            return DotNet-BuildRunUnitTestsWindows
+                            $buildOk = DotNet-BuildRunUnitTestsWindows
                         }
                     }
                     else {
-                        return DotNet-BuildRunIntegrationTests
+                        $buildOk =  DotNet-BuildRunIntegrationTests
                     }
-                } else {
-                    return $true
-                }
             }
         }
     }
 
-    return $false
+    # Restore the original path after any build.
+    Set-Location -Path $originalPath
+
+    return $buildOk
 }
 
 Export-ModuleMember -Function DotNet-BuildSolution
