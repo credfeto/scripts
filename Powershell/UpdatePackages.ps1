@@ -123,6 +123,7 @@ function processRepo($repo, $packages) {
     $changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
 
     $codeOK = DotNet-BuildSolution -srcFolder $srcPath
+    Set-Location -Path $repoFolder
     if($codeOk -eq $false) {
         # no point updating
         Write-Host "* WARNING: Solution doesn't build without any changes - no point in trying to update packages"
@@ -146,7 +147,7 @@ function processRepo($repo, $packages) {
         if($branchExists -ne $true) {
 
             Write-Host ">>>> Checking to see if code builds against $packageId $update <<<<"
-            $codeOK = DotNet-BuildSolution -baseFolder $repoFolder
+            $codeOK = DotNet-BuildSolution -srcFolder $srcPath
             Set-Location -Path $repoFolder
             if($codeOK -eq $true) {
                 ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
