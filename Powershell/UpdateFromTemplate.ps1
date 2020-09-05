@@ -7,7 +7,7 @@ param(
 
 $ErrorActionPreference = "Stop" 
 $root = Get-Location
-Write-Host $root
+Write-Output $root
 
 
 #########################################################################
@@ -52,24 +52,24 @@ function updateOneFile($sourceFileName, $targetFileName) {
         
         $copy = $true
         if($trgExists -eq $true) {
-            Write-Host "--- Files exist - checking hash"
+            Write-Output "--- Files exist - checking hash"
             $srcHash = Get-FileHash -Path $sourceFileName -Algorithm SHA512
             $trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
         
             if($srcHash -eq $trgHash) {
                 $copy = $false;
-                Write-Host "--- Identical $sourceFileName to $targetFileName"
+                Write-Output "--- Identical $sourceFileName to $targetFileName"
             }
         }
                       
         if($copy -eq $true) {
-            Write-Host "--- Copy $sourceFileName to $targetFileName"
+            Write-Output "--- Copy $sourceFileName to $targetFileName"
             Copy-Item $sourceFileName -Destination $targetFileName -Force
             return $true
         }
     }
     elseif($trgExists -eq $true) {
-        Write-Host "--- Delete"
+        Write-Output "--- Delete"
         #Remove-Item -Path $targetFileName
 
         #return $null
@@ -81,7 +81,7 @@ function updateOneFile($sourceFileName, $targetFileName) {
 function updateFile($sourceRepo, $targetRepo, $fileName) {
     $fileName = convertToOsPath -path $fileName
 
-    Write-Host "Checking $fileName"
+    Write-Output "Checking $fileName"
 
     $sourceFileName = makePath -Path $sourceRepo -ChildPath $fileName
     $targetFileName = makePath -Path $targetRepo -ChildPath $fileName
@@ -90,7 +90,7 @@ function updateFile($sourceRepo, $targetRepo, $fileName) {
 }
 
 function doCommit($fileName) {
-    Write-Host "Staging $fileName"
+    Write-Output "Staging $fileName"
     [String[]] $files = $filename.Replace("\", "/")
     Git-Commit-Named -message "[FF-1429] - Update $fileName to match the template repo" -files $fileName
 }
@@ -111,14 +111,14 @@ function hasCodeToBuild($targetRepo) {
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $false) {
         # no source to update
-        Write-Host "* No src folder in repo"
+        Write-Output "* No src folder in repo"
         return $true;
     }
 
     $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
     if($projects.Length -eq 0) {
         # no source to update
-        Write-Host "* No C# projects in repo"
+        Write-Output "* No C# projects in repo"
         return $false;
     }
 
@@ -146,7 +146,7 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
                 $branchName = "template/ff-1429/$fileName".Replace("\", "/")
                 $branchOk = createBranch -name $branchName
                 if($branchOk -eq $true) {
-                    Write-Host "Create Branch $branchName"
+                    Write-Output "Create Branch $branchName"
                     doCommit -fileName $fileName
                     Git-PushOrigin -branchName $branchName
                 }
@@ -173,7 +173,7 @@ function updateResharperSettings($srcRepo, $trgRepo) {
 
         $fileNameForCommit = $targetFileName.SubString($trgRepo.Length + 1)
 
-        Write-Host "Update $targetFileName"
+        Write-Output "Update $targetFileName"
         $ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
         if($ret -ne $null) {
             doCommit -fileName $fileNameForCommit
@@ -186,12 +186,12 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
     $fileName = convertToOsPath -path $fileName
     $mergeFileName = convertToOsPath -path $mergeFileName
     
-    Write-Host "Merging ? $fileName"
+    Write-Output "Merging ? $fileName"
     $sourceFileName = makePath -Path $srcRepo -ChildPath $fileName
-    Write-Host "Source File: $sourceFileName"
+    Write-Output "Source File: $sourceFileName"
     $sourceFileNameExists = Test-Path -Path $sourceFileName -PathType Leaf
     if($sourceFileNameExists -eq $false) {
-        Write-Host "Non-Existent Source File: $sourceFileName"
+        Write-Output "Non-Existent Source File: $sourceFileName"
         return
     }
 
@@ -200,12 +200,12 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
 
     $targetMergeFileNameExists = Test-Path -Path $targetMergeFileName
     if($targetMergeFileNameExists -eq $true) {
-        Write-Host "Found $mergeFileName"
+        Write-Output "Found $mergeFileName"
         
-        Write-Host "Source File: $sourceFileName"
+        Write-Output "Source File: $sourceFileName"
         $srcContent = Get-Content -Path $sourceFileName -Raw
         
-        Write-Host "Merge File: $targetMergeFileName"
+        Write-Output "Merge File: $targetMergeFileName"
         $mergeContent = Get-Content -Path $targetMergeFileName -Raw
 
         $trgContent = $srcContent + $mergeContent
@@ -223,10 +223,10 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
 function buildDependabotConfig($srcRepo, $trgRepo) {
 
     $srcPath = makePath -Path $srcRepo -ChildPath ".dependabot"
-    write-host "$srcPath"
+    Write-Output "$srcPath"
     $targetFileName = makePath -Path $trgRepo -ChildPath ".dependabot\config.yml"
 
-    Write-Host "Building Dependabot Config:"
+    Write-Output "Building Dependabot Config:"
     $trgContent = "version: 1
 update_configs:
 "
@@ -236,7 +236,7 @@ update_configs:
     if($templateFileExists -eq $true) {        
         $files = Get-ChildItem -Path $trgRepo -Filter *.csproj -Recurse
         if($files -ne $null) {
-            Write-Host " --> Addning .NET"
+            Write-Output " --> Addning .NET"
             $templateContent = Get-Content -Path $templateFile -Raw
             $trgContent = $trgContent + $templateContent
         }
@@ -247,7 +247,7 @@ update_configs:
     if($templateFileExists -eq $true) {
         $files = Get-ChildItem -Path $trgRepo -Filter 'package.json' -Recurse
         if($files -ne $null) {
-            Write-Host " --> Addning Javascript"
+            Write-Output " --> Addning Javascript"
             $templateContent = Get-Content -Path $templateFile -Raw
             $trgContent = $trgContent + $templateContent
         }
@@ -258,7 +258,7 @@ update_configs:
     if($templateFileExists -eq $true) {
         $files = Get-ChildItem -Path $trgRepo -Filter 'Dockerfile' -Recurse
         if($files -ne $null) {
-            Write-Host " --> Adding Docker"
+            Write-Output " --> Adding Docker"
             $templateContent = Get-Content -Path $templateFile -Raw
             $trgContent = $trgContent + $templateContent
         }
@@ -270,13 +270,13 @@ update_configs:
         $actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
         $files = Get-ChildItem -Path $actionsTargetPath -Filter *.yml -Recurse
         if($files -ne $null) {
-            Write-Host " --> Adding Github Actions"
+            Write-Output " --> Adding Github Actions"
             $templateContent = Get-Content -Path $templateFile -Raw
             $trgContent = $trgContent +  $templateContent
         }
     }
 
-    Write-Host " --> Done"
+    Write-Output " --> Done"
     Set-Content -Path $targetFileName -Value $trgContent
 
     doCommit -FileName ".dependabot/config.yml"
@@ -296,13 +296,13 @@ function processRepo($srcRepo, $repo) {
     
     Set-Location -Path $root
     
-    Write-Host "Processing Repo: $repo"
+    Write-Output "Processing Repo: $repo"
 
     # Extract the folder from the repo name
     $folder = $repo.Substring($repo.LastIndexOf("/")+1)
     $folder = $folder.SubString(0, $folder.LastIndexOf("."))
 
-    Write-Host "Folder: $folder"
+    Write-Output "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
 
     
@@ -368,13 +368,13 @@ $repoList = Git-LoadRepoList -repoFile $repos
 
 Set-Location -Path $root
     
-Write-Host "Loading template: $templateRepo"
+Write-Output "Loading template: $templateRepo"
 
 # Extract the folder from the repo name
 $templateFolder = $templateRepo.Substring($templateRepo.LastIndexOf("/")+1)
 $templateFolder = $templateFolder.SubString(0, $templateFolder.LastIndexOf("."))
 
-Write-Host "Template Folder: $templateFolder"
+Write-Output "Template Folder: $templateFolder"
 $templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
 
 Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder

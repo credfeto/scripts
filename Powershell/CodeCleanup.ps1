@@ -10,7 +10,7 @@ $ErrorActionPreference = "Stop"
 $packageIdToInstall = "JetBrains.ReSharper.GlobalTools"
 $preRelease = $False
 $root = Get-Location
-Write-Host $root
+Write-Output $root
 
 
 #########################################################################
@@ -19,7 +19,7 @@ Write-Host $root
 #
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib" 
-Write-Host "Loading Modules from $ScriptDirectory"
+Write-Output "Loading Modules from $ScriptDirectory"
 try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
 }
@@ -65,22 +65,22 @@ function runCodeCleanup($solutionFile) {
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
     if($buildOk -eq $true) {
-        Write-Host "* Running Code Cleanup"
-        Write-Host "  - Solution: $Solution"
-        Write-Host "  - Cache Folder: $cachesFolder"
-        Write-Host "  - Settings File: $settingsFile"
+        Write-Output "* Running Code Cleanup"
+        Write-Output "  - Solution: $Solution"
+        Write-Output "  - Cache Folder: $cachesFolder"
+        Write-Output "  - Settings File: $settingsFile"
 
         dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:WARN --no-buildin-settings --no-builtin-settings
         if(!$?) {
-            Write-Host ">>>>> Code Cleanup failed"
+            Write-Output ">>>>> Code Cleanup failed"
             return $false
         }
 
-        Write-Host "* Building after cleanup"
+        Write-Output "* Building after cleanup"
         return DotNet-BuildSolution -srcFolder $sourceFolder
     }
 
-    Write-Host ">>>>> Build Failed!"
+    Write-Output ">>>>> Build Failed!"
     return $false;
 }
 
@@ -89,13 +89,13 @@ function processRepo($srcRepo, $repo) {
     
     Set-Location -Path $root
     
-    Write-Host "Processing Repo: $repo"
+    Write-Output "Processing Repo: $repo"
 
     # Extract the folder from the repo name
     $folder = $repo.Substring($repo.LastIndexOf("/")+1)
     $folder = $folder.SubString(0, $folder.LastIndexOf("."))
 
-    Write-Host "Folder: $folder"
+    Write-Output "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
 
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder

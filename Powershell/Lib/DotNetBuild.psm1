@@ -1,72 +1,72 @@
 
 function DotNet-BuildClean {
     try {
-        Write-Host " * Cleaning"
+        Write-Output " * Cleaning"
         $result = dotnet clean --configuration=Release 
         if(!$?) {
-            Write-Host ">>> Clean Failed"
-            Write-Host $result
+            Write-Output ">>> Clean Failed"
+            Write-Output $result
             return $false
         }
         
-        Write-Host "   - Clean Succeded"
+        Write-Output "   - Clean Succeded"
 
         return $true
     } catch  {
-        Write-Host ">>> Clean Failed"
+        Write-Output ">>> Clean Failed"
         return $false
     }
 }
 
 function DotNet-BuildRestore {
     try {
-        Write-Host " * Restoring"
+        Write-Output " * Restoring"
         dotnet restore
         if(!$?) {
-            Write-Host ">>> Restore Failed"
+            Write-Output ">>> Restore Failed"
             return $false
         }
 
-        Write-Host "   - Restore Succeded"
+        Write-Output "   - Restore Succeded"
         return $true
     } catch  {
-        Write-Host ">>> Restore Failed"
+        Write-Output ">>> Restore Failed"
         return $false
     }
 }
 
 function DotNet-Build {
     try {
-        Write-Host " * Building"
+        Write-Output " * Building"
         dotnet build --configuration=Release --no-restore -warnAsError
         if(!$?) {
-            Write-Host ">>> Build Failed"
+            Write-Output ">>> Build Failed"
             
             return $false
         }
 
-        Write-Host "   - Build Succeded"
+        Write-Output "   - Build Succeded"
 
         return $true
     } catch  {
-        Write-Host ">>> Build Failed"
+        Write-Output ">>> Build Failed"
         return $false
     }
 }
 
 function DotNet-BuildRunUnitTestsLinux {
     try {
-        Write-Host " * Unit Tests"
+        Write-Output " * Unit Tests"
         dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName\!~Integration
         if(!$?) {
-            Write-Host ">>> Tests Failed"
+            Write-Output ">>> Tests Failed"
             return $false
         }
 
-        Write-Host "   - Tests Succeded"
+        Write-Output "   - Tests Succeded"
         return $true
     } catch  {
-        Write-Host ">>> Tests Failed"
+        Write-Output ">>> Tests Failed"
         return $false
     }
 }
@@ -74,19 +74,19 @@ function DotNet-BuildRunUnitTestsLinux {
 function DotNet-BuildRunUnitTestsWindows {
     try {
 
-        Write-Host " * Unit Tests"
+        Write-Output " * Unit Tests"
         dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration
         if(!$?) {
             # Didn't Build
-            Write-Host ">>> Tests Failed"
+            Write-Output ">>> Tests Failed"
             return $false
         }
 
-        Write-Host "   - Tests Succeded"
+        Write-Output "   - Tests Succeded"
         return $true
     } catch  {
         # Didn't Build
-        Write-Host ">>> Tests Failed"
+        Write-Output ">>> Tests Failed"
         return $false
     }
 }
@@ -95,19 +95,19 @@ function DotNet-BuildRunUnitTestsWindows {
 function DotNet-BuildRunIntegrationTests {
     try {
 
-        Write-Host " * Unit Tests and Integration Tests"    
+        Write-Output " * Unit Tests and Integration Tests"    
         dotnet test --configuration Release --no-build --no-restore
         if(!$?) {
             # Didn't Build
-            Write-Host ">>> Tests Failed"
+            Write-Output ">>> Tests Failed"
             return $false;
         }
 
-        Write-Host "   - Tests Succeded"
+        Write-Output "   - Tests Succeded"
         return $true
     } catch  {
         # Didn't Build
-        Write-Host ">>> Tests Failed"
+        Write-Output ">>> Tests Failed"
         return $false
     }
 }
@@ -142,7 +142,7 @@ param(
 
     try
     {
-        Write-Host "Building Source in $srcFolder"
+        Write-Output "Building Source in $srcFolder"
 
         $buildOk = DotNet-BuildClean
         if($buildOk -eq $true) {
