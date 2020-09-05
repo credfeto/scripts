@@ -48,11 +48,11 @@ param(
     $gitHead = Join-Path -Path $repoFolder -ChildPath ".git" 
     $gitHead = Join-Path -Path $gitHead -ChildPath "HEAD" 
     
-    Write-Host $gitHead
+    Write-Output $gitHead
     $gitHeadCloned = Test-Path -path $gitHead
 
     if ($gitHeadCloned -eq $True) {
-        Write-Host "Already Cloned"
+        Write-Output "Already Cloned"
         Set-Location -Path $repofolder
 
         Git-ResetToMaster
@@ -82,7 +82,7 @@ param(
 
     foreach($file in $files) {
         $fileUnix = $file.Replace("\", "/")
-        Write-Host "Staging $fileUnix"
+        Write-Output "Staging $fileUnix"
         git add $fileUnix
     }
 
@@ -144,17 +144,17 @@ param(
 
     $branchExists = Git-DoesBranchExist -branchName $branchName
     if($branchExists -eq $true) {
-        Write-Host "Failed to create branch $branchName - branch already exists"
+        Write-Output "Failed to create branch $branchName - branch already exists"
         return $false
     }
 
     git checkout -b $branchName
     if(!$?) {
-        Write-Host "Failed to create branch $branchName - Create branch failed - Call failed."
+        Write-Output "Failed to create branch $branchName - Create branch failed - Call failed."
         return $false
     }
 
-    Write-Host "Created branch $branchName"
+    Write-Output "Created branch $branchName"
 
     return $true;
 }
@@ -165,7 +165,7 @@ param(
     [string] $repoFile
     )
 
-    Write-Host "Loading Repos from $repoFile"
+    Write-Output "Loading Repos from $repoFile"
 
     return Get-Content -Path $repoFile | Select-Object
 }

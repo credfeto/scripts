@@ -26,7 +26,7 @@ param(
         $buildNumber = $buildNumber.Substring(0, $buildNumber.LastIndexOf('.'))
     }
 
-    #Write-Host "Source Build:" $buildNumber
+    #Write-Output "Source Build:" $buildNumber
 
     $text = Get-Content $fileName
 
@@ -74,11 +74,11 @@ param(
 
             if($previousLine.StartsWith("### "))
             {
-                #Write-Host $previousLine
+                #Write-Output $previousLine
                 $releaseNotes = $releaseNotes +"`n" + $previousLine
             }
 
-            #Write-Host $text[$i]
+            #Write-Output $text[$i]
             $releaseNotes = $releaseNotes +"`n" + $text[$i]
             $previousLine = $text[$i]
         }
@@ -128,7 +128,7 @@ Releases that have at least been deployed to staging, BUT NOT necessarily releas
 ## [0.0.0] - Project created
 "
 
-    Write-Host "* Creating Empty Changelog"
+    Write-Output "* Creating Empty Changelog"
     $output = $output.Trim()
     Set-Content -Path $fileName -Value $output
 }
@@ -160,7 +160,7 @@ param(
     [string] $message
     )
     
-    Write-Host ">>> Updating Changelog <<<"
+    Write-Output ">>> Updating Changelog <<<"
 
     $changeLogExists = Test-Path -path $fileName
     if ($changeLogExists -ne $true)
@@ -193,7 +193,7 @@ param(
         }
         else {
             if( $line -eq "### $entryType") {
-                Write-Host "* Changelog Insert position added"
+                Write-Output "* Changelog Insert position added"
                 $output = $output + "- $code - $message" + $newline 
                 $done = $true;
             }
@@ -201,12 +201,12 @@ param(
     }
 
     if($done -eq $true) {
-        Write-Host "* Saving Changelog"
+        Write-Output "* Saving Changelog"
 	$output = $output.Trim()
         Set-Content -Path $fileName -Value $output
     }
     else {
-        Write-Host "* Changelog NOT Updated"
+        Write-Output "* Changelog NOT Updated"
     }
 
 }

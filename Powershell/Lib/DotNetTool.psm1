@@ -1,6 +1,6 @@
 function findPreReleasePackageVersion( $packageId) {
 
-    Write-Host "Looking for latest version of $packageId (Includes pre-release)"
+    Write-Output "Looking for latest version of $packageId (Includes pre-release)"
 
     $packageIdRegex = $packageId.Replace(".", "\.")
 
@@ -23,7 +23,7 @@ function isInstalled($packageId) {
 
     $entry = &dotnet tool list --local | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
 
-	Write-Host "Found: $entry"
+	Write-Output "Found: $entry"
     return $entry -ne $null;
 }
 
@@ -44,7 +44,7 @@ param(
 
     if(isInstalled -packageId $packageId) {
 
-        Write-Host "Removing currently installed $packageId"
+        Write-Output "Removing currently installed $packageId"
         dotnet tool uninstall --local $packageId
     }
 }
@@ -81,7 +81,7 @@ param(
         $version = findPreReleasePackageVersion -packageId $packageId
 
         if( $version -ne $null) {
-            Write-Host "Installing $version of $packageId"
+            Write-Output "Installing $version of $packageId"
             dotnet tool install --local $packageId --version $version
             
             $installed = isInstalled -packageId $packageId
@@ -89,7 +89,7 @@ param(
         }
     }
 
-    Write-Host "Installing latest release version of $packageId"
+    Write-Output "Installing latest release version of $packageId"
     dotnet tool install --local $packageId
     
     $installed = isInstalled -packageId $packageId
