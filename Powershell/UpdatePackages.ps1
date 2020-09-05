@@ -70,9 +70,9 @@ function checkForUpdates($repoFolder, $packageId) {
         $regexPattern = "echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
 
         $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
-        $matches = $regex.Matches($results.ToLower());
-        if($matches.Count -gt 0) {
-            $version = $matches[0].Groups["Version"].Value
+        $regexMatches = $regex.Matches($results.ToLower());
+        if($regexMatches.Count -gt 0) {
+            $version = $regexMatches[0].Groups["Version"].Value
             Write-Output "Found: $version"
             return $version
         }
