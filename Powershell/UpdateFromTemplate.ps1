@@ -6,8 +6,6 @@ param(
 )
 
 $ErrorActionPreference = "Stop" 
-$root = (Get-Location).Path
-Write-Output $root
 
 
 #########################################################################
@@ -292,7 +290,7 @@ function ensureFolderExists($baseFolder, $subFolder) {
     }
 }
 
-function processRepo($srcRepo, $repo) {
+function processRepo($srcRepo, $repo, $baseFolder) {
     
 
     Write-Output ""
@@ -300,7 +298,7 @@ function processRepo($srcRepo, $repo) {
     Write-Output "***************************************************************"
     Write-Output ""
 
-    Set-Location -Path $root
+    Set-Location -Path $baseFolder
     
     Write-Output "Processing Repo: $repo"
 
@@ -308,7 +306,7 @@ function processRepo($srcRepo, $repo) {
     $folder = Git-GetFolderForRepo -repo $repo
 
     Write-Output "Folder: $folder"
-    $repoFolder = Join-Path -Path $root -ChildPath $folder
+    $repoFolder = Join-Path -Path $baseFolder -ChildPath $folder
 
     
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
@@ -367,18 +365,20 @@ function processRepo($srcRepo, $repo) {
     buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder
 }
 
-function processAll($repositoryList, $templateRepositoryFolder) {
+function processAll($repositoryList, $templateRepositoryFolder, $baseFolder) {
 
     ForEach($gitRepository in $repositoryList) {
         if($gitRepository.Trim() -eq "") {
             continue
         }
 
-        processRepo -srcRepo $templateRepoFolder -repo $gitRepository
+        processRepo -srcRepo $templateRepoFolder -repo $gitRepository -baseFolder $baseFolder
     }
-
 }
 
+
+$root = (Get-Location).Path
+Write-Output $root
 
 Write-Output "Repository List: $repos"
 $repoList = Git-LoadRepoList -repoFile $repos
@@ -403,6 +403,6 @@ Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
 Set-Location -Path $root
 
-processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder
+processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder -baseFolder $baseFolder
 
 Set-Location -Path $root
