@@ -43,13 +43,13 @@ param(
     [string] $repo
     )
 
-    Write-Output "Repo: $repo"
+    #Write-Output "Repo: $repo"
 
     # Extract the folder from the repo name
     [string] $folder = $repo.Substring($repo.LastIndexOf("/")+1)
     $folder = $folder.SubString(0, $folder.LastIndexOf("."))
 
-    Write-Output "Folder for Repo: $folder" 
+    #Write-Output "Folder for Repo: $folder" 
 
     return $folder
 }
