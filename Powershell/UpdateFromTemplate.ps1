@@ -294,6 +294,12 @@ function ensureFolderExists($baseFolder, $subFolder) {
 
 function processRepo($srcRepo, $repo) {
     
+
+    Write-Output ""
+    Write-Output "***************************************************************"
+    Write-Output "***************************************************************"
+    Write-Output ""
+
     Set-Location -Path $root
     
     Write-Output "Processing Repo: $repo"
@@ -369,6 +375,11 @@ $repoList = Git-LoadRepoList -repoFile $repos
 Write-Output "Base folder: $root"
 Set-Location -Path $root
     
+Write-Output ""
+Write-Output "***************************************************************"
+Write-Output "***************************************************************"
+Write-Output ""
+
 Write-Output "Loading template: $templateRepo"
 
 # Extract the folder from the repo name
