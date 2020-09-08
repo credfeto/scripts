@@ -96,8 +96,7 @@ function processRepo($repo, $packages) {
     Write-Information "Processing Repo: $repo"
 
     # Extract the folder from the repo name
-    $folder = $repo.Substring($repo.LastIndexOf("/")+1)
-    $folder = $folder.SubString(0, $folder.LastIndexOf("."))
+    $folder = Git-GetFolderForRepo -repo $repo
 
     Write-Information "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
@@ -187,7 +186,7 @@ if($installed -eq $false) {
 
 $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
 
-$repoList = Git-LoadRepoList -repoFile $repos
+[string[]] $repoList = Git-LoadRepoList -repoFile $repos
 ForEach($repo in $repoList) {
     if($repo.Trim() -eq "") {
         continue

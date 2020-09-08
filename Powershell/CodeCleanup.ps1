@@ -92,8 +92,7 @@ function processRepo($srcRepo, $repo) {
     Write-Information "Processing Repo: $repo"
 
     # Extract the folder from the repo name
-    $folder = $repo.Substring($repo.LastIndexOf("/")+1)
-    $folder = $folder.SubString(0, $folder.LastIndexOf("."))
+    $folder = Git-GetFolderForRepo -repo $repo
 
     Write-Information "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
@@ -149,7 +148,7 @@ if($installed -eq $false) {
 }
 
 
-$repoList = Git-LoadRepoList -repoFile $repos
+[string[]] $repoList = Git-LoadRepoList -repoFile $repos
 
 Set-Location -Path $root   
 
