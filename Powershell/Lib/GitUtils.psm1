@@ -49,6 +49,8 @@ param(
     $folder = $repo.Substring($repo.LastIndexOf("/")+1)
     $folder = $folder.SubString(0, $folder.LastIndexOf("."))
 
+    Write-Output "Folder for Repo: $folder" 
+
     return $folder
 }
 
