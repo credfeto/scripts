@@ -363,6 +363,7 @@ function processRepo($srcRepo, $repo) {
 }
 
 
+Write-Output "Repository List: $repos"
 $repoList = Git-LoadRepoList -repoFile $repos
 
 Write-Output "Base folder: $root"
