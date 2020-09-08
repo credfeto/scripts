@@ -175,6 +175,18 @@ param(
     return Get-Content -Path $repoFile | Select-Object
 }
 
+function Git-GetFolderForRepo {
+param(
+    [string] $repo
+    )    
+
+    # Extract the folder from the repo name
+    $folder = $repo.Substring($repo.LastIndexOf("/")+1)
+    $folder = $folder.SubString(0, $templateFolder.LastIndexOf("."))
+
+    return $folder
+}
+
 Export-ModuleMember -Function Git-RemoveAllLocalBranches
 Export-ModuleMember -Function Git-ResetToMaster
 Export-ModuleMember -Function Git-EnsureSynchronised

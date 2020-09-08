@@ -395,8 +395,7 @@ Write-Output ""
 Write-Output "Loading template: $templateRepo"
 
 # Extract the folder from the repo name
-$templateFolder = $templateRepo.Substring($templateRepo.LastIndexOf("/")+1)
-$templateFolder = $templateFolder.SubString(0, $templateFolder.LastIndexOf("."))
+$templateFolder = Git-GetFolderForRepo -repo templateRepo
 
 Write-Output "Template Folder: $templateFolder"
 $templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
@@ -408,5 +407,3 @@ Set-Location -Path $root
 processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder
 
 Set-Location -Path $root
-
-processAll -
