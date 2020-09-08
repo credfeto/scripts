@@ -368,6 +368,18 @@ function processRepo($srcRepo, $repo) {
     buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder
 }
 
+function processAll($repositoryList, $templateRepositoryFolder) {
+
+    ForEach($gitRepository in $repositoryList) {
+        if($gitRepository.Trim() -eq "") {
+            continue
+        }
+
+        processRepo -srcRepo $templateRepoFolder -repo $gitRepository
+    }
+
+}
+
 
 Write-Output "Repository List: $repos"
 $repoList = Git-LoadRepoList -repoFile $repos
@@ -393,13 +405,8 @@ Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
 Set-Location -Path $root
 
-ForEach($gitRepository in $repoList) {
-    if($gitRepository.Trim() -eq "") {
-        continue
-    }
-
-    processRepo -srcRepo $templateRepoFolder -repo $gitRepository
-}
+processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder
 
 Set-Location -Path $root
 
+processAll -
