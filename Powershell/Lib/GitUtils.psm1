@@ -41,7 +41,9 @@ function Git-HasUnCommittedChanges {
 function Git-GetFolderForRepo {
 param(
     [string] $repo
-    )    
+    )
+
+    Write-Output "Repo: $repo"
 
     # Extract the folder from the repo name
     $folder = $repo.Substring($repo.LastIndexOf("/")+1)

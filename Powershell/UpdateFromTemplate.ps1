@@ -305,8 +305,7 @@ function processRepo($srcRepo, $repo) {
     Write-Output "Processing Repo: $repo"
 
     # Extract the folder from the repo name
-    $folder = $repo.Substring($repo.LastIndexOf("/")+1)
-    $folder = $folder.SubString(0, $folder.LastIndexOf("."))
+    $folder = Git-GetFolderForRepo -repo $repo
 
     Write-Output "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
@@ -395,7 +394,7 @@ Write-Output ""
 Write-Output "Loading template: $templateRepo"
 
 # Extract the folder from the repo name
-$templateFolder = Git-GetFolderForRepo -repo templateRepo
+$templateFolder = Git-GetFolderForRepo -repo $templateRepo
 
 Write-Output "Template Folder: $templateFolder"
 $templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
