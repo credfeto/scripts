@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = $False
 $root = Get-Location
-Write-Output $root
+Write-Information $root
 
 
 #########################################################################
@@ -21,7 +21,7 @@ Write-Output $root
 
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib" 
-Write-Output "Loading Modules from $ScriptDirectory"
+Write-Information "Loading Modules from $ScriptDirectory"
 try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
 }
@@ -73,13 +73,13 @@ function checkForUpdates($repoFolder, $packageId) {
         $regexMatches = $regex.Matches($results.ToLower());
         if($regexMatches.Count -gt 0) {
             $version = $regexMatches[0].Groups["Version"].Value
-            Write-Output "Found: $version"
+            Write-Information "Found: $version"
             return $version
         }
     }
     
 
-    Write-Output " * No Changes"    
+    Write-Information " * No Changes"    
     return $null
 }
 
@@ -87,19 +87,19 @@ function processRepo($repo, $packages) {
     
     Set-Location -Path $root
     
-    Write-Output ""
-    Write-Output "***********************************************************************************"
-    Write-Output "***********************************************************************************"
-    Write-Output "***********************************************************************************"
-    Write-Output "***********************************************************************************"
-    Write-Output ""
-    Write-Output "Processing Repo: $repo"
+    Write-Information ""
+    Write-Information "***********************************************************************************"
+    Write-Information "***********************************************************************************"
+    Write-Information "***********************************************************************************"
+    Write-Information "***********************************************************************************"
+    Write-Information ""
+    Write-Information "Processing Repo: $repo"
 
     # Extract the folder from the repo name
     $folder = $repo.Substring($repo.LastIndexOf("/")+1)
     $folder = $folder.SubString(0, $folder.LastIndexOf("."))
 
-    Write-Output "Folder: $folder"
+    Write-Information "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
 
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
@@ -108,14 +108,14 @@ function processRepo($repo, $packages) {
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $false) {
         # no source to update
-        Write-Output "* No src folder in repo"
+        Write-Information "* No src folder in repo"
         return;
     }
 
     $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
     if($projects.Length -eq 0) {
         # no source to update
-        Write-Output "* No C# projects in repo"
+        Write-Information "* No C# projects in repo"
         return;
     }
 
@@ -126,7 +126,7 @@ function processRepo($repo, $packages) {
     Set-Location -Path $repoFolder
     if($codeOk -eq $false) {
         # no point updating
-        Write-Output "* WARNING: Solution doesn't build without any changes - no point in trying to update packages"
+        Write-Information "* WARNING: Solution doesn't build without any changes - no point in trying to update packages"
         return;
     }
 
@@ -134,9 +134,9 @@ function processRepo($repo, $packages) {
         $packageId = $package.packageId
         $type = $package.type
 
-        Write-Output ""
-        Write-Output "------------------------------------------------"
-        Write-Output "Looking for updates of $packageId"
+        Write-Information ""
+        Write-Information "------------------------------------------------"
+        Write-Information "Looking for updates of $packageId"
         $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId
         if($update -eq $null) {
             Continue
@@ -146,7 +146,7 @@ function processRepo($repo, $packages) {
         $branchExists = Git-DoesBranchExist -branchName $branchName
         if($branchExists -ne $true) {
 
-            Write-Output ">>>> Checking to see if code builds against $packageId $update <<<<"
+            Write-Information ">>>> Checking to see if code builds against $packageId $update <<<<"
             $codeOK = DotNet-BuildSolution -srcFolder $srcPath
             Set-Location -Path $repoFolder
             if($codeOK -eq $true) {
@@ -155,19 +155,19 @@ function processRepo($repo, $packages) {
                 Git-Push
             }
             else {
-                Write-Output "Create Branch $branchName"
+                Write-Information "Create Branch $branchName"
                 $branchOk = Git-CreateBranch -branchName $branchName
                 if($branchOk -eq $true) {
                     ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                     Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
                     Git-PushOrigin -branchName $branchName
                 } else {
-                    Write-Output ">>> ERROR: FAILED TO CREATE BRANCH <<<"
+                    Write-Information ">>> ERROR: FAILED TO CREATE BRANCH <<<"
                 }
             }
         }
         else {
-                Write-Output "Branch $branchName already exists - skipping"
+                Write-Information "Branch $branchName already exists - skipping"
         }
  
         Git-ResetToMaster        
@@ -198,7 +198,7 @@ ForEach($repo in $repoList) {
 
 Set-Location $root
 
-Write-Output ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
+Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
 
 
 

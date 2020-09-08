@@ -56,25 +56,25 @@ param(
     [string] $repofolder
     )
 
-    Write-Output "Repo: $repo"
-    Write-Output "Folder: $repofolder"
+    Write-Information "Repo: $repo"
+    Write-Information "Folder: $repofolder"
 
     $gitHead = Join-Path -Path $repoFolder -ChildPath ".git" 
     $gitHead = Join-Path -Path $gitHead -ChildPath "HEAD" 
     
-    Write-Output "Head: $gitHead"
+    Write-Information "Head: $gitHead"
 
     $gitHeadCloned = Test-Path -path $gitHead
 
     if ($gitHeadCloned -eq $True) {
-        Write-Output "Already Cloned"
+        Write-Information "Already Cloned"
         Set-Location -Path $repofolder
 
         Git-ResetToMaster
     }
     else
     {
-        Write-Output "Cloning..."
+        Write-Information "Cloning..."
         git clone $repo
         Set-Location -Path $repofolder
     }
@@ -98,7 +98,7 @@ param(
 
     foreach($file in $files) {
         $fileUnix = $file.Replace("\", "/")
-        Write-Output "Staging $fileUnix"
+        Write-Information "Staging $fileUnix"
         git add $fileUnix
     }
 
@@ -160,17 +160,17 @@ param(
 
     $branchExists = Git-DoesBranchExist -branchName $branchName
     if($branchExists -eq $true) {
-        Write-Output "Failed to create branch $branchName - branch already exists"
+        Write-Information "Failed to create branch $branchName - branch already exists"
         return $false
     }
 
     git checkout -b $branchName
     if(!$?) {
-        Write-Output "Failed to create branch $branchName - Create branch failed - Call failed."
+        Write-Information "Failed to create branch $branchName - Create branch failed - Call failed."
         return $false
     }
 
-    Write-Output "Created branch $branchName"
+    Write-Information "Created branch $branchName"
 
     return $true;
 }
