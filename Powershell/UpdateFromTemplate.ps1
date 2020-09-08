@@ -6,7 +6,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop" 
-$root = Get-Location
+$root = (Get-Location).Path
 Write-Output $root
 
 
@@ -365,7 +365,7 @@ function processRepo($srcRepo, $repo) {
 
 $repoList = Git-LoadRepoList -repoFile $repos
 
-
+Write-Output "Base folder: $root"
 Set-Location -Path $root
     
 Write-Output "Loading template: $templateRepo"
