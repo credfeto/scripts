@@ -46,7 +46,7 @@ param(
     Write-Output "Repo: $repo"
 
     # Extract the folder from the repo name
-    $folder = $repo.Substring($repo.LastIndexOf("/")+1)
+    [string] $folder = $repo.Substring($repo.LastIndexOf("/")+1)
     $folder = $folder.SubString(0, $folder.LastIndexOf("."))
 
     Write-Output "Folder for Repo: $folder" 
