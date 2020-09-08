@@ -43,13 +43,9 @@ param(
     [string] $repo
     )
 
-    #Write-Output "Repo: $repo"
-
     # Extract the folder from the repo name
     [string] $folder = $repo.Substring($repo.LastIndexOf("/")+1)
     $folder = $folder.SubString(0, $folder.LastIndexOf("."))
-
-    #Write-Output "Folder for Repo: $folder" 
 
     return $folder
 }
@@ -187,7 +183,10 @@ param(
 
     Write-Output "Loading Repos from $repoFile"
 
-    return Get-Content -Path $repoFile | Select-Object
+    [string[]] $content = Get-Content -Path "D:\Work\auto-update-config\funfair\repos.lst" 
+
+
+    return $content
 }
 
 
