@@ -403,6 +403,6 @@ Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
 Set-Location -Path $root
 
-processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder -baseFolder $baseFolder
+processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder -baseFolder $root
 
 Set-Location -Path $root
