@@ -367,6 +367,16 @@ function processRepo($srcRepo, $repo, $baseFolder) {
 
 function processAll($repositoryList, $templateRepositoryFolder, $baseFolder) {
 
+    $repoCount = $repositoryList.Count
+
+    Write-Output "Found $repoCount repositories to process"
+
+    ForEach($gitRepository in $repositoryList) {
+        Write-Output "* $gitRepository"
+    }
+
+
+
     ForEach($gitRepository in $repositoryList) {
         if($gitRepository.Trim() -eq "") {
             continue
@@ -381,7 +391,7 @@ $root = (Get-Location).Path
 Write-Output $root
 
 Write-Output "Repository List: $repos"
-$repoList = Git-LoadRepoList -repoFile $repos
+[string[]] $repoList = Git-LoadRepoList -repoFile $repos
 
 Write-Output "Base folder: $root"
 Set-Location -Path $root

@@ -181,17 +181,7 @@ param(
     [string] $repoFile
     )
 
-    Write-Output "Loading Repos from $repoFile"
-
     [string[]] $content = Get-Content -Path $repoFile
-
-    $repoCount = $content.Count
-
-    Write-Output "Found $repoCount repositories to process"
-
-    ForEach($gitRepository in $repositoryList) {
-        Write-Output "* $gitRepository"
-    }
 
     return $content
 }
