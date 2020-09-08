@@ -183,7 +183,7 @@ param(
 
     Write-Output "Loading Repos from $repoFile"
 
-    [string[]] $content = Get-Content -Path "D:\Work\auto-update-config\funfair\repos.lst" 
+    [string[]] $content = Get-Content -Path $repoFile
 
 
     return $content
