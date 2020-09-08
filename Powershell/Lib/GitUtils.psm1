@@ -45,10 +45,14 @@ param(
     [string] $repofolder
     )
 
+    Write-Output "Repo: $repo"
+    Write-Output "Folder: $repofolder"
+
     $gitHead = Join-Path -Path $repoFolder -ChildPath ".git" 
     $gitHead = Join-Path -Path $gitHead -ChildPath "HEAD" 
     
-    Write-Output $gitHead
+    Write-Output "Head: $gitHead"
+
     $gitHeadCloned = Test-Path -path $gitHead
 
     if ($gitHeadCloned -eq $True) {
@@ -59,6 +63,7 @@ param(
     }
     else
     {
+        Write-Output "Cloning..."
         git clone $repo
         Set-Location -Path $repofolder
     }
