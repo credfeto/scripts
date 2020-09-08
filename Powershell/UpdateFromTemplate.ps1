@@ -393,12 +393,12 @@ Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
 Set-Location -Path $root
 
-ForEach($repo in $repoList) {
-    if($repo.Trim() -eq "") {
+ForEach($gitRepository in $repoList) {
+    if($gitRepository.Trim() -eq "") {
         continue
     }
 
-    processRepo -srcRepo $templateRepoFolder -repo $repo
+    processRepo -srcRepo $templateRepoFolder -repo $gitRepository
 }
 
 Set-Location -Path $root
