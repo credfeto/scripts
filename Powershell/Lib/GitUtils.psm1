@@ -45,7 +45,7 @@ param(
 
     # Extract the folder from the repo name
     $folder = $repo.Substring($repo.LastIndexOf("/")+1)
-    $folder = $folder.SubString(0, $templateFolder.LastIndexOf("."))
+    $folder = $folder.SubString(0, $folder.LastIndexOf("."))
 
     return $folder
 }
