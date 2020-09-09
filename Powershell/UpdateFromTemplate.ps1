@@ -5,6 +5,7 @@ param(
     [string] $templateRepo = $(throw "Template repo")
 )
 
+$InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 
 

@@ -7,6 +7,7 @@ param(
 
 Remove-Module *
 
+$InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = $False

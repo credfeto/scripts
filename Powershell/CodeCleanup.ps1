@@ -6,6 +6,7 @@ param(
 
 Remove-Module *
 
+$InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "JetBrains.ReSharper.GlobalTools"
 $preRelease = $False
