@@ -87,6 +87,11 @@ function runCodeCleanup($solutionFile) {
 
 function processRepo($srcRepo, $repo) {
     
+    Write-Information ""
+    Write-Information "***************************************************************"
+    Write-Information "***************************************************************"
+    Write-Information ""
+
     Set-Location -Path $root
     
     Write-Information "Processing Repo: $repo"
@@ -149,6 +154,11 @@ if($installed -eq $false) {
 
 
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
+
+Write-Information ""
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information ""
 
 Set-Location -Path $root   
 

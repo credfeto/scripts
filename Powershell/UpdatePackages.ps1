@@ -184,6 +184,11 @@ if($installed -eq $false) {
 }
 
 
+Write-Information ""
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information ""
+
 $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
 
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
