@@ -60,7 +60,6 @@ function runCodeCleanup($solutionFile) {
         $sourceFolderWithoutDrive = $sourceFolder.Substring(3)
     }    
 
-    #SET SOLUTIONFILE=%~nx1
     $cachesFolder = Join-Path -Path $tempFolder -ChildPath $sourceFolderWithoutDrive
     $settingsFile = $solutionFile + ".DotSettings"
 
@@ -71,7 +70,7 @@ function runCodeCleanup($solutionFile) {
         Write-Information "  - Cache Folder: $cachesFolder"
         Write-Information "  - Settings File: $settingsFile"
 
-        dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:WARN --no-buildin-settings --no-builtin-settings
+        dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
         if(!$?) {
             Write-Information ">>>>> Code Cleanup failed"
             return $false
