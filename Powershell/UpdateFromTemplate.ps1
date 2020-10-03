@@ -230,6 +230,8 @@ function buildDependabotConfig($srcRepo, $trgRepo) {
 update_configs:
 "
 
+$newline = "`r`n"
+
     $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.dotnet'
     $templateFileExists = Test-Path -Path $templateFile
     if($templateFileExists -eq $true) {        
@@ -237,6 +239,7 @@ update_configs:
         if($files -ne $null) {
             Write-Information " --> Addning .NET"
             $templateContent = Get-Content -Path $templateFile -Raw
+            $trgContent = $trgContent + $newline
             $trgContent = $trgContent + $templateContent
         }
     }
@@ -248,6 +251,7 @@ update_configs:
         if($files -ne $null) {
             Write-Information " --> Addning Javascript"
             $templateContent = Get-Content -Path $templateFile -Raw
+            $trgContent = $trgContent + $newline
             $trgContent = $trgContent + $templateContent
         }
     }
@@ -259,6 +263,7 @@ update_configs:
         if($files -ne $null) {
             Write-Information " --> Adding Docker"
             $templateContent = Get-Content -Path $templateFile -Raw
+            $trgContent = $trgContent + $newline
             $trgContent = $trgContent + $templateContent
         }
     }
@@ -271,6 +276,7 @@ update_configs:
         if($files -ne $null) {
             Write-Information " --> Adding Github Actions"
             $templateContent = Get-Content -Path $templateFile -Raw
+            $trgContent = $trgContent + $newline
             $trgContent = $trgContent +  $templateContent
         }
     }
