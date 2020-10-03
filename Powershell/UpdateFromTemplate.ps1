@@ -239,7 +239,7 @@ $newline = "`r`n"
         if($files -ne $null) {
             Write-Information " --> Addning .NET"
             $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent + $newline
+            $trgContent = $trgContent.Trim() + $newline + $newline
             $trgContent = $trgContent + $templateContent
         }
     }
@@ -251,7 +251,7 @@ $newline = "`r`n"
         if($files -ne $null) {
             Write-Information " --> Addning Javascript"
             $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent + $newline
+            $trgContent = $trgContent.Trim() + $newline + $newline
             $trgContent = $trgContent + $templateContent
         }
     }
@@ -263,7 +263,7 @@ $newline = "`r`n"
         if($files -ne $null) {
             Write-Information " --> Adding Docker"
             $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent + $newline
+            $trgContent = $trgContent.Trim() + $newline + $newline
             $trgContent = $trgContent + $templateContent
         }
     }
@@ -276,10 +276,12 @@ $newline = "`r`n"
         if($files -ne $null) {
             Write-Information " --> Adding Github Actions"
             $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent + $newline
+            $trgContent = $trgContent.Trim() + $newline + $newline
             $trgContent = $trgContent +  $templateContent
         }
     }
+
+    $trgContent = $trgContent.Trim() + $newline
 
     Write-Information " --> Done"
     Set-Content -Path $targetFileName -Value $trgContent
