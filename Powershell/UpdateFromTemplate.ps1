@@ -309,6 +309,9 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     Write-Information "Folder: $folder"
     $repoFolder = Join-Path -Path $baseFolder -ChildPath $folder
 
+    if($srcRepo -eq $repoFolder) {
+        Return
+    }
     
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
 
