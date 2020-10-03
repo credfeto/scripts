@@ -230,7 +230,7 @@ function buildDependabotConfig($srcRepo, $trgRepo) {
 update_configs:
 "
 
-    $templateFile = makePath -Path $srcPath -ChildPath 'config.template.dotnet'
+    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.dotnet'
     $templateFileExists = Test-Path -Path $templateFile
     if($templateFileExists -eq $true) {        
         $files = Get-ChildItem -Path $trgRepo -Filter *.csproj -Recurse
@@ -322,7 +322,6 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     ensureFolderExists -baseFolder $repoFolder -subFolder "src"
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github"
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github\workflows"
-    ensureFolderExists -baseFolder $repoFolder -subFolder ".dependabot"
 
 
     #########################################################
