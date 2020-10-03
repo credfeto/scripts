@@ -65,11 +65,56 @@ function runCodeCleanup($solutionFile) {
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
     if($buildOk -eq $true) {
+
+        Write-Information "* Changing Resharper disable once comments to SuppressMessage"
+        Write-Information "  - Folder: $sourceFolder"
+
+        $replacements = "RedundantDefaultMemberInitializer",
+                        "ParameterOnlyUsedForPreconditionCheck.Local",
+                        "UnusedMember.Global",
+                        "UnusedMember.Local",
+                        "AutoPropertyCanBeMadeGetOnly.Global",
+                        "AutoPropertyCanBeMadeGetOnly.Local",
+                        "ClassNeverInstantiated.Local",
+                        "ClassNeverInstantiated.Global",
+                        "UnusedAutoPropertyAccessor.Local"
+        $files = Get-ChildItem -Path $srcPath -Filter "*.cs" -Recurse
+        ForEach($file in $files) {
+            $fileName = $file.FullName
+
+            $content = Get-Content -Path $fileName -Raw
+            $originalContent = $content
+
+            $changedFile = $False
+
+            ForEach($replacement in $replacements) {
+                $code = $replacement.Replace(".", "\.")
+                $regex = "//\s+ReSharper\s+disable\s+once\s+$code"
+                $replacementText = "[System.Diagnostics.CodeAnalysis.SuppressMessage(""ReSharper"", ""$replacement"", Justification=""TODO: Review"")]"
+
+                $content = $content -replace $regex, $replacementText
+                if($content -ne $originalContent)
+                {
+                    if($changedFile -eq $False) {
+                        Write-Information "* $fileName"
+                        $changedFile = $True
+                    }
+
+                    Write-Information "   - Changed $replacement comment to SuppressMessage"                    
+                }
+            }
+
+            if($content -ne $originalContent) {
+                $content = $content.Trim()
+                Write-Information "   - Updated file"
+                Set-Content -Path $fileName -Value $content
+            }
+        }
+
         Write-Information "* Running Code Cleanup"
         Write-Information "  - Solution: $Solution"
         Write-Information "  - Cache Folder: $cachesFolder"
         Write-Information "  - Settings File: $settingsFile"
-
         dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
         if(!$?) {
             Write-Information ">>>>> Code Cleanup failed"
