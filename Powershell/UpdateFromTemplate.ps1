@@ -221,12 +221,12 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
 
 function buildDependabotConfig($srcRepo, $trgRepo) {
 
-    $srcPath = makePath -Path $srcRepo -ChildPath ".dependabot"
+    $srcPath = makePath -Path $srcRepo -ChildPath ".github"
     Write-Information "$srcPath"
-    $targetFileName = makePath -Path $trgRepo -ChildPath ".dependabot\config.yml"
+    $targetFileName = makePath -Path $trgRepo -ChildPath ".github/dependabot.yml"
 
     Write-Information "Building Dependabot Config:"
-    $trgContent = "version: 1
+    $trgContent = "version: 2
 update_configs:
 "
 
@@ -241,7 +241,7 @@ update_configs:
         }
     }
 
-    $templateFile = makePath -Path $srcPath -ChildPath 'config.template.javascript'
+    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.javascript'
     $templateFileExists = Test-Path -Path $templateFile
     if($templateFileExists -eq $true) {
         $files = Get-ChildItem -Path $trgRepo -Filter 'package.json' -Recurse
@@ -252,7 +252,7 @@ update_configs:
         }
     }
 
-    $templateFile = makePath -Path $srcPath -ChildPath 'config.template.docker'
+    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.docker'
     $templateFileExists = Test-Path -Path $templateFile
     if($templateFileExists -eq $true) {
         $files = Get-ChildItem -Path $trgRepo -Filter 'Dockerfile' -Recurse
@@ -263,7 +263,7 @@ update_configs:
         }
     }
 
-    $templateFile = makePath -Path $srcPath -ChildPath 'config.template.github_actions'
+    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.github_actions'
     $templateFileExists = Test-Path -Path $templateFile
     if($templateFileExists -eq $true) {
         $actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
