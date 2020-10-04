@@ -20,3 +20,4 @@ Read Me #5319e7
 !!! WAITING FOR QA SIGNOFF #ffff00
 Changelog Not Required #ea6619
 github-actions #e09cf4
+dependencies #a7e5e5
