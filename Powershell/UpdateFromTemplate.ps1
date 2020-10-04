@@ -343,7 +343,7 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     ensureFolderExists -baseFolder $repoFolder -subFolder "src"
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github"
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github\workflows"
-
+    ensureFolderExists -baseFolder $repoFolder -subFolder ".github\linters"
 
     #########################################################
     # C# file updates
@@ -368,6 +368,16 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     
     $workflows = makePath -Path $srcRepo -ChildPath ".github\workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml
+    ForEach($file in $files) {
+        $srcFileName = $file.FullName
+        $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
+
+	    $fileToUpdate = $srcFileName
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
+    }
+
+    $linters = makePath -Path $srcRepo -ChildPath ".github\linters"
+    $files = Get-ChildItem -Path $linters -Filter *.*
     ForEach($file in $files) {
         $srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
