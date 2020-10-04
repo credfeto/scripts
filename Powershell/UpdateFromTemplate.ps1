@@ -367,7 +367,7 @@ function processRepo($srcRepo, $repo, $baseFolder) {
 
     
     $workflows = makePath -Path $srcRepo -ChildPath ".github\workflows"
-    $files = Get-ChildItem -Path $workflows -Filter *.yml
+    $files = Get-ChildItem -Path $workflows -Filter *.yml -File
     ForEach($file in $files) {
         $srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
@@ -376,7 +376,7 @@ function processRepo($srcRepo, $repo, $baseFolder) {
         updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
     }
 
-    $linters = makePath -Path $srcRepo -ChildPath ".github\linters" -Attributes !Directory
+    $linters = makePath -Path $srcRepo -ChildPath ".github\linters" -File
     $files = Get-ChildItem -Path $linters
     ForEach($file in $files) {
         $srcFileName = $file.FullName
