@@ -376,8 +376,8 @@ function processRepo($srcRepo, $repo, $baseFolder) {
         updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
     }
 
-    $linters = makePath -Path $srcRepo -ChildPath ".github\linters"
-    $files = Get-ChildItem -Path $linters -Filter *.*
+    $linters = makePath -Path $srcRepo -ChildPath ".github\linters" -Attributes !Directory
+    $files = Get-ChildItem -Path $linters
     ForEach($file in $files) {
         $srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
