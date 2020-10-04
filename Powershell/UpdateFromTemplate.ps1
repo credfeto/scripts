@@ -230,7 +230,7 @@ function buildDependabotConfig($srcRepo, $trgRepo) {
 updates:
 "
 
-$newline = "`r`n"
+    $newline = "`r`n"
 
     $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.dotnet'
     $templateFileExists = Test-Path -Path $templateFile
