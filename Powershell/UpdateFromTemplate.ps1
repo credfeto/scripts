@@ -323,6 +323,7 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     Set-Location -Path $baseFolder
     
     Write-Information "Processing Repo: $repo"
+    Write-Information "Source Repo: $srcRepo"
 
     # Extract the folder from the repo name
     $folder = Git-GetFolderForRepo -repo $repo
@@ -367,23 +368,27 @@ function processRepo($srcRepo, $repo, $baseFolder) {
 
     
     $workflows = makePath -Path $srcRepo -ChildPath ".github\workflows"
+    Write-Information "Looking for Workflows in $workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml -File
+    Write-Information $files
     ForEach($file in $files) {
         $srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
+        Write-Information " * Found Workflow $srcFileName"
 
-	    $fileToUpdate = $srcFileName
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $srcFileName
     }
 
     $linters = makePath -Path $srcRepo -ChildPath ".github\linters" -File
+    Write-Information "Looking for Workflows in $linters"
     $files = Get-ChildItem -Path $linters
+    Write-Information $files
     ForEach($file in $files) {
         $srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
+        Write-Information " * Found Linter config $srcFileName"
 
-	    $fileToUpdate = $srcFileName
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $fileToUpdate
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $srcFileName
     }
 
 
