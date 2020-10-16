@@ -78,6 +78,7 @@ function runCodeCleanup($solutionFile) {
                         "ClassNeverInstantiated.Local",
                         "ClassNeverInstantiated.Global",
                         "UnusedAutoPropertyAccessor.Local",
+                        "UnusedAutoPropertyAccessor.Global",       
                         "InconsistentNaming"
         $files = Get-ChildItem -Path $srcPath -Filter "*.cs" -Recurse
         ForEach($file in $files) {
