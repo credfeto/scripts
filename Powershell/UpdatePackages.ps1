@@ -10,7 +10,7 @@ Remove-Module *
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
-$preRelease = $True
+$preRelease = $False
 $root = Get-Location
 Write-Information $root
 
