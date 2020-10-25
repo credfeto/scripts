@@ -10,7 +10,7 @@ Remove-Module *
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
-$preRelease = $False
+$preRelease = $True
 $root = Get-Location
 Write-Information $root
 
@@ -60,9 +60,15 @@ catch {
 #endregion
 
 
-function checkForUpdates($repoFolder, $packageId) {
+function checkForUpdates([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch) {
 
-    $results = dotnet updatepackages -folder $repoFolder -prefix $packageId 
+    if($exactMatch -eq $true) {
+        $results = dotnet updatepackages -folder $repoFolder -packageId $packageId 
+    }
+    else {
+        $results = dotnet updatepackages -folder $repoFolder -packageprefix $packageId 
+    }
+
 
     if($?) {
         
@@ -137,7 +143,7 @@ function processRepo($repo, $packages) {
         Write-Information ""
         Write-Information "------------------------------------------------"
         Write-Information "Looking for updates of $packageId"
-        $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId
+        $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $package.'exact-match'
         if($update -eq $null) {
             Continue
         }
