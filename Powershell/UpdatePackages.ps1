@@ -95,7 +95,7 @@ function checkForUpdatesPrefix([String]$repoFolder, [String]$packageId) {
         
         # has updates
         $packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
-        $regexPattern = "echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
+        $regexPattern = "echo ::set-env name=$packageIdAsRegex(.*?)::(?<Version>\d+(\.\d+)+)"
 
         $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
         $regexMatches = $regex.Matches($results.ToLower());
