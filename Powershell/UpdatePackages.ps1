@@ -59,15 +59,9 @@ catch {
 }
 #endregion
 
+function checkForUpdatesExact([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch) {
 
-function checkForUpdates([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch) {
-
-    if($exactMatch -eq $true) {
-        $results = dotnet updatepackages -folder $repoFolder -packageId $packageId 
-    }
-    else {
-        $results = dotnet updatepackages -folder $repoFolder -packageprefix $packageId 
-    }
+    $results = dotnet updatepackages -folder $repoFolder -packageId $packageId 
 
 
     if($?) {
@@ -88,6 +82,40 @@ function checkForUpdates([String]$repoFolder, [String]$packageId, [Boolean]$exac
 
     Write-Information " * No Changes"    
     return $null
+}
+
+
+function checkForUpdatesPrefix([String]$repoFolder, [String]$packageId) {
+
+    $results = dotnet updatepackages -folder $repoFolder -packageprefix $packageId 
+
+    if($?) {
+        
+        # has updates
+        $packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
+        $regexPattern = "echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
+
+        $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
+        $regexMatches = $regex.Matches($results.ToLower());
+        if($regexMatches.Count -gt 0) {
+            $version = $regexMatches[0].Groups["Version"].Value
+            Write-Information "Found: $version"
+            return $version
+        }
+    }
+    
+
+    Write-Information " * No Changes"    
+    return $null
+}
+
+function checkForUpdates([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch) {
+    if($exactMatch -eq $true) {
+        return checkForUpdatesExact -repoFolder $repoFolder -packageId $packageId
+    }
+    else {
+        return checkForUpdatesPrefix -repoFolder $repoFolder -packageId $packageId
+    }
 }
 
 function processRepo($repo, $packages) {
@@ -139,11 +167,15 @@ function processRepo($repo, $packages) {
     ForEach($package in $packages) {
         $packageId = $package.packageId
         $type = $package.type
+        $exactMatch = $package.'exact-match'
 
         Write-Information ""
         Write-Information "------------------------------------------------"
         Write-Information "Looking for updates of $packageId"
-        $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $package.'exact-match'
+        Write-Information "Exact Match: $exactMatch"
+        
+        $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
+        
         if($update -eq $null) {
             Continue
         }
