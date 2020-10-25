@@ -61,6 +61,7 @@ catch {
 
 function checkForUpdatesExact([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch) {
 
+    Write-Information "Updating Package Exact"
     $results = dotnet updatepackages -folder $repoFolder -packageId $packageId 
 
 
@@ -87,6 +88,7 @@ function checkForUpdatesExact([String]$repoFolder, [String]$packageId, [Boolean]
 
 function checkForUpdatesPrefix([String]$repoFolder, [String]$packageId) {
 
+    Write-Information "Updating Package Prefix"
     $results = dotnet updatepackages -folder $repoFolder -packageprefix $packageId 
 
     if($?) {
