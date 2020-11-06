@@ -70,9 +70,10 @@ function runCodeCleanup($solutionFile) {
         Write-Information "  - Folder: $sourceFolder"
 
         $replacements = "RedundantDefaultMemberInitializer",
+                        "ParameterOnlyUsedForPreconditionCheck.Global",
                         "ParameterOnlyUsedForPreconditionCheck.Local",
                         "UnusedMember.Global",
-                        "UnusedMember.Local",
+                        "UnusedMember.Local",        
                         "AutoPropertyCanBeMadeGetOnly.Global",
                         "AutoPropertyCanBeMadeGetOnly.Local",
                         "ClassNeverInstantiated.Local",
