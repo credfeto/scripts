@@ -65,7 +65,7 @@ jobs:
 
         # Optional tag message 
         # Action will create and push a new tag to the remote repository and the defined branch
-        tagging_message: "GeoIp"
+        #tagging_message: "GeoIp"
 
         # Optional options appended to `git-push`
         # See git-push documentation for details: https://git-scm.com/docs/git-push#_options
