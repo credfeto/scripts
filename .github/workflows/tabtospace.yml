@@ -17,17 +17,51 @@ jobs:
     - uses: actions/checkout@v2.3.4
       with:
         fetch-depth: 0
+        ref: ${{ github.head_ref }}
     - run: |
         echo Current Branch ${GITHUB_REF#refs/heads/}
         echo ::set-env name=GIT_BRANCH::$(echo ${GITHUB_REF#refs/heads/})
     - name: Reformat
       uses: credfeto/action-sql-format@v1.2
-    - name: Commit files
-      run: |
-        git status
-        git config --local user.email "credfeto@users.noreply.github.com"
-        git config --local user.name "fun-sqlfmt[bot]"
-        git commit --all -m"[FF-2107] Reformat SQL Files to common format." || true
-    - name: Push
-      run: |
-        git push "https://${{github.actor}}:${{secrets.SOURCE_PUSH_TOKEN}}@github.com/${{github.repository}}.git" "HEAD:${{ env.GIT_BRANCH }}"
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        # Optional but recommended
+
+        # Defaults to "Apply automatic changes"
+        commit_message: [FF-2107] Reformat SQL Files to common format.
+
+        # Optional branch name where commit should be pushed to
+        # Defaults to the current branch
+        #branch: feature-123
+
+        # Optional options appended to `git-commit`
+        # See https://git-scm.com/docs/git-commit for a list of available options
+        #commit_options: '--no-verify --signoff'
+
+        # Optional glob pattern of files which should be added to the commit
+        # Defaults to all (.)
+        # See the `pathspec`-documentation for git
+        # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
+        # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
+        #file_pattern: src/*.js tests/*.js *.php
+
+        # Optional local file path to the repository
+        # Defaults to the root of the repository
+        repository: .
+
+        # Optional commit user and author settings
+        commit_user_name: fun-geoip[bot]
+        commit_user_email: credfeto@users.noreply.github.com
+        commit_author: fun-geoip[bot] <credfeto@users.noreply.github.com> # defaults to author of the commit that triggered the run
+
+        # Optional tag message 
+        # Action will create and push a new tag to the remote repository and the defined branch
+        #tagging_message: 'v1.0.0'
+
+        # Optional options appended to `git-push`
+        # See git-push documentation for details: https://git-scm.com/docs/git-push#_options
+        #push_options: '--force'
+    
+        # Optional: Disable dirty check and always try to create a commit and push
+        skip_dirty_check: false    - name: Commit files
