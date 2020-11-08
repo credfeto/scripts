@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Configure Git
-      run: |
-        git config --local user.email "credfeto@users.noreply.github.com"
-        git config --local user.name "Mark Ridgwell"
+    - uses: actions/checkout@v2.3.4
+      with:
+        fetch-depth: 0
+        ref: ${{ github.head_ref }}
+
     - name: Define GeoIP.conf
       run: |
         echo AccountID ${{ secrets.MAXMIND_ACCOUNT_ID }} > GeoIP.conf
@@ -52,20 +52,20 @@ jobs:
         # See the `pathspec`-documentation for git
         # - https://git-scm.com/docs/git-add#Documentation/git-add.txt-ltpathspecgt82308203
         # - https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefpathspecapathspec
-        #file_pattern: src/*.js tests/*.js *.php
+        file_pattern: *.mmdb
 
         # Optional local file path to the repository
         # Defaults to the root of the repository
         repository: .
 
         # Optional commit user and author settings
-        commit_user_name: fun-geoip[bot]
-        commit_user_email: credfeto@users.noreply.github.com
-        commit_author: fun-geoip[bot] <credfeto@users.noreply.github.com> # defaults to author of the commit that triggered the run
+        commit_user_name: "fun-geoip[bot]"
+        commit_user_email: "credfeto@users.noreply.github.com"
+        commit_author: "fun-geoip[bot] <credfeto@users.noreply.github.com>"
 
         # Optional tag message 
         # Action will create and push a new tag to the remote repository and the defined branch
-        #tagging_message: 'v1.0.0'
+        tagging_message: "GeoIp"
 
         # Optional options appended to `git-push`
         # See git-push documentation for details: https://git-scm.com/docs/git-push#_options
