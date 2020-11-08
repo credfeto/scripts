@@ -72,4 +72,4 @@ jobs:
         #push_options: '--force'
     
         # Optional: Disable dirty check and always try to create a commit and push
-        skip_dirty_check: false    - name: Commit files
+        skip_dirty_check: false
