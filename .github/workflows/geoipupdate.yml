@@ -41,7 +41,7 @@ jobs:
 
         # Optional branch name where commit should be pushed to
         # Defaults to the current branch
-        branch: master
+        branch: "geopip/${{ date +%Y-%m-%d }}"
 
         # Optional options appended to `git-commit`
         # See https://git-scm.com/docs/git-commit for a list of available options
@@ -69,7 +69,7 @@ jobs:
 
         # Optional options appended to `git-push`
         # See git-push documentation for details: https://git-scm.com/docs/git-push#_options
-        push_options: '--force'
+        #push_options: '--force'
     
         # Optional: Disable dirty check and always try to create a commit and push
         skip_dirty_check: false
