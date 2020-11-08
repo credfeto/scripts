@@ -3,9 +3,6 @@ name: Perform Maxmind GEOIP Updates
 on:
   schedule:
     - cron: "15 3 * * *"
-  push:
-    branches:
-    - master
 
 jobs:
   update-geoip:
