@@ -37,7 +37,7 @@ jobs:
         # Optional but recommended
 
         # Defaults to "Apply automatic changes"
-        commit_message: [FF-368] - Updated GEOIP DB from MaxMind
+        commit_message: "[FF-368] - Updated GEOIP DB from MaxMind"
 
         # Optional branch name where commit should be pushed to
         # Defaults to the current branch
