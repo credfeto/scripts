@@ -111,7 +111,7 @@ function hasCodeToBuild($targetRepo) {
     if($srcExists -eq $false) {
         # no source to update
         Write-Information "* No src folder in repo"
-        return $true
+        return $false
     }
 
     $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
