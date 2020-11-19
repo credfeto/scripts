@@ -224,6 +224,13 @@ if($installed -eq $false) {
 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
 }
 
+$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
+
+if($installed -eq $false) {
+    Write-Error ""
+	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install Credfeto.Changelog.Cmd']"
+}
+
 
 Write-Information ""
 Write-Information "***************************************************************"
