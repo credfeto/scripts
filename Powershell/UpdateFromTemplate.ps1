@@ -314,12 +314,12 @@ function ensureFolderExists($baseFolder, $subFolder) {
 
 function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
 
-    $fileName = convertToOsPath -path $fileName
+    $localFileName = convertToOsPath -path $fileName
 
-    Write-Information "Checking $fileName"
+    Write-Information "Checking $localFileName"
 
-    $sourceFileName = makePath -Path $sourceRepo -ChildPath $fileName
-    $targetFileName = makePath -Path $targetRepo -ChildPath $fileName
+    $sourceFileName = makePath -Path $sourceRepo -ChildPath $localFileName
+    $targetFileName = makePath -Path $targetRepo -ChildPath $localFileName
 
     $targetFreezeFileName = $targetFileName + ".freeze"
     $trgFreexeExists = Test-Path -Path $targetFreezeFileName
