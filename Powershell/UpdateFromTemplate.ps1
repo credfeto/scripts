@@ -350,7 +350,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         }
     }
 
-    updateFileBuildAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo, -fileName $fileName
+    updateFileBuildAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $fileName
 }
 
 function processRepo($srcRepo, $repo, $baseFolder) {
