@@ -136,14 +136,14 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
     if($ret -ne $null) {
         
         if($ret -eq $true) {
-            $codeOK = buildSolution -repoFolder $repoFolder
+            $codeOK = DotNet-BuildSolution -repoFolder $repoFolder
             if($codeOK -eq $true) {
                 doCommit -fileName $fileName
                 Git-Push
             }
             else {
                 $branchName = "template/ff-1429/$fileName".Replace("\", "/")
-                $branchOk = createBranch -name $branchName
+                $branchOk = Git-CreateBranch -branchName $branchName
                 if($branchOk -eq $true) {
                     Write-Information "Create Branch $branchName"
                     doCommit -fileName $fileName
