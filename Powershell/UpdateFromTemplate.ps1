@@ -111,7 +111,7 @@ function hasCodeToBuild($targetRepo) {
     if($srcExists -eq $false) {
         # no source to update
         Write-Information "* No src folder in repo"
-        return $true;
+        return $true
     }
 
     $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
@@ -155,7 +155,7 @@ function updateFileBuildAndCommit($sourceRepo, $targetRepo, $fileName) {
             
         }
 
-        return $true;
+        return $true
     }
 
     return $false;
@@ -312,6 +312,47 @@ function ensureFolderExists($baseFolder, $subFolder) {
     }
 }
 
+function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
+
+    $fileName = convertToOsPath -path $fileName
+
+    Write-Information "Checking $fileName"
+
+    $sourceFileName = makePath -Path $sourceRepo -ChildPath $fileName
+    $targetFileName = makePath -Path $targetRepo -ChildPath $fileName
+
+    $targetFreezeFileName = $targetFileName + ".freeze"
+    $trgFreexeExists = Test-Path -Path $targetFreezeFileName
+    if($trgFreexeExists -eq $true) {
+        # no source to update
+        Write-Information "* no global.json is frozen in target"
+        return
+    }
+
+
+    $srcExists = Test-Path -Path $sourceFileName
+    if($srcExists -eq $false) {
+        # no source to update
+        Write-Information "* no global.json in template"
+        return
+    }
+    
+    $trgExists = Test-Path -Path $targetFileName
+    if($trgExists -eq $true) {
+
+        $srcGlobal = Get-Content $sourceFileName | Out-String | ConvertFrom-Json
+        $trgGlobal = Get-Content $targetFileName | Out-String | ConvertFrom-Json
+
+        if($trgGlobal.sdk.version -gt $srcGlobal.sdk.version) {
+            # no source to update
+            Write-Information "* target global.json specifies a newer version of .net"
+            return
+        }
+    }
+
+    updateFileBuildAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo, -fileName $fileName
+}
+
 function processRepo($srcRepo, $repo, $baseFolder) {
     
 
@@ -354,8 +395,7 @@ function processRepo($srcRepo, $repo, $baseFolder) {
         
         # Process files in src folder
         updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
-    
+        updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
     }
 
     #########################################################
