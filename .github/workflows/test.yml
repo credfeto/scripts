@@ -35,11 +35,11 @@ jobs:
         git diff -s --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
         echo "Diff2"
         git diff
-#    - uses: stefanzweifel/git-auto-commit-action@v4
-#      with:
-#        commit_message: "[FF-368] - Updated GEOIP DB from MaxMind"
-#        file_pattern: "*.mmdb CHANGELOG.md"
-#        commit_user_name: "fun-geoip[bot]"
-#        commit_user_email: "credfeto@users.noreply.github.com"
-#        commit_author: "fun-geoip[bot] <credfeto@users.noreply.github.com>"
-#        skip_dirty_check: false
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "[FF-368] - Updated GEOIP DB from MaxMind"
+        file_pattern: "change.log CHANGELOG.md"
+        commit_user_name: "fun-geoip[bot]"
+        commit_user_email: "credfeto@users.noreply.github.com"
+        commit_author: "fun-geoip[bot] <credfeto@users.noreply.github.com>"
+        skip_dirty_check: false
