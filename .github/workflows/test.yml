@@ -30,6 +30,8 @@ jobs:
     - run: echo ${{ env.WHEN }} > change.log
     - name: Add Changelog
       run: |
+        echo "Diff1"
+        git diff
         git diff -s --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
         echo "Diff2"
         git diff
