@@ -18,5 +18,7 @@ jobs:
         token: ${{ secrets.SOURCE_PUSH_TOKEN }}
     - run: echo `date +"%Y-%m-%d %T"` > execution-time.log
     - run: |
-        git diff
-        echo "banana"
+        if `git diff -s --exit-code`;
+        then     
+           echo "banana"
+        fi
