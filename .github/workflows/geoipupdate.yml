@@ -15,18 +15,31 @@ jobs:
         fetch-depth: 0
         ref: ${{ github.head_ref }}
         token: ${{ secrets.SOURCE_PUSH_TOKEN }}
+    - uses: credfeto/action-dotnet-version-detect@v1.1.1
+    - uses: actions/setup-dotnet@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    - name: Enable dotnet tools
+      run: dotnet new tool-manifest
+    - name: Install Changelog tool
+      run: dotnet tool install --local Credfeto.ChangeLog.Cmd
     - run: |
         echo AccountID ${{ secrets.MAXMIND_ACCOUNT_ID }} > GeoIP.conf
         echo LicenseKey ${{ secrets.MAXMIND_LICENSE_KEY }} >> GeoIP.conf
         echo EditionIDs GeoLite2-Country >> GeoIP.conf
+    - run: echo WHEN=`date +"%Y-%m-%d"` >> $GITHUB_ENV
     - run: sudo add-apt-repository ppa:maxmind/ppa
     - run: sudo apt update
     - run: sudo apt install geoipupdate
     - run: geoipupdate --config-file GeoIP.conf --database-directory geoip
+    - name: Update changelog if changes occured
+      run: git diff -s --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: "[FF-368] - Updated GEOIP DB from MaxMind"
-        file_pattern: "*.mmdb"
+        commit_message: "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
+        file_pattern: "*.mmdb CHANGELOG.md"
         commit_user_name: "fun-geoip[bot]"
         commit_user_email: "credfeto@users.noreply.github.com"
         commit_author: "fun-geoip[bot] <credfeto@users.noreply.github.com>"

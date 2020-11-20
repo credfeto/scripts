@@ -29,10 +29,10 @@ jobs:
     - run: echo WHEN=`date +"%Y-%m-%d"` >> $GITHUB_ENV
     - run: echo ${{ env.WHEN }} > change.log
     - name: Update changelog if changes occured
-      run: git diff -s --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
+      run: git diff -s --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[FF-0000] - Test Run (${{ env.WHEN}})"
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
+        commit_message: "[FF-0000] - Test Run (${{ env.WHEN}})"
         file_pattern: "change.log CHANGELOG.md"
         commit_user_name: "fun-geoip[bot]"
         commit_user_email: "credfeto@users.noreply.github.com"
