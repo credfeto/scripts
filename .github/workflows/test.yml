@@ -1,0 +1,22 @@
+name: Testing
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2.3.4
+      with:
+        fetch-depth: 0
+        ref: ${{ github.head_ref }}
+        token: ${{ secrets.SOURCE_PUSH_TOKEN }}
+    - run: echo `date +"%Y-%m-%d %T"` > execution-time.log
+    - run: |
+        git diff
+        echo "banana"
