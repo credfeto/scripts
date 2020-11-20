@@ -27,7 +27,7 @@ jobs:
     - name: Install Changelog tool
       run: dotnet tool install --local Credfeto.ChangeLog.Cmd
     - run: echo WHEN=`date +"%Y-%m-%d"` >> $GITHUB_ENV
-    - run: echo ${{ env.WHEN }} T1 > change.log
+    - run: echo ${{ env.WHEN }} > change.log
     - run: |
         git diff  --exit-code
         if [ $? -ne 0 ] ; then    
