@@ -11,6 +11,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 ### Changed
 - [FF-368] - Updated GEOIP DB from MaxMind (2020-11-20)
 - [FF-368] - Updated GEOIP DB from MaxMind (2020-11-20)
+- [FF-368] - Updated GEOIP DB from MaxMind (2020-11-20)
 ### Removed
 ### Deployment Changes
 
