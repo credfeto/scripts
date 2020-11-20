@@ -36,7 +36,7 @@ jobs:
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: "[FF-368] - Updated GEOIP DB from MaxMind"
-        file_pattern: "*.mmdb" CHANGELOG.md
+        file_pattern: "*.mmdb CHANGELOG.md"
         commit_user_name: "fun-geoip[bot]"
         commit_user_email: "credfeto@users.noreply.github.com"
         commit_author: "fun-geoip[bot] <credfeto@users.noreply.github.com>"
