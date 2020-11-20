@@ -30,7 +30,7 @@ jobs:
     - run: echo ${{ env.WHEN }} > change.log
     - run: |
         echo "Diff1"
-        git diff  --exit-code && dotnet changelog -changelog CHANGELOG.md -add Changed -message "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
+        git diff  --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
         echo "Diff2"
         git diff
 #    - uses: stefanzweifel/git-auto-commit-action@v4
