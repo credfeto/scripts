@@ -268,18 +268,18 @@ updates:
         }
     }
 
-#    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.github_actions'
-#    $templateFileExists = Test-Path -Path $templateFile
-#    if($templateFileExists -eq $true) {
-#        $actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
-#        $files = Get-ChildItem -Path $actionsTargetPath -Filter *.yml -Recurse
-#        if($files -ne $null) {
-#            Write-Information " --> Adding Github Actions"
-#            $templateContent = Get-Content -Path $templateFile -Raw
-#            $trgContent = $trgContent.Trim() + $newline + $newline
-#            $trgContent = $trgContent +  $templateContent
-#        }
-#    }
+    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.github_actions'
+    $templateFileExists = Test-Path -Path $templateFile
+    if($templateFileExists -eq $true) {
+        $actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
+        $files = Get-ChildItem -Path $actionsTargetPath -Filter *.yml -Recurse
+        if($files -ne $null) {
+            Write-Information " --> Adding Github Actions"
+            $templateContent = Get-Content -Path $templateFile -Raw
+            $trgContent = $trgContent.Trim() + $newline + $newline
+            $trgContent = $trgContent +  $templateContent
+        }
+    }
 
     $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.python'
     $templateFileExists = Test-Path -Path $templateFile
