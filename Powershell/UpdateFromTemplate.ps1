@@ -387,6 +387,14 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github\workflows"
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github\linters"
 
+    ## Ensure Changelog exists
+    $targetChangelogFile = makePath -Path $baseFolder -ChildPath "CHANGELOG.md"
+    $targetChangeLogExists = Test-Path -Path $targetChangelogFile
+    if($targetChangeLogExists -eq $false) {
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "CHANGELOG.md"
+    }
+
+    
     #########################################################
     # C# file updates
     $srcPath = makePath -Path $repoFolder -ChildPath "src"
