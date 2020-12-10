@@ -22,6 +22,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - [FF-0000] - Test Run (2020-12-07)
 - [FF-0000] - Test Run (2020-12-08)
 - [FF-0000] - Test Run (2020-12-09)
+- [FF-368] - Updated GEOIP DB from MaxMind (2020-12-10)
 ### Removed
 ### Deployment Changes
 
