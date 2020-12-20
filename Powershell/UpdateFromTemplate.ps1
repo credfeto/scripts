@@ -388,7 +388,7 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github\linters"
 
     ## Ensure Changelog exists
-    $targetChangelogFile = makePath -Path $baseFolder -ChildPath "CHANGELOG.md"
+    $targetChangelogFile = makePath -Path $repoFolder -ChildPath "CHANGELOG.md"
     $targetChangeLogExists = Test-Path -Path $targetChangelogFile
     if($targetChangeLogExists -eq $false) {
         updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "CHANGELOG.md"
