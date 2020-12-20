@@ -69,6 +69,8 @@ function runCodeCleanup($solutionFile) {
         Write-Information "* Changing Resharper disable once comments to SuppressMessage"
         Write-Information "  - Folder: $sourceFolder"
 
+        $removeBlankLinesRegex = "(?ms)" + "^((\s+)///\s</(.*?)\>(\r|\n|\r\n))(?<LinesToRemove>(\r|\n|\r\n)+)(\s+\[(System\.Diagnostics\.CodeAnalysis\.)?SuppressMessage)"
+
         $replacements = "RedundantDefaultMemberInitializer",
                         "ParameterOnlyUsedForPreconditionCheck.Global",
                         "ParameterOnlyUsedForPreconditionCheck.Local",
@@ -87,6 +89,7 @@ function runCodeCleanup($solutionFile) {
 
             $content = Get-Content -Path $fileName -Raw
             $originalContent = $content
+            $updatedContent = $content
 
             $changedFile = $False
 
@@ -95,9 +98,10 @@ function runCodeCleanup($solutionFile) {
                 $regex = "//\s+ReSharper\s+disable\s+once\s+$code"
                 $replacementText = "[System.Diagnostics.CodeAnalysis.SuppressMessage(""ReSharper"", ""$replacement"", Justification=""TODO: Review"")]"
 
-                $content = $content -replace $regex, $replacementText
-                if($content -ne $originalContent)
+                $updatedContent = $content -replace $regex, $replacementText
+                if($content -ne $updatedContent)
                 {
+                    $content = $updatedContent
                     if($changedFile -eq $False) {
                         Write-Information "* $fileName"
                         $changedFile = $True
@@ -107,11 +111,18 @@ function runCodeCleanup($solutionFile) {
                 }
             }
 
-            if($content -ne $originalContent) {
-                $content = $content.Trim()
-                Write-Information "   - Updated file"
-                Set-Content -Path $fileName -Value $content
+            $updatedContent = $content -replace $removeBlankLinesRegex, '$1XXXX$7'
+            if($content -ne $updatedContent)
+            {
+                $content = $updatedContent
+                if($changedFile -eq $False) {
+                    Write-Information "* $fileName"
+                    $changedFile = $True
+                }
+
+                Write-Information "   - Removed blank likes"
             }
+
         }
 
         Write-Information "* Running Code Cleanup"
