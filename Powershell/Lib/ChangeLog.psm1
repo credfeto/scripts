@@ -27,7 +27,7 @@ param(
     
     Write-Information ">>> Updating Changelog <<<"
 
-    dotnet changelog -changelog $fileName -add $entryType -message "$code - $message"
+    dotnet changelog --changelog $fileName --add $entryType --message "$code - $message"
     if($?) {
         Write-Information "* Changelog Updated"
     }
