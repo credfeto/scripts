@@ -70,6 +70,7 @@ function runCodeCleanup($solutionFile) {
         Write-Information "  - Folder: $sourceFolder"
 
         $removeBlankLinesRegex = "(?ms)" + "^((\s+)///\s</(.*?)\>(\r|\n|\r\n))(?<LinesToRemove>(\r|\n|\r\n)+)(\s+\[(System\.Diagnostics\.CodeAnalysis\.)?SuppressMessage)"
+        $removeBlankLines2Regex = "(?ms)" + "^((\s+)///\s<(.*?)/s+/\>(\r|\n|\r\n))(?<LinesToRemove>(\r|\n|\r\n)+)(\s+\[(System\.Diagnostics\.CodeAnalysis\.)?SuppressMessage)"
 
         $replacements = "RedundantDefaultMemberInitializer",
                         "ParameterOnlyUsedForPreconditionCheck.Global",
@@ -122,9 +123,21 @@ function runCodeCleanup($solutionFile) {
                     $changedFile = $True
                 }
 
-                Write-Information "   - Removed blank likes"
+                Write-Information "   - Removed blank lines (end tag)"
             }
 
+
+            $updatedContent = $content -replace $removeBlankLines2Regex, '$1XXXX$7'
+            if($content -ne $updatedContent)
+            {
+                $content = $updatedContent
+                if($changedFile -eq $False) {
+                    Write-Information "* $fileName"
+                    $changedFile = $True
+                }
+
+                Write-Information "   - Removed blank lines (single tag)"
+            }
         }
 
         Write-Information "* Running Code Cleanup"
