@@ -81,6 +81,8 @@ function runCodeCleanup($solutionFile) {
                         "AutoPropertyCanBeMadeGetOnly.Local",
                         "ClassNeverInstantiated.Local",
                         "ClassNeverInstantiated.Global",
+                        "ClassCanBeSealed.Global",
+                        "ClassCanBeSealed.Local",
                         "UnusedAutoPropertyAccessor.Local",
                         "UnusedAutoPropertyAccessor.Global",       
                         "InconsistentNaming",
@@ -137,6 +139,10 @@ function runCodeCleanup($solutionFile) {
                 }
 
                 Write-Information "   - Removed blank lines (single tag)"
+            }
+
+            if($content -ne $originalContent) {
+                Set-Content -Path $fileName -Value $content
             }
         }
 
