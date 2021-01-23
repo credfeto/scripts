@@ -382,7 +382,6 @@ function processRepo($srcRepo, $repo, $baseFolder) {
 
     #########################################################
     # CREATE ANY FOLDERS THAT ARE NEEDED
-    ensureFolderExists -baseFolder $repoFolder -subFolder "src"
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github"
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github\workflows"
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github\linters"
