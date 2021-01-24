@@ -399,10 +399,13 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     $srcPath = makePath -Path $repoFolder -ChildPath "src"
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $true) {
-        
-        # Process files in src folder
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
-        updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+        $files = Get-ChildItem -Path $srcPath -Filter *.sln -Recurse
+        if($files.Count -ne 0) {
+
+            # Process files in src folder
+            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
+            updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+        }
     }
 
     #########################################################
