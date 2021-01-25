@@ -157,7 +157,12 @@ function runCodeCleanup($solutionFile) {
         }
 
         Write-Information "* Building after cleanup"
-        return DotNet-BuildSolution -srcFolder $sourceFolder
+        $result = DotNet-BuildSolution -srcFolder $sourceFolder
+        if($result -eq $true) {
+                return $true
+        }
+
+        [Environment]::Exit(22)
     }
 
     Write-Information ">>>>> Build Failed!"
