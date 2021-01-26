@@ -55,7 +55,7 @@ function runCodeCleanup($solutionFile) {
     $tempFolder = [System.IO.Path]::GetTempPath()
 
     $sourceFolder = Split-Path -Path $solutionFile -Parent
-    $sourceFolderWithoutDrive = $sourceFolder;
+    $sourceFolderWithoutDrive = $sourceFolder
     if($sourceFolder[1] -eq ":") { 
         $sourceFolderWithoutDrive = $sourceFolder.Substring(3)
     }    
@@ -159,14 +159,15 @@ function runCodeCleanup($solutionFile) {
         Write-Information "* Building after cleanup"
         $result = DotNet-BuildSolution -srcFolder $sourceFolder
         if($result -eq $true) {
-                return $true
+            return $true
         }
 
-        [Environment]::Exit(22)
+	Write-Information ">>>>> Build Failed!"
+	exit
     }
 
     Write-Information ">>>>> Build Failed!"
-    return $false;
+    return $false
 }
 
 
