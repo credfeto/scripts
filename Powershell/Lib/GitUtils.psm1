@@ -176,7 +176,7 @@ param(
 }
 
 function Git-Get-HeadRev {
-    $result = git rev-parse --short HEAD
+    $result = git rev-parse HEAD
 
     if(!$?) {
         Write-Information "Failed to create branch $branchName - Create branch failed - Call failed."
