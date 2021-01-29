@@ -175,6 +175,20 @@ param(
     return $true;
 }
 
+function Git-Get-HeadRev {
+    $result = git rev-parse --short HEAD
+
+    if(!$?) {
+        Write-Information "Failed to create branch $branchName - Create branch failed - Call failed."
+        return $null
+    }
+
+    return $result.Trim()
+}
+
+$rev = Git-GetHeadHash
+
+
 
 function Git-LoadRepoList {
 param(
@@ -199,3 +213,4 @@ Export-ModuleMember -Function Git-PushOrigin
 Export-ModuleMember -Function Git-DoesBranchExist
 Export-ModuleMember -Function Git-LoadRepoList
 Export-ModuleMember -Function Git-GetFolderForRepo
+Export-ModuleMember -Function Git-Get-HeadRev

@@ -46,6 +46,15 @@ catch {
     Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: DotNetBuild" 
 }
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Tracking.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: Tracking" 
+}
 #endregion
 
 
@@ -173,6 +182,24 @@ function runCodeCleanup($solutionFile) {
     return $false
 }
 
+function Tracking_Load($fileName) {
+    $srcPath = Join-Path -Path $repoFolder -ChildPath "tracking.json"
+    $srcExists 
+
+}
+
+function Tracking_Get($basePath, $repo) {
+
+    $srcPath = Join-Path -Path $repoFolder -ChildPath "tracking.json"
+    $src 
+
+    $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
+
+}
+
+function Tracking_Set($basePath, $repo) {
+}
+
 
 function processRepo($srcRepo, $repo) {
     
@@ -194,6 +221,17 @@ function processRepo($srcRepo, $repo) {
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
 
     Set-Location -Path $repoFolder
+
+    $lastRevision = Tracking_Get -basePath $root -repo $repo
+    $currentRevision = Git-Get-HeadRev
+
+    Write-Information "Last Revision:    $lastRevision"
+    Write-Information "Current Revision: $currentRevision"
+
+    if( $lastRevision -eq $currentRevision ) {
+        Write-Information "Repo not changed"
+    }
+
 
     #########################################################
     # C# file updates
@@ -227,6 +265,8 @@ function processRepo($srcRepo, $repo) {
             }
         }    
     }
+
+    Tracking_Set -basePath $root -repo $repo -value
 }
 
 
