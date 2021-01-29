@@ -1,4 +1,8 @@
-function Tracking_Read($fileName) {
+function Tracking_Read {
+param (
+    [string] $fileName
+    )
+
     $content = @{}
 
     $srcExists = Test-Path -Path $fileName
@@ -12,6 +16,18 @@ function Tracking_Read($fileName) {
     return $content
 }
 
+<#
+ .Synopsis
+  Gets a setting from the tracking file.
+
+ .Description
+  Gets a setting from the tracking file.
+
+ .Parameter basePath
+  Location of the folder where the tracking file resides
+ .Parameter repo
+  The repo to get the setting for
+#>
 function Tracking_Get {
 param(
     [string] $basePath, 
@@ -29,6 +45,21 @@ param(
         
     return $null
 }
+
+<#
+ .Synopsis
+  Sets a setting in the tracking file.
+
+ .Description
+  Gets a setting from the tracking file.
+
+ .Parameter basePath
+  Location of the folder where the tracking file resides
+ .Parameter repo
+  The repo to set the setting for
+ .Parameter value
+  The new value to set
+#>
 
 function Tracking_Set {
 param(
