@@ -545,7 +545,7 @@ Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
 $templateRepoFolder = Join-Path -Path $root -ChildPath $folder
 
-Set-Location $templateFolder
+Set-Location -Path $templateRepoFolder
 
 $templateRepoHash = Git-Get-HeadRev
 
