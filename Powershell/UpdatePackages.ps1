@@ -53,20 +53,33 @@ try
 {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "ChangeLog.psm1") -Force -DisableNameChecking
 }
-catch {
+catch
+{
     Write-Error $Error[0]
-    Throw "Error while loading supporting PowerShell Scripts: Changelog" 
+    Throw "Error while loading supporting PowerShell Scripts: Changelog"
+}
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Tracking.psm1") -Force -DisableNameChecking
+}
+catch
+{
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: Tracking"
 }
 #endregion
 
-function checkForUpdatesExact([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch) {
+function checkForUpdatesExact([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch)
+{
 
     Write-Information "Updating Package Exact"
-    $results = dotnet updatepackages -folder $repoFolder -packageId $packageId 
+    $results = dotnet updatepackages -folder $repoFolder -packageId $packageId
 
 
-    if($?) {
-        
+    if ($?)
+    {
+
         # has updates
         $packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
         $regexPattern = "echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
@@ -111,19 +124,40 @@ function checkForUpdatesPrefix([String]$repoFolder, [String]$packageId) {
     return $null
 }
 
-function checkForUpdates([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch) {
-    if($exactMatch -eq $true) {
+function checkForUpdates([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch)
+{
+    if ($exactMatch -eq $true)
+    {
         return checkForUpdatesExact -repoFolder $repoFolder -packageId $packageId
     }
-    else {
+    else
+    {
         return checkForUpdatesPrefix -repoFolder $repoFolder -packageId $packageId
     }
 }
 
-function processRepo($repo, $packages) {
-    
+function BuildSolution([String]$srcPath, [String]$baseFolder, [String]$currentVersion)
+{
+
+
+    if ($lastRevision -eq $currentRevision)
+    {
+        Write-Information "Repo not changed since last successful build"
+        Return $true
+    }
+
+    $codeOK = DotNet-BuildSolution -srcFolder $srcPath
+    if ($codeOK -eq $true)
+    {
+        Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
+    }
+}
+
+function processRepo($repo, $packages)
+{
+
     Set-Location -Path $root
-    
+
     Write-Information ""
     Write-Information "***********************************************************************************"
     Write-Information "***********************************************************************************"
@@ -149,24 +183,48 @@ function processRepo($repo, $packages) {
     }
 
     $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
-    if($projects.Length -eq 0) {
+    if ($projects.Length -eq 0)
+    {
         # no source to update
         Write-Information "* No C# projects in repo"
         return;
     }
 
+    $lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
+    $currentRevision = Git-Get-HeadRev
+
+    Write-Information "Last Revision:    $lastRevision"
+    Write-Information "Current Revision: $currentRevision"
 
     $changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
 
-    $codeOK = DotNet-BuildSolution -srcFolder $srcPath
+    $codeOK = $false
+    if ($lastRevision -eq $currentRevision)
+    {
+        # no need to build - it last built successfully with this code revision
+        $codeOK = $true
+    }
+    else
+    {
+        $codeOK = DotNet-BuildSolution -srcFolder $srcPath
+        if ($codeOk -eq $true)
+        {
+            # Update last successful revision
+            $lastRevision = $currentRevision
+            Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
+        }
+    }
+
     Set-Location -Path $repoFolder
-    if($codeOk -eq $false) {
+    if ($codeOk -eq $false)
+    {
         # no point updating
         Write-Information "* WARNING: Solution doesn't build without any changes - no point in trying to update packages"
         return;
     }
 
-    ForEach($package in $packages) {
+    ForEach ($package in $packages)
+    {
         $packageId = $package.packageId
         $type = $package.type
         $exactMatch = $package.'exact-match'
@@ -193,6 +251,14 @@ function processRepo($repo, $packages) {
                 ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                 Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
                 Git-Push
+
+                # Just built, commited and pushed so get the the revsions 
+                $currentRevision = Git-Get-HeadRev
+                $lastRevision = $currentRevision
+                Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
+
+                Write-Information "Last Revision:    $lastRevision"
+                Write-Information "Current Revision: $currentRevision"
             }
             else {
                 Write-Information "Create Branch $branchName"
