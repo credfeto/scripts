@@ -420,6 +420,8 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         Write-Information "Repo not changed"
     }
 
+    Set-Location -Path $repoFolder
+
     #########################################################
     # CREATE ANY FOLDERS THAT ARE NEEDED
     ensureFolderExists -baseFolder $repoFolder -subFolder ".github"
@@ -542,8 +544,6 @@ Write-Information "Template Folder: $templateFolder"
 $templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
 
 Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
-
-$templateRepoFolder = Join-Path -Path $root -ChildPath $folder
 
 Set-Location -Path $templateRepoFolder
 
