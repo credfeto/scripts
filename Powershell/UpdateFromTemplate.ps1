@@ -420,6 +420,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
 
     if( $lastRevision -eq $currentRevision) {
         Write-Information "Repo not changed"
+        Return
     }
 
     Set-Location -Path $repoFolder
