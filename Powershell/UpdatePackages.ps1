@@ -153,7 +153,7 @@ function BuildSolution([String]$srcPath, [String]$baseFolder, [String]$currentVe
     }
 }
 
-function processRepo($repo, $packages)
+function processRepo($repo, $packages, $baseFolder)
 {
 
     Set-Location -Path $root
@@ -311,7 +311,7 @@ ForEach($repo in $repoList) {
         continue
     }
 
-    processRepo -repo $repo -packages $packages
+    processRepo -repo $repo -packages $packages -baseFolder $root
 }
 
 Set-Location $root
