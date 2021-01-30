@@ -552,6 +552,16 @@ Write-Information "Template Rev Hash = $templateRepoHash"
 
 Set-Location -Path $root
 
+Write-Information ""
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information ""
+
 processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder -baseFolder $root -templateRepoHash $templateRepoHash
 
 Set-Location -Path $root
