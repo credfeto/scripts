@@ -409,8 +409,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
 
     Set-Location -Path $repoFolder
 
-
-    $lastRevision = Tracking_Get -basePath $root -repo $repo
+    $lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
     $currentRevision = Git-Get-HeadRev
     $currentRevision = "$templateRepoHash/$currentRevision"
 
@@ -495,7 +494,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder
 
     Write-Information "Updating Tracking for $repo to $currentRevision"
-    Tracking_Set -basePath $root -repo $repo -value $currentRevision
+    Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
 }
 
 function processAll($repositoryList, $templateRepositoryFolder, $baseFolder, $templateRepoHash) {
