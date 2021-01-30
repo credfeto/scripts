@@ -186,9 +186,6 @@ function Git-Get-HeadRev {
     return $result.Trim()
 }
 
-$rev = Git-GetHeadHash
-
-
 
 function Git-LoadRepoList {
 param(
@@ -199,7 +196,6 @@ param(
 
     return $content
 }
-
 
 Export-ModuleMember -Function Git-RemoveAllLocalBranches
 Export-ModuleMember -Function Git-ResetToMaster
