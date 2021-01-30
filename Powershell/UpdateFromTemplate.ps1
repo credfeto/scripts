@@ -402,6 +402,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     $repoFolder = Join-Path -Path $baseFolder -ChildPath $folder
 
     if($srcRepo -eq $repoFolder) {
+        Write-Information "Skipping updating $repo as it is the same as the template"
         Return
     }
     
