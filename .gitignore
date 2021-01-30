@@ -1,5 +1,4 @@
 /.gtm/
 *.lock
 GeoIP.conf
-.idea
 *.zip
