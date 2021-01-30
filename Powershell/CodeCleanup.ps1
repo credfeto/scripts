@@ -182,25 +182,6 @@ function runCodeCleanup($solutionFile) {
     return $false
 }
 
-function Tracking_Load($fileName) {
-    $srcPath = Join-Path -Path $repoFolder -ChildPath "tracking.json"
-    $srcExists 
-
-}
-
-function Tracking_Get($basePath, $repo) {
-
-    $srcPath = Join-Path -Path $repoFolder -ChildPath "tracking.json"
-    $src 
-
-    $packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
-
-}
-
-function Tracking_Set($basePath, $repo) {
-}
-
-
 function processRepo($srcRepo, $repo) {
     
     Write-Information ""
