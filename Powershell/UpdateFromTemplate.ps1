@@ -15,13 +15,42 @@ $ErrorActionPreference = "Stop"
 #
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib" 
-try {
+
+try
+{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: GitUtils" 
+}
+
+try
+{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: DotNetBuild" 
+}
+
+try
+{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "ChangeLog.psm1") -Force -DisableNameChecking
 }
 catch {
-    Throw "Error while loading supporting PowerShell Scripts" 
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: ChangeLog" 
+}
+
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Tracking.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: Tracking" 
 }
 #endregion
 
@@ -353,7 +382,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
     updateFileBuildAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $fileName
 }
 
-function processRepo($srcRepo, $repo, $baseFolder) {
+function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     
 
     Write-Information ""
@@ -379,6 +408,18 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
 
     Set-Location -Path $repoFolder
+
+
+    $lastRevision = Tracking_Get -basePath $root -repo $repo
+    $currentRevision = Git-Get-HeadRev
+    $currentRevision = "$templateRepoHash/$currentRevision"
+
+    Write-Information "Last Revision:    $lastRevision"
+    Write-Information "Current Revision: $currentRevision"
+
+    if( $lastRevision -eq $currentRevision) {
+        Write-Information "Repo not changed"
+    }
 
     #########################################################
     # CREATE ANY FOLDERS THAT ARE NEEDED
@@ -452,9 +493,12 @@ function processRepo($srcRepo, $repo, $baseFolder) {
     updateAndMergeFileAndComit -srcRepo $srcRepo -trgRepo $repoFolder -fileName ".github\labeler.yml" -mergeFileName ".github\labeler.project-specific.yml"
 
     buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder
+
+    Write-Information "Updating Tracking for $repo to $currentRevision"
+    Tracking_Set -basePath $root -repo $repo -value $currentRevision
 }
 
-function processAll($repositoryList, $templateRepositoryFolder, $baseFolder) {
+function processAll($repositoryList, $templateRepositoryFolder, $baseFolder, $templateRepoHash) {
 
     $repoCount = $repositoryList.Count
 
@@ -471,7 +515,7 @@ function processAll($repositoryList, $templateRepositoryFolder, $baseFolder) {
             continue
         }
 
-        processRepo -srcRepo $templateRepoFolder -repo $gitRepository -baseFolder $baseFolder
+        processRepo -srcRepo $templateRepoFolder -repo $gitRepository -baseFolder $baseFolder -templateRepoHash $templateRepoHash
     }
 }
 
@@ -500,8 +544,14 @@ $templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
 
 Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
+$templateRepoFolder = Join-Path -Path $root -ChildPath $folder
+
+Set-Location $templateFolder
+
+$templateRepoHash = Git-Get-HeadRev
+
 Set-Location -Path $root
 
-processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder -baseFolder $root
+processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder -baseFolder $root -templateRepoHash $templateRepoHash
 
 Set-Location -Path $root
