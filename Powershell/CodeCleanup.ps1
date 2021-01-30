@@ -209,7 +209,7 @@ function processRepo($srcRepo, $repo) {
     Write-Information "Last Revision:    $lastRevision"
     Write-Information "Current Revision: $currentRevision"
 
-    if( $lastRevision -eq $currentRevision ) {
+    if( $lastRevision -eq $currentRevision) {
         Write-Information "Repo not changed"
     }
 
@@ -247,7 +247,8 @@ function processRepo($srcRepo, $repo) {
         }    
     }
 
-    Tracking_Set -basePath $root -repo $repo -value
+    Write-Information "Updating Tracking for $repo to $currentRevision"
+    Tracking_Set -basePath $root -repo $repo -value $currentRevision
 }
 
 
