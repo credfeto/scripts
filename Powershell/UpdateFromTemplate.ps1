@@ -391,6 +391,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     Write-Information ""
 
     Set-Location -Path $baseFolder
+    Write-Information "Base Folder: $baseFolder"
     
     Write-Information "Processing Repo: $repo"
     Write-Information "Source Repo: $srcRepo"
