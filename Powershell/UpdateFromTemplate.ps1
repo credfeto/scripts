@@ -548,6 +548,7 @@ Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 Set-Location -Path $templateRepoFolder
 
 $templateRepoHash = Git-Get-HeadRev
+Write-Information "Template Rev Hash = $templateRepoHash"
 
 Set-Location -Path $root
 
