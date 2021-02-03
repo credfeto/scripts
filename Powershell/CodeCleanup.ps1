@@ -175,7 +175,6 @@ function runCodeCleanup($solutionFile) {
         }
 
 	Write-Information ">>>>> Build Failed!"
-	exit
     }
 
     Write-Information ">>>>> Build Failed!"
