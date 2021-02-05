@@ -219,7 +219,7 @@ function processRepo($srcRepo, $repo) {
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $true) {
         
-        $solutions = Get-ChildItem -Path $srcPath -Filter "*.sln"
+        $solutions = Get-ChildItem -Path $srcPath -Filter "*.sln" 
         foreach($solution in $solutions) {
 
             $solutionFile = $solution.FullName
@@ -239,6 +239,18 @@ function processRepo($srcRepo, $repo) {
                         Git-Commit -message "[FF-2244] - Code cleanup on $solutionName"
                         Git-PushOrigin -branchName $branchName
                     }
+                }
+                else {
+                    $branchName = "broken/$currentRevision/cleanup/ff-2244/$solutionName"
+                    $branchExists = Git-DoesBranchExist -branchName $branchName
+                    if($branchExists -ne $true) {
+                        $hasChanges = Git-HasUnCommittedChanges
+                        if($hasChanges -eq $true) {
+                            Git-CreateBranch -branchName $branchName
+                            Git-Commit -message "[FF-2244] - Code cleanup on $solutionName [BROKEN - NEEDS INVESTIGATION - DO NOT MERGE]"
+                            Git-PushOrigin -branchName $branchName
+                    }
+
                 }
 
                 Git-ResetToMaster
