@@ -214,6 +214,7 @@ function processRepo($srcRepo, $repo) {
     }
 
 
+    $hasCleanedSuccessFully = $false
     #########################################################
     # C# file updates
     $srcPath = Join-Path -Path $repoFolder -ChildPath "src"
@@ -231,6 +232,7 @@ function processRepo($srcRepo, $repo) {
 
                 $cleaned = runCodeCleanup -solutionFile $solution.FullName
                 if($cleaned -eq $true) {
+                    $hasCleanedSuccessFully = $true
 
                     Set-Location -Path $repoFolder
 
@@ -260,8 +262,10 @@ function processRepo($srcRepo, $repo) {
         }    
     }
 
-    Write-Information "Updating Tracking for $repo to $currentRevision"
-    Tracking_Set -basePath $root -repo $repo -value $currentRevision
+    if($hasCleanedSuccessFully -eq $true) {
+        Write-Information "Updating Tracking for $repo to $currentRevision"
+        Tracking_Set -basePath $root -repo $repo -value $currentRevision
+    }
 }
 
 
