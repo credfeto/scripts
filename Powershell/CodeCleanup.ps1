@@ -175,6 +175,7 @@ function runCodeCleanup($solutionFile) {
         }
 
 	Write-Information ">>>>> Build Failed!"
+	exit
     }
 
     Write-Information ">>>>> Build Failed!"
@@ -249,6 +250,7 @@ function processRepo($srcRepo, $repo) {
                             Git-CreateBranch -branchName $branchName
                             Git-Commit -message "[FF-2244] - Code cleanup on $solutionName [BROKEN - NEEDS INVESTIGATION - DO NOT MERGE]"
                             Git-PushOrigin -branchName $branchName
+                        }
                     }
 
                 }
