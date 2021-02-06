@@ -162,10 +162,17 @@ function runCodeCleanup($solutionFile) {
         Write-Information "  - Solution: $Solution"
         Write-Information "  - Cache Folder: $cachesFolder"
         Write-Information "  - Settings File: $settingsFile"
-        dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
-        if(!$?) {
-            Write-Information ">>>>> Code Cleanup failed"
-            return $false
+
+        $projects = Get-ChildItem -Path $sourceFolder -Filter "*.csproj" -Recurse
+        ForEach($project in $projects) {
+            $projectFile = $project.FullName
+            Write-Information "  - Project $projectFile"
+
+            dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
+            if(!$?) {
+                Write-Information ">>>>> Code Cleanup failed"
+                return $false
+            }
         }
 
         Write-Information "* Building after cleanup"
