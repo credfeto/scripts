@@ -78,11 +78,12 @@ function runCodeCleanup($solutionFile) {
         Write-Information "* Changing Resharper disable once comments to SuppressMessage"
         Write-Information "  - Folder: $sourceFolder"
 
-        $singleBlankLine = "(\r|\n|\r\n|\n\r)"
+        $emptyLine = [System.Environment]::NewLine
+
         $linesToRemoveRegex = "(?<LinesToRemove>((\r+)|(\n+)|((\r\n)+)|(\n\r)+))"
         $suppressMessageRegex = "(?<End>\s+\[(System\.Diagnostics\.CodeAnalysis\.)?SuppressMessage)"
-        $removeBlankLinesRegex = "(?ms)" +  "(?<Start>(^((\s+)///\s+</(.*?)\>"+ $singleBlankLine +")))" + $linesToRemoveRegex + $suppressMessageRegex
-        $removeBlankLines2Regex = "(?ms)" + "(?<Start>(^((\s+)///\s+<(.*?)/\>"+ $singleBlankLine +")))" + $linesToRemoveRegex + $suppressMessageRegex
+        $removeBlankLinesRegex = "(?ms)" +  "(?<Start>(^((\s+)///\s+</(.*?)\>)))" + $linesToRemoveRegex + $suppressMessageRegex
+        $removeBlankLines2Regex = "(?ms)" + "(?<Start>(^((\s+)///\s+<(.*?)/\>)))" + $linesToRemoveRegex + $suppressMessageRegex
 
         $replacements = "RedundantDefaultMemberInitializer",
                         "ParameterOnlyUsedForPreconditionCheck.Global",
@@ -128,7 +129,7 @@ function runCodeCleanup($solutionFile) {
                 }
             }
 
-            $updatedContent = $content -replace $removeBlankLinesRegex, '${Start}${End}'
+            $updatedContent = $content -replace $removeBlankLinesRegex, '${Start}' + $emptyLine + '${End}'
             if($content -ne $updatedContent)
             {
                 $content = $updatedContent
@@ -141,7 +142,7 @@ function runCodeCleanup($solutionFile) {
             }
 
 
-            $updatedContent = $content -replace $removeBlankLines2Regex, '${Start}${End}'
+            $updatedContent = $content -replace $removeBlankLines2Regex, '${Start}' + $emptyLine + '${End}'
             if($content -ne $updatedContent)
             {
                 $content = $updatedContent
