@@ -180,7 +180,7 @@ param(
     )
     
     if($sourceFilesBase -ne $null) {
-        Write-Host "Updating project files under $sourceFilesBase"
+        Write-Information "Updating project files under $sourceFilesBase"
         $projects = Get-ChildItem -Path $sourceFilesBase -Directory
 
         Foreach($project in $projects) {
