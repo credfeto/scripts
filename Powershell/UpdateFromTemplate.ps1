@@ -403,9 +403,9 @@ function updateLabel($baseFolder) {
         $srcPath = $null
     }
 
-    $githubFolder = make-Path -Path $baseFolder -ChildPath ".github"
-    $mappingLabelerFile = make-Path -Path $githubFolder -ChildPath "labeler.yml"
-    $coloursLabelFile = make-Path -Path $githubFolder -ChildPath "labels.yml"
+    $githubFolder = makePath -Path $baseFolder -ChildPath ".github"
+    $mappingLabelerFile = makePath -Path $githubFolder -ChildPath "labeler.yml"
+    $coloursLabelFile = makePath -Path $githubFolder -ChildPath "labels.yml"
 
     Labels_Update -Prefix $prefix -sourceFilesBase $srcPath -labelerFileName $mappingLabelerFile -labelsFileName $coloursLabelFile
 
