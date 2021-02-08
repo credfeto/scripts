@@ -225,7 +225,7 @@ param(
             $labeller += ''
         }
 
-        $labelsWithColour += ' - name: "' + $group.Name + '":'
+        $labelsWithColour += ' - name: "' + $group.Name
         $labelsWithColour += '   color: "' + $group.Colour + '"'
         $labelsWithColour += ''
 
