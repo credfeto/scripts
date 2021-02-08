@@ -1,306 +1,78 @@
- - name: "C#"
+ - name: "C#":
    color: "db6baa"
 
- - name: "Powershell"
+ - name: "Powershell":
    color: "23bc12"
 
- - name: "SQL"
+ - name: "SQL":
    color: "413cd1"
 
- - name: "Solidity"
+ - name: "Solidity":
    color: "413cd1"
 
- - name: "unit-tests"
+ - name: "unit-tests":
    color: "0e8a16"
 
- - name: ".NET update"
+ - name: ".NET update":
    color: "a870c9"
 
- - name: "Config Change"
+ - name: "Config Change":
    color: "d8bb50"
 
- - name: "Static Code Analysis Rules"
+ - name: "Static Code Analysis Rules":
    color: "00dead"
 
- - name: "Migration Script"
+ - name: "Migration Script":
    color: "b680e5"
 
- - name: "Legal Text"
+ - name: "Legal Text":
    color: "facef0"
 
- - name: "Change Log"
+ - name: "Change Log":
    color: "53fcd4"
 
- - name: "Read Me"
+ - name: "Read Me":
    color: "5319e7"
 
- - name: "Setup"
+ - name: "Setup":
    color: "5319e7"
 
- - name: "github-actions"
+ - name: "github-actions":
    color: "e09cf4"
 
- - name: "Tech Debt"
+ - name: "Tech Debt":
    color: "30027a"
 
- - name: "auto-pr"
+ - name: "auto-pr":
    color: "0000aa"
 
- - name: ".NET Update"
+ - name: ".NET Update":
    color: "a870c9"
 
- - name: "no-pr-activity"
+ - name: "no-pr-activity":
    color: "ffff00"
 
- - name: "!!! WAITING FOR CLIENT PR"
+ - name: "!!! WAITING FOR CLIENT PR":
    color: "ffff00"
 
- - name: "!!! WAITING FOR WALLET PR"
+ - name: "!!! WAITING FOR WALLET PR":
    color: "ffff00"
 
- - name: "!!! WAITING FOR SERVER PR"
+ - name: "!!! WAITING FOR SERVER PR":
    color: "ffff00"
 
- - name: "!!! WAITING FOR QA SIGNOFF"
+ - name: "!!! WAITING FOR QA SIGNOFF":
    color: "ffff00"
 
- - name: "dependencies"
+ - name: "dependencies":
    color: "0366d6"
 
- - name: "dotnet"
+ - name: "dotnet":
    color: "db6baa"
 
- - name: "npm"
+ - name: "npm":
    color: "e99695"
 
- - name: "DO NOT MERGE"
+ - name: "DO NOT MERGE":
    color: "ff0000"
-
- - name: ".idea"
-   color: "96f7d2"
-
- - name: "EcdsaKeyPairGenerator"
-   color: "96f7d2"
-
- - name: "FunFair.FunWallet"
-   color: "96f7d2"
-
- - name: "Admin.Api.ServiceInterface"
-   color: "96f7d2"
-
- - name: "Admin.Api.ServiceInterface.Tests"
-   color: "0e8a16"
-
- - name: "Api.Authentication"
-   color: "96f7d2"
-
- - name: "Api.Authentication.Tests"
-   color: "0e8a16"
-
- - name: "Api.Domain"
-   color: "96f7d2"
-
- - name: "Api.Domain.Mocks"
-   color: "96f7d2"
-
- - name: "Api.Domain.Tests"
-   color: "0e8a16"
-
- - name: "Api.Logic"
-   color: "96f7d2"
-
- - name: "Api.Logic.Tests"
-   color: "0e8a16"
-
- - name: "Api.Middleware"
-   color: "96f7d2"
-
- - name: "Api.Middleware.Tests"
-   color: "0e8a16"
-
- - name: "Api.ServiceInterface"
-   color: "96f7d2"
-
- - name: "Api.ServiceInterface.Rewriting"
-   color: "96f7d2"
-
- - name: "Api.ServiceInterface.Rewriting.Tests"
-   color: "0e8a16"
-
- - name: "Api.ServiceInterface.Tests"
-   color: "0e8a16"
-
- - name: "Changelly"
-   color: "96f7d2"
-
- - name: "Changelly.Tests"
-   color: "0e8a16"
-
- - name: "CoinGecko"
-   color: "96f7d2"
-
- - name: "CoinGecko.Tests"
-   color: "0e8a16"
-
- - name: "Common"
-   color: "96f7d2"
-
- - name: "Common.Api.Middleware"
-   color: "96f7d2"
-
- - name: "Common.Api.Middleware.Tests"
-   color: "0e8a16"
-
- - name: "Common.Api.ServiceInterface.Rewriting"
-   color: "96f7d2"
-
- - name: "Common.Tests"
-   color: "0e8a16"
-
- - name: "Content"
-   color: "96f7d2"
-
- - name: "Crypto"
-   color: "96f7d2"
-
- - name: "Crypto.Tests"
-   color: "0e8a16"
-
- - name: "Dapp.Admin.Api.ServiceInterface"
-   color: "96f7d2"
-
- - name: "Dapp.Admin.Api.ServiceInterface.Rewriting"
-   color: "96f7d2"
-
- - name: "Dapp.Admin.Api.ServiceInterface.Rewriting.Tests"
-   color: "0e8a16"
-
- - name: "Dapp.Admin.Api.ServiceInterface.Tests"
-   color: "0e8a16"
-
- - name: "DappAdmin"
-   color: "96f7d2"
-
- - name: "Data.SqlServer"
-   color: "96f7d2"
-
- - name: "Data.SqlServer.Tests"
-   color: "0e8a16"
-
- - name: "Data.SqlServer.Tests.Integration"
-   color: "0e8a16"
-
- - name: "Dispatchers.Email"
-   color: "96f7d2"
-
- - name: "Dispatchers.Email.Tests"
-   color: "0e8a16"
-
- - name: "Dispatchers.Sms"
-   color: "96f7d2"
-
- - name: "Dispatchers.Sms.Tests"
-   color: "0e8a16"
-
- - name: "Email.Razor"
-   color: "96f7d2"
-
- - name: "Email.Razor.Tests"
-   color: "0e8a16"
-
- - name: "Kyc.Shufti"
-   color: "96f7d2"
-
- - name: "Kyc.Shufti.Tests"
-   color: "0e8a16"
-
- - name: "Kyc.Trulioo"
-   color: "96f7d2"
-
- - name: "Kyc.Trulioo.Tests"
-   color: "0e8a16"
-
- - name: "Kyc.Yoti.App"
-   color: "96f7d2"
-
- - name: "Kyc.Yoti.App.Tests"
-   color: "0e8a16"
-
- - name: "Kyc.Yoti.DocScan"
-   color: "96f7d2"
-
- - name: "Kyc.Yoti.DocScan.Tests"
-   color: "0e8a16"
-
- - name: "Localisation"
-   color: "96f7d2"
-
- - name: "Localisation.Tests"
-   color: "0e8a16"
-
- - name: "MoonPay"
-   color: "96f7d2"
-
- - name: "Scss"
-   color: "96f7d2"
-
- - name: "Scss.Tests"
-   color: "0e8a16"
-
- - name: "Server.Api.Client"
-   color: "96f7d2"
-
- - name: "Server.Api.Client.Tests"
-   color: "0e8a16"
-
- - name: "Server.Api.Client.Tests.Integration"
-   color: "0e8a16"
-
- - name: "Server.Api.Common"
-   color: "96f7d2"
-
- - name: "Server.Api.ServiceInterface"
-   color: "96f7d2"
-
- - name: "Server.Api.ServiceInterface.Tests"
-   color: "0e8a16"
-
- - name: "Server.Api.ServiceModel"
-   color: "96f7d2"
-
- - name: "Server.Common"
-   color: "96f7d2"
-
- - name: "Server.Common.Tests"
-   color: "0e8a16"
-
- - name: "Signing.Client"
-   color: "96f7d2"
-
- - name: "Signing.Client.Tests"
-   color: "0e8a16"
-
- - name: "Signing.Common"
-   color: "96f7d2"
-
- - name: "Signing.Common.Tests"
-   color: "0e8a16"
-
- - name: "Signing.Server"
-   color: "96f7d2"
-
- - name: "Signing.Server.Tests"
-   color: "0e8a16"
-
- - name: "Tests.Integration.Common"
-   color: "0e8a16"
-
- - name: "TwoFactor"
-   color: "96f7d2"
-
- - name: "TwoFactor.Tests"
-   color: "0e8a16"
-
- - name: "FunFair.Wallet.Api.ServiceInterface.Rewriting"
-   color: "96f7d2"
 
