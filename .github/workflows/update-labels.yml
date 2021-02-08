@@ -23,7 +23,7 @@ jobs:
       with:
         github-token: ${{ secrets.SOURCE_PUSH_TOKEN }}
         yaml-file: .github/labels.yml
-        skip-delete: false
+        skip-delete: true
         dry-run: false
         exclude: |
           help*
