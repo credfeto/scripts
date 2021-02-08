@@ -397,8 +397,7 @@ function updateLabel($baseFolder) {
     if($srcExists -eq $true) {
         $files = Get-ChildItem -Path $srcPath -Filter *.sln -Recurse
         if($files.Count -ne 0) {
-
-            $prefix = $files[0].
+            $prefix = $files[0].BaseName
         }
     } else {
         $srcPath = $null

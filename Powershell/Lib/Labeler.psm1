@@ -179,28 +179,31 @@ param(
         }
     )
     
-    $projects = Get-ChildItem -Path $sourceFilesBase -Directory
+    if($sourceFilesBase -ne $null) {
+        Write-Host "Updating project files under $sourceFilesBase"
+        $projects = Get-ChildItem -Path $sourceFilesBase -Directory
 
-    Foreach($project in $projects) {
-        $projectList = Get-ChildItem -Path $projects.FullName -Filter "*.csproj"
-        if($projectList.Count -ne 0) {
+        Foreach($project in $projects) {
+            $projectList = Get-ChildItem -Path $projects.FullName -Filter "*.csproj"
+            if($projectList.Count -ne 0) {
 
-            $name = $project.Name
+                $name = $project.Name
 
-            $labelName = $name
-            if($name.StartsWith($prefix +".") -eq $true) {
-                $labelName = $name.SubString($prefix.Length + 1)
-            }
+                $labelName = $name
+                if($name.StartsWith($prefix +".") -eq $true) {
+                    $labelName = $name.SubString($prefix.Length + 1)
+                }
 
-            $colour = getLabelColour($name)
+                $colour = getLabelColour($name)
 
-            $newLabel = [pscustomobject]@{
-                            Name=$labelName
-                            Colour=$colour
-                            Paths = @("src/$name/**/*")
-                        }
+                $newLabel = [pscustomobject]@{
+                                Name=$labelName
+                                Colour=$colour
+                                Paths = @("src/$name/**/*")
+                            }
         
-            $config += $newLabel
+                $config += $newLabel
+            }
         }
     }
 
@@ -235,6 +238,4 @@ param(
 
 
 Export-ModuleMember -Function Labels_Update
-
-#Labels_Update -Prefix "FunFair.FunWallet" -sourceFilesBase "C:\work\FunFair\funfair-wallet-server\src" -labelerFileName "C:\work\temp.txt" -labelsFileName "C:\work\temp.colour.txt"
     
