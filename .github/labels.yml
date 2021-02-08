@@ -1,78 +1,75 @@
- - name: "C#
+ - name: "C#"
    color: "db6baa"
 
- - name: "Powershell
+ - name: "Powershell"
    color: "23bc12"
 
- - name: "SQL
+ - name: "SQL"
    color: "413cd1"
 
- - name: "Solidity
+ - name: "Solidity"
    color: "413cd1"
 
- - name: "unit-tests
+ - name: "unit-tests"
    color: "0e8a16"
 
- - name: ".NET update
+ - name: ".NET update"
    color: "a870c9"
 
- - name: "Config Change
+ - name: "Config Change"
    color: "d8bb50"
 
- - name: "Static Code Analysis Rules
+ - name: "Static Code Analysis Rules"
    color: "00dead"
 
- - name: "Migration Script
+ - name: "Migration Script"
    color: "b680e5"
 
- - name: "Legal Text
+ - name: "Legal Text"
    color: "facef0"
 
- - name: "Change Log
+ - name: "Change Log"
    color: "53fcd4"
 
- - name: "Read Me
+ - name: "Read Me"
    color: "5319e7"
 
- - name: "Setup
+ - name: "Setup"
    color: "5319e7"
 
- - name: "github-actions
+ - name: "github-actions"
    color: "e09cf4"
 
- - name: "Tech Debt
+ - name: "Tech Debt"
    color: "30027a"
 
- - name: "auto-pr
+ - name: "auto-pr"
    color: "0000aa"
 
- - name: ".NET Update
-   color: "a870c9"
-
- - name: "no-pr-activity
+ - name: "no-pr-activity"
    color: "ffff00"
 
- - name: "!!! WAITING FOR CLIENT PR
+ - name: "!!! WAITING FOR CLIENT PR"
    color: "ffff00"
 
- - name: "!!! WAITING FOR WALLET PR
+ - name: "!!! WAITING FOR WALLET PR"
    color: "ffff00"
 
- - name: "!!! WAITING FOR SERVER PR
+ - name: "!!! WAITING FOR SERVER PR"
    color: "ffff00"
 
- - name: "!!! WAITING FOR QA SIGNOFF
+ - name: "!!! WAITING FOR QA SIGNOFF"
    color: "ffff00"
 
- - name: "dependencies
+ - name: "dependencies"
    color: "0366d6"
 
- - name: "dotnet
+ - name: "dotnet"
    color: "db6baa"
 
- - name: "npm
+ - name: "npm"
    color: "e99695"
 
- - name: "DO NOT MERGE
+ - name: "DO NOT MERGE"
    color: "ff0000"
 
