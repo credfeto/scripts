@@ -43,7 +43,6 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: ChangeLog" 
 }
 
-
 try
 {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Tracking.psm1") -Force -DisableNameChecking
@@ -51,6 +50,15 @@ try
 catch {
     Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: Tracking" 
+}
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Labeler.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: Labeler" 
 }
 #endregion
 
@@ -382,6 +390,32 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
     updateFileBuildAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $fileName
 }
 
+function updateLabel($baseFolder) {
+    $srcPath = makePath -Path $baseFolder -ChildPath "src"
+    $prefix = ''
+    $srcExists = Test-Path -Path $srcPath
+    if($srcExists -eq $true) {
+        $files = Get-ChildItem -Path $srcPath -Filter *.sln -Recurse
+        if($files.Count -ne 0) {
+
+            $prefix = $files[0].
+        }
+    } else {
+        $srcPath = $null
+    }
+
+    $githubFolder = make-Path -Path $baseFolder -ChildPath ".github"
+    $mappingLabelerFile = make-Path -Path $githubFolder -ChildPath "labeler.yml"
+    $coloursLabelFile = make-Path -Path $githubFolder -ChildPath "labels.yml"
+
+    Labels_Update -Prefix $prefix -sourceFilesBase $srcPath -labelerFileName $mappingLabelerFile -labelsFileName $coloursLabelFile
+
+    doCommit -FileName ".github/labeler.yml"
+    doCommit -FileName ".github/labels.yml"
+    Git-Push
+
+}
+
 function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     
 
@@ -492,7 +526,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     
     # Update R# DotSettings
     updateResharperSettings -srcRepo $srcRepo -trgRepo $repoFolder
-
+    updateLabel -baseFolder $repoFolder
 
     updateAndMergeFileAndComit -srcRepo $srcRepo -trgRepo $repoFolder -fileName ".github\labeler.yml" -mergeFileName ".github\labeler.project-specific.yml"
 
@@ -511,8 +545,6 @@ function processAll($repositoryList, $templateRepositoryFolder, $baseFolder, $te
     ForEach($gitRepository in $repositoryList) {
         Write-Information "* $gitRepository"
     }
-
-
 
     ForEach($gitRepository in $repositoryList) {
         if($gitRepository.Trim() -eq "") {
