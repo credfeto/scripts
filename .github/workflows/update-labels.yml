@@ -4,10 +4,9 @@ on:
   push:
     branches:
     - master
-    - "hotfix/*"
     paths:
     - '.github/labels.yml'
-    - '**.yml'
+    - '.github/workflows/update-labels.yml'
 
 jobs:
   update-labels-config:
@@ -19,13 +18,13 @@ jobs:
       with:
         fetch-depth: 0
         token: ${{ secrets.SOURCE_PUSH_TOKEN }}
-      - if: success()
-        uses: crazy-max/ghaction-github-labeler@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          yaml-file: .github/labels.yml
-          skip-delete: false
-          dry-run: false
-          exclude: |
-            help*
-            *issue
+    - if: success()
+      uses: crazy-max/ghaction-github-labeler@v3
+      with:
+        github-token: ${{ secrets.SOURCE_PUSH_TOKEN }}
+        yaml-file: .github/labels.yml
+        skip-delete: false
+        dry-run: false
+        exclude: |
+          help*
+          *issue
