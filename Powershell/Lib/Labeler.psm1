@@ -11,6 +11,10 @@ function getLabelColour($name) {
         return "0e8a16"
     }
 
+    if($lowerName.EndsWith(".mocks")) {
+        return "0e8a16"
+    }
+
     return "96f7d2"
 }
 
