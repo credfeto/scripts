@@ -526,8 +526,6 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     updateResharperSettings -srcRepo $srcRepo -trgRepo $repoFolder
     updateLabel -baseFolder $repoFolder
 
-    updateAndMergeFileAndComit -srcRepo $srcRepo -trgRepo $repoFolder -fileName ".github\labeler.yml" -mergeFileName ".github\labeler.project-specific.yml"
-
     buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder
 
     Write-Information "Updating Tracking for $repo to $currentRevision"
