@@ -248,7 +248,7 @@ param(
 
         $labelsWithColour += ' - name: "' + $group.Name + '"'
         $labelsWithColour += '   color: "' + $group.Colour + '"'
-        if(group.Description -ne $null) {
+        if($group.Description -ne $null) {
             $labelsWithColour += '   description: "' + $group.Description + '"'
         }
         $labelsWithColour += ''
