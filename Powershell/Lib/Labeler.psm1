@@ -243,7 +243,8 @@ param(
         if($group.Paths) {
 
             $labeller += '"' + $group.Name + '":'
-	    $sortedPaths = $group.Paths | Sort
+	    $sortedPaths = $group.Paths 
+            $sortedPaths = $sortedPaths | sort
             Foreach($mask in $sortedPaths) {
 
                 $labeller += ' - ' + $mask

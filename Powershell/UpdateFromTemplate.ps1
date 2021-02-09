@@ -518,7 +518,6 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $srcFileName
     }
 
-
     #########################################################
     # COMPLICATED UPDATES
     
