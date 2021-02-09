@@ -407,12 +407,11 @@ function updateLabel($baseFolder) {
     $mappingLabelerFile = makePath -Path $githubFolder -ChildPath "labeler.yml"
     $coloursLabelFile = makePath -Path $githubFolder -ChildPath "labels.yml"
 
-#    Labels_Update -Prefix $prefix -sourceFilesBase $srcPath -labelerFileName $mappingLabelerFile -labelsFileName $coloursLabelFile
+    Labels_Update -Prefix $prefix -sourceFilesBase $srcPath -labelerFileName $mappingLabelerFile -labelsFileName $coloursLabelFile
 
-#    doCommit -FileName ".github/labeler.yml"
-#    doCommit -FileName ".github/labels.yml"
-#    Git-Push
-
+    doCommit -FileName ".github/labeler.yml"
+    doCommit -FileName ".github/labels.yml"
+    Git-Push
 }
 
 function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {

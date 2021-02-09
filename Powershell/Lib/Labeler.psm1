@@ -236,13 +236,15 @@ param(
     $labeller = @()
     $labelsWithColour = @()
 
+    $sortedConfig = $config | Sort-Object -Property Name
 
     ForEach($group in $config) {
 
         if($group.Paths) {
 
             $labeller += '"' + $group.Name + '":'
-            Foreach($mask in $group.Paths) {
+	    $sortedPaths = $group.Paths | Sort
+            Foreach($mask in $sortedPaths) {
 
                 $labeller += ' - ' + $mask
             }
