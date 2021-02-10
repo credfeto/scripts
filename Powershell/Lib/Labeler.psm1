@@ -55,8 +55,8 @@ param(
             Name="Powershell"
             Description="Powershell Source Files"
             Colour="23bc12"
-            Paths = @( "**/*.ps1",
-                       "**/*.psm1" )
+            Paths = @( "src/**/*.ps1",
+                       "src/**/*.psm1" )
         },
         [pscustomobject]@{
             Name="SQL"
