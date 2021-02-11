@@ -56,20 +56,34 @@ try
 {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Labeler.psm1") -Force -DisableNameChecking
 }
-catch {
+catch
+{
     Write-Error $Error[0]
-    Throw "Error while loading supporting PowerShell Scripts: Labeler" 
+    Throw "Error while loading supporting PowerShell Scripts: Labeler"
+}
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GlobalJson.psm1") -Force -DisableNameChecking
+}
+catch
+{
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: GlobalJson"
 }
 #endregion
 
-function makePath($Path, $ChildPath) {
+function makePath($Path, $ChildPath)
+{
     $ChildPath = convertToOsPath -path $ChildPath
 
-    return [System.IO.Path]::Combine($Path,$ChildPath)
+    return [System.IO.Path]::Combine($Path, $ChildPath)
 }
 
-function convertToOsPath($path) {
-    if($IsLinux -eq $true) {
+function convertToOsPath($path)
+{
+    if ($IsLinux -eq $true)
+    {
         return $path.Replace("\", "/")
     }
 
@@ -358,36 +372,31 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
     $sourceFileName = makePath -Path $sourceRepo -ChildPath $localFileName
     $targetFileName = makePath -Path $targetRepo -ChildPath $localFileName
 
-    $targetFreezeFileName = $targetFileName + ".freeze"
-    $trgFreexeExists = Test-Path -Path $targetFreezeFileName
-    if($trgFreexeExists -eq $true) {
-        # no source to update
-        Write-Information "* no global.json is frozen in target"
-        return
-    }
+    $updated = GlobalJson_Update -sourceFileName $sourceFileName -sourceFileName $targetFileName
 
+    if ($updated -eq $true)
+    {
 
-    $srcExists = Test-Path -Path $sourceFileName
-    if($srcExists -eq $false) {
-        # no source to update
-        Write-Information "* no global.json in template"
-        return
-    }
-    
-    $trgExists = Test-Path -Path $targetFileName
-    if($trgExists -eq $true) {
+        $codeOK = DotNet-BuildSolution -repoFolder $repoFolder
+        if ($codeOK -eq $true)
+        {
+            doCommit -fileName $fileName
+            Git-Push
+        }
+        else
+        {
+            $branchName = "template/ff-1429/$fileName".Replace("\", "/")
+            $branchOk = Git-CreateBranch -branchName $branchName
+            if ($branchOk -eq $true)
+            {
+                Write-Information "Create Branch $branchName"
+                doCommit -fileName $fileName
+                Git-PushOrigin -branchName $branchName
+            }
 
-        $srcGlobal = Get-Content $sourceFileName -Raw  | ConvertFrom-Json
-        $trgGlobal = Get-Content $targetFileName -Raw | ConvertFrom-Json
-
-        if($trgGlobal.sdk.version -gt $srcGlobal.sdk.version) {
-            # no source to update
-            Write-Information "* target global.json specifies a newer version of .net"
-            return
+            Git-ResetToMaster
         }
     }
-
-    updateFileBuildAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $fileName
 }
 
 function updateLabel($baseFolder) {
