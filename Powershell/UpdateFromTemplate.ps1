@@ -372,7 +372,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
     $sourceFileName = makePath -Path $sourceRepo -ChildPath $localFileName
     $targetFileName = makePath -Path $targetRepo -ChildPath $localFileName
 
-    $updated = GlobalJson_Update -sourceFileName $sourceFileName -sourceFileName $targetFileName
+    $updated = GlobalJson_Update -sourceFileName $sourceFileName -targetFileName $targetFileName
 
     if ($updated -eq $true)
     {
