@@ -70,7 +70,7 @@ param(
             Name="Solidity"
             Description="Solidity Source Files"
             Colour="413cd1"
-            Paths = @( "src/**/*.sol" )
+            Paths = @( "./**/*.sol" )
         },
         [pscustomobject]@{
             Name="unit-tests"
@@ -178,6 +178,12 @@ param(
             Paths = @()
         },
         [pscustomobject]@{
+            Name="!!! WAITING FOR ETHEREUM PR"
+            Description="Pull request needs a server ethereum pull request to be merged at the same time"
+            Colour="ffff00"
+            Paths = @()
+        },
+        [[pscustomobject]@{
             Name="dependencies"
             Description="Updates to dependencies"
             Colour="0366d6"
