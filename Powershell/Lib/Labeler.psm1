@@ -45,23 +45,35 @@ param(
 
     $config = @(
         [pscustomobject]@{
-            Name="C#"
-            Description="C# Source Files"
-            Colour="db6baa"
+            Name = "C#"
+            Description = "C# Source Files"
+            Colour = "db6baa"
             Paths = @( "./**/*.cs",
-                       "./**/*.csproj" )
+            "./**/*.csproj" )
         },
         [pscustomobject]@{
-            Name="Powershell"
-            Description="Powershell Source Files"
-            Colour="23bc12"
+            Name = "C# Project"
+            Description = "C# Project Files"
+            Colour = "db6baa"
+            Paths = @( "./**/*.csproj" )
+        },
+        [pscustomobject]@{
+            Name = "C# Solution"
+            Description = "C# Solutions"
+            Colour = "db6baa"
+            Paths = @( "./**/*.sln" )
+        },
+        [pscustomobject]@{
+            Name = "Powershell"
+            Description = "Powershell Source Files"
+            Colour = "23bc12"
             Paths = @( "./**/*.ps1",
-                       "./**/*.psm1" )
+            "./**/*.psm1" )
         },
         [pscustomobject]@{
-            Name="SQL"
-            Description="SQL Source Files"
-            Colour="413cd1"
+            Name = "SQL"
+            Description = "SQL Source Files"
+            Colour = "413cd1"
             Paths = @( "db/**/*",
                        "./**/*.sql" )
 
