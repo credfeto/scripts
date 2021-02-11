@@ -183,10 +183,10 @@ param(
             Colour="ffff00"
             Paths = @()
         },
-        [[pscustomobject]@{
-            Name="dependencies"
-            Description="Updates to dependencies"
-            Colour="0366d6"
+        [pscustomobject]@{
+            Name = "dependencies"
+            Description = "Updates to dependencies"
+            Colour = "0366d6"
             Paths = @()
         },
         [pscustomobject]@{
