@@ -48,22 +48,22 @@ param(
             Name="C#"
             Description="C# Source Files"
             Colour="db6baa"
-            Paths = @( "src/**/*.cs",
-                       "src/**/*.csproj" )
+            Paths = @( "./**/*.cs",
+                       "./**/*.csproj" )
         },
         [pscustomobject]@{
             Name="Powershell"
             Description="Powershell Source Files"
             Colour="23bc12"
-            Paths = @( "src/**/*.ps1",
-                       "src/**/*.psm1" )
+            Paths = @( "./**/*.ps1",
+                       "./**/*.psm1" )
         },
         [pscustomobject]@{
             Name="SQL"
             Description="SQL Source Files"
             Colour="413cd1"
             Paths = @( "db/**/*",
-                       "tools/**/*.sql" )
+                       "./**/*.sql" )
 
         },
         [pscustomobject]@{
