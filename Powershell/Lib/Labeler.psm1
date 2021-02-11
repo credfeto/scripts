@@ -77,9 +77,9 @@ param(
             Description="Unit test and integration test projects"
             Colour="0e8a16"
             Paths = @( "src/*.Tests.*/**/*",
-                       "src/*.Tests.Integration.*/**/*",
-                       "src/*.Tests/**/*"
-                       "src/*.Tests.Integration/**/*" )
+            "src/*.Tests.Integration.*/**/*",
+            "src/*.Tests/**/*",
+            "src/*.Tests.Integration/**/*" )
         },
         [pscustomobject]@{
             Name=".NET update"
@@ -88,10 +88,11 @@ param(
             Paths = @( "src/global.json" )
         },
         [pscustomobject]@{
-            Name="Config Change"
-            Description="Configuration files changes"
-            Colour="d8bb50"
-            Paths = @( "src/**/*.json" )
+            Name = "Config Change"
+            Description = "Configuration files changes"
+            Colour = "d8bb50"
+            Paths = @( "src/**/*.json",
+            "!src/global.json" )
         },
         [pscustomobject]@{
             Name="Static Code Analysis Rules"
@@ -120,25 +121,31 @@ param(
         [pscustomobject]@{
             Name="Read Me"
             Description="Repository readme file"
-            Colour="5319e7"
+            Colour = "5319e7"
             Paths = @( "README.md" )
         },
         [pscustomobject]@{
-            Name="Setup"
-            Description="Setup instructions"
-            Colour="5319e7"
+            Name = "Setup"
+            Description = "Setup instructions"
+            Colour = "5319e7"
             Paths = @( "SETUP.md" )
         },
         [pscustomobject]@{
-            Name="github-actions"
-            Description="Github actions workflow files"
-            Colour="e09cf4"
+            Name = "Markdown"
+            Description = "Markdown files"
+            Colour = "5319e7"
+            Paths = @( "./**/*.md" )
+        },
+        [pscustomobject]@{
+            Name = "github-actions"
+            Description = "Github actions workflow files"
+            Colour = "e09cf4"
             Paths = @( ".github/workflows/*.yml" )
         },
         [pscustomobject]@{
-            Name="Tech Debt"
-            Description="Technical debt"
-            Colour="30027a"
+            Name = "Tech Debt"
+            Description = "Technical debt"
+            Colour = "30027a"
             Paths = @()
         },
         [pscustomobject]@{
