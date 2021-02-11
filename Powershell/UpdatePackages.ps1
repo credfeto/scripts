@@ -303,7 +303,7 @@ Write-Information "*************************************************************
 Write-Information "***************************************************************"
 Write-Information ""
 
-$packages = Get-Content $packagesToUpdate| Out-String | ConvertFrom-Json
+$packages = Get-Content $packagesToUpdate -Raw | ConvertFrom-Json
 
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
 ForEach($repo in $repoList) {

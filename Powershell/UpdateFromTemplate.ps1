@@ -377,8 +377,8 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
     $trgExists = Test-Path -Path $targetFileName
     if($trgExists -eq $true) {
 
-        $srcGlobal = Get-Content $sourceFileName | Out-String | ConvertFrom-Json
-        $trgGlobal = Get-Content $targetFileName | Out-String | ConvertFrom-Json
+        $srcGlobal = Get-Content $sourceFileName -Raw  | ConvertFrom-Json
+        $trgGlobal = Get-Content $targetFileName -Raw | ConvertFrom-Json
 
         if($trgGlobal.sdk.version -gt $srcGlobal.sdk.version) {
             # no source to update
