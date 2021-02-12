@@ -50,18 +50,21 @@ param(
             Colour = "db6baa"
             Paths = @( "./**/*.cs",
             "./**/*.csproj" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "C# Project"
             Description = "C# Project Files"
             Colour = "db6baa"
             Paths = @( "./**/*.csproj" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "C# Solution"
             Description = "C# Solutions"
             Colour = "db6baa"
             Paths = @( "./**/*.sln" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "Powershell"
@@ -69,144 +72,165 @@ param(
             Colour = "23bc12"
             Paths = @( "./**/*.ps1",
             "./**/*.psm1" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "SQL"
             Description = "SQL Source Files"
             Colour = "413cd1"
             Paths = @( "db/**/*",
-                       "./**/*.sql" )
-
+            "./**/*.sql" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="Solidity"
-            Description="Solidity Source Files"
-            Colour="413cd1"
+            Name = "Solidity"
+            Description = "Solidity Source Files"
+            Colour = "413cd1"
             Paths = @( "./**/*.sol" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="unit-tests"
-            Description="Unit test and integration test projects"
-            Colour="0e8a16"
+            Name = "unit-tests"
+            Description = "Unit test and integration test projects"
+            Colour = "0e8a16"
             Paths = @( "src/*.Tests.*/**/*",
             "src/*.Tests.Integration.*/**/*",
             "src/*.Tests/**/*",
             "src/*.Tests.Integration/**/*" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name=".NET update"
-            Description="Update to .net global.json"
-            Colour="a870c9"
+            Name = ".NET update"
+            Description = "Update to .net global.json"
+            Colour = "a870c9"
             Paths = @( "src/global.json" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "Config Change"
             Description = "Configuration files changes"
             Colour = "d8bb50"
-            Paths = @( "src/**/*.json",
-            "!src/global.json" )
+            Paths = @( "src/**/*.json" )
+            PathsExclude = @( "src/global.json" )
         },
         [pscustomobject]@{
-            Name="Static Code Analysis Rules"
-            Description="Ruleset for static code analysis files"
-            Colour="00dead"
+            Name = "Static Code Analysis Rules"
+            Description = "Ruleset for static code analysis files"
+            Colour = "00dead"
             Paths = @( "src/CodeAnalysis.ruleset" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="Migration Script"
-            Description="SQL Migration scripts"
-            Colour="b680e5"
+            Name = "Migration Script"
+            Description = "SQL Migration scripts"
+            Colour = "b680e5"
             Paths = @( "tools/MigrationScripts/**/*" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="Legal Text"
-            Description="Legal text files"
-            Colour="facef0"
+            Name = "Legal Text"
+            Description = "Legal text files"
+            Colour = "facef0"
             Paths = @( "tools/LegalText/**/*" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="Change Log"
-            Description="Changelog tracking file"
-            Colour="53fcd4"
+            Name = "Change Log"
+            Description = "Changelog tracking file"
+            Colour = "53fcd4"
             Paths = @( "CHANGELOG.md" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="Read Me"
-            Description="Repository readme file"
+            Name = "Read Me"
+            Description = "Repository readme file"
             Colour = "5319e7"
             Paths = @( "README.md" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "Setup"
             Description = "Setup instructions"
             Colour = "5319e7"
             Paths = @( "SETUP.md" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "Markdown"
             Description = "Markdown files"
             Colour = "5319e7"
             Paths = @( "./**/*.md" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "github-actions"
             Description = "Github actions workflow files"
             Colour = "e09cf4"
             Paths = @( ".github/workflows/*.yml" )
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "Tech Debt"
             Description = "Technical debt"
             Colour = "30027a"
             Paths = @()
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="auto-pr"
-            Description="Pull request created automatically"
-            Colour="0000aa"
+            Name = "auto-pr"
+            Description = "Pull request created automatically"
+            Colour = "0000aa"
             Paths = @()
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="no-pr-activity"
-            Description="Pull Request has had no activity for a long time"
-            Colour="ffff00"
+            Name = "no-pr-activity"
+            Description = "Pull Request has had no activity for a long time"
+            Colour = "ffff00"
             Paths = @()
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="!!! WAITING FOR CLIENT PR"
-            Description="Pull request needs a client pull request to be merged at the same time"
-            Colour="ffff00"
+            Name = "!!! WAITING FOR CLIENT PR"
+            Description = "Pull request needs a client pull request to be merged at the same time"
+            Colour = "ffff00"
             Paths = @()
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="!!! WAITING FOR WALLET PR"
-            Description="Pull request needs a wallet pull request to be merged at the same time"
-            Colour="ffff00"
+            Name = "!!! WAITING FOR WALLET PR"
+            Description = "Pull request needs a wallet pull request to be merged at the same time"
+            Colour = "ffff00"
             Paths = @()
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="!!! WAITING FOR SERVER PR"
-            Description="Pull request needs a server pull request to be merged at the same time"
-            Colour="ffff00"
+            Name = "!!! WAITING FOR SERVER PR"
+            Description = "Pull request needs a server pull request to be merged at the same time"
+            Colour = "ffff00"
             Paths = @()
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="!!! WAITING FOR QA SIGNOFF"
-            Description="Pull request needs a QA Signoff before it can be merged"
-            Colour="ffff00"
+            Name = "!!! WAITING FOR QA SIGNOFF"
+            Description = "Pull request needs a QA Signoff before it can be merged"
+            Colour = "ffff00"
             Paths = @()
+            PathsExclude = @()
         },
         [pscustomobject]@{
-            Name="!!! WAITING FOR ETHEREUM PR"
-            Description="Pull request needs a server ethereum pull request to be merged at the same time"
-            Colour="ffff00"
+            Name = "!!! WAITING FOR ETHEREUM PR"
+            Description = "Pull request needs a server ethereum pull request to be merged at the same time"
+            Colour = "ffff00"
             Paths = @()
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name = "dependencies"
             Description = "Updates to dependencies"
             Colour = "0366d6"
             Paths = @()
+            PathsExclude = @()
         },
         [pscustomobject]@{
             Name="dotnet"
@@ -221,10 +245,11 @@ param(
             Paths = @()
         },
         [pscustomobject]@{
-            Name="DO NOT MERGE"
-            Description="This pull request should not be merged yey"
-            Colour="ff0000"
+            Name = "DO NOT MERGE"
+            Description = "This pull request should not be merged yey"
+            Colour = "ff0000"
             Paths = @()
+            PathsExclude = @()
         }
     )
     
@@ -246,11 +271,12 @@ param(
                 $colour = getLabelColour($name)
 
                 $newLabel = [pscustomobject]@{
-                                Name=$labelName
-                                Description="Changes in $name project"
-                                Colour=$colour
-                                Paths = @("src/$name/**/*")
-                            }
+                    Name = $labelName
+                    Description = "Changes in $name project"
+                    Colour = $colour
+                    Paths = @("src/$name/**/*")
+                    PathsExclude = @()
+                }
         
                 $config += $newLabel
             }
@@ -265,17 +291,52 @@ param(
 
     ForEach($group in $config) {
 
-        if($group.Paths) {
-
+        if ($group.Paths -and $group.PathsExclude)
+        {
             $labeller += '"' + $group.Name + '":'
-	    $sortedPaths = $group.Paths 
-            $sortedPaths = $sortedPaths | sort
-            Foreach($mask in $sortedPaths) {
 
-                $labeller += ' - ' + $mask
+            $first = $true
+            $all = ' - any: [ '
+            if ($group.Paths)
+            {
+                $sortedPaths = $group.Paths
+                $sortedPaths = $sortedPaths | sort
+
+                Foreach ($mask in $sortedPaths)
+                {
+                    if ($first -eq $true)
+                    {
+                        $all += ", "
+                    }
+
+                    $first = $false
+                    $all += "'$mask'"
+                }
             }
 
-            $labeller += ''
+            if ($group.PathsExclude)
+            {
+
+                $sortedPaths = $group.PathsExclude
+                $sortedPaths = $sortedPaths | sort
+
+                Foreach ($mask in $sortedPaths)
+                {
+                    if ($first -eq $true)
+                    {
+                        $all += ", "
+                    }
+
+                    $first = $false
+                    $all += "'!$mask'"
+                }
+
+                $labeller += $all
+            }
+
+            $all = ' ]'
+
+            $labeller += $all
         }
 
         $labelsWithColour += ' - name: "' + $group.Name + '"'
@@ -284,7 +345,6 @@ param(
             $labelsWithColour += '   description: "' + $group.Description + '"'
         }
         $labelsWithColour += ''
-
     }
 
 
