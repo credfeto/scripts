@@ -66,7 +66,7 @@ function GlobalJson_Update
         Write-Information "Target global.json does not exist"
     }
 
-    Set-Content -Path $targetFileName -Value $labelsWithColour
+    Set-Content -Path $targetFileName -Value $srcContent
     return $true
 }
 
