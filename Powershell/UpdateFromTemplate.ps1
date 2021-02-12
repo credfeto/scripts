@@ -376,8 +376,10 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
 
     if ($updated -eq $true)
     {
+        $sourceCodeFolder = makePath -Path $targetRepo -ChildPath "src"
 
-        $codeOK = DotNet-BuildSolution -repoFolder $repoFolder
+        $codeOK = DotNet-BuildSolution -repoFolder $sourceCodeFolder
+        Set-Location $targetRepo
         if ($codeOK -eq $true)
         {
             doCommit -fileName $fileName
