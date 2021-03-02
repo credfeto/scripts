@@ -293,8 +293,6 @@ param(
 
         if ($group.Paths -and $group.PathsExclude)
         {
-            $labeller += '"' + $group.Name + '":'
-
             $first = $true
             $all = ' - any: [ '
             if ($group.Paths)
@@ -304,7 +302,7 @@ param(
 
                 Foreach ($mask in $sortedPaths)
                 {
-                    if ($first -eq $true)
+                    if ($first -ne $true)
                     {
                         $all += ", "
                     }
@@ -322,7 +320,7 @@ param(
 
                 Foreach ($mask in $sortedPaths)
                 {
-                    if ($first -eq $true)
+                    if ($first -ne $true)
                     {
                         $all += ", "
                     }
@@ -331,12 +329,14 @@ param(
                     $all += "'!$mask'"
                 }
 
-                $labeller += $all
             }
 
-            $all = ' ]'
+            $all += ' ]'
 
-            $labeller += $all
+            if($first -ne $true) {
+                $labeller += '"' + $group.Name + '":'
+                $labeller += $all
+            }
         }
 
         $labelsWithColour += ' - name: "' + $group.Name + '"'
