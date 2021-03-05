@@ -2,7 +2,7 @@
 function DotNet-BuildClean {
     try {
         Write-Information " * Cleaning"
-        $result = dotnet clean --configuration=Release 
+        $result = dotnet clean --configuration=Release -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Clean Failed"
             Write-Information $result
@@ -21,7 +21,7 @@ function DotNet-BuildClean {
 function DotNet-BuildRestore {
     try {
         Write-Information " * Restoring"
-        dotnet restore
+        dotnet restore -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Restore Failed"
             return $false
@@ -38,7 +38,7 @@ function DotNet-BuildRestore {
 function DotNet-Build {
     try {
         Write-Information " * Building"
-        dotnet build --configuration=Release --no-restore -warnAsError
+        dotnet build --configuration=Release --no-restore -warnAsError -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Build Failed"
             
@@ -57,7 +57,7 @@ function DotNet-Build {
 function DotNet-BuildRunUnitTestsLinux {
     try {
         Write-Information " * Unit Tests"
-        dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName\!~Integration
+        dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration
         if(!$?) {
             Write-Information ">>> Tests Failed"
             return $false
@@ -75,7 +75,7 @@ function DotNet-BuildRunUnitTestsWindows {
     try {
 
         Write-Information " * Unit Tests"
-        dotnet test --configuration Release --no-build --no-restore --filter FullyQualifiedName!~Integration
+        dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration
         if(!$?) {
             # Didn't Build
             Write-Information ">>> Tests Failed"
@@ -96,7 +96,7 @@ function DotNet-BuildRunIntegrationTests {
     try {
 
         Write-Information " * Unit Tests and Integration Tests"    
-        dotnet test --configuration Release --no-build --no-restore
+        dotnet test --configuration Release --no-build --no-restore -nodeReuse:False
         if(!$?) {
             # Didn't Build
             Write-Information ">>> Tests Failed"
