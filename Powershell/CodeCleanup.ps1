@@ -129,7 +129,9 @@ function runCodeCleanup($solutionFile) {
                 }
             }
 
-            $updatedContent = $content -replace $removeBlankLinesRegex, '${Start}' + $emptyLine + '${End}'
+
+            $replacementText = '${Start}' + $emptyLine + '${End}'
+            $updatedContent = $content -replace $removeBlankLinesRegex, $replacementText
             if($content -ne $updatedContent)
             {
                 $content = $updatedContent
@@ -142,7 +144,8 @@ function runCodeCleanup($solutionFile) {
             }
 
 
-            $updatedContent = $content -replace $removeBlankLines2Regex, '${Start}' + $emptyLine + '${End}'
+            $replacementText = '${Start}' + $emptyLine + '${End}'
+            $updatedContent = $content -replace $removeBlankLines2Regex, $replacementText
             if($content -ne $updatedContent)
             {
                 $content = $updatedContent
