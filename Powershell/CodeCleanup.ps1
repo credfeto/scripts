@@ -78,9 +78,9 @@ function runCodeCleanup($solutionFile) {
         Write-Information "* Changing Resharper disable once comments to SuppressMessage"
         Write-Information "  - Folder: $sourceFolder"
 
-        $emptyLine = [System.Environment]::NewLine
+        $emptyLine = [char]13 + [char]10
 
-        $linesToRemoveRegex = "(?<LinesToRemove>((\r+)|(\n+)|((\r\n)+)|(\n\r)+))"
+        $linesToRemoveRegex = "(?<LinesToRemove>((\r\n){2,}))"
         $suppressMessageRegex = "(?<End>\s+\[(System\.Diagnostics\.CodeAnalysis\.)?SuppressMessage)"
         $removeBlankLinesRegex = "(?ms)" +  "(?<Start>(^((\s+)///\s+</(.*?)\>)))" + $linesToRemoveRegex + $suppressMessageRegex
         $removeBlankLines2Regex = "(?ms)" + "(?<Start>(^((\s+)///\s+<(.*?)/\>)))" + $linesToRemoveRegex + $suppressMessageRegex
