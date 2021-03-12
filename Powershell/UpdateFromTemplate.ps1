@@ -372,11 +372,12 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
     $sourceFileName = makePath -Path $sourceRepo -ChildPath $localFileName
     $targetFileName = makePath -Path $targetRepo -ChildPath $localFileName
 
+    $branchName = "template/ff-1429/$fileName".Replace("\", "/")
+
     $updated = GlobalJson_Update -sourceFileName $sourceFileName -targetFileName $targetFileName
 
     if ($updated -eq $true)
     {
-        $branchName = "template/ff-1429/$fileName".Replace("\", "/")
         $sourceCodeFolder = makePath -Path $targetRepo -ChildPath "src"
         Write-Information "Src Folder: $sourceCodeFolder"
 
@@ -401,6 +402,10 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
 
             Git-ResetToMaster
         }
+    }
+    else {
+        Write-Information "Ensuring $branchName no longer exists"
+        Git-DeleteBranch -branchName $branchName
     }
 }
 
