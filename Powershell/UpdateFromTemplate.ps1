@@ -376,14 +376,17 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
 
     if ($updated -eq $true)
     {
+        $branchName = "template/ff-1429/$fileName".Replace("\", "/")
         $sourceCodeFolder = makePath -Path $targetRepo -ChildPath "src"
+        Write-Information "Src Folder: $sourceCodeFolder"
 
-        $codeOK = DotNet-BuildSolution -repoFolder $sourceCodeFolder
+        $codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
         Set-Location $targetRepo
         if ($codeOK -eq $true)
         {
             doCommit -fileName $fileName
             Git-Push
+            Git-DeleteBranch -branchName $branchName
         }
         else
         {

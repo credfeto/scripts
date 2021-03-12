@@ -175,6 +175,18 @@ param(
     return $true;
 }
 
+function Git-DeleteBranch {
+param(
+    [string] $branchName
+    )
+
+    git branch -d $branchName
+    git push origin ":$branchName"
+
+    return $true;
+}
+
+
 function Git-Get-HeadRev {
     $result = git rev-parse HEAD
 
@@ -204,6 +216,7 @@ Export-ModuleMember -Function Git-HasUnCommittedChanges
 Export-ModuleMember -Function Git-Commit
 Export-ModuleMember -Function Git-Commit-Named
 Export-ModuleMember -Function Git-CreateBranch
+Export-ModuleMember -Function Git-DeleteBranch
 Export-ModuleMember -Function Git-Push
 Export-ModuleMember -Function Git-PushOrigin
 Export-ModuleMember -Function Git-DoesBranchExist
