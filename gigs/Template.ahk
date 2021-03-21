@@ -20,7 +20,7 @@ SongName := SubStr(A_ScriptName, 1, SongNameLength)
 
 
 ; Update the last played file with the name of the song, with the latest song at the top of the file
-If FileExist(Played)
+if FileExist(Played)
 {
     FileRead, LastPlayedSongs, %Played%
 
