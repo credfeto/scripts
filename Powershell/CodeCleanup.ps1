@@ -96,10 +96,17 @@ function runCodeCleanup($solutionFile) {
                         "ClassNeverInstantiated.Global",
                         "ClassCanBeSealed.Global",
                         "ClassCanBeSealed.Local",
+                        "UnusedAutoPropertyAccessor.Global",
                         "UnusedAutoPropertyAccessor.Local",
-                        "UnusedAutoPropertyAccessor.Global",       
+                        "MemberCanBePrivate.Global",
+                        "MemberCanBePrivate.Local",
                         "InconsistentNaming",
-                        "IdentifierTypo"
+                        "IdentifierTypo",
+                        "UnusedTypeParameter",
+                        "HeapView.BoxingAllocation"
+                        "UnusedType.Local",
+                        "UnusedType.Global",
+                        "PrivateFieldCanBeConvertedToLocalVariable"
 
         $files = Get-ChildItem -Path $srcPath -Filter "*.cs" -Recurse
         ForEach($file in $files) {
