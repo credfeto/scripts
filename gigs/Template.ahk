@@ -7,11 +7,25 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; * CONFIGURATION
 ; **********************************************************************************************************************
 
-; Where is the folder that contain the files for now playing and played
+; Where is the folder that contain the files for now playing and played (Accessing ObsDirectoryStudio on the OBS Machine)
 ObsDirectory := "O:"
+
+; Where is the folder that contains files for now playing and played on the studio machine
+ObsDirectoryStudio := "C:\Currently Playing"
+
+; Where the videos file exists under BOTH ObsDirectory and ObsDirectoryStudio
+VideosDirectoryName := "Videos"
+
+; Where is the VLC instance:
+VlcHostAndPort := "127.0.0.1:8080"
+VlcUsername := ""
+VlcPassword := "vlcremote"
 
 ;For testing on studio pc uncomment this line
 ;ObsDirectory := "C:\Currently Playing"
+;ObsDirectoryStudio := ObsDirectory
+;VlcHostAndPort := "127.0.0.1:8080"
+
 
 ; **********************************************************************************************************************
 ; * FUNCTIONS
@@ -52,6 +66,88 @@ UpdateNowPlaying(SongTrackingDirectory, SongName) {
     return
 }
 
+b64Encode(string) {
+    ; BASIC Authentication requires BASE 64 encoding
+    VarSetCapacity(bin, StrPut(string, "UTF-8")) && len := StrPut(string, &bin, "UTF-8") - 1
+    if !(DllCall("crypt32\CryptBinaryToString", "ptr", &bin, "uint", len, "uint", 0x1, "ptr", 0, "uint*", size))
+        throw Exception("CryptBinaryToString failed", -1)
+    VarSetCapacity(buf, size << 1, 0)
+    if !(DllCall("crypt32\CryptBinaryToString", "ptr", &bin, "uint", len, "uint", 0x1, "ptr", &buf, "uint*", size))
+        throw Exception("CryptBinaryToString failed", -1)
+    return StrGet(&buf)
+}
+
+LC_UriEncode(Uri, RE="[0-9A-Za-z]") {
+    ; Make sure parameters are encoded
+	VarSetCapacity(Var, StrPut(Uri, "UTF-8"), 0), StrPut(Uri, &Var, "UTF-8")
+	While Code := NumGet(Var, A_Index - 1, "UChar")
+		Res .= (Chr:=Chr(Code)) ~= RE ? Chr : Format("%{:02X}", Code)
+	Return, Res
+}
+
+StartVideoInVlc(HostAndPort, UserName, Password, RemoteDirectory, LocalDirectory, CommonVideosDirectory, SongName) {
+
+    ; Define local and remote filenames - they should both resolve to the same file
+    RemoteFileName := RemoteDirectory . "\" . CommonVideosDirectory . "\" . SongName . ".m3u"
+    LocalFileName := LocalDirectory . "\" . CommonVideosDirectory . "\" . SongName . ".m3u"
+
+    ; Check to see if there is a playlist called <SongName>.m3u in the RemoteDirectory
+    if Not FileExist(RemoteFileName) {
+        ; File doesn't exist
+        return
+    }
+
+    ; Generate BASIC AUth token
+    auth := b64Encode(UserName . ":" . Password)
+
+    ; URI Encode the filename so that its properly parsable by the http request
+    FileToPlay := LC_UriEncode(LocalFileName)
+
+    ; Build the play playlist command
+    command := "http://" . HostAndPort . "/requests/status.xml?command=in_play&input=" . FileToPlay
+
+    ; Send the request to VLC's web server
+    oWhr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    oWhr.Open("GET", command, false)
+    oWhr.SetRequestHeader("Content-Type", "application/json")
+    oWhr.SetRequestHeader("Authorization", "Basic " . auth)
+    oWhr.Send()
+}
+
+StopVideoInVlc(HostAndPort, UserName, Password) {
+    ; Stop playing whatever may be playing
+
+   ; Generate BASIC AUth token
+    auth := b64Encode(UserName . ":" . Password)
+
+    ; Build the stop play playlist command
+    command := "http://" . HostAndPort . "/requests/status.xml?command=pl_stop"
+
+    ; Send the request to VLC's web server
+    oWhr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    oWhr.Open("GET", command, false)
+    oWhr.SetRequestHeader("Content-Type", "application/json")
+    oWhr.SetRequestHeader("Authorization", "Basic " . auth)
+    oWhr.Send()
+}
+
+ClearPlaylistInVlc(HostAndPort, UserName, Password) {
+    ; Clear the playlist
+
+   ; Generate BASIC AUth token
+    auth := b64Encode(UserName . ":" . Password)
+
+    ; Build the clear playlist command
+    playPLaylistCommand := "http://" . HostAndPort . "/requests/status.xml?command=pl_clear"
+
+    ; Send the request to VLC's web server
+    oWhr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    oWhr.Open("GET", playPLaylistCommand, false)
+    oWhr.SetRequestHeader("Content-Type", "application/json")
+    oWhr.SetRequestHeader("Authorization", "Basic " . auth)
+    oWhr.Send()
+}
+
 StartTrackInShowBuddy() {
     ; Activate Show Buddy, hit space to start playing
 	WinActivate, Show Buddy
@@ -64,8 +160,11 @@ StartTrackInShowBuddy() {
 ; * SEQUENCE OF ACTIONS
 ; **********************************************************************************************************************
 
+StopVideoInVlc(VlcHostAndPort, VlcUsername, VlcPassword)
+ClearPlaylistInVlc(VlcHostAndPort, VlcUsername, VlcPassword)
 SongName := GetSongName()
 UpdateNowPlaying(ObsDirectory, SongName)
+StartVideoInVlc(VlcHostAndPort, VlcUsername, VlcPassword, ObsDirectory, ObsDirectoryStudio, VideosDirectoryName, SongName)
 StartTrackInShowBuddy()
 
 return
