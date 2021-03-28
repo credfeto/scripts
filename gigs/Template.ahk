@@ -88,11 +88,20 @@ LC_UriEncode(Uri, RE="[0-9A-Za-z]") {
 SendBasicAuthGetCommand(Command, Auth) {
 
     ; Send the request to VLC's web server
-    oWhr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    oWhr.Open("GET", command, false)
-    oWhr.SetRequestHeader("Content-Type", "application/json")
-    oWhr.SetRequestHeader("Authorization", "Basic " . Auth)
-    oWhr.Send()
+    try
+    {
+        oWhr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        oWhr.SetTimeouts("1000", "1000", "2500", "5000")
+        oWhr.Open("GET", command, false)
+        oWhr.SetRequestHeader("Content-Type", "application/json")
+        oWhr.SetRequestHeader("Authorization", "Basic " . Auth)
+        oWhr.Send()
+    }
+    catch e {
+        ; don't care
+        ; MsgBox e.Message
+    }
+
 }
 
 StartVideoInVlc(HostAndPort, UserName, Password, RemoteDirectory, LocalDirectory, CommonVideosDirectory, SongName) {
