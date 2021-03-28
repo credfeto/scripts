@@ -85,6 +85,16 @@ LC_UriEncode(Uri, RE="[0-9A-Za-z]") {
 	Return, Res
 }
 
+SendBasicAuthGetCommand(Command, Auth) {
+
+    ; Send the request to VLC's web server
+    oWhr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    oWhr.Open("GET", command, false)
+    oWhr.SetRequestHeader("Content-Type", "application/json")
+    oWhr.SetRequestHeader("Authorization", "Basic " . Auth)
+    oWhr.Send()
+}
+
 StartVideoInVlc(HostAndPort, UserName, Password, RemoteDirectory, LocalDirectory, CommonVideosDirectory, SongName) {
 
     ; Define local and remote filenames - they should both resolve to the same file
@@ -107,11 +117,7 @@ StartVideoInVlc(HostAndPort, UserName, Password, RemoteDirectory, LocalDirectory
     command := "http://" . HostAndPort . "/requests/status.xml?command=in_play&input=" . FileToPlay
 
     ; Send the request to VLC's web server
-    oWhr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    oWhr.Open("GET", command, false)
-    oWhr.SetRequestHeader("Content-Type", "application/json")
-    oWhr.SetRequestHeader("Authorization", "Basic " . auth)
-    oWhr.Send()
+    SendBasicAuthGetCommand(command, auth)
 }
 
 StopVideoInVlc(HostAndPort, UserName, Password) {
@@ -124,11 +130,7 @@ StopVideoInVlc(HostAndPort, UserName, Password) {
     command := "http://" . HostAndPort . "/requests/status.xml?command=pl_stop"
 
     ; Send the request to VLC's web server
-    oWhr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    oWhr.Open("GET", command, false)
-    oWhr.SetRequestHeader("Content-Type", "application/json")
-    oWhr.SetRequestHeader("Authorization", "Basic " . auth)
-    oWhr.Send()
+    SendBasicAuthGetCommand(command, auth)
 }
 
 ClearPlaylistInVlc(HostAndPort, UserName, Password) {
@@ -138,14 +140,10 @@ ClearPlaylistInVlc(HostAndPort, UserName, Password) {
     auth := b64Encode(UserName . ":" . Password)
 
     ; Build the clear playlist command
-    playPLaylistCommand := "http://" . HostAndPort . "/requests/status.xml?command=pl_clear"
+    command := "http://" . HostAndPort . "/requests/status.xml?command=pl_empty"
 
     ; Send the request to VLC's web server
-    oWhr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    oWhr.Open("GET", playPLaylistCommand, false)
-    oWhr.SetRequestHeader("Content-Type", "application/json")
-    oWhr.SetRequestHeader("Authorization", "Basic " . auth)
-    oWhr.Send()
+    SendBasicAuthGetCommand(command, auth)
 }
 
 StartTrackInShowBuddy() {
@@ -160,8 +158,8 @@ StartTrackInShowBuddy() {
 ; * SEQUENCE OF ACTIONS
 ; **********************************************************************************************************************
 
-StopVideoInVlc(VlcHostAndPort, VlcUsername, VlcPassword)
 ClearPlaylistInVlc(VlcHostAndPort, VlcUsername, VlcPassword)
+StopVideoInVlc(VlcHostAndPort, VlcUsername, VlcPassword)
 SongName := GetSongName()
 UpdateNowPlaying(ObsDirectory, SongName)
 StartVideoInVlc(VlcHostAndPort, VlcUsername, VlcPassword, ObsDirectory, ObsDirectoryStudio, VideosDirectoryName, SongName)
