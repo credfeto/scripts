@@ -4,6 +4,34 @@ $files = Get-ChildItem -Path $srcDataPath -Filter "*.json"
 
 cls
 
+$config = @(
+        [pscustomobject]@{
+            NetworkId = 1
+            ChainId = 1
+            Alias = "PublicEthereumNetworks.MAINNET"
+        },
+        [pscustomobject]@{
+            NetworkId = 2
+            ChainId = 2
+            Alias = "PublicEthereumNetworks.MORDEN"
+        },
+        [pscustomobject]@{
+            NetworkId = 3
+            ChainId = 3
+            Alias = "PublicEthereumNetworks.ROPSTEN"
+        },
+        [pscustomobject]@{
+            NetworkId = 4
+            ChainId = 4
+            Alias = "PublicEthereumNetworks.RINKEBY"
+        },
+        [pscustomobject]@{
+            NetworkId = 42
+            ChainId = 42
+            Alias = "PublicEthereumNetworks.KOVAN"
+        }
+        )
+
 $list = New-Object Collections.Generic.List[String]
 
 
@@ -18,6 +46,8 @@ $list.Add("    ///     Ethereum networks")
 $list.Add("    /// </summary>")
 $list.Add("    public static class EthereumNetworks")
 $list.Add("    {")
+
+$TextInfo = (Get-Culture).TextInfo
 
 $first = $true
 foreach($file in $files) {
@@ -42,21 +72,24 @@ foreach($file in $files) {
         }
     }
 
-    $varName = $network.name.Replace(" ", "")
-    $netName = $network.chain.ToUpperInvariant().Replace(" ", "_")
-    if($network.chain -eq "ETH") {
-        if($network.name.StartsWith("Optimistic") -eq $false) {
-            $varName = $network.network.ToUpperInvariant()
-            $netName = $network.network.ToUpperInvariant()            
-        }
-        else {
-            $varName = $network.name.Replace(" ", "")
-            $netName = $network.name.Replace(" ", "_").ToUpperInvariant()
-        }
-    }
-    elseif($network.network -ne "mainnet") {
-        $netName = $network.chain.ToUpperInvariant().Replace(" ", "_") + "_" + $network.network.ToUpperInvariant().Replace(" ", "_")
-    }
+    $varName = $TextInfo.ToTitleCase($network.name).Replace(" ", "")
+#
+#    $netName = $network.chain.ToUpperInvariant().Replace(" ", "_")
+#    if($network.chain -eq "ETH") {
+#        if($network.name.StartsWith("Optimistic") -eq $false) {
+#            $varName = $network.network.ToUpperInvariant()
+#            $netName = $network.network.ToUpperInvariant()            
+#        }
+#        else {
+#            $varName = $network.name.Replace(" ", "")
+#            $netName = $network.name.Replace(" ", "_").ToUpperInvariant()
+#        }
+#    }
+#    elseif($network.network -ne "mainnet") {
+#        $netName = $network.chain.ToUpperInvariant().Replace(" ", "_") + "_" + $network.network.ToUpperInvariant().Replace(" ", "_")
+#    }
+
+    $netName = $network.name.Replace(" ", "_").ToUpperInvariant()
 
     $description = $network.name
     $production = "false"
@@ -88,13 +121,25 @@ foreach($file in $files) {
 
 
     $list.Add("        [SuppressMessage(category: ""ReSharper"", checkId: ""InconsistentNaming"", Justification = ""Code generated"")]")
-    $list.Add("        public static EthereumNetwork $varName { get; } = new(")
-    $list.Add("                        id: $networkId,")
-    $list.Add("                        chainId: $chainId,")
-    $list.Add("                        name: @""$netName"",")
-    $list.Add("                        isProduction: $production,")
-    $list.Add("                        isStandalone: false,")
-    $list.Add("                        isPublic: true);")
+    $found = $false
+    foreach($entry in $config) {
+        if($entry.NetworkId -eq $networkId -and $entry.ChainId -eq $chainId) {
+            $alias = $entry.Alias
+            $list.Add("        public static EthereumNetwork $varName { get; } = $alias;")
+            $found = $true
+            break
+        }
+    }
+
+    if($found -eq $false) {
+        $list.Add("        public static EthereumNetwork $varName { get; } = new(")
+        $list.Add("                        id: $networkId,")
+        $list.Add("                        chainId: $chainId,")
+        $list.Add("                        name: @""$netName"",")
+        $list.Add("                        isProduction: $production,")
+        $list.Add("                        isStandalone: false,")
+        $list.Add("                        isPublic: true);")
+    }
 }
 
 $list.Add("    }");
