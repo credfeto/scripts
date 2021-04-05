@@ -29,6 +29,31 @@ $config = @(
             NetworkId = 42
             ChainId = 42
             Alias = "PublicEthereumNetworks.KOVAN"
+        },
+        [pscustomobject]@{
+            NetworkId = 10
+            ChainId = 10
+            Alias = "Layer2EthereumNetworks.Optimism"
+        },
+        [pscustomobject]@{
+            NetworkId = 56
+            ChainId = 56
+            Alias = "Layer2EthereumNetworks.BinanceSmartChain"
+        },
+        [pscustomobject]@{
+            NetworkId = 100
+            ChainId = 100
+            Alias = "Layer2EthereumNetworks.xDai"
+        },
+        [pscustomobject]@{
+            NetworkId = 137
+            ChainId = 137
+            Alias = "Layer2EthereumNetworks.Matic"
+        },
+        [pscustomobject]@{
+            NetworkId = 1287
+            ChainId = 1287
+            Alias = "Layer2EthereumNetworks.PolkadotMoonBeam"
         }
         )
 
@@ -37,13 +62,13 @@ $list = New-Object Collections.Generic.List[String]
 
 $list.Add("using System.Diagnostics.CodeAnalysis;")
 $list.Add("using FunFair.Ethereum.DataTypes;")
-$list.Add("using FunFair.Ethereum.DataTypes.Primitives;")
 $list.Add("")
 $list.Add("namespace FunFair.Ethereum.Proxy.Server.Configuration.Networks")
 $list.Add("{")
 $list.Add("    /// <summary>")
 $list.Add("    ///     Ethereum networks")
 $list.Add("    /// </summary>")
+$list.Add("    [SuppressMessage(category: ""ReSharper"", checkId: ""UnusedType.Global"", Justification = ""Code generated"")]")
 $list.Add("    public static class EthereumNetworks")
 $list.Add("    {")
 
@@ -72,7 +97,10 @@ foreach($file in $files) {
         }
     }
 
-    $varName = $TextInfo.ToTitleCase($network.name).Replace(" ", "")
+    $varName = $TextInfo.ToTitleCase($network.name).Replace(" ", "").Replace("-", "").Replace(".", "_")
+    if([char]::IsDigit($varName[0])) {
+        $varName = "X" + $varName
+    }
 #
 #    $netName = $network.chain.ToUpperInvariant().Replace(" ", "_")
 #    if($network.chain -eq "ETH") {
@@ -97,8 +125,15 @@ foreach($file in $files) {
         $production = "true"
     }
 
+    
+
     $networkId = $network.networkId
     $chainId = $network.chainId
+
+    if($network.networkId -eq "3125659152") {
+        // Pirl
+        continue
+    }
 
 
     if($first) {
@@ -121,6 +156,8 @@ foreach($file in $files) {
 
 
     $list.Add("        [SuppressMessage(category: ""ReSharper"", checkId: ""InconsistentNaming"", Justification = ""Code generated"")]")
+    $list.Add("        [SuppressMessage(category: ""ReSharper"", checkId: ""UnusedMember.Global"", Justification = ""Code generated"")]")
+        
     $found = $false
     foreach($entry in $config) {
         if($entry.NetworkId -eq $networkId -and $entry.ChainId -eq $chainId) {
@@ -145,4 +182,4 @@ foreach($file in $files) {
 $list.Add("    }");
 $list.Add("}");
 
-Set-Content -Path C:\work\networks.cs -Value $list
+Set-Content -Path C:\work\FunFair\funfair-ethereum-proxy-server\src\FunFair.Ethereum.Proxy.Server\Configuration\Networks\EthereumNetworks.cs -Value $list
