@@ -136,7 +136,7 @@ foreach($file in $files) {
     $chainId = $network.chainId
 
     if($network.networkId -eq "3125659152") {
-        // Pirl
+        # Pirl
         continue
     }
 
