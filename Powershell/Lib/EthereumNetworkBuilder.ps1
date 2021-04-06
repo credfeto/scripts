@@ -26,6 +26,11 @@ $config = @(
             Alias = "PublicEthereumNetworks.RINKEBY"
         },
         [pscustomobject]@{
+            NetworkId = 5
+            ChainId = 5
+            Alias = "PublicEthereumNetworks.GOERLI"
+        },
+        [pscustomobject]@{
             NetworkId = 42
             ChainId = 42
             Alias = "PublicEthereumNetworks.KOVAN"
