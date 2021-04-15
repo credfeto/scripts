@@ -59,6 +59,11 @@ $config = @(
             NetworkId = 1287
             ChainId = 1287
             Alias = "Layer2EthereumNetworks.PolkadotMoonBeam"
+        },
+        [pscustomobject]@{
+            NetworkId = 1
+            ChainId = 43114
+            Alias = "Layer2EthereumNetworks.Avalanche"
         }
         )
 
@@ -92,6 +97,9 @@ foreach($file in $files) {
     Write-Host "Network: " $network.networkId
     Write-Host "ChainId: " $network.chainId
     Write-Host "Name:    " $network.chain $network.network
+    Write-Host "Symbol:  " $network.nativeCurrency.symbol
+    Write-Host "Decimals:" $network.nativeCurrency.decimals
+    Write-Host "Sym Name:" $network.nativeCurrency.name
 
     $rpcs = $network.rpc
     if( $rpcs ) {
@@ -134,12 +142,17 @@ foreach($file in $files) {
 
     $networkId = $network.networkId
     $chainId = $network.chainId
+    $nativeCurrency = $network.nativeCurrency.symbol
 
     if($network.networkId -eq "3125659152") {
         # Pirl
         continue
     }
 
+    if($network.networkId -eq "0") {
+        # The Freight Trust Network 
+        continue
+    }
 
     if($first) {
        $first = $false
@@ -178,6 +191,7 @@ foreach($file in $files) {
         $list.Add("                        id: $networkId,")
         $list.Add("                        chainId: $chainId,")
         $list.Add("                        name: @""$netName"",")
+        $list.Add("                        nativeCurrency: @""$nativeCurrency"",")
         $list.Add("                        isProduction: $production,")
         $list.Add("                        isStandalone: false,")
         $list.Add("                        isPublic: true);")
