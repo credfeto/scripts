@@ -38,12 +38,17 @@ $config = @(
         [pscustomobject]@{
             NetworkId = 10
             ChainId = 10
-            Alias = "Layer2EthereumNetworks.Optimism"
+            Alias = "Layer2EthereumNetworks.OptimismMainNet"
         },
         [pscustomobject]@{
             NetworkId = 56
             ChainId = 56
             Alias = "Layer2EthereumNetworks.BinanceSmartChain"
+        },
+        [pscustomobject]@{
+            NetworkId = 69
+            ChainId = 69
+            Alias = "Layer2EthereumNetworks.OptimismKovan"
         },
         [pscustomobject]@{
             NetworkId = 100
@@ -56,6 +61,11 @@ $config = @(
             Alias = "Layer2EthereumNetworks.Matic"
         },
         [pscustomobject]@{
+            NetworkId = 420
+            ChainId = 420
+            Alias = "Layer2EthereumNetworks.OptimismGoerli"
+        },
+        [pscustomobject]@{
             NetworkId = 1287
             ChainId = 1287
             Alias = "Layer2EthereumNetworks.PolkadotMoonBeam"
@@ -63,7 +73,7 @@ $config = @(
         [pscustomobject]@{
             NetworkId = 1
             ChainId = 43114
-            Alias = "Layer2EthereumNetworks.Avalanche"
+            Alias = "Layer2EthereumNetworks.AvalancheMainNet"
         }
         )
 
@@ -72,6 +82,7 @@ $list = New-Object Collections.Generic.List[String]
 
 $list.Add("using System.Diagnostics.CodeAnalysis;")
 $list.Add("using FunFair.Ethereum.DataTypes;")
+$list.Add("using FunFair.Ethereum.Standard;")
 $list.Add("")
 $list.Add("namespace FunFair.Ethereum.Proxy.Server.Configuration.Networks")
 $list.Add("{")
@@ -188,13 +199,15 @@ foreach($file in $files) {
 
     if($found -eq $false) {
         $list.Add("        public static EthereumNetwork $varName { get; } = new(")
-        $list.Add("                        id: $networkId,")
+        $list.Add("                        networkId: $networkId,")
         $list.Add("                        chainId: $chainId,")
         $list.Add("                        name: @""$netName"",")
         $list.Add("                        nativeCurrency: @""$nativeCurrency"",")
         $list.Add("                        isProduction: $production,")
         $list.Add("                        isStandalone: false,")
-        $list.Add("                        isPublic: true);")
+        $list.Add("                        isPublic: true,")
+        $list.Add("                        blockExplorer: null")
+        $list.Add("                        );")
     }
 }
 
