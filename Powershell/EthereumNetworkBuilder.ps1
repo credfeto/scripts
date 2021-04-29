@@ -41,9 +41,19 @@ $config = @(
             Alias = "Layer2EthereumNetworks.OptimismMainNet"
         },
         [pscustomobject]@{
+            NetworkId = 1337
+            ChainId = 10
+            Alias = "Layer2EthereumNetworks.OptimismMainNet"
+        },
+        [pscustomobject]@{
             NetworkId = 56
             ChainId = 56
             Alias = "Layer2EthereumNetworks.BinanceSmartChain"
+        },
+        [pscustomobject]@{
+            NetworkId = 1337
+            ChainId = 69
+            Alias = "Layer2EthereumNetworks.OptimismKovan"
         },
         [pscustomobject]@{
             NetworkId = 69
@@ -202,6 +212,7 @@ foreach($file in $files) {
         $list.Add("                        networkId: $networkId,")
         $list.Add("                        chainId: $chainId,")
         $list.Add("                        name: @""$netName"",")
+        $list.Add("                        blockFrequency: BlockFrequency.REGULAR_BLOCKS,")
         $list.Add("                        nativeCurrency: @""$nativeCurrency"",")
         $list.Add("                        isProduction: $production,")
         $list.Add("                        isStandalone: false,")
