@@ -36,7 +36,7 @@ jobs:
     - run: echo ${{ env.WHEN }} > change.log
     - name: Update changelog if changes occured
       run: git diff -s --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[FF-0000] - Test Run (${{ env.WHEN}})"
-    - uses: stefanzweifel/git-auto-commit-action@v4
+    - uses: stefanzweifel/git-auto-commit-action@v4.11.0
       with:
         commit_message: "[FF-0000] - Test Run (${{ env.WHEN}})"
         file_pattern: "change.log CHANGELOG.md"
