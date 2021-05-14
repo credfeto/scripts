@@ -38,12 +38,12 @@ $config = @(
         [pscustomobject]@{
             NetworkId = 10
             ChainId = 10
-            Alias = "Layer2EthereumNetworks.OptimismMainNet"
+            Alias = "Layer2EthereumNetworks.Optimism"
         },
         [pscustomobject]@{
             NetworkId = 1337
             ChainId = 10
-            Alias = "Layer2EthereumNetworks.OptimismMainNet"
+            Alias = "Layer2EthereumNetworks.Optimism"
         },
         [pscustomobject]@{
             NetworkId = 56
@@ -83,7 +83,12 @@ $config = @(
         [pscustomobject]@{
             NetworkId = 1
             ChainId = 43114
-            Alias = "Layer2EthereumNetworks.AvalancheMainNet"
+            Alias = "Layer2EthereumNetworks.Avalanche"
+        }
+        [pscustomobject]@{
+            NetworkId = 1
+            ChainId = 43113
+            Alias = "Layer2EthereumNetworks.AvalancheFuji"
         }
         )
 
