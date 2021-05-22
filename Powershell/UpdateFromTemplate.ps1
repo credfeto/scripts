@@ -517,7 +517,8 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     Write-Information "Looking for Workflows in $workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml -File -Attributes Normal, Hidden
     Write-Information $files
-    ForEach($file in $files) {
+    ForEach ($file in $files)
+    {
         $srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
         Write-Information " * Found Workflow $srcFileName"
@@ -525,11 +526,42 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $srcFileName
     }
 
+    $targetWorkflows = makePath -Path $trgRepo -ChildPath ".github\workflows"
+    $files = Get-ChildItem -Path $targetWorkflows -Filter *.yml -File -Attributes Normal, Hidden
+    Write-Information $files
+    
+    ForEach ($file in $files)
+    {
+        If ($file.Name -eq "cc.yml")
+        {
+            Remove-Item -Path $file.FileName
+        }
+
+        If ($file.Name -eq "linter.yml")
+        {
+            Remove-Item -Path $file.FileName
+        }
+
+        If ($file.Name -eq "tabtospace.yml")
+        {
+            Remove-Item -Path $file.FileName
+        }
+    }
+
+    $uncommitted = Git-HasUnCommittedChanges
+    If ($uncommitted -eq $true)
+    {
+        Git-Commit -message "Removed old workflows"
+        Git-Push
+    }
+
+
     $linters = makePath -Path $srcRepo -ChildPath ".github\linters"
     Write-Information "Looking for Workflows in $linters"
     $files = Get-ChildItem -Path $linters -File -Attributes Normal, Hidden
     Write-Information $files
-    ForEach($file in $files) {
+    ForEach ($file in $files)
+    {
         $srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
         Write-Information " * Found Linter config $srcFileName"
