@@ -1,5 +1,5 @@
-﻿$base = "C:\work\FunFair\funfair-wallet-server\src\FunFair.FunWallet.Data.SqlServer"
-$testBase = "C:\work\FunFair\funfair-wallet-server\src\FunFair.FunWallet.Data.SqlServer.Tests.Integration"
+﻿$base = "D:\work\funfair-wallet-server\src\FunFair.FunWallet.Data.SqlServer"
+$testBase = "D:\work\funfair-wallet-server\src\FunFair.FunWallet.Data.SqlServer.Tests.Integration"
 
 $files = Get-ChildItem -Path $base -Filter "*.cs" -Recurse
 $testFiles = Get-ChildItem -Path $testBase -Filter "*.cs" -Recurse

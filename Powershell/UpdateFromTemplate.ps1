@@ -534,17 +534,17 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     {
         If ($file.Name -eq "cc.yml")
         {
-            Remove-Item -Path $file.FileName
+            Remove-Item -Path $file.FullName
         }
 
         If ($file.Name -eq "linter.yml")
         {
-            Remove-Item -Path $file.FileName
+            Remove-Item -Path $file.FullName
         }
 
         If ($file.Name -eq "tabtospace.yml")
         {
-            Remove-Item -Path $file.FileName
+            Remove-Item -Path $file.FullName
         }
     }
 
