@@ -52,8 +52,8 @@ function GlobalJson_Update
 
         $sourceVersion = $srcGlobal.sdk.version
         $targetVersion = $trgGlobal.sdk.version
-        Write-Information "Source Version: $srcVersion"
-        Write-Information "Target Version: $trgVersion"
+        Write-Information "Source Version: $sourceVersion"
+        Write-Information "Target Version: $targetVersion"
 
         if ($trgGlobal.sdk.version -gt $srcGlobal.sdk.version)
         {
