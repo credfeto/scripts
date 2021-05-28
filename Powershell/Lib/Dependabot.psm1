@@ -250,7 +250,7 @@ updates:
     $trgContent = $trgContent.Trim() + $newline
     
     Write-Information " --> Done"
-    Set-Content -Path $targetFileName -Value $trgContent
+    Set-Content -Path $configFileName -Value $trgContent
 
 }
 
