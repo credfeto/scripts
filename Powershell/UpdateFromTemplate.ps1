@@ -294,6 +294,23 @@ function buildDependabotConfig($srcRepo, $trgRepo) {
     Git-Push
 }
 
+function removeLegacyDependabotConfig($trgRepo) {
+    $trgPath = makePath -Path $trgRepo -ChildPath ".github"
+
+    $files = Get-ChildItem -Path $trgPath -filter "dependabot.config.template.*"
+    foreach($file in $files)
+    {
+        Remove-Item -Path $file.FullName
+    }
+
+    $uncommitted = Git-HasUnCommittedChanges
+    If ($uncommitted -eq $true)
+    {
+        Git-Commit -message "Removed old dependabot config templates"
+        Git-Push
+    }
+}
+
 
 function ensureFolderExists($baseFolder, $subFolder) {
     $fullPath = makePath -Path $baseFolder -ChildPath $subFolder
@@ -522,6 +539,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     updateLabel -baseFolder $repoFolder
 
     buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder
+    removeLegacyDependabotConfig -trgRepo $repoFolder
 
     Write-Information "Updating Tracking for $repo to $currentRevision"
     Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
