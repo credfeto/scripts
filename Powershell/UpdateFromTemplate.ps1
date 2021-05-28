@@ -542,6 +542,11 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
             Remove-Item -Path $file.FullName
         }
 
+        If ($file.Name -eq "sqlcheck.yml")
+        {
+            Remove-Item -Path $file.FullName
+        }
+
         If ($file.Name -eq "tabtospace.yml")
         {
             Remove-Item -Path $file.FullName
