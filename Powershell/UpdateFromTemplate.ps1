@@ -71,6 +71,16 @@ catch
     Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: GlobalJson"
 }
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Dependabot.psm1") -Force -DisableNameChecking
+}
+catch
+{
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: Dependabot"
+}
 #endregion
 
 function makePath($Path, $ChildPath)
@@ -276,79 +286,9 @@ function buildDependabotConfig($srcRepo, $trgRepo) {
     Write-Information "$srcPath"
     $targetFileName = makePath -Path $trgRepo -ChildPath ".github/dependabot.yml"
 
-    Write-Information "Building Dependabot Config:"
-    $trgContent = "version: 2
-updates:
-"
+    $updateGitHubActions = !$trgRepo.ToLowerInvariant().Contains("fFunfair")
 
-    $newline = "`r`n"
-
-    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.dotnet'
-    $templateFileExists = Test-Path -Path $templateFile
-    if($templateFileExists -eq $true) {        
-        $files = Get-ChildItem -Path $trgRepo -Filter *.csproj -Recurse
-        if($files -ne $null) {
-            Write-Information " --> Addning .NET"
-            $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent.Trim() + $newline + $newline
-            $trgContent = $trgContent + $templateContent
-        }
-    }
-
-    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.javascript'
-    $templateFileExists = Test-Path -Path $templateFile
-    if($templateFileExists -eq $true) {
-        $files = Get-ChildItem -Path $trgRepo -Filter 'package.json' -Recurse
-        if($files -ne $null) {
-            Write-Information " --> Addning Javascript"
-            $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent.Trim() + $newline + $newline
-            $trgContent = $trgContent + $templateContent
-        }
-    }
-
-    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.docker'
-    $templateFileExists = Test-Path -Path $templateFile
-    if($templateFileExists -eq $true) {
-        $files = Get-ChildItem -Path $trgRepo -Filter 'Dockerfile' -Recurse
-        if($files -ne $null) {
-            Write-Information " --> Adding Docker"
-            $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent.Trim() + $newline + $newline
-            $trgContent = $trgContent + $templateContent
-        }
-    }
-
-    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.github_actions'
-    $templateFileExists = Test-Path -Path $templateFile
-    if($templateFileExists -eq $true) {
-        $actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
-        $files = Get-ChildItem -Path $actionsTargetPath -Filter *.yml -Recurse
-        if($files -ne $null) {
-            Write-Information " --> Adding Github Actions"
-            $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent.Trim() + $newline + $newline
-            $trgContent = $trgContent +  $templateContent
-        }
-    }
-
-    $templateFile = makePath -Path $srcPath -ChildPath 'dependabot.config.template.python'
-    $templateFileExists = Test-Path -Path $templateFile
-    if($templateFileExists -eq $true) {
-        $actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
-        $files = Get-ChildItem -Path $actionsTargetPath -Filter requirements.txt -Recurse
-        if($files -ne $null) {
-            Write-Information " --> Adding Python"
-            $templateContent = Get-Content -Path $templateFile -Raw
-            $trgContent = $trgContent.Trim() + $newline + $newline
-            $trgContent = $trgContent +  $templateContent
-        }
-    }
-
-    $trgContent = $trgContent.Trim() + $newline
-
-    Write-Information " --> Done"
-    Set-Content -Path $targetFileName -Value $trgContent
+    Dependabot-BuildConfig -configFileName $targetFileName -repoRoot trgRepo -updateGitHubActions $updateGitHubActions
 
     doCommit -FileName ".github/dependabot.yml"
     Git-Push
