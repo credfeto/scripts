@@ -280,13 +280,13 @@ function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileNam
 
 }
 
-function buildDependabotConfig($srcRepo, $trgRepo) {
+function buildDependabotConfig($srcRepo, $trgRepo, $hasNonTemplateWorkFlows) {
 
     $srcPath = makePath -Path $srcRepo -ChildPath ".github"
     Write-Information "$srcPath"
     $targetFileName = makePath -Path $trgRepo -ChildPath ".github/dependabot.yml"
 
-    $updateGitHubActions = !$trgRepo.ToLowerInvariant().Contains("fFunfair")
+    $updateGitHubActions = $hasNonTemplateWorkFlows -And !$trgRepo.ToLowerInvariant().Contains("fFunfair")
 
     Dependabot-BuildConfig -configFileName $targetFileName -repoRoot trgRepo -updateGitHubActions $updateGitHubActions
 
@@ -510,6 +510,26 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         }
     }
 
+    $templateWorkflowFiles = Get-ChildItem -Path $workflows -Filter *.yml -File -Attributes Normal, Hidden
+    $targetWorkflowFiles = Get-ChildItem -Path $targetWorkflows -Filter *.yml -File -Attributes Normal, Hidden
+    $hasNonTemplateWorkFlows = $False
+    foreach($targetFile in $targetWorkflowFiles) {
+        $targetFileName = $targetFile.Name
+        $match = $False
+        foreach($templateFile in $templateWorkflowFiles) {
+            if($targetFileName -eq $templateFile.Name) {
+                $match = $true
+                break
+            }
+        }
+
+        if($match -eq $false) {
+            $hasNonTemplateWorkFlows = true
+            break
+        }
+    }
+
+
     $uncommitted = Git-HasUnCommittedChanges
     If ($uncommitted -eq $true)
     {
@@ -538,7 +558,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     updateResharperSettings -srcRepo $srcRepo -trgRepo $repoFolder
     updateLabel -baseFolder $repoFolder
 
-    buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder
+    buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
     removeLegacyDependabotConfig -trgRepo $repoFolder
 
     Write-Information "Updating Tracking for $repo to $currentRevision"
