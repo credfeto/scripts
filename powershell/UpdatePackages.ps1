@@ -21,7 +21,7 @@ Write-Information $root
 #
 
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-$ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "Lib" 
+$ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "lib" 
 Write-Information "Loading Modules from $ScriptDirectory"
 try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
