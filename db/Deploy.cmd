@@ -12,6 +12,10 @@ sqlcmd -S %SERVER2% -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE nam
 sqlcmd -S %SERVER2% -b -e -Q "CREATE DATABASE %SERVER2DB%"
 
 
-"%EXE%" "/filter:%FILTER%" /options:ConsiderNextFilegroupInPartitionSchemes,DecryptPost2kEncryptedObjects,DoNotOutputCommentHeader,ForceColumnOrder,IgnoreCertificatesAndCryptoKeys,IgnoreDatabaseAndServerName,IgnoreUserProperties,IgnoreUsersPermissionsAndRoleMemberships,IgnoreWhiteSpace,IgnoreWithElementOrder,IncludeDependencies,NoDeploymentLogging,ThrowOnFileParseFailed,UseCompatibilityLevel /transactionIsolationLevel:SERIALIZABLE /include:staticData "/scriptFile:%OUTPUT%" /showWarnings /include:Identical "/report:%REPORT%" /reportType:Xml /assertidentical /force /OutputWidth:1024 "/scripts1:%SOURCE%" /server2:%SERVER2% /database2:%SERVER2DB% /out:"%LOG%"
+REM Assert Idenitcal
+REM "%EXE%" "/filter:%FILTER%" /options:ConsiderNextFilegroupInPartitionSchemes,DecryptPost2kEncryptedObjects,DoNotOutputCommentHeader,ForceColumnOrder,IgnoreCertificatesAndCryptoKeys,IgnoreDatabaseAndServerName,IgnoreUserProperties,IgnoreUsersPermissionsAndRoleMemberships,IgnoreWhiteSpace,IgnoreWithElementOrder,IncludeDependencies,NoDeploymentLogging,ThrowOnFileParseFailed,UseCompatibilityLevel /transactionIsolationLevel:SERIALIZABLE /include:staticData "/scriptFile:%OUTPUT%" /showWarnings /include:Identical "/report:%REPORT%" /reportType:Xml /assertidentical /force /OutputWidth:1024 "/scripts1:%SOURCE%" /server2:%SERVER2% /database2:%SERVER2DB% /out:"%LOG%" /Synchronise"
 
-sqlcmd -S %SERVER2%  -d %SERVER2DB% -i "%OUTPUT%" -b -e
+REM Synchronise
+"%EXE%" "/filter:%FILTER%" /options:ConsiderNextFilegroupInPartitionSchemes,DecryptPost2kEncryptedObjects,DoNotOutputCommentHeader,ForceColumnOrder,IgnoreCertificatesAndCryptoKeys,IgnoreDatabaseAndServerName,IgnoreUserProperties,IgnoreUsersPermissionsAndRoleMemberships,IgnoreWhiteSpace,IgnoreWithElementOrder,IncludeDependencies,NoDeploymentLogging,ThrowOnFileParseFailed,UseCompatibilityLevel /transactionIsolationLevel:SERIALIZABLE /include:staticData "/scriptFile:%OUTPUT%" /showWarnings /include:Identical "/report:%REPORT%" /reportType:Xml /synchronise /force /OutputWidth:1024 "/scripts1:%SOURCE%" /server2:%SERVER2% /database2:%SERVER2DB% /out:"%LOG%""
+
+REM sqlcmd -S %SERVER2%  -d %SERVER2DB% -i "%OUTPUT%" -b -e
