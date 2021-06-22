@@ -1,21 +1,46 @@
+
+# $privateSource = '....'
+$standardSource = 'https://api.nuget.org/v3/index.json'
+
+function getLatestPreReleasePackage($packageId) {
+
+	try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Write-Host "Looking for $packageId in $standardSource"
+        $packages = Find-Package -Name $packageId -Source $standardSource -AllowPrereleaseVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
+        if($packages) {
+			$foundVersion = $packages[0].Version
+			Write-Host "* Found $foundVersion"
+            return $foundVersion
+        }
+
+#         Write-Host "Looking for $packageId in $privateSource"
+#         $packages = Find-Package -Name $packageId -Source $privateSource -AllowPrereleaseVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
+#         if($packages) {
+# 			$foundVersion = $packages[0].Version
+# 			Write-Host "* Found $foundVersion"
+#             return $foundVersion
+#         }
+
+		Write-Host "- Not Found"
+        return $null
+	}
+	catch {
+		Write-Host "# Not Found - Error"
+		return $null
+	}
+}
+
 function findPreReleasePackageVersion( $packageId) {
 
     Write-Information "Looking for latest version of $packageId (Includes pre-release)"
 
-    $packageIdRegex = $packageId.Replace(".", "\.")
-
-    $entry = &nuget list PackageId:$packageId -prerelease | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
-    
-    if($entry -eq $null) {
-        return $null
+    package = getLatestPreReleasePackage -packageId $packageId
+    if($package) {
+        return $package
     }
 
-
-    $splitEntry = $entry.Split(' ')
-    $id = $splitEntry[0]
-    $version = $splitEntry[1]
-
-    return $version
+    return $null
 }
 
 function isInstalled($packageId) {
@@ -24,7 +49,7 @@ function isInstalled($packageId) {
     $entry = &dotnet tool list --local | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
 
 	Write-Information "Found: $entry"
-    return $entry -ne $null;
+    return $entry -ne $null
 }
 
 <#
