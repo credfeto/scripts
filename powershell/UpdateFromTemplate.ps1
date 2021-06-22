@@ -465,6 +465,8 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     # SIMPLE OVERWRITE UPDATES
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".editorconfig"
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".gitleaks.toml"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".gitignore"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".gitattributes"
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\pr-lint.yml"
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\CODEOWNERS"
     updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\PULL_REQUEST_TEMPLATE.md"
