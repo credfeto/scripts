@@ -1,0 +1,66 @@
+#!/bin/bash
+
+PROG=$0
+
+function error_exit {
+    echo
+    echo "$@"
+    exit 1
+}
+#Trap the killer signals so that we can exit with a good message.
+trap "error_exit 'Received signal SIGHUP'" SIGHUP
+trap "error_exit 'Received signal SIGINT'" SIGINT
+trap "error_exit 'Received signal SIGTERM'" SIGTERM
+
+shopt -s expand_aliases
+alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
+
+SERVER=
+DB=
+AUTH=
+
+while [[ $# -gt 0 ]]; do
+  key="$1"
+
+  case $key in
+    -U|--user)
+      USER="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -P|--password)
+      PASSWORD="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -s|--server)
+      SERVER="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -d|--database)
+      DB="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -o|--output)
+      OUTPUT="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    *)    # unknown option
+      die "unknown argument $1"
+      ;;
+  esac
+done
+
+[ -z "$SERVER" ] && die "--server not specified"
+[ -z "$DB" ] && die "--database not specified"
+[ -z "$USER" ] && die "--user not specified"
+[ -z "$PASSWORD" ] && die "--password not specified"
+
+
+~/sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') ALTER DATABASE $DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE"
+~/sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') DROP DATABASE $DB"
+
+#sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "CREATE DATABASE $DB"
