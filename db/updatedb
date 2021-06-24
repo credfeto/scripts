@@ -16,6 +16,10 @@ shopt -s expand_aliases
 alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
 
 SOURCE=
+SERVER=
+DATABASE=
+USER=
+DB=
 OUTPUT=
 REPORT=
 LOG=
@@ -24,6 +28,26 @@ while [[ $# -gt 0 ]]; do
   key="$1"
 
   case $key in
+    -U|--user)
+      USER="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -P|--password)
+      PASSWORD="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -s|--server)
+      SERVER="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -d|--database)
+      DB="$2"
+      shift # past argument
+      shift # past value
+      ;;
     -f|--files)
       SOURCE="$2"
       shift # past argument
@@ -42,6 +66,10 @@ done
 
 [ -z "$SOURCE" ] && die "--files not specified"
 [ -z "$OUTPUT" ] && die "--output not specified"
+[ -z "$SERVER" ] && die "--server not specified"
+[ -z "$DB" ] && die "--database not specified"
+[ -z "$USER" ] && die "--user not specified"
+[ -z "$PASSWORD" ] && die "--password not specified"
 
 FILTER=$SOURCE/Filter.scpf
 LOG=$OUTPUT.log
@@ -61,7 +89,10 @@ REPORT=$OUTPUT.xml
   /OutputWidth:1024 \
   /scripts1:"$SOURCE" \
   /out:"$LOG" \
-  /empty2 \
+  /server2:"$SERVER" \
+  /database2:"$DB" \
+  /username2:"$USERNAME" \
+  /password2:"$PASSWORD" \
   /assertidentical
 
 #  /Synchronise
