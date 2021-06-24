@@ -1,0 +1,2 @@
+#! /bin/bash
+docker exec -it mssql /opt/mssql-tools/bin/sqlcmd "$@"

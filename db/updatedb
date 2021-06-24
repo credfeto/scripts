@@ -75,7 +75,7 @@ FILTER=$SOURCE/Filter.scpf
 LOG=$OUTPUT.log
 REPORT=$OUTPUT.xml
 
-~/sqlcompare \
+sqlcompare \
   /filter:"$FILTER" \
   /options:ConsiderNextFilegroupInPartitionSchemes,DecryptPost2kEncryptedObjects,DoNotOutputCommentHeader,ForceColumnOrder,IgnoreCertificatesAndCryptoKeys,IgnoreDatabaseAndServerName,IgnoreUserProperties,IgnoreUsersPermissionsAndRoleMemberships,IgnoreWhiteSpace,IgnoreWithElementOrder,IncludeDependencies,NoDeploymentLogging,ThrowOnFileParseFailed,UseCompatibilityLevel \
   /transactionIsolationLevel:SERIALIZABLE \
@@ -95,6 +95,3 @@ REPORT=$OUTPUT.xml
   /password2:"$PASSWORD" \
   /assertidentical
 
-#  /Synchronise
-#  /server2:$SERVER \
-#  /database2:$DATABASE \

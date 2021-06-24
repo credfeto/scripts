@@ -60,7 +60,6 @@ done
 [ -z "$PASSWORD" ] && die "--password not specified"
 
 
-~/sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') ALTER DATABASE $DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE"
-~/sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') DROP DATABASE $DB"
+sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') ALTER DATABASE $DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE"
+sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') DROP DATABASE $DB"
 
-#sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "CREATE DATABASE $DB"

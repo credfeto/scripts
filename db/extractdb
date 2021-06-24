@@ -123,7 +123,7 @@ echo "  <HooksConfigFile>$HOOKSXML</HooksConfigFile>" >> $DBXML
 echo "  <HooksFileInRepositoryFolder>False</HooksFileInRepositoryFolder>" >> $DBXML
 echo "</ISOCCompareLocation>" >> $DBXML
 
-~/sqlcompare /filter:"$FILTER" \
+sqlcompare /filter:"$FILTER" \
   /options:ConsiderNextFilegroupInPartitionSchemes,DecryptPost2kEncryptedObjects,DoNotOutputCommentHeader,ForceColumnOrder,IgnoreCertificatesAndCryptoKeys,IgnoreDatabaseAndServerName,IgnoreUserProperties,IgnoreUsersPermissionsAndRoleMemberships,IgnoreWhiteSpace,IgnoreWithElementOrder,IncludeDependencies,NoDeploymentLogging,ThrowOnFileParseFailed,UseCompatibilityLevel \
   /transactionIsolationLevel:SERIALIZABLE \
   /makescripts:"$OUTPUT" \
@@ -133,9 +133,4 @@ echo "</ISOCCompareLocation>" >> $DBXML
   /database1:"$DB" \
   /username1:"$USER" \
   /password1:"$PASSWORD"
-#  /sourcecontrol2 \
-#  /revision2:latest \
-#  /sfx:"$DBXML"
-  
-  # /out:"$LOG" \
   

@@ -61,6 +61,6 @@ done
 [ -z "$USER" ] && die "--user not specified"
 [ -z "$PASSWORD" ] && die "--password not specified"
 
-~/sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "CREATE DATABASE $DB"
+sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "CREATE DATABASE $DB"
 
 [ -n "$SCHEMA" ] && ~/sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -d "$DB" -b -e -i "$SCHEMA"

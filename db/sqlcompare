@@ -1,0 +1,3 @@
+#!/bin/bash
+docker pull redgate/sqlcompare:latest
+docker run  --rm --network multi-host-network -v/home:/home -v/data/work:/data/work/ redgate/sqlcompare:latest /IAgreeToTheEULA "$@"
