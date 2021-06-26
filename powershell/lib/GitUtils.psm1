@@ -1,5 +1,6 @@
 $env:GIT_REDIRECT_STDERR="2>&1"
 
+
 function Git-RemoveAllLocalBranches {
     $result = git branch
     foreach($branch in $result) {
@@ -186,6 +187,15 @@ param(
     return $true;
 }
 
+function Git-ReNormalise {
+    git add . --renormalize
+    $hasChanged = Git-HasUnCommittedChanges
+    if($hasChanged -eq $true) {
+        git commit -m"Renormalised files"
+        git push
+    }
+}
+
 
 function Git-Get-HeadRev {
     $result = git rev-parse HEAD
@@ -223,3 +233,4 @@ Export-ModuleMember -Function Git-DoesBranchExist
 Export-ModuleMember -Function Git-LoadRepoList
 Export-ModuleMember -Function Git-GetFolderForRepo
 Export-ModuleMember -Function Git-Get-HeadRev
+Export-ModuleMember -Function Git-ReNormalise

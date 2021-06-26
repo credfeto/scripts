@@ -563,6 +563,8 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
     removeLegacyDependabotConfig -trgRepo $repoFolder
 
+    Git-ReNormalise
+    
     Write-Information "Updating Tracking for $repo to $currentRevision"
     Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
 }

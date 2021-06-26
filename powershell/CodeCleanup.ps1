@@ -268,6 +268,8 @@ function processRepo($srcRepo, $repo) {
                         Git-CreateBranch -branchName $branchName
                         Git-Commit -message "[FF-2244] - Code cleanup on $solutionName"
                         Git-PushOrigin -branchName $branchName
+                        
+                        Git-ReNormalise
                     }
                 }
                 else {
@@ -279,9 +281,10 @@ function processRepo($srcRepo, $repo) {
                             Git-CreateBranch -branchName $branchName
                             Git-Commit -message "[FF-2244] - Code cleanup on $solutionName [BROKEN - NEEDS INVESTIGATION - DO NOT MERGE]"
                             Git-PushOrigin -branchName $branchName
+                            
+                            Git-ReNormalise
                         }
                     }
-
                 }
 
                 Git-ResetToMaster
