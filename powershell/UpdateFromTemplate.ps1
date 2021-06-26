@@ -510,6 +510,11 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         {
             Remove-Item -Path $file.FullName
         }
+        
+        If ($file.Name -eq "dependabot-auto-merge.yml")
+        {
+            Remove-Item -Path $file.FullName
+        }
     }
 
     $templateWorkflowFiles = Get-ChildItem -Path $workflows -Filter *.yml -File -Attributes Normal, Hidden
