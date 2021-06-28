@@ -489,32 +489,21 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     $files = Get-ChildItem -Path $targetWorkflows -Filter *.yml -File -Attributes Normal, Hidden
     Write-Information $files
     
+    $obsoleteWorkflows = @(
+        "cc.yml",
+        "linter.yml",
+        "sqlcheck.yml",
+        "tabtospace.yml",
+        "dependabot-auto-merge.yml"
+    )
     ForEach ($file in $files)
     {
-        If ($file.Name -eq "cc.yml")
-        {
-            Remove-Item -Path $file.FullName
-        }
-
-        If ($file.Name -eq "linter.yml")
-        {
-            Remove-Item -Path $file.FullName
-        }
-
-        If ($file.Name -eq "sqlcheck.yml")
-        {
-            Remove-Item -Path $file.FullName
-        }
-
-        If ($file.Name -eq "tabtospace.yml")
-        {
-            Remove-Item -Path $file.FullName
-        }
-        
-        If ($file.Name -eq "dependabot-auto-merge.yml")
-        {
-            Remove-Item -Path $file.FullName
-        }
+        for($workflow in $workflows) {
+            If ($file.Name -eq $workflow) {
+                Remove-Item -Path $file.FullName
+                break 
+            }
+        }        
     }
 
     $templateWorkflowFiles = Get-ChildItem -Path $workflows -Filter *.yml -File -Attributes Normal, Hidden
