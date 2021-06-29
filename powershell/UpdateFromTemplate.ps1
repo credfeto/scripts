@@ -498,7 +498,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     )
     ForEach ($file in $files)
     {
-        for($workflow in $workflows) {
+        ForEach ($workflow in $workflows) {
             If ($file.Name -eq $workflow) {
                 Remove-Item -Path $file.FullName
                 break 
