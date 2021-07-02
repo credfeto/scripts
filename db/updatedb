@@ -87,8 +87,9 @@ sqlcompare \
   /reportType:Xml \
   /force \
   /OutputWidth:1024 \
-  /scripts1:"$SOURCE" \
+  /scriptfile:"$OUTPUT" \
   /out:"$LOG" \
+  /scriptfile:"$SCHEMA" \
   /server2:"$SERVER" \
   /database2:"$DB" \
   /username2:"$USER" \
@@ -102,4 +103,4 @@ sqlcmd \
   -d "$DB" \
   -b \
   -e \
-  -i "$SCHEMA"
+  -i "$OUTPUT"
