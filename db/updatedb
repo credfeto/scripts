@@ -91,7 +91,15 @@ sqlcompare \
   /out:"$LOG" \
   /server2:"$SERVER" \
   /database2:"$DB" \
-  /username2:"$USERNAME" \
+  /username2:"$USER" \
   /password2:"$PASSWORD" \
   /assertidentical
 
+sqlcmd \
+  -S "$SERVER" \
+  -U "$USER" \
+  -P "$PASSWORD" \
+  -d "$DB" \
+  -b \
+  -e \
+  -i "$SCHEMA"
