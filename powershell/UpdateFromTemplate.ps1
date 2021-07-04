@@ -459,6 +459,11 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
             updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
             updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
         }
+        
+        if($repoFolder.Contains("funfair")) {
+            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\FunFair.props"
+            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\packageicon.png"
+        }
     }
 
     #########################################################
