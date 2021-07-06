@@ -117,7 +117,7 @@ foreach($file in $files) {
     Write-Host "****************************************************************************"
     Write-Host $fileName
 
-    $network = Get-Content -Raw $fileName | ConvertFrom-JSON
+    $network = Get-Content -Path $fileName -Raw | ConvertFrom-JSON
 
     Write-Host "Name:    " $network.name
     Write-Host "Network: " $network.networkId

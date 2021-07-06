@@ -33,14 +33,14 @@ function GlobalJson_Update
         return $false
     }
 
-    $srcContent = Get-Content $sourceFileName -Raw
+    $srcContent = Get-Content -Path $sourceFileName -Raw
     $srcGlobal = $srcContent | ConvertFrom-Json
 
     $trgExists = Test-Path -Path $targetFileName
     if ($trgExists -eq $true)
     {
 
-        $trgContent = Get-Content $targetFileName -Raw
+        $trgContent = Get-Content -Path $targetFileName -Raw
 
         if ($srcContent -eq $trgContent)
         {
