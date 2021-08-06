@@ -7,23 +7,12 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; * CONFIGURATION
 ; **********************************************************************************************************************
 
-; Where is the folder that contain the files for now playing and played (Accessing ObsDirectoryStudio on the OBS Machine)
-ObsDirectory := "O:"
-
-; Where is the folder that contains files for now playing and played on the studio machine
-ObsDirectoryStudio := "C:\Currently Playing"
-
-; Where the videos file exists under BOTH ObsDirectory and ObsDirectoryStudio
-VideosDirectoryName := "Videos"
-
 ; Where is the VLC instance:
 VlcHostAndPort := "127.0.0.1:8080"
 VlcUsername := ""
 VlcPassword := "vlcremote"
 
 ;For testing on studio pc uncomment this line
-;ObsDirectory := "C:\Currently Playing"
-;ObsDirectoryStudio := ObsDirectory
 ;VlcHostAndPort := "127.0.0.1:8080"
 
 
