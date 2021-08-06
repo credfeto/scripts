@@ -15,7 +15,6 @@ VlcPassword := "vlcremote"
 ;For testing on studio pc uncomment this line
 ;VlcHostAndPort := "127.0.0.1:8080"
 
-
 ; **********************************************************************************************************************
 ; * FUNCTIONS
 ; **********************************************************************************************************************
@@ -72,7 +71,8 @@ PauseOrResumeVideoInVlc(HostAndPort, UserName, Password) {
 }
 
 ShowBuddyPauseResume() {
-    if WinExist("Show Buddy V1.5.3") {
+    SetTitleMatchMode, 1
+    if WinExist("Show Buddy") {
         WinActivate
 	Send, " "
     }
