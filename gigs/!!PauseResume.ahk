@@ -82,15 +82,15 @@ PauseOrResumeVideoInVlc(HostAndPort, UserName, Password) {
     SendBasicAuthGetCommand(command, auth)
 }
 
-ShowBuddyPauseResume()
-{
-    if WinExist("Show Buddy V1.5.3")
+ShowBuddyPauseResume() {
+    if WinExist("Show Buddy V1.5.3") {
         WinActivate
 	Send, " "
-    else
+    }
+    else {
         MsgBox Show Buddy not running
         ExitApp
-
+    }
 }
 
 
