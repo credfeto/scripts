@@ -225,7 +225,7 @@ function processRepo($repo, $packages, $baseFolder)
 
     ForEach ($package in $packages)
     {
-        $packageId = $package.packageId
+        $packageId = $package.packageId.Trim('.')
         $type = $package.type
         $exactMatch = $package.'exact-match'
 
