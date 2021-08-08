@@ -19,7 +19,7 @@ Write-Information $root
 # region Include required files
 #
 $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-$ScriptDire/data/work/funfair/funfair-server-geo/srcctory = Join-Path -Path $ScriptDirectory -ChildPath "lib" 
+$ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "lib" 
 Write-Information "Loading Modules from $ScriptDirectory"
 try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
