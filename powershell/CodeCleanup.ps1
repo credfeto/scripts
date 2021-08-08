@@ -64,6 +64,15 @@ catch {
     Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: Resharper" 
 }
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "ProjectCleanup.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: ProjectCleanup" 
+}
 #endregion
 
 function runCodeCleanup($solutionFile) {
@@ -94,6 +103,8 @@ function runCodeCleanup($solutionFile) {
         ForEach($project in $projects) {
             $projectFile = $project.FullName
             Write-Information "  - Project $projectFile"
+            
+            Project_Cleanup -projectFile $projectFile
 
             dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
             if(!$?) {
