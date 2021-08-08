@@ -36,9 +36,12 @@ ClearNowPlaying(SongTrackingDirectory) {
     NowPlaying := SongTrackingDirectory . "\NowPlaying.txt"
     Played := SongTrackingDirectory . "\Played.txt"
 
-    ; Remove NowPlaying and played.
+    ; Remove NowPlaying and played and write an empty file.
+    NothingPLaying = ""
     FileDelete, %NowPlaying%
     FileDelete, %Played%
+    FileAppend, %NothingPLaying%, %Played%
+    FileAppend, %NothingPLaying%, %Played%
 
     return
 }
