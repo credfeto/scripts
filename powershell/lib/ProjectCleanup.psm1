@@ -50,7 +50,7 @@ param (
         $projectPath = $include.GetAttribute("Include")
         
         $toRemove += $include
-        $projectItems.Add($packageId.ToUpper(), $include);
+        $projectItems.Add($projectPath.ToUpper(), $include);
       }
     }
     
