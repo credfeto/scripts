@@ -99,7 +99,7 @@ param (
   $xws.Indent = $true
   $xws.IndentChars = "  "
   $xws.NewLineOnAttributes = $false
-  $xws.OmitXmlDeclaration = true
+  $xws.OmitXmlDeclaration = $true
   
   $outputFile = $projectFile
   $data.Save([Xml.XmlWriter]::Create($outputFile, $xws))    
