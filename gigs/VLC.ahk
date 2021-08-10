@@ -3,6 +3,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
+
+
 ; **********************************************************************************************************************
 ; * CONFIGURATION
 ; **********************************************************************************************************************
@@ -11,6 +13,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 EnsureRunning() {
     SetTitleMatchMode, 1
     if Not WinExist("VLC media player") {
+	
+	; Change to be the full path where VLC.exe is installed.
         Run "C:\Program Files (x86)\VideoLAN\VLC\vlc.exe"
 
 	; Sleep for x miliseconds
