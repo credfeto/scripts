@@ -54,6 +54,44 @@ function DotNet-Build {
     }
 }
 
+function DotNet-Pack {
+    try {
+        Write-Information " * Packing"
+        dotnet pack --configuration=Release --no-build --no-restore -warnAsError -nodeReuse:False
+        if(!$?) {
+            Write-Information ">>> Packing Failed"
+
+            return $false
+        }
+
+        Write-Information "   - Packing Succeded"
+
+        return $true
+    } catch  {
+        Write-Information ">>> Packing Failed"
+        return $false
+    }
+}
+
+function DotNet-Publish {
+    try {
+        Write-Information " * Publishing"
+        dotnet publish --configuration Release --no-restore -r linux-x64 --self-contained:true /p:PublishSingleFile=true /p:PublishReadyToRun=False /p:PublishReadyToRunShowWarnings=true /p:PublishTrimmed=False /p:DisableSwagger=False /p:TreatWarningsAsErrors=true /warnaserror /p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+        if(!$?) {
+            Write-Information ">>> Publishing Failed"
+
+            return $false
+        }
+
+        Write-Information "   - Publishing Succeded"
+
+        return $true
+    } catch  {
+        Write-Information ">>> Publishing Failed"
+        return $false
+    }
+}
+
 function DotNet-BuildRunUnitTestsLinux {
     try {
         Write-Information " * Unit Tests"
@@ -112,6 +150,73 @@ function DotNet-BuildRunIntegrationTests {
     }
 }
 
+function DotNet-HasPackable {
+    param(
+        [string] $srcFolder
+    )
+
+    $projects = Get-ChildItem -Path $srcFolder -Filter *.csproj -Recurse
+    
+    ForEach($project in $projects) {
+        $projectFileName = $project.FullName
+        Write-Host "* $projectFileName"
+
+        $data = [xml](Get-Content $projectFileName)
+
+        $projectType = $data.SelectSingleNode("/Project/PropertyGroup/OutputType");
+        if($projectType -ne $null) {
+            $projectTypeValue = $projectType.InnerText.Trim()
+            Write-Host " --> $projectTypeValue"
+
+            if($projectTypeValue -eq "Library") {
+                $publishable = $data.SelectSingleNode("/Project/PropertyGroup/IsPackable");
+                if($publishable -ne $null) {
+                    $publishableValue = $publishable.InnerText.Trim()
+                    if($publishableValue -eq "True") {
+                        Write-Host " --> Packable"
+                        return $true
+                    }
+                }
+            }
+        }
+    }
+
+    return $false
+}
+
+function DotNet-HasPublishableExe {
+param(
+    [string] $srcFolder
+)
+
+    $projects = Get-ChildItem -Path $srcFolder -Filter *.csproj -Recurse
+
+    ForEach($project in $projects) {
+        $projectFileName = $project.FullName
+        Write-Host "* $projectFileName"
+
+        $data = [xml](Get-Content $projectFileName)
+
+        $projectType = $data.SelectSingleNode("/Project/PropertyGroup/OutputType");
+        if($projectType -ne $null) {
+            $projectTypeValue = $projectType.InnerText.Trim()
+            Write-Host " --> $projectTypeValue"
+
+            if($projectTypeValue -eq "Exe") {
+                $publishable = $data.SelectSingleNode("/Project/PropertyGroup/IsPublishable");
+                if($publishable -ne $null) {
+                    $publishableValue = $publishable.InnerText.Trim()
+                    if($publishableValue -eq "True") {
+                        Write-Host " --> Publishable"
+                        return $true
+                    }
+                }
+            }
+        }
+    }
+
+    return $false
+}
 
 <#
  .Synopsis
@@ -145,26 +250,54 @@ param(
         Write-Information "Building Source in $srcFolder"
 
         $buildOk = DotNet-BuildClean
-        if($buildOk -eq $true) {
-            $buildOk = DotNet-BuildRestore
-            if($buildOk -eq $true) {
-                $buildOk = DotNet-Build
-                if($buildOk -eq $true) {
-                    if($runTests -eq $true) {
-                        if($includeIntegrationTests -eq $false) {
-	                        if($IsLinux -eq $true) {
-                                return DotNet-BuildRunUnitTestsLinux
-                            } else {
-                                return DotNet-BuildRunUnitTestsWindows
-                            }
-                        }
-                        else {
-                            return DotNet-BuildRunIntegrationTests
-                        }
-                    }
-                }
+        if($buildOk -ne $true)
+        {
+            return $false
+        }
+        
+        $buildOk = DotNet-BuildRestore
+        if($buildOk -ne $true)
+        {
+            return $false
+        }
+
+        $buildOk = DotNet-Build
+        if($buildOk -ne $true)
+        {
+            return $false
+        }
+        
+        $isPackable = DotNet-HasPackable -srcFolder $srcFolder
+        if($isPublishable -eq $true) {
+            $buildOk = DotNet-Pack
+            if($buildOk -ne $true)
+            {
+                return $false
             }
         }
+
+        $isPublishable = DotNet-HasPublishableExe -srcFolder $srcFolder
+        if($isPublishable -eq $true) {
+            $buildOk = DotNet-Publish
+            if($buildOk -ne $true)
+            {
+                return $false
+            }
+        }
+        
+        if($runTests -eq $true) {
+            if($includeIntegrationTests -eq $false) {
+                if($IsLinux -eq $true) {
+                    return DotNet-BuildRunUnitTestsLinux
+                } else {
+                    return DotNet-BuildRunUnitTestsWindows
+                }
+            }
+            else {
+                return DotNet-BuildRunIntegrationTests
+            }
+        }
+        
         return $false
     }
     catch {
