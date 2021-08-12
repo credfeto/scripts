@@ -54,6 +54,14 @@ param (
       }
     }
     
+    # Folder Includes
+    $includes = $itemGroup.SelectNodes("Folder")
+    if($includes.Count -ne 0) {
+      foreach($include in $includes) {
+        $toRemove += $include
+      }
+    }
+    
     # Remove items marked for deletion
     foreach($include in $toRemove) {
         [void]$itemGroup.RemoveChild($include)
