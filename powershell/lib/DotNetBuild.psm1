@@ -159,21 +159,21 @@ function DotNet-HasPackable {
     
     ForEach($project in $projects) {
         $projectFileName = $project.FullName
-        Write-Host "* $projectFileName"
+        Write-Information "* $projectFileName"
 
         $data = [xml](Get-Content $projectFileName)
 
         $projectType = $data.SelectSingleNode("/Project/PropertyGroup/OutputType");
         if($projectType -ne $null) {
             $projectTypeValue = $projectType.InnerText.Trim()
-            Write-Host " --> $projectTypeValue"
+            Write-Information " --> $projectTypeValue"
 
             if($projectTypeValue -eq "Library") {
                 $publishable = $data.SelectSingleNode("/Project/PropertyGroup/IsPackable");
                 if($publishable -ne $null) {
                     $publishableValue = $publishable.InnerText.Trim()
                     if($publishableValue -eq "True") {
-                        Write-Host " --> Packable"
+                        Write-Information " --> Packable"
                         return $true
                     }
                 }
@@ -193,21 +193,21 @@ param(
 
     ForEach($project in $projects) {
         $projectFileName = $project.FullName
-        Write-Host "* $projectFileName"
+        Write-Information "* $projectFileName"
 
         $data = [xml](Get-Content $projectFileName)
 
         $projectType = $data.SelectSingleNode("/Project/PropertyGroup/OutputType");
         if($projectType -ne $null) {
             $projectTypeValue = $projectType.InnerText.Trim()
-            Write-Host " --> $projectTypeValue"
+            Write-Information " --> $projectTypeValue"
 
             if($projectTypeValue -eq "Exe") {
                 $publishable = $data.SelectSingleNode("/Project/PropertyGroup/IsPublishable");
                 if($publishable -ne $null) {
                     $publishableValue = $publishable.InnerText.Trim()
                     if($publishableValue -eq "True") {
-                        Write-Host " --> Publishable"
+                        Write-Information " --> Publishable"
                         return $true
                     }
                 }

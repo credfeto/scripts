@@ -7,18 +7,18 @@ $testFiles = Get-ChildItem -Path $testBase -Filter "*.cs" -Recurse
 foreach($sourceFile in $files) {
     $sourceFileName = $sourceFile.Name
     $sourceFilePath = $sourceFile.FullName
-    #Write-Host $sourceFileName
-    #Write-Host $sourceFilePath
+    #Write-Information $sourceFileName
+    #Write-Information $sourceFilePath
 
     $testFile = "I" + $sourceFileName
-    #Write-Host $testFile
+    #Write-Information $testFile
 
     $found = $null
     foreach( $candidate in $testFiles ) {
         $candidateFileName = $candidate.Name
         if( $candidateFileName -eq $testFile ) {
             $found = $candidate
-            #Write-Host $testFile
+            #Write-Information $testFile
             break
         }
     }
@@ -31,7 +31,7 @@ foreach($sourceFile in $files) {
 
         if( $sourceFolder -ne $moveFolder ) {
             $targetFolder = $testBase + $sourceFolder
-            Write-Host $targetFolder
+            Write-Information $targetFolder
 
             $folderExists = Test-Path -Path $targetFolder -PathType Container
             if( $folderExists -ne $true )
@@ -41,7 +41,7 @@ foreach($sourceFile in $files) {
 
             Move-Item -Path $movePath -Destination $targetFolder
         }
-        #Write-Host $sourceFolder
-        #Write-Host $moveFileName
+        #Write-Information $sourceFolder
+        #Write-Information $moveFileName
     }
 }

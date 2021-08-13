@@ -6,27 +6,27 @@ function getLatestPreReleasePackage($packageId) {
 
 	try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Write-Host "Looking for $packageId in $standardSource"
+        Write-Information "Looking for $packageId in $standardSource"
         $packages = Find-Package -Name $packageId -Source $standardSource -AllowPrereleaseVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
         if($packages) {
 			$foundVersion = $packages[0].Version
-			Write-Host "* Found $foundVersion"
+			Write-Information "* Found $foundVersion"
             return $foundVersion
         }
 
-#         Write-Host "Looking for $packageId in $privateSource"
+#         Write-Information "Looking for $packageId in $privateSource"
 #         $packages = Find-Package -Name $packageId -Source $privateSource -AllowPrereleaseVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
 #         if($packages) {
 # 			$foundVersion = $packages[0].Version
-# 			Write-Host "* Found $foundVersion"
+# 			Write-Information "* Found $foundVersion"
 #             return $foundVersion
 #         }
 
-		Write-Host "- Not Found"
+		Write-Information "- Not Found"
         return $null
 	}
 	catch {
-		Write-Host "# Not Found - Error"
+		Write-Information "# Not Found - Error"
 		return $null
 	}
 }
