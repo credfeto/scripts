@@ -242,12 +242,12 @@ function processRepo($repo, $packages, $baseFolder)
 
         $branchName = "depends/ff-1429/update-$packageId/$update"
         $branchExists = Git-DoesBranchExist -branchName $branchName
-        if($branchExists -ne $true) {
+        if(!$branchExists) {
 
             Write-Information ">>>> Checking to see if code builds against $packageId $update <<<<"
             $codeOK = DotNet-BuildSolution -srcFolder $srcPath
             Set-Location -Path $repoFolder
-            if($codeOK -eq $true) {
+            if($codeOK) {
                 ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                 Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
                 Git-Push
@@ -263,7 +263,7 @@ function processRepo($repo, $packages, $baseFolder)
             else {
                 Write-Information "Create Branch $branchName"
                 $branchOk = Git-CreateBranch -branchName $branchName
-                if($branchOk -eq $true) {
+                if($branchOk) {
                     ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                     Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
                     Git-PushOrigin -branchName $branchName

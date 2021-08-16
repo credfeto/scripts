@@ -89,7 +89,7 @@ function runCodeCleanup($solutionFile) {
     $settingsFile = $solutionFile + ".DotSettings"
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
-    if($buildOk -eq $true) {
+    if($buildOk) {
 
         Resharper_ConvertSuppressionCommentToSuppressMessage -sourceFolder $sourceFolder
 
@@ -121,8 +121,8 @@ function runCodeCleanup($solutionFile) {
         }
 
         Write-Information "* Building after cleanup"
-        $result = DotNet-BuildSolution -srcFolder $sourceFolder
-        if($result -eq $true) {
+        $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
+        if($buildOk) {
             return $true
         }
 
