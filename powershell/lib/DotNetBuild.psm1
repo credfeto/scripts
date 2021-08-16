@@ -1,11 +1,22 @@
 
+function DotNet-DumpOutput {
+    param(
+         $result
+    )
+
+    foreach ($item in $result) {
+        Write-Information ">>>>>> $item"
+    }
+}
+
+
 function DotNet-BuildClean {
     try {
         Write-Information " * Cleaning"
         $result = dotnet clean --configuration=Release -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Clean Failed"
-            Write-Information $result
+            DotNet-DumpOutput -result $result
             return $false
         }
         
@@ -24,7 +35,7 @@ function DotNet-BuildRestore {
         $result = dotnet restore -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Restore Failed"
-            Write-Information $result
+            DotNet-DumpOutput -result $result
             return $false
         }
 
@@ -42,7 +53,7 @@ function DotNet-Build {
         $result = dotnet build --configuration=Release --no-restore -warnAsError -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Build Failed"
-            Write-Information $result
+            DotNet-DumpOutput -result $result
             
             return $false
         }
@@ -62,7 +73,7 @@ function DotNet-Pack {
         $result = dotnet pack --configuration=Release --no-build --no-restore -warnAsError -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Packing Failed"
-            Write-Information $result
+            DotNet-DumpOutput -result $result
 
             return $false
         }
@@ -82,7 +93,7 @@ function DotNet-Publish {
         $result = dotnet publish --configuration Release --no-restore -r linux-x64 --self-contained:true /p:PublishSingleFile=true /p:PublishReadyToRun=False /p:PublishReadyToRunShowWarnings=true /p:PublishTrimmed=False /p:DisableSwagger=False /p:TreatWarningsAsErrors=true /warnaserror /p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Publishing Failed"
-            Write-Information $result
+            DotNet-DumpOutput -result $result
 
             return $false
         }
@@ -102,7 +113,7 @@ function DotNet-BuildRunUnitTestsLinux {
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration
         if(!$?) {
             Write-Information ">>> Tests Failed"
-            Write-Information $result
+            DotNet-DumpOutput -result $result
             return $false
         }
 
@@ -122,7 +133,7 @@ function DotNet-BuildRunUnitTestsWindows {
         if(!$?) {
             # Didn't Build
             Write-Information ">>> Tests Failed"
-            Write-Information $result
+            DotNet-DumpOutput -result $result
             return $false
         }
 
@@ -150,7 +161,7 @@ function DotNet-BuildRunIntegrationTests {
         if(!$?) {
             # Didn't Build
             Write-Information ">>> Tests Failed"
-            Write-Information $result
+            DotNet-DumpOutput -result $result
             return $false;
         }
 
