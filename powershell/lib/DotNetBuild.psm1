@@ -317,6 +317,8 @@ param(
                 return $false
             }
         }
+        
+        return $true
     }
     catch {
         Write-Error "Something failed, badly!"
