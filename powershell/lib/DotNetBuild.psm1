@@ -322,12 +322,11 @@ param(
     }
     catch {
         Write-Error "Something failed, badly!"
+        return $false
     }
     finally {
-
-
-    # Restore the original path after any build.
-    Set-Location -Path $originalPath
+        # Restore the original path after any build.
+        Set-Location -Path $originalPath
     }
     
 }
