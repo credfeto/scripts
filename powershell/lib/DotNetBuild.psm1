@@ -129,10 +129,16 @@ function DotNet-BuildRunUnitTestsWindows {
     }
 }
 
+function DotNet-BuildRunUnitTests {
+    if($IsLinux -eq $true) {
+        return DotNet-BuildRunUnitTestsLinux
+    } else {
+        return DotNet-BuildRunUnitTestsWindows
+    }
+}
 
 function DotNet-BuildRunIntegrationTests {
     try {
-
         Write-Information " * Unit Tests and Integration Tests"    
         dotnet test --configuration Release --no-build --no-restore -nodeReuse:False
         if(!$?) {
@@ -250,18 +256,21 @@ param(
         Write-Information "Building Source in $srcFolder"
 
         $buildOk = DotNet-BuildClean
+        Write-Information "Result $buildOk" 
         if($buildOk -ne $true)
         {
             return $false
         }
         
         $buildOk = DotNet-BuildRestore
+        Write-Information "Result $buildOk"
         if($buildOk -ne $true)
         {
             return $false
         }
 
         $buildOk = DotNet-Build
+        Write-Information "Result $buildOk"
         if($buildOk -ne $true)
         {
             return $false
@@ -270,6 +279,7 @@ param(
         $isPackable = DotNet-HasPackable -srcFolder $srcFolder
         if($isPublishable -eq $true) {
             $buildOk = DotNet-Pack
+            Write-Information "Result $buildOk"
             if($buildOk -ne $true)
             {
                 return $false
@@ -279,26 +289,34 @@ param(
         $isPublishable = DotNet-HasPublishableExe -srcFolder $srcFolder
         if($isPublishable -eq $true) {
             $buildOk = DotNet-Publish
+            Write-Information "Result $buildOk"
             if($buildOk -ne $true)
             {
                 return $false
             }
         }
         
-        if($runTests -eq $true) {
-            if($includeIntegrationTests -eq $false) {
-                if($IsLinux -eq $true) {
-                    return DotNet-BuildRunUnitTestsLinux
-                } else {
-                    return DotNet-BuildRunUnitTestsWindows
-                }
-            }
-            else {
-                return DotNet-BuildRunIntegrationTests
-            }
+        if($runTests -ne $true)
+        {
+            return $true
         }
         
-        return $false
+        if($includeIntegrationTests -eq $false) {
+            $buildOk = DotNet-BuildRunUnitTests
+            Write-Information "Result $buildOk"
+            if($buildOk -ne $true)
+            {
+                return $false
+            }
+        }
+        else {
+            $buildOk = DotNet-BuildRunIntegrationTests
+            Write-Information "Result $buildOk"
+            if($buildOk -ne $true)
+            {
+                return $false
+            }
+        }
     }
     catch {
         Write-Error "Something failed, badly!"
