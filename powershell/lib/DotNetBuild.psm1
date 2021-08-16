@@ -21,9 +21,10 @@ function DotNet-BuildClean {
 function DotNet-BuildRestore {
     try {
         Write-Information " * Restoring"
-        dotnet restore -nodeReuse:False
+        $result = dotnet restore -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Restore Failed"
+            Write-Information $result
             return $false
         }
 
@@ -38,9 +39,10 @@ function DotNet-BuildRestore {
 function DotNet-Build {
     try {
         Write-Information " * Building"
-        dotnet build --configuration=Release --no-restore -warnAsError -nodeReuse:False
+        $result = dotnet build --configuration=Release --no-restore -warnAsError -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Build Failed"
+            Write-Information $result
             
             return $false
         }
@@ -57,9 +59,10 @@ function DotNet-Build {
 function DotNet-Pack {
     try {
         Write-Information " * Packing"
-        dotnet pack --configuration=Release --no-build --no-restore -warnAsError -nodeReuse:False
+        $result = dotnet pack --configuration=Release --no-build --no-restore -warnAsError -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Packing Failed"
+            Write-Information $result
 
             return $false
         }
@@ -76,9 +79,10 @@ function DotNet-Pack {
 function DotNet-Publish {
     try {
         Write-Information " * Publishing"
-        dotnet publish --configuration Release --no-restore -r linux-x64 --self-contained:true /p:PublishSingleFile=true /p:PublishReadyToRun=False /p:PublishReadyToRunShowWarnings=true /p:PublishTrimmed=False /p:DisableSwagger=False /p:TreatWarningsAsErrors=true /warnaserror /p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+        $result = dotnet publish --configuration Release --no-restore -r linux-x64 --self-contained:true /p:PublishSingleFile=true /p:PublishReadyToRun=False /p:PublishReadyToRunShowWarnings=true /p:PublishTrimmed=False /p:DisableSwagger=False /p:TreatWarningsAsErrors=true /warnaserror /p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Publishing Failed"
+            Write-Information $result
 
             return $false
         }
@@ -95,9 +99,10 @@ function DotNet-Publish {
 function DotNet-BuildRunUnitTestsLinux {
     try {
         Write-Information " * Unit Tests"
-        dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration
+        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration
         if(!$?) {
             Write-Information ">>> Tests Failed"
+            Write-Information $result
             return $false
         }
 
@@ -113,10 +118,11 @@ function DotNet-BuildRunUnitTestsWindows {
     try {
 
         Write-Information " * Unit Tests"
-        dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration
+        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration
         if(!$?) {
             # Didn't Build
             Write-Information ">>> Tests Failed"
+            Write-Information $result
             return $false
         }
 
@@ -139,11 +145,12 @@ function DotNet-BuildRunUnitTests {
 
 function DotNet-BuildRunIntegrationTests {
     try {
-        Write-Information " * Unit Tests and Integration Tests"    
-        dotnet test --configuration Release --no-build --no-restore -nodeReuse:False
+        Write-Information " * Unit Tests and Integration Tests"
+        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False
         if(!$?) {
             # Didn't Build
             Write-Information ">>> Tests Failed"
+            Write-Information $result
             return $false;
         }
 
