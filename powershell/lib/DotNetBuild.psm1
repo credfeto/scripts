@@ -257,22 +257,19 @@ param(
 
         $buildOk = DotNet-BuildClean
         Write-Information "Result $buildOk" 
-        if($buildOk -ne $true)
-        {
+        if($buildOk -ne $true) {
             return $false
         }
         
         $buildOk = DotNet-BuildRestore
         Write-Information "Result $buildOk"
-        if($buildOk -ne $true)
-        {
+        if($buildOk -ne $true) {
             return $false
         }
 
         $buildOk = DotNet-Build
         Write-Information "Result $buildOk"
-        if($buildOk -ne $true)
-        {
+        if($buildOk -ne $true) {
             return $false
         }
         
@@ -280,8 +277,7 @@ param(
         if($isPublishable -eq $true) {
             $buildOk = DotNet-Pack
             Write-Information "Result $buildOk"
-            if($buildOk -ne $true)
-            {
+            if($buildOk -ne $true) {
                 return $false
             }
         }
@@ -290,8 +286,7 @@ param(
         if($isPublishable -eq $true) {
             $buildOk = DotNet-Publish
             Write-Information "Result $buildOk"
-            if($buildOk -ne $true)
-            {
+            if($buildOk -ne $true) {
                 return $false
             }
         }
@@ -304,16 +299,14 @@ param(
         if($includeIntegrationTests -eq $false) {
             $buildOk = DotNet-BuildRunUnitTests
             Write-Information "Result $buildOk"
-            if($buildOk -ne $true)
-            {
+            if($buildOk -ne $true) {
                 return $false
             }
         }
         else {
             $buildOk = DotNet-BuildRunIntegrationTests
             Write-Information "Result $buildOk"
-            if($buildOk -ne $true)
-            {
+            if($buildOk -ne $true) {
                 return $false
             }
         }
