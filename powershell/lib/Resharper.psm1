@@ -37,7 +37,7 @@ param (
         "NotAccessedField.Local",
         "ParameterOnlyUsedForPreconditionCheck.Global",
         "ParameterOnlyUsedForPreconditionCheck.Local",
-        "PrivateFieldCanBeConvertedToLocalVariable".
+        "PrivateFieldCanBeConvertedToLocalVariable",
         "RedundantDefaultMemberInitializer",
         "UnusedAutoPropertyAccessor.Global",
         "UnusedAutoPropertyAccessor.Local",
@@ -65,7 +65,7 @@ param (
         "StringLiteralTypo",
         "UnusedMethodReturnValue.Global",
         "UnusedMethodReturnValue.Local",
-        "UseIndexFromEndExpression"
+        "UseIndexFromEndExpression",
         "VirtualMemberCallInConstructor"
     )
 
@@ -81,6 +81,10 @@ param (
         $changedFile = $False
 
         ForEach($replacement in $replacements) {
+            if($replacement -eq $null) {
+                continue
+            }
+            
             $code = $replacement.Replace(".", "\.")
             $regex = "//\s+ReSharper\s+disable\s+once\s+$code"
             $replacementText = "[System.Diagnostics.CodeAnalysis.SuppressMessage(""ReSharper"", ""$replacement"", Justification=""TODO: Review"")]"
@@ -99,6 +103,10 @@ param (
         }
 
         ForEach($replacement in $deletions) {
+            if($replacement -eq $null) {
+                continue
+            }
+
             $code = $replacement.Replace(".", "\.")
             $regex = "//\s+ReSharper\s+disable\s+once\s+$code"
             $replacementText = ""
