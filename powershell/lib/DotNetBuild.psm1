@@ -289,7 +289,7 @@ param(
         }
         
         $isPackable = DotNet-HasPackable -srcFolder $srcFolder
-        if($isPublishable -eq $true) {
+        if($isPackable -eq $true) {
             $buildOk = DotNet-Pack
             Write-Information "Result $buildOk"
             if(!$buildOk) {
