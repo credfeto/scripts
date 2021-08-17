@@ -183,21 +183,19 @@ function DotNet-HasPackable {
     
     ForEach($project in $projects) {
         $projectFileName = $project.FullName
-        Write-Information "* $projectFileName"
 
         $data = [xml](Get-Content $projectFileName)
 
         $projectType = $data.SelectSingleNode("/Project/PropertyGroup/OutputType");
         if($projectType -ne $null) {
             $projectTypeValue = $projectType.InnerText.Trim()
-            Write-Information " --> $projectTypeValue"
 
             if($projectTypeValue -eq "Library") {
                 $publishable = $data.SelectSingleNode("/Project/PropertyGroup/IsPackable");
                 if($publishable -ne $null) {
                     $publishableValue = $publishable.InnerText.Trim()
                     if($publishableValue -eq "True") {
-                        Write-Information " --> Packable"
+                        Write-Information "*** Found Packable Library"
                         return $true
                     }
                 }
@@ -205,6 +203,7 @@ function DotNet-HasPackable {
         }
     }
 
+    Write-Information "*** No Packable Library Found"
     return $false
 }
 
@@ -217,21 +216,18 @@ param(
 
     ForEach($project in $projects) {
         $projectFileName = $project.FullName
-        Write-Information "* $projectFileName"
 
         $data = [xml](Get-Content $projectFileName)
 
         $projectType = $data.SelectSingleNode("/Project/PropertyGroup/OutputType");
         if($projectType -ne $null) {
             $projectTypeValue = $projectType.InnerText.Trim()
-            Write-Information " --> $projectTypeValue"
-
             if($projectTypeValue -eq "Exe") {
                 $publishable = $data.SelectSingleNode("/Project/PropertyGroup/IsPublishable");
                 if($publishable -ne $null) {
                     $publishableValue = $publishable.InnerText.Trim()
                     if($publishableValue -eq "True") {
-                        Write-Information " --> Publishable"
+                        Write-Information "*** Found Publishable Executable"
                         return $true
                     }
                 }
@@ -239,6 +235,7 @@ param(
         }
     }
 
+    Write-Information "*** No Publishable Executable Found"
     return $false
 }
 
