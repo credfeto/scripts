@@ -13,28 +13,62 @@ param (
     $removeBlankLinesRegex = "(?ms)" +  "(?<Start>(^((\s+)///\s+</(.*?)\>)))" + $linesToRemoveRegex + $suppressMessageRegex
     $removeBlankLines2Regex = "(?ms)" + "(?<Start>(^((\s+)///\s+<(.*?)/\>)))" + $linesToRemoveRegex + $suppressMessageRegex
 
-    $replacements = "RedundantDefaultMemberInitializer",
-                    "ParameterOnlyUsedForPreconditionCheck.Global",
-                    "ParameterOnlyUsedForPreconditionCheck.Local",
-                    "UnusedMember.Global",
-                    "UnusedMember.Local",
-                    "AutoPropertyCanBeMadeGetOnly.Global",
-                    "AutoPropertyCanBeMadeGetOnly.Local",
-                    "ClassNeverInstantiated.Local",
-                    "ClassNeverInstantiated.Global",
-                    "ClassCanBeSealed.Global",
-                    "ClassCanBeSealed.Local",
-                    "UnusedAutoPropertyAccessor.Global",
-                    "UnusedAutoPropertyAccessor.Local",
-                    "MemberCanBePrivate.Global",
-                    "MemberCanBePrivate.Local",
-                    "InconsistentNaming",
-                    "IdentifierTypo",
-                    "UnusedTypeParameter",
-                    "HeapView.BoxingAllocation"
-                    "UnusedType.Local",
-                    "UnusedType.Global",
-                    "PrivateFieldCanBeConvertedToLocalVariable"
+    $replacements = @(
+        "AccessToModifiedClosure",
+        "AccessToStaticMemberViaDerivedType",
+        "AutoPropertyCanBeMadeGetOnly.Global",
+        "AutoPropertyCanBeMadeGetOnly.Local",
+        "ClassCanBeSealed.Global",
+        "ClassCanBeSealed.Local",
+        "ClassNeverInstantiated.Global",
+        "ClassNeverInstantiated.Local",
+        "CompareNonConstrainedGenericWithNull",
+        "ConstantConditionalAccessQualifier",
+        "ConvertToAutoProperty",
+        "ConvertToUsingDeclaration",
+        "EntityNameCapturedOnly.Local",
+        "ExpressionIsAlwaysNull",
+        "IdentifierTypo",
+        "ImpureMethodCallOnReadonlyValueField",
+        "InconsistentlySynchronizedField",
+        "InconsistentNaming",
+        "MemberCanBePrivate.Global",
+        "MemberCanBePrivate.Local",
+        "NotAccessedField.Local",
+        "ParameterOnlyUsedForPreconditionCheck.Global",
+        "ParameterOnlyUsedForPreconditionCheck.Local",
+        "PrivateFieldCanBeConvertedToLocalVariable".
+        "RedundantDefaultMemberInitializer",
+        "UnusedAutoPropertyAccessor.Global",
+        "UnusedAutoPropertyAccessor.Local",
+        "UnusedMember.Global",
+        "UnusedMember.Local",
+        "UnusedParameter.Global",
+        "UnusedParameter.Local",
+        "UnusedType.Global",
+        "UnusedType.Local",
+        "UnusedTypeParameter"
+    )
+
+    $deletions = @(
+        "AssignNullToNotNullAttribute",
+        "ConditionIsAlwaysTrueOrFalse",
+        "ConstantNullCoalescingCondition",
+        "ConvertToUsingDeclaration",
+        "EqualExpressionComparison",
+        "ExpressionIsAlwaysNull",
+        "GCSuppressFinalizeForTypeWithoutDestructor",
+        "HeapView.BoxingAllocation",
+        "NotAccessedField.Local",
+        "PossibleNullReferenceException",
+        "PropertyCanBeMadeInitOnly.Global",
+        "StringLiteralTypo",
+        "UnusedMethodReturnValue.Global",
+        "UnusedMethodReturnValue.Local",
+        "UseIndexFromEndExpression"
+        "VirtualMemberCallInConstructor"
+    )
+
 
     $files = Get-ChildItem -Path $sourceFolder -Filter "*.cs" -Recurse
     ForEach($file in $files) {
@@ -64,6 +98,23 @@ param (
             }
         }
 
+        ForEach($replacement in $deletions) {
+            $code = $replacement.Replace(".", "\.")
+            $regex = "//\s+ReSharper\s+disable\s+once\s+$code"
+            $replacementText = ""
+
+            $updatedContent = $content -replace $regex, $replacementText
+            if($content -ne $updatedContent)
+            {
+                $content = $updatedContent
+                if($changedFile -eq $False) {
+                    Write-Information "* $fileName"
+                    $changedFile = $True
+                }
+
+                Write-Information "   - Removed $replacement comment"
+            }
+        }
 
         $replacementText = '${Start}' + $emptyLine + '${End}'
         $updatedContent = $content -replace $removeBlankLinesRegex, $replacementText
@@ -77,7 +128,6 @@ param (
 
             Write-Information "   - Removed blank lines (end tag)"
         }
-
 
         $replacementText = '${Start}' + $emptyLine + '${End}'
         $updatedContent = $content -replace $removeBlankLines2Regex, $replacementText
