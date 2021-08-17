@@ -50,7 +50,7 @@ function DotNet-BuildRestore {
 function DotNet-Build {
     try {
         Write-Information " * Building"
-        $result = dotnet build --configuration=Release --no-restore -warnAsError -nodeReuse:False
+        $result = dotnet build --configuration=Release --no-restore -warnAsError -nodeReuse:False /p:Version=0.0.0.1-do-not-distribute
         if(!$?) {
             Write-Information ">>> Build Failed"
             DotNet-DumpOutput -result $result
@@ -70,7 +70,7 @@ function DotNet-Build {
 function DotNet-Pack {
     try {
         Write-Information " * Packing"
-        $result = dotnet pack --configuration=Release --no-build --no-restore -warnAsError -nodeReuse:False
+        $result = dotnet pack --configuration=Release --no-build --no-restore -nodeReuse:False /p:Version=0.0.0.1-do-not-distribute
         if(!$?) {
             Write-Information ">>> Packing Failed"
             DotNet-DumpOutput -result $result
@@ -90,7 +90,7 @@ function DotNet-Pack {
 function DotNet-Publish {
     try {
         Write-Information " * Publishing"
-        $result = dotnet publish --configuration Release --no-restore -r linux-x64 --self-contained:true /p:PublishSingleFile=true /p:PublishReadyToRun=False /p:PublishReadyToRunShowWarnings=true /p:PublishTrimmed=False /p:DisableSwagger=False /p:TreatWarningsAsErrors=true /warnaserror /p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+        $result = dotnet publish --configuration Release --no-build --no-restore -r linux-x64 --self-contained:true /p:PublishSingleFile=true /p:PublishReadyToRun=False /p:PublishReadyToRunShowWarnings=true /p:PublishTrimmed=False /p:DisableSwagger=False /p:TreatWarningsAsErrors=true /p:Version=0.0.0.1-do-not-distribute /warnaserror /p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
         if(!$?) {
             Write-Information ">>> Publishing Failed"
             DotNet-DumpOutput -result $result
