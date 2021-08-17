@@ -69,7 +69,7 @@ param (
         "VirtualMemberCallInConstructor"
     )
 
-
+    $changed = $false
     $files = Get-ChildItem -Path $sourceFolder -Filter "*.cs" -Recurse
     ForEach($file in $files) {
         $fileName = $file.FullName
@@ -151,9 +151,12 @@ param (
         }
 
         if($content -ne $originalContent) {
+            $changed = $true
             Set-Content -Path $fileName -Value $content
         }
     }
+
+    return $changed
 }
 
 

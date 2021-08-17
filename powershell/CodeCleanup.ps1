@@ -89,48 +89,55 @@ function runCodeCleanup($solutionFile) {
     $settingsFile = $solutionFile + ".DotSettings"
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
-    if($buildOk) {
+    if(!$buildOk) {
+        Write-Information ">>>>> Build Failed! [From clean checkin]"
+        return $null
+    }
 
-        Resharper_ConvertSuppressionCommentToSuppressMessage -sourceFolder $sourceFolder
-
-        Write-Information "* Running Code Cleanup"
-        Write-Information "  - Solution: $Solution"
-        Write-Information "  - Cache Folder: $cachesFolder"
-        Write-Information "  - Settings File: $settingsFile"
-
-        # Cleanup each project
-        $projects = Get-ChildItem -Path $sourceFolder -Filter "*.csproj" -Recurse
-        ForEach($project in $projects) {
-            $projectFile = $project.FullName
-            Write-Information "  - Project $projectFile"
-            
-            Project_Cleanup -projectFile $projectFile
-
-            dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
-            if(!$?) {
-                Write-Information ">>>>> Code Cleanup failed"
-                return $false
-            }
+    $changed = Resharper_ConvertSuppressionCommentToSuppressMessage -sourceFolder $sourceFolder
+    if($changed) {
+        Write-Information "* Building after simple cleanuo"
+        $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
+        if(!$buildOk) {
+            Write-Information ">>>>> Build Failed! [From simple cleanup]"
+            return $false
         }
+    }
 
-        # Cleanup the solution
-        dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
+    Write-Information "* Running Code Cleanup"
+    Write-Information "  - Solution: $Solution"
+    Write-Information "  - Cache Folder: $cachesFolder"
+    Write-Information "  - Settings File: $settingsFile"
+
+    # Cleanup each project
+    $projects = Get-ChildItem -Path $sourceFolder -Filter "*.csproj" -Recurse
+    ForEach($project in $projects) {
+        $projectFile = $project.FullName
+        Write-Information "  - Project $projectFile"
+        
+        Project_Cleanup -projectFile $projectFile
+
+        dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
         if(!$?) {
             Write-Information ">>>>> Code Cleanup failed"
             return $false
         }
+    }
 
-        Write-Information "* Building after cleanup"
-        $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
-        if($buildOk) {
-            return $true
-        }
-
-	    Write-Information ">>>>> Build Failed!"
+    # Cleanup the solution
+    dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
+    if(!$?) {
+        Write-Information ">>>>> Code Cleanup failed"
         return $false
     }
 
-    Write-Information ">>>>> Build Failed!"
+    Write-Information "* Building after cleanup"
+    $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
+    if($buildOk) {
+        return $true
+    }
+
+    Write-Information ">>>>> Build Failed! [From Cleanup]"
     return $false
 }
 
@@ -182,7 +189,12 @@ function processRepo($srcRepo, $repo) {
             if($branchExists -ne $true) {
 
                 $cleaned = runCodeCleanup -solutionFile $solution.FullName
-                if($cleaned -eq $true) {
+                if($cleaned -eq $null) {
+                    Git-ResetToMaster
+                    continue
+                }
+
+                if($cleaned) {
                     $hasCleanedSuccessFully = $true
 
                     Set-Location -Path $repoFolder
