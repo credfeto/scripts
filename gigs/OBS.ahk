@@ -9,6 +9,6 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; * SEQUENCE OF ACTIONS
 ; **********************************************************************************************************************
 
-EnsureRunning("VLC")
+EnsureRunning("OBS")
 
 return
