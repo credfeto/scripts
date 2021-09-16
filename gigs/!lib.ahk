@@ -1,6 +1,11 @@
 ; ********************************************************
 ; Library Functions
 ; ********************************************************
+
+
+; ********************************************************
+; Run program with full positioning
+; ********************************************************
 EnsureRunningFull(Title, Exe, X, Y, Width, Height) {
 
     SetTitleMatchMode, 1
@@ -36,4 +41,3 @@ EnsureRunning(Program) {
 
   EnsureRunningFull(Title, Exe, Left, Top, Width, Height)
 }
-
