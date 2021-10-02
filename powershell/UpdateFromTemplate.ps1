@@ -242,7 +242,11 @@ function updateResharperSettings($srcRepo, $trgRepo) {
     }
 }
 
-function updateAndMergeFileAndComit($srcRepo, $trgRepo, $fileName, $mergeFileName) {
+function updateWorkFlowAndCommit($sourceRepo, $targetRepo, $fileName) {
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $fileName
+}
+
+function updateAndMergeFileAndCommit($srcRepo, $trgRepo, $fileName, $mergeFileName) {
     $fileName = convertToOsPath -path $fileName
     $mergeFileName = convertToOsPath -path $mergeFileName
     
@@ -487,7 +491,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
         Write-Information " * Found Workflow $srcFileName"
 
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $srcFileName
+        updateWorkFlowAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $srcFileName
     }
 
     $targetWorkflows = makePath -Path $trgRepo -ChildPath ".github\workflows"
