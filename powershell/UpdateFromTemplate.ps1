@@ -243,7 +243,31 @@ function updateResharperSettings($srcRepo, $trgRepo) {
 }
 
 function updateWorkFlowAndCommit($sourceRepo, $targetRepo, $fileName) {
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $fileName
+    
+    if($targetRepo.Contains("cs-template") -eq $true) {
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $fileName
+        return
+    }
+    
+    $sourceFileName = makePath -Path $srcRepo -ChildPath $fileName
+    $targetFileName = makePath -Path $trgRepo -ChildPath $fileName
+
+    $targetMergeFileNameExists = Test-Path -Path $targetMergeFileName
+    if($targetMergeFileNameExists -eq $true) {
+        $srcContent = Get-Content -Path $sourceFileName -Raw
+        $trgContent = Get-Content -Path $targetFileName -Raw
+        
+        $updated = $srcContent.Replace("runs-on: [self-hosted, linux]", "runs-on: ubuntu-latest")
+        
+        if($srcContent -ne $trgContent) {
+            Set-Content -Path $targetFileName -Value $srcContent
+            doCommit -fileName $fileName
+        }
+        
+    }
+    else {
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $fileName
+    }
 }
 
 function updateAndMergeFileAndCommit($srcRepo, $trgRepo, $fileName, $mergeFileName) {
