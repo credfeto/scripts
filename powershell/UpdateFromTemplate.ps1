@@ -244,7 +244,7 @@ function updateResharperSettings($srcRepo, $trgRepo) {
 
 function updateWorkFlowAndCommit($sourceRepo, $targetRepo, $fileName) {
     
-    if($targetRepo.Contains("cs-template") -eq $true) {
+    if($targetRepo.Contains("cs-template") -ne $true) {
         updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $fileName
         return
     }
@@ -254,10 +254,12 @@ function updateWorkFlowAndCommit($sourceRepo, $targetRepo, $fileName) {
 
     $targetMergeFileNameExists = Test-Path -Path $targetFileName
     if($targetMergeFileNameExists -eq $true) {
+        Write-Information "Performing update on $targetFileName with text replacements"
+            
         $srcContent = Get-Content -Path $sourceFileName -Raw
         $trgContent = Get-Content -Path $targetFileName -Raw
         
-        $updated = $srcContent.Replace("runs-on: [self-hosted, linux]", "runs-on: ubuntu-latest")
+        $srcContent = $srcContent.Replace("runs-on: [self-hosted, linux]", "runs-on: ubuntu-latest")
         
         if($srcContent -ne $trgContent) {
             Set-Content -Path $targetFileName -Value $srcContent
@@ -266,7 +268,14 @@ function updateWorkFlowAndCommit($sourceRepo, $targetRepo, $fileName) {
         
     }
     else {
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $fileName
+        Write-Information "Performing add on $targetFileName with text replacements"
+        
+        $srcContent = Get-Content -Path $sourceFileName -Raw
+        
+        $srcContent = $srcContent.Replace("runs-on: [self-hosted, linux]", "runs-on: ubuntu-latest")
+        
+        Set-Content -Path $targetFileName -Value $srcContent
+        doCommit -fileName $fileName
     }
 }
 
