@@ -252,7 +252,7 @@ function updateWorkFlowAndCommit($sourceRepo, $targetRepo, $fileName) {
     $sourceFileName = makePath -Path $sourceRepo -ChildPath $fileName
     $targetFileName = makePath -Path $targetRepo -ChildPath $fileName
 
-    $targetMergeFileNameExists = Test-Path -Path $targetMergeFileName
+    $targetMergeFileNameExists = Test-Path -Path $targetFileName
     if($targetMergeFileNameExists -eq $true) {
         $srcContent = Get-Content -Path $sourceFileName -Raw
         $trgContent = Get-Content -Path $targetFileName -Raw
