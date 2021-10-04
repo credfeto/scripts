@@ -533,6 +533,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     
     $obsoleteWorkflows = @(
         "cc.yml",
+        "codacy-analysis.yml",
         "linter.yml",
         "sqlcheck.yml",
         "tabtospace.yml",
