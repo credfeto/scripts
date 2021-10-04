@@ -17,8 +17,8 @@ function GlobalJson_Update
         [String] $targetFileName
     )
     $targetFreezeFileName = $targetFileName + ".freeze"
-    $trgFreexeExists = Test-Path -Path $targetFreezeFileName
-    if ($trgFreexeExists -eq $true)
+    $trgFreezeExists = Test-Path -Path $targetFreezeFileName
+    if ($trgFreezeExists -eq $true)
     {
         # no source to update
         Write-Information "* no global.json is frozen in target"
