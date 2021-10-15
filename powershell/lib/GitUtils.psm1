@@ -5,7 +5,7 @@ function GetRepoPath{
         [string] $repoPath
     )
 
-    if(string.IsNullOrWhiteSpace($repoPath)) {
+    if([string]::IsNullOrWhiteSpace($repoPath)) {
         $currentDir = Get-Location
         return $currentDir.Path
     }
