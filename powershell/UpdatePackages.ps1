@@ -314,7 +314,7 @@ ForEach($repo in $repoList) {
     processRepo -repo $repo -packages $packages -baseFolder $root
 }
 
-Set-Location $root
+Set-Location -Path $root
 
 Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
 

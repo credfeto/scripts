@@ -378,7 +378,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         Write-Information "Src Folder: $sourceCodeFolder"
 
         $codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
-        Set-Location $targetRepo
+        Set-Location -Path $targetRepo
         if ($codeOK -eq $true)
         {
             doCommit -fileName $fileName
@@ -672,3 +672,5 @@ Write-Information ""
 processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder -baseFolder $root -templateRepoHash $templateRepoHash
 
 Set-Location -Path $root
+
+Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"

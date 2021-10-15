@@ -264,3 +264,4 @@ ForEach($repo in $repoList) {
 
 Set-Location -Path $root
 
+Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
