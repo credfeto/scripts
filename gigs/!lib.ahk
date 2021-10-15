@@ -6,7 +6,7 @@
 ; ********************************************************
 ; Run program with full positioning
 ; ********************************************************
-EnsureRunningFull(Title, Exe, X, Y, Width, Height) {
+EnsureRunningFull(Title, Exe, X, Y, Width, Height, DelayInMsAfterStarting) {
 
     SetTitleMatchMode, 1
     if Not WinExist(Title) {
@@ -16,7 +16,7 @@ EnsureRunningFull(Title, Exe, X, Y, Width, Height) {
 	Run %Exe%, %WorkingDir%
 
 	; Sleep for x miliseconds
-	Sleep 2000
+	Sleep DelayInMsAfterStarting
     }
 
     if WinExist(Title) {
@@ -26,7 +26,7 @@ EnsureRunningFull(Title, Exe, X, Y, Width, Height) {
 	WinMove, , , X, Y, Width, Height
     }
     else {
-	MsgBox, %Title% Not running!
+;	MsgBox, %Title% Not running!
         Exit
     }
 }
@@ -38,6 +38,7 @@ EnsureRunning(Program) {
   IniRead, Top, Settings.ini, %Program%, Top
   IniRead, Width, Settings.ini, %Program%, Width
   IniRead, Height, Settings.ini, %Program%, Height
+  IniRead, DelayInMsAfterStarting, Settings.ini, %Program%, DelayInMsAfterStarting
 
-  EnsureRunningFull(Title, Exe, Left, Top, Width, Height)
+  EnsureRunningFull(Title, Exe, Left, Top, Width, Height, DelayInMsAfterStarting)
 }

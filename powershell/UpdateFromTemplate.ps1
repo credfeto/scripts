@@ -83,6 +83,8 @@ catch
 }
 #endregion
 
+$scriptsHash = Git-Get-HeadRev -repoPath $ScriptDirectory
+
 function makePath($Path, $ChildPath)
 {
     $ChildPath = convertToOsPath -path $ChildPath
@@ -458,7 +460,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
 
     $lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
     $currentRevision = Git-Get-HeadRev
-    $currentRevision = "$templateRepoHash/$currentRevision"
+    $currentRevision = "$scriptsHash/$templateRepoHash/$currentRevision"
 
     Write-Information "Last Revision:    $lastRevision"
     Write-Information "Current Revision: $currentRevision"

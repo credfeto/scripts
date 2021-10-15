@@ -1,8 +1,28 @@
 $env:GIT_REDIRECT_STDERR="2>&1"
 
+function GetRepoPath{
+    param(
+        [string] $repoPath
+    )
+
+    if(string.IsNullOrWhiteSpace($repoPath)) {
+        $currentDir = Get-Location
+        return $currentDir.Path
+    }
+    else {
+        return $repoPath
+    }
+}
+
 
 function Git-RemoveAllLocalBranches {
-    $result = git branch
+param(
+        [string] $repoPath
+    )
+
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    $result = git -C $repoPath branch
     foreach($branch in $result) {
         $branch = $branch.Trim()
         if(!$branch.StartsWith("* ")) {
@@ -12,26 +32,37 @@ function Git-RemoveAllLocalBranches {
 }
 
 function Git-ResetToMaster {
+param(
+        [string] $repoPath
+    )
+
+    $repoPath = GetRepoPath -repoPath $repoPath
 
     # junk any existing checked out files
-    git reset HEAD --hard
-    git clean -f -x -d
-    git checkout master
-    git reset HEAD --hard
-    git clean -f -x -d
-    git fetch
+    git -C $repoPath reset HEAD --hard
+    git -C $repoPath clean -f -x -d
+    git -C $repoPath checkout master
+    git -C $repoPath reset HEAD --hard
+    git -C $repoPath clean -f -x -d
+    git -C $repoPath fetch
 
     # NOTE Loses all local commmits on master
-    git reset --hard origin/master
-    git remote update origin --prune
-    git prune
-    git gc --aggressive --prune
+    git -C $repoPath reset --hard origin/master
+    git -C $repoPath remote update origin --prune
+    git -C $repoPath prune
+    git -C $repoPath gc --aggressive --prune
 
-    Git-RemoveAllLocalBranches
+    Git-RemoveAllLocalBranches -repoPath $repoPath
 }
 
 function Git-HasUnCommittedChanges {
-    git diff --no-patch --exit-code
+param(
+    [string] $repoPath
+    )
+
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    git -C $repoPath diff --no-patch --exit-code
     if(!$?) {
         return $true
     }
@@ -85,36 +116,46 @@ function Git-Commit {
 param(
     [string] $message
     )
-    
-    git add -A
-    git commit -m"$message"
+
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    git -C $repoPath add -A
+    git -C $repoPath commit -m"$message"
 }
 
 function Git-Commit-Named {
 param(
     [string] $message,
-    [String[]] $files
+    [String[]] $files,
+    [string] $repoPath
     )
-    
+
+    $repoPath = GetRepoPath -repoPath $repoPath
 
     foreach($file in $files) {
         $fileUnix = $file.Replace("\", "/")
         Write-Information "Staging $fileUnix"
-        git add $fileUnix
+        git -C $repoPath add $fileUnix
     }
 
     
     git commit -m"$message"
 }
 
-function Git-Push() 
-{
-    git push
+function Git-Push() {
+param(
+    [string] $repoPath
+    )
+
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    git -C $repoPath push
 }
 
 function Git-PushOrigin {
 param(
-    [string] $branchName
+    [string] $branchName,
+    [string] $repoPath
     )
     
     if($branchName -eq $null) {
@@ -125,16 +166,21 @@ param(
         throw "Invalid branch: [$branchName]"
     }
 
-    git push --set-upstream origin $branchName -v
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    git -C $repoPath push --set-upstream origin $branchName -v
 }
 
 
 function Git-DoesBranchExist {
 param(
-    [string] $branchName
+    [string] $branchName,
+    [string] $repoPath
     )
 
-    $result = git branch --remote
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    $result = git -C $repoPath branch --remote
 
     $regex = $branchName.replace(".", "\.") + "$"
 
@@ -156,16 +202,19 @@ param(
 
 function Git-CreateBranch {
 param(
-    [string] $branchName
+    [string] $branchName,
+    [string] $repoPath
     )
 
-    $branchExists = Git-DoesBranchExist -branchName $branchName
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    $branchExists = Git-DoesBranchExist -branchName $branchName -repoPath $repoPath
     if($branchExists -eq $true) {
         Write-Information "Failed to create branch $branchName - branch already exists"
         return $false
     }
 
-    git checkout -b $branchName
+    git -C $repoPath checkout -b $branchName
     if(!$?) {
         Write-Information "Failed to create branch $branchName - Create branch failed - Call failed."
         return $false
@@ -178,27 +227,42 @@ param(
 
 function Git-DeleteBranch {
 param(
-    [string] $branchName
+    [string] $branchName,
+    [string] $repoPath
     )
 
-    git branch -d $branchName
-    git push origin ":$branchName"
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    git -C $repoPath branch -d $branchName
+    git -C $repoPath push origin ":$branchName"
 
     return $true;
 }
 
 function Git-ReNormalise {
-    git add . --renormalize
-    $hasChanged = Git-HasUnCommittedChanges
+param(
+        [string] $repoPath
+    )
+
+    $repoPath = GetRepoPath -repoPath $repoPath
+    
+    git -C $repoPath add . --renormalize
+    $hasChanged = Git-HasUnCommittedChanges -repoPath $repoPath
     if($hasChanged -eq $true) {
-        git commit -m"Renormalised files"
-        git push
+        git -C $repoPath commit -m"Renormalised files"
+        git -C $repoPath push
     }
 }
 
 
 function Git-Get-HeadRev {
-    $result = git rev-parse HEAD
+param(
+    [string] $repoPath
+    )
+
+    $repoPath = GetRepoPath -repoPath $repoPath
+    
+    $result = git -C $repoPath rev-parse HEAD    
 
     if(!$?) {
         Write-Information "Failed to create branch $branchName - Create branch failed - Call failed."
