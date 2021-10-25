@@ -265,11 +265,36 @@ param(
     $result = git -C $repoPath rev-parse HEAD    
 
     if(!$?) {
-        Write-Information "Failed to create branch $branchName - Create branch failed - Call failed."
+        Write-Information "Failed to get head rev"
         return $null
     }
 
     return $result.Trim()
+}
+
+function Git-HasSubmodules {
+    param(
+        [string] $repoPath
+    )
+
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    $result = git -C $repoPath submodule
+
+    if(!$?) {
+        Write-Information "Failed to get submodules."
+        return $false
+    }
+
+    if($result -eq $null -or $result.Trim() -eq "")
+    {
+        return $false
+    }
+    
+    Write-Information "Submodules found:"
+    Write-Information $result
+
+    return $true
 }
 
 
@@ -298,3 +323,4 @@ Export-ModuleMember -Function Git-LoadRepoList
 Export-ModuleMember -Function Git-GetFolderForRepo
 Export-ModuleMember -Function Git-Get-HeadRev
 Export-ModuleMember -Function Git-ReNormalise
+Export-ModuleMember -Function Git-HasSubmodules
