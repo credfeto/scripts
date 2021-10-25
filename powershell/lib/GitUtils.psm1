@@ -107,7 +107,7 @@ param(
     else
     {
         Write-Information "Cloning..."
-        git clone $repo
+        git clone $repo --recurse-submodules
         Set-Location -Path $repofolder
     }
 }
