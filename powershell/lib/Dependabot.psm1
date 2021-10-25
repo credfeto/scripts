@@ -170,6 +170,27 @@ function pythonDependabotTemplate {
 "
 }
 
+function githubSubmodulesDependabotTemplate {
+    return "
+- package-ecosystem: gitsubmodule
+  directory: ""/""
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 99
+  reviewers:
+  - credfeto
+  assignees:
+  - credfeto
+  commit-message:
+    prefix: ""[FF-1429]""
+  rebase-strategy: ""auto""
+  labels:
+  - ""submodule""
+  - ""dependencies""
+  - ""Changelog Not Required""
+"
+}
+
 function makePath($Path, $ChildPath)
 {
     $ChildPath = convertToOsPath -path $ChildPath
@@ -192,7 +213,8 @@ function Dependabot-BuildConfig {
 param(
     [string] $configFileName,
     [string] $repoRoot,
-    [bool] $updateGitHubActions
+    [bool] $updateGitHubActions,
+    [bool] $hasSubModules
     )
 
     Write-Information "Building Dependabot Config:"
@@ -201,7 +223,15 @@ updates:
 "
     
     $newline = "`r`n"
-    
+
+    if($hasSubModules -eq $true)
+    {
+        Write-Information " --> Adding Git Submodules"
+        $templateContent = githubSubmodulesDependabotTemplate
+        $trgContent = $trgContent.Trim() + $newline + $newline
+        $trgContent = $trgContent + $templateContent
+    }
+
     $files = Get-ChildItem -Path $trgRepo -Filter *.csproj -Recurse
     if($files -ne $null) {
         Write-Information " --> Adding .NET"
