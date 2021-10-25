@@ -50,6 +50,7 @@ function dotNetDependabotTemplate {
   - dependency-name: ""Portable.BouncyCastle""
   - dependency-name: ""Profanity.Detector""
   - dependency-name: ""Roslynator.Analyzers""
+  - dependency-name: ""ScottPlot""
   - dependency-name: ""SonarAnalyzer.CSharp""
   - dependency-name: ""SourceLink.Create.CommandLine""
   - dependency-name: ""TeamCity.VSTest.TestAdapter""
