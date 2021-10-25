@@ -32,7 +32,7 @@ function DotNet-BuildClean {
 function DotNet-BuildRestore {
     try {
         Write-Information " * Restoring"
-        $result = dotnet restore -nodeReuse:False
+        $result = dotnet restore -nodeReuse:False -r linux-x64
         if(!$?) {
             Write-Information ">>> Restore Failed"
             DotNet-DumpOutput -result $result
