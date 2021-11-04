@@ -500,6 +500,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     
     #########################################################
     # C# file updates
+    $dotnetVersionUpdated = $false
     $srcPath = makePath -Path $repoFolder -ChildPath "src"
     $srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $true) {
@@ -508,7 +509,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
 
             # Process files in src folder
             updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
-            updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+            $dotnetVersionUpdated = updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
         }
         
         if($repoFolder.Contains("funfair")) {
@@ -613,8 +614,12 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
 
     buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
     removeLegacyDependabotConfig -trgRepo $repoFolder
-
+    
     Git-ReNormalise
+    
+    if($dotnetVersionUpdated -eq $true) {
+        Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"    
+    }
     
     Write-Information "Updating Tracking for $repo to $currentRevision"
     Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
