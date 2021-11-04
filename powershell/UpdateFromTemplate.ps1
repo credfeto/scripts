@@ -373,10 +373,17 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
 
     $updated = GlobalJson_Update -sourceFileName $sourceFileName -targetFileName $targetFileName
 
-    if ($updated -eq $true)
+    if ($updated.Update -eq $true)
     {
         $sourceCodeFolder = makePath -Path $targetRepo -ChildPath "src"
         Write-Information "Src Folder: $sourceCodeFolder"
+
+        if($updated.UpdatingVersion -eq $true)
+        {
+            $dotnetVersion = $updated.NewVersion
+            $changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
+            ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-1429" - message "Updated DotNet to $dotnetVersion"
+        }
 
         $codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
         Set-Location -Path $targetRepo
@@ -385,6 +392,8 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
             doCommit -fileName $fileName
             Git-Push
             Git-DeleteBranch -branchName $branchName
+            
+            return $true
         }
         else
         {
@@ -404,6 +413,8 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         Write-Information "Ensuring $branchName no longer exists"
         Git-DeleteBranch -branchName $branchName
     }
+    
+    return $false
 }
 
 function updateLabel($baseFolder) {

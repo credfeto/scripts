@@ -32,8 +32,11 @@ function GlobalJson_Update
         # no source to update
         Write-Information "* no global.json in template"
 
-        #(update: $false, isVersionUpdate: $false, newVersion: $null)
-        return $false
+        return [pscustomobject]@{
+            Update = $false
+            UpdatingVersion = $false
+            NewVersion = $null
+        }
     }
 
     $srcContent = Get-Content -Path $sourceFileName -Raw
@@ -48,8 +51,12 @@ function GlobalJson_Update
         if ($srcContent -eq $trgContent)
         {
             Write-Information "* target global.json same as source"
-            #(update: $false, isVersionUpdate: $false, newVersion: $null)
-            return $false
+            
+            return [pscustomobject]@{
+                Update = $false
+                UpdatingVersion = $false
+                NewVersion = $null
+            }
         }
 
         $trgGlobal = $trgContent | ConvertFrom-Json
@@ -61,16 +68,24 @@ function GlobalJson_Update
 
         if ($targetVersion -gt $sourceVersion) {
             Write-Information "* Target global.json specifies a newer version of .net ($targetVersion > $sourceVersion)"
-            #(update: $false, isVersionUpdate: $false, newVersion: $null)
-            return $false
+            
+            return [pscustomobject]@{
+                Update = $false
+                UpdatingVersion = $false
+                NewVersion = $null
+            }
         }
 
         if ($targetVersion -lt $sourceVersion) {
             Write-Information "* Target global.json specifies a older version of .net ($targetVersion) < $sourceVersion)"
 
             Set-Content -Path $targetFileName -Value $srcContent
-            #(update: $false, isVersionUpdate: $true, newVersion: $sourceVersion)
-            return $true
+
+            return [pscustomobject]@{
+                Update = $true
+                UpdatingVersion = $true
+                NewVersion = $sourceVersion
+            }
         }
     }
     else
@@ -80,8 +95,11 @@ function GlobalJson_Update
 
     Set-Content -Path $targetFileName -Value $srcContent
 
-    #(update: $false, isVersionUpdate: $false, newVersion: $null)
-    return $true
+    return [pscustomobject]@{
+        Update = $true
+        UpdatingVersion = $false
+        NewVersion = $null
+    }
 }
 
 Export-ModuleMember -Function GlobalJson_Update
