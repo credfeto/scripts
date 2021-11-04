@@ -395,6 +395,9 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
             $dotnetVersion = $updated.NewVersion
             $changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
             ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-1429" - message "Updated DotNet to $dotnetVersion"
+
+            # Change branch name so its obvious its a dotnet update rather than just a change to the file
+            $branchName = "depends/ff-1429/update-dotnet/$dotnetVersion/$fileName".Replace("\", "/")
         }
 
         $codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
@@ -409,7 +412,6 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         }
         else
         {
-            $branchName = "template/ff-1429/$fileName".Replace("\", "/")
             $branchOk = Git-CreateBranch -branchName $branchName
             if ($branchOk -eq $true)
             {
