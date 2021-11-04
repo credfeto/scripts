@@ -5,8 +5,11 @@ param(
     [string] $templateRepo = $(throw "Template repo")
 )
 
+Remove-Module *
+
 $InformationPreference = "Continue"
-$ErrorActionPreference = "Stop" 
+$ErrorActionPreference = "Stop"
+$preRelease = $False
 
 
 #########################################################################
@@ -41,6 +44,15 @@ try
 catch {
     Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: ChangeLog" 
+}
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "BuildVersion.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: BuildVersion"
 }
 
 try
@@ -618,9 +630,24 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     Git-ReNormalise
     
     if($dotnetVersionUpdated -eq $true) {
-        Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"    
+        Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
+        
+        if($repo.contains("credfeto")) {
+            $nextPatch = BuildVersion-GetNextPatch
+            if($nextPatch) {
+                $branch = "release/$nextPatch"
+
+                $branched = Git-CreateBranch -branchName $branch -repoPath $repoFolder
+                if($branch) {
+                    Git-PushOrigin -branchName $branch -repoPath $repoFolder
+                    Write-Host "*** Created new release branch $branch in $repo"
+                }
+            }
+        }
     }
-    
+
+    Git-ReNormalise
+
     Write-Information "Updating Tracking for $repo to $currentRevision"
     Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
 }
@@ -642,6 +669,22 @@ function processAll($repositoryList, $templateRepositoryFolder, $baseFolder, $te
 
         processRepo -srcRepo $templateRepoFolder -repo $gitRepository -baseFolder $baseFolder -templateRepoHash $templateRepoHash
     }
+}
+
+#########################################################################
+
+$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
+
+if($installed -eq $false) {
+    Write-Error ""
+    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install Credfeto.Changelog.Cmd']"
+}
+
+$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
+
+if($installed -eq $false) {
+    Write-Error ""
+    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
 }
 
 
