@@ -55,10 +55,14 @@ function GlobalJson_Update
         Write-Information "Source Version: $sourceVersion"
         Write-Information "Target Version: $targetVersion"
 
-        if ($trgGlobal.sdk.version -gt $srcGlobal.sdk.version)
-        {
-            Write-Information "* Target global.json specifies a newer version of .net"
+        if ($targetVersion -gt $sourceVersion) {
+            Write-Information "* Target global.json specifies a newer version of .net ($targetVersion > $sourceVersion)"
             return $false
+        }
+
+        if ($targetVersion -lt $sourceVersion) {
+            Write-Information "* Target global.json specifies a older version of .net ($targetVersion) < $sourceVersion)"
+            return $true
         }
     }
     else
