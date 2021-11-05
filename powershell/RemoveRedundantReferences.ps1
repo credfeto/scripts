@@ -203,14 +203,23 @@ foreach($file in $files) {
 
     foreach($node in $nodes)
     {
-        $previousNode = $node.Node.PreviousSibling
-        $parentNode = $node.Node.ParentNode
-        $parentNode.RemoveChild($node.Node) > $null
-
         if($node.Node.PrivateAssets)
         {
             continue
         }
+
+        if($node.Node.Include)
+        {
+            $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include
+            if($doNotRemove)
+            {
+                continue
+            }
+        }
+
+        $previousNode = $node.Node.PreviousSibling
+        $parentNode = $node.Node.ParentNode
+        $parentNode.RemoveChild($node.Node) > $null
         
         if($node.Node.Include)
         {
@@ -218,12 +227,6 @@ foreach($file in $files) {
 
             if($node.Node.Version)
             {
-                $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include
-                if($doNotRemove)
-                {
-                    continue
-                }
-
                 $existingChildInclude = $childPackageReferences | Where-Object { $_.Name -eq $node.Node.Include -and $_.Version -eq $node.Node.Version } | Select-Object -First 1
 
                 if ($existingChildInclude)
