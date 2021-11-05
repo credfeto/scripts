@@ -651,7 +651,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     if($dotnetVersionUpdated -eq $true) {
         Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
         
-        if($repo.contains("credfeto")) {
+        if($repo.contains("credfeto") -and !$repo.Contains("template")) {
             $nextPatch = BuildVersion-GetNextPatch
             if($nextPatch) {
                 ChangeLog-CreateRelease -fileName targetChangelogFile -release $nextPatch
