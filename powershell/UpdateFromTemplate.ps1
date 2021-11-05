@@ -411,8 +411,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         Set-Location -Path $targetRepo
         if ($codeOK -eq $true)
         {
-            if($updated.UpdatingVersion -eq $true)
-            {
+            if($updated.UpdatingVersion -eq $true) {
                 Git-Commit -message "FF-1429 - Updated DotNet to $dotnetVersion"
             }
             else {
@@ -429,8 +428,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
             if ($branchOk -eq $true)
             {
                 Write-Information "Create Branch $branchName"
-                if($updated.UpdatingVersion -eq $true)
-                {
+                if($updated.UpdatingVersion -eq $true) {
                     Git-Commit -message "FF-1429 - Updated DotNet to $dotnetVersion"
                 }
                 else {
