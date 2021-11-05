@@ -411,7 +411,13 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         Set-Location -Path $targetRepo
         if ($codeOK -eq $true)
         {
-            doCommit -fileName $fileName
+            if($updated.UpdatingVersion -eq $true)
+            {
+                Git-Commit -message "FF-1429 - Updated DotNet to $dotnetVersion"
+            }
+            else {
+                doCommit -fileName $fileName
+            }
             Git-Push
             Git-DeleteBranch -branchName $branchName
             
@@ -423,7 +429,13 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
             if ($branchOk -eq $true)
             {
                 Write-Information "Create Branch $branchName"
-                doCommit -fileName $fileName
+                if($updated.UpdatingVersion -eq $true)
+                {
+                    Git-Commit -message "FF-1429 - Updated DotNet to $dotnetVersion"
+                }
+                else {
+                    doCommit -fileName $fileName
+                }
                 Git-PushOrigin -branchName $branchName
             }
 
@@ -644,8 +656,11 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         if($repo.contains("credfeto")) {
             $nextPatch = BuildVersion-GetNextPatch
             if($nextPatch) {
+                ChangeLog-CreateRelease -fileName targetChangelogFile -release $nextPatch
+                Git-Commit-Named -message "Release notes for $nextPatch"
+                Git-Push --repoPath  $repoFolder
+                
                 $branch = "release/$nextPatch"
-
                 $branched = Git-CreateBranch -branchName $branch -repoPath $repoFolder
                 if($branch) {
                     Git-PushOrigin -branchName $branch -repoPath $repoFolder

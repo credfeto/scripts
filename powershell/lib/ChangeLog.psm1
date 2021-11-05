@@ -37,4 +37,23 @@ param(
     }
 }
 
+function ChangeLog-CreateRelease {
+    param(
+        [string] $fileName,
+        [string] $release
+    )
+
+    Write-Information ">>> Creating Changelog release notes for $release <<<"
+
+    dotnet changelog --changelog $fileName --create-release $release
+    if($?) {
+        Write-Information "* Changelog Updated"
+    }
+    else {
+        Write-Information "* Changelog NOT Updated"
+        throw "Failed to update changelog"
+    }
+}
+
 Export-ModuleMember -Function ChangeLog-AddEntry
+Export-ModuleMember -Function ChangeLog-CreateRelease
