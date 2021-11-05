@@ -11,6 +11,10 @@ param(
 function IsDoNotRemovePackage {
     param($PackageId)
 
+    if($PackageId -eq "FunFair.Test.Common") {
+        return $true
+    }
+    
     if($PackageId -eq "Microsoft.NET.Test.Sdk") {
         return $true
     }
