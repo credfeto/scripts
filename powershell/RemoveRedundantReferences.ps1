@@ -97,7 +97,7 @@ function Get-PackageReferences {
 }
 
 function BuildProject {
-    param($FileName)
+    param([string]$FileName, [bool]$FullError)
 
     do
     {
@@ -107,7 +107,10 @@ function BuildProject {
             $retry = $results.Contains("CSC : error AD0001:")
             if(!$retry)
             {
-                #Write-Host $results
+                if($FullError)
+                {
+                    Write-Host $results
+                }
                 return $false
             }
         }
@@ -182,7 +185,7 @@ foreach($file in $files) {
 
     $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
 
-    $buildOk = BuildProject -FileName $file.FullName
+    $buildOk = BuildProject -FileName $file.FullName -FullError $true
     if(!$buildOk) {
         Write-Output " * Does not build without changes"
         continue
@@ -253,7 +256,7 @@ foreach($file in $files) {
             continue
         }
 
-        $buildOk = BuildProject -FileName $file.FullName
+        $buildOk = BuildProject -FileName $file.FullName -FullError $false
         if($buildOk)
         {
             Write-Output "Building succeeded."
@@ -298,7 +301,7 @@ foreach($file in $files) {
 
     [System.IO.File]::WriteAllBytes($file.FullName, $rawFileContent)
 
-    $buildOk = BuildProject -FileName $file.FullName
+    $buildOk = BuildProject -FileName $file.FullName -FullError $true
     if(!$buildOk)
     {
         Write-Error "Failed to build $($file.FullName) after project file restore. Was project broken before?"
