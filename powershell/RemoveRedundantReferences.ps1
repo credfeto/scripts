@@ -36,6 +36,12 @@ function IsDoNotRemovePackage {
     }
 
     if($PackageId -eq "Secp256k1.Native") {
+        # Referenced but not in an obvious way
+        return $true
+    }
+    
+    if($PackageId -eq "Castle.Core") {
+        # Has bug fix
         return $true
     }
 
@@ -225,6 +231,7 @@ foreach($file in $files) {
         $parentNode = $node.Node.ParentNode
         $parentNode.RemoveChild($node.Node) > $null
         
+        $needToBuild = $true
         if($node.Node.Include)
         {
             $xml.Save($file.FullName)
@@ -236,7 +243,7 @@ foreach($file in $files) {
                 if ($existingChildInclude)
                 {
                     Write-Output "$( $file.Name ) references package $( $node.Node.Include ) ($( $node.Node.Version )) that is also referenced in child project $( $existingChildInclude.File )."
-                    continue
+                    $needToBuild = $false
                 }
                 else
                 {
@@ -250,7 +257,7 @@ foreach($file in $files) {
                 if($existingChildInclude)
                 {
                     Write-Output "$($file.Name) references project $($node.Node.Include) that is also referenced in child project $($existingChildInclude.File)."
-                    continue
+                    $needToBuild = $false
                 }
                 else
                 {
@@ -262,8 +269,15 @@ foreach($file in $files) {
         {
             continue
         }
-
-        $buildOk = BuildProject -FileName $file.FullName -FullError $false
+        
+        if($needToBuild) {
+            $buildOk = BuildProject -FileName $file.FullName -FullError $false    
+        }
+        else
+        {
+            $buildOk = $true
+        }
+        
         if($buildOk)
         {
             Write-Output "Building succeeded."
