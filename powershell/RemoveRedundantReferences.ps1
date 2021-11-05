@@ -35,6 +35,10 @@ function IsDoNotRemovePackage {
         return $true
     }
 
+    if($PackageId -eq "Secp256k1.Native") {
+        return $true
+    }
+
     return $false
 }
 
