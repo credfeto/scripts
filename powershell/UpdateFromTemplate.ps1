@@ -472,6 +472,22 @@ function updateLabel($baseFolder) {
     Git-Push
 }
 
+function MakeRelease($repo, $changeLog, $repoPath) {
+    
+    $nextPatch = BuildVersion-GetNextPatch
+    if($nextPatch) {
+        ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
+        Git-Commit-Named -message "Release notes for $nextPatch"
+        Git-Push --repoPath  $repoPath
+
+        $branch = "release/$nextPatch"
+        $branched = Git-CreateBranch -branchName $branch -repoPath $repoPath
+        if($branch) {
+            Git-PushOrigin -branchName $branch -repoPath $repoPath
+            Write-Host "*** Created new release branch $branch in $repo"
+        }
+    }
+}
 function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     
 
@@ -651,21 +667,20 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     if($dotnetVersionUpdated -eq $true) {
         Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
         
-        if($repo.contains("credfeto") -and !$repo.Contains("template")) {
-            $nextPatch = BuildVersion-GetNextPatch
-            if($nextPatch) {
-                ChangeLog-CreateRelease -fileName targetChangelogFile -release $nextPatch
-                Git-Commit-Named -message "Release notes for $nextPatch"
-                Git-Push --repoPath  $repoFolder
-                
-                $branch = "release/$nextPatch"
-                $branched = Git-CreateBranch -branchName $branch -repoPath $repoFolder
-                if($branch) {
-                    Git-PushOrigin -branchName $branch -repoPath $repoFolder
-                    Write-Host "*** Created new release branch $branch in $repo"
+        if(!$repo.Contains("template"))
+        {
+            if ($repo.contains("credfeto")) {
+                MakeRelease -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
+            }
+            else {
+                $publishable = DotNet-HasPublishableExe -srcFolder $srcPath
+                if (!$publishable -and !$repo.Contains("template"))
+                {
+                    MakeRelease -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
                 }
             }
         }
+        
     }
 
     Git-ReNormalise
