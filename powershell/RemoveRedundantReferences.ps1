@@ -188,10 +188,15 @@ $stopWatch = [System.Diagnostics.Stopwatch]::startNew()
 
 $obseletes = @()
 
+$projectCount = $files.Length
+$projectInstance = 0
+
 foreach($file in $files) {
 
+    $projectInstance = $projectInstance + 1
+    
     Write-Output ""
-    Write-Output "Testing project: $($file.Name)"
+    Write-Output "($projectInstance/$projectCount): Testing project: $($file.Name)"
 
     $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
 
