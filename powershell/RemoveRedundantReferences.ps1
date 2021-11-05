@@ -8,6 +8,33 @@ param(
 )
 
 
+function IsDoNotRemovePackage {
+    param($PackageId)
+
+    if($PackageId -eq "Microsoft.NET.Test.Sdk") {
+        return $true
+    }
+
+    if($PackageId -eq "NSubstitute") {
+        return $true
+    }
+
+    if($PackageId -eq "TeamCity.VSTest.TestAdapter") {
+        return $true
+    }
+
+    if($PackageId -eq "xunit") {
+        return $true
+    }
+
+    if($PackageId -eq "xunit.runner.visualstudio") {
+        return $true
+    }
+
+    return $false
+}
+
+
 function Get-PackageReferences {
     param($FileName, $IncludeReferences, $IncludeChildReferences)
 
@@ -23,6 +50,12 @@ function Get-PackageReferences {
             if($node.Node.Include)
             {
                 if($node.Node.PrivateAssets)
+                {
+                    continue
+                }
+
+                $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include
+                if($doNotRemove)
                 {
                     continue
                 }
@@ -80,8 +113,6 @@ function BuildProject {
         }
     }
     while($true)
-    
-    
 }
 
 function Get-ProjectReferences {
@@ -173,23 +204,29 @@ foreach($file in $files) {
         {
             continue
         }
-
+        
         if($node.Node.Include)
         {
             $xml.Save($file.FullName)
 
             if($node.Node.Version)
             {
+                $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include
+                if($doNotRemove)
+                {
+                    continue
+                }
+
                 $existingChildInclude = $childPackageReferences | Where-Object { $_.Name -eq $node.Node.Include -and $_.Version -eq $node.Node.Version } | Select-Object -First 1
 
-                if($existingChildInclude)
+                if ($existingChildInclude)
                 {
-                    Write-Output "$($file.Name) references package $($node.Node.Include) ($($node.Node.Version)) that is also referenced in child project $($existingChildInclude.File)."
+                    Write-Output "$( $file.Name ) references package $( $node.Node.Include ) ($( $node.Node.Version )) that is also referenced in child project $( $existingChildInclude.File )."
                     continue
                 }
                 else
                 {
-                    Write-Host -NoNewline "Building $($file.Name) without package $($node.Node.Include) ($($node.Node.Version))... "
+                    Write-Host -NoNewline "Building $( $file.Name ) without package $( $node.Node.Include ) ($( $node.Node.Version ))... "
                 }
             }
             else
