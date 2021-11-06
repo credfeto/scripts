@@ -231,48 +231,46 @@ foreach($file in $files) {
                 continue
             }
         }
+        else {
+            continue
+        }
+        
 
         $previousNode = $node.Node.PreviousSibling
         $parentNode = $node.Node.ParentNode
         $parentNode.RemoveChild($node.Node) > $null
         
         $needToBuild = $true
-        if($node.Node.Include)
+        
+        $xml.Save($file.FullName)
+
+        if($node.Node.Version)
         {
-            $xml.Save($file.FullName)
+            $existingChildInclude = $childPackageReferences | Where-Object { $_.Name -eq $node.Node.Include -and $_.Version -eq $node.Node.Version } | Select-Object -First 1
 
-            if($node.Node.Version)
+            if ($existingChildInclude)
             {
-                $existingChildInclude = $childPackageReferences | Where-Object { $_.Name -eq $node.Node.Include -and $_.Version -eq $node.Node.Version } | Select-Object -First 1
-
-                if ($existingChildInclude)
-                {
-                    Write-Output "$( $file.Name ) references package $( $node.Node.Include ) ($( $node.Node.Version )) that is also referenced in child project $( $existingChildInclude.File )."
-                    $needToBuild = $false
-                }
-                else
-                {
-                    Write-Host -NoNewline "Building $( $file.Name ) without package $( $node.Node.Include ) ($( $node.Node.Version ))... "
-                }
+                Write-Output "$( $file.Name ) references package $( $node.Node.Include ) ($( $node.Node.Version )) that is also referenced in child project $( $existingChildInclude.File )."
+                $needToBuild = $false
             }
             else
             {
-                $existingChildInclude = $childProjectReferences | Where-Object { $_.Name -eq $node.Node.Include } | Select-Object -First 1
-
-                if($existingChildInclude)
-                {
-                    Write-Output "$($file.Name) references project $($node.Node.Include) that is also referenced in child project $($existingChildInclude.File)."
-                    $needToBuild = $false
-                }
-                else
-                {
-                    Write-Host -NoNewline "Building $($file.Name) without project $($node.Node.Include)... "
-                }
+                Write-Host -NoNewline "Building $( $file.Name ) without package $( $node.Node.Include ) ($( $node.Node.Version ))... "
             }
         }
         else
         {
-            continue
+            $existingChildInclude = $childProjectReferences | Where-Object { $_.Name -eq $node.Node.Include } | Select-Object -First 1
+
+            if($existingChildInclude)
+            {
+                Write-Output "$($file.Name) references project $($node.Node.Include) that is also referenced in child project $($existingChildInclude.File)."
+                $needToBuild = $false
+            }
+            else
+            {
+                Write-Host -NoNewline "Building $($file.Name) without project $($node.Node.Include)... "
+            }
         }
         
         if($needToBuild) {
