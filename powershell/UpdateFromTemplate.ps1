@@ -412,15 +412,16 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         if ($codeOK -eq $true)
         {
             if($updated.UpdatingVersion -eq $true) {
+                Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
                 Git-Commit -message "FF-1429 - Updated DotNet to $dotnetVersion"
+                Git-Push
+                Git-DeleteBranch -branchName $branchName
+                
+                return $true
             }
             else {
                 doCommit -fileName $fileName
             }
-            Git-Push
-            Git-DeleteBranch -branchName $branchName
-            
-            return $updated.UpdatingVersion
         }
         else
         {
