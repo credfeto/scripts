@@ -7,6 +7,8 @@ param(
     [string] $solutionDirectory = $(throw "Directory containing projects")
 )
 
+$InformationPreference = "Continue"
+
 
 function IsDoNotRemovePackage {
     param($PackageId)
@@ -113,19 +115,19 @@ function BuildProject {
     {
         $results = dotnet build $file.FullName -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
         if(!$?) {
-            #Write-Host "**** FAILED ****"
-            $retry = $results.Contains("CSC : error AD0001:")
+            #Write-Information "**** FAILED ****"
+            $retry = $results.Contains("AD0001")
             if(!$retry)
             {
                 if($FullError)
                 {
-                    Write-Host $results
+                    Write-Information $results
                 }
                 return $false
             }
         }
         else {
-            #Write-Host "**** SUCCESS ****" 
+            #Write-Information "**** SUCCESS ****" 
             return $true
         }
     }
@@ -174,6 +176,39 @@ function Get-ProjectReferences {
     return $references
 }
 
+function ShouldHaveNarrowerPackageReference {
+    param([string]$ProjectFolder, [string]$PackageId)
+
+    if(!$PackageId.StartsWith("FunFair.")) {
+        # not a package we control
+        return $false
+    }
+    
+    if($PackageId.EndsWith(".All")){
+        # This is explicitly a grouping package
+        return $false
+    }
+
+    $sourceFiles = Get-ChildItem -Path $ProjectFolder -Filter *.cs -Recurse
+    
+    $search = "using $PackageId"
+    Write-Information "Looking for $search"
+    foreach($file in $sourceFiles) {
+        Write-Information $file.FullName
+        $content = Get-Content $file.FullName -Raw
+        
+        if($content.Contains("using $PackageId"))
+        {
+            Write-Information "* Found $PackageId source reference in project"
+            return $false
+        }
+    }
+    
+    Write-Information "* Did not Find $PackageId source reference in project"
+    
+    return $true
+}
+
 
 $files = Get-ChildItem -Path $solutionDirectory -Filter *.csproj -Recurse
 
@@ -187,6 +222,7 @@ Write-Output "Number of projects: $($files.Length)"
 $stopWatch = [System.Diagnostics.Stopwatch]::startNew()
 
 $obseletes = @()
+$reduceReferences = @()
 
 $projectCount = $files.Length
 $projectInstance = 0
@@ -306,6 +342,23 @@ foreach($file in $files) {
         else
         {
             Write-Output "Building failed."
+            if($node.Node.Version)
+            {
+                $narrower = ShouldHaveNarrowerPackageReference -ProjectFolder $file.Directory.FullName -PackageId $node.Node.Include
+                if($narrower)
+                {
+                    $reduceReferences += [PSCustomObject]@{
+                        File = $file;
+                        Type = 'Package';
+                        Name = $node.Node.Include;
+                        Version = $node.Node.Version;
+                    }
+                } 
+            }
+            else {
+                # TODO: Check project references?
+                #Write-Output "---- do not Check References"
+            }
         }
 
 
@@ -337,7 +390,9 @@ Write-Output ""
 Write-Output "-------------------------------------------------------------------------"
 Write-Output "Analyse completed in $($stopWatch.Elapsed.TotalSeconds) seconds"
 Write-Output "$($obseletes.Length) reference(s) could potentially be removed."
+Write-Output "$($reduceReferences.Length) reference(s) could potentially be switched to different packages."
 
+Write-Output "Obsolete:"
 $previousFile = $null
 foreach($obselete in $obseletes)
 {
@@ -353,8 +408,31 @@ foreach($obselete in $obseletes)
     }
     else
     {
-        Write-Output "* Project refence: $($obselete.Name)"
+        Write-Output "* Project reference: $($obselete.Name)"
     }
 
     $previousFile = $obselete.File
+}
+
+Write-Output ""
+Write-Output "Reduce Scope:"
+$previousFile = $null
+foreach($reduce in $reduceReferences)
+{
+    if($previousFile -ne $reduce.File)
+    {
+        Write-Output ""
+        Write-Output "Project: $($reduce.File.Name)"
+    }
+
+    if($reduce.Type -eq 'Package')
+    {
+        Write-Output "* Package reference: $($reduce.Name) ($($reduce.Version))"
+    }
+    else
+    {
+        Write-Output "* Project reference: $($reduce.Name)"
+    }
+
+    $previousFile = $reduce.File
 }
