@@ -420,7 +420,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
             Git-Push
             Git-DeleteBranch -branchName $branchName
             
-            return $true
+            return $updated.UpdatingVersion
         }
         else
         {
