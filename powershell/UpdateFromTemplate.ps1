@@ -687,6 +687,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         
     }
 
+    Git-ResetToMaster
     Git-ReNormalise
 
     Write-Information "Updating Tracking for $repo to $currentRevision"
