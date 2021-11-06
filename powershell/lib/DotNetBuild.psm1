@@ -340,3 +340,4 @@ param(
 }
 
 Export-ModuleMember -Function DotNet-BuildSolution
+Export-ModuleMember -Function DotNet-HasPublishableExe
