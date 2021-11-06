@@ -677,7 +677,10 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
                 $publishable = DotNet-HasPublishableExe -srcFolder $srcPath
                 if (!$publishable -and !$repo.Contains("template"))
                 {
-                    MakeRelease -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
+                    Write-Information "**** MAKE RELEASE ****"
+                    Write-Information "Changelog: $targetChangelogFile"
+                    Write-Information "Repo: $repoFolder"
+                    # MakeRelease -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
                 }
             }
         }
