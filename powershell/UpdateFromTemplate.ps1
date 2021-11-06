@@ -580,7 +580,6 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     $workflows = makePath -Path $srcRepo -ChildPath ".github\workflows"
     Write-Information "Looking for Workflows in $workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml -File -Attributes Normal, Hidden
-    Write-Information $files
     ForEach ($file in $files)
     {
         $srcFileName = $file.FullName
@@ -641,9 +640,8 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
 
 
     $linters = makePath -Path $srcRepo -ChildPath ".github\linters"
-    Write-Information "Looking for Workflows in $linters"
+    Write-Information "Looking for Lint config in $linters"
     $files = Get-ChildItem -Path $linters -File -Attributes Normal, Hidden
-    Write-Information $files
     ForEach ($file in $files)
     {
         $srcFileName = $file.FullName
