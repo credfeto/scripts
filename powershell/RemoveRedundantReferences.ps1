@@ -121,7 +121,7 @@ function BuildProject {
             {
                 if($FullError)
                 {
-                    Write-Information $results
+                    Write-Host $results
                 }
                 return $false
             }
@@ -197,9 +197,8 @@ function ShouldHaveNarrowerPackageReference {
         Write-Information $file.FullName
         $content = Get-Content $file.FullName -Raw
         
-        if($content.Contains("using $PackageId"))
+        if($content.Contains($search))
         {
-            Write-Information "* Found $PackageId source reference in project"
             return $false
         }
     }
