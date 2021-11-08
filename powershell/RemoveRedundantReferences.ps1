@@ -9,6 +9,23 @@ param(
 
 $InformationPreference = "Continue"
 
+function ExtractProjectFromReference {
+    param([string]$reference)
+
+    $last = $reference.LastIndexOf("\")
+    if($last -gt -1) {
+        $last = $last + 1
+
+        $res = $reference.SubString($last, $reference.Length - $last)
+
+        if($res.EndsWith(".csproj")) {
+            $res = $res.Substring(0, $res.Length - 7)
+            return $res
+        }
+    }
+
+    return $null
+}
 
 function IsDoNotRemovePackage {
     param($PackageId)
@@ -111,17 +128,20 @@ function Get-PackageReferences {
 function BuildProject {
     param([string]$FileName, [bool]$FullError)
 
+    $errorCode = "AD0001"
+    $NewLine = [System.Environment]::NewLine
     do
     {
         $results = dotnet build $file.FullName -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
         if(!$?) {
+            $resultsAsText = $results -join $NewLine
             #Write-Information "**** FAILED ****"
-            $retry = $results.Contains("AD0001")
+            $retry = $resultsAsText.Contains($errorCode) 
             if(!$retry)
             {
                 if($FullError)
                 {
-                    Write-Host $results
+                    Write-Error $resultsAsText
                 }
                 return $false
             }
@@ -238,7 +258,7 @@ foreach($file in $files) {
     $buildOk = BuildProject -FileName $file.FullName -FullError $true
     if(!$buildOk) {
         Write-Output " * Does not build without changes"
-        continue
+        throw "Failed to build a project"
     }
     
     $childPackageReferences = Get-PackageReferences $file.FullName $false $true
@@ -355,8 +375,20 @@ foreach($file in $files) {
                 } 
             }
             else {
-                # TODO: Check project references?
-                #Write-Output "---- do not Check References"
+                $packageId = ExtractProjectFromReference -paclageId $node.Node.Include
+                if($packageId)
+                {
+                    $narrower = ShouldHaveNarrowerPackageReference -ProjectFolder $file.Directory.FullName -PackageId $packageId
+                    if ($narrower)
+                    {
+                        $reduceReferences += [PSCustomObject]@{
+                            File = $file;
+                            Type = 'Project';
+                            Name = $node.Node.Include;
+                            Version = $node.Node.Version;
+                        }
+                    }
+                }
             }
         }
 
