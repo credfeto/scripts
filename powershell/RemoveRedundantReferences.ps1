@@ -467,3 +467,6 @@ foreach($reduce in $reduceReferences)
 
     $previousFile = $reduce.File
 }
+
+# No obsoletes then exit code = 0 = Success
+Exit $obseletes.Length
