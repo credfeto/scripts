@@ -668,17 +668,23 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         
         if(!$repo.Contains("template"))
         {
-            if ($repo.contains("credfeto")) {
+            if ($repo.Contains("credfeto")) {
+                Write-Information "**** MAKE RELEASE ****"
+                Write-Information "Changelog: $targetChangelogFile"
+                Write-Information "Repo: $repoFolder"
                 MakeRelease -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
             }
             else {
-                $publishable = DotNet-HasPublishableExe -srcFolder $srcPath
-                if (!$publishable -and !$repo.Contains("template"))
+                if(!$repo.Contains("server-content-package"))
                 {
-                    Write-Information "**** MAKE RELEASE ****"
-                    Write-Information "Changelog: $targetChangelogFile"
-                    Write-Information "Repo: $repoFolder"
-                    # MakeRelease -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
+                    $publishable = DotNet-HasPublishableExe -srcFolder $srcPath
+                    if (!$publishable -and !$repo.Contains("template"))
+                    {
+                        Write-Information "**** MAKE RELEASE ****"
+                        Write-Information "Changelog: $targetChangelogFile"
+                        Write-Information "Repo: $repoFolder"
+                        MakeRelease -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
+                    }
                 }
             }
         }
