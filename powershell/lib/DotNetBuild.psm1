@@ -47,64 +47,116 @@ function DotNet-BuildRestore {
     }
 }
 
+
+function BuildProject {
+    param([string]$FileName, [bool]$FullError)
+
+    $errorCode = "AD0001"
+    $NewLine = [System.Environment]::NewLine
+    do
+    {
+        $results = dotnet build $file.FullName -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
+        if(!$?) {
+            $resultsAsText = $results -join $NewLine
+            #Write-Information "**** FAILED ****"
+            $retry = $resultsAsText.Contains($errorCode)
+            if(!$retry)
+            {
+                if($FullError)
+                {
+                    Write-Error $resultsAsText
+                }
+                return $false
+            }
+        }
+        else {
+            #Write-Information "**** SUCCESS ****" 
+            return $true
+        }
+    }
+    while($true)
+}
+
+
 function DotNet-Build {
-    try {
-        Write-Information " * Building"
+
+    $errorCode = "AD0001"
+    $NewLine = [System.Environment]::NewLine
+
+    Write-Information " * Building"
+    do {
         $result = dotnet build --configuration=Release --no-restore -warnAsError -nodeReuse:False /p:Version=0.0.0.1-do-not-distribute
         if(!$?) {
-            Write-Information ">>> Build Failed"
-            DotNet-DumpOutput -result $result
-            
-            return $false
+            $resultsAsText = $results -join $NewLine
+            $retry = $resultsAsText.Contains($errorCode)
+            if (!$retry) {
+                Write-Information ">>> Build Failed"
+                DotNet-DumpOutput -result $result
+                return $false
+            }
         }
+        else {
+            Write-Information "   - Build Succeded"
 
-        Write-Information "   - Build Succeded"
-
-        return $true
-    } catch  {
-        Write-Information ">>> Build Failed"
-        return $false
+            return $true
+        }
     }
+    while($true)
 }
 
 function DotNet-Pack {
-    try {
-        Write-Information " * Packing"
+    $errorCode = "AD0001"
+    $NewLine = [System.Environment]::NewLine
+
+    Write-Information " * Packing"
+    do {
         $result = dotnet pack --configuration=Release --no-build --no-restore -nodeReuse:False /p:Version=0.0.0.1-do-not-distribute
         if(!$?) {
-            Write-Information ">>> Packing Failed"
-            DotNet-DumpOutput -result $result
+            $resultsAsText = $results -join $NewLine
+            $retry = $resultsAsText.Contains($errorCode)
+            if (!$retry) {
+                Write-Information ">>> Packing Failed"
+                DotNet-DumpOutput -result $result
 
-            return $false
+                return $false
+            }
         }
+        else {
+            Write-Information "   - Packing Succeded"
 
-        Write-Information "   - Packing Succeded"
-
-        return $true
-    } catch  {
-        Write-Information ">>> Packing Failed"
-        return $false
+            return $true
+        }
     }
+    while($true)
 }
 
 function DotNet-Publish {
-    try {
-        Write-Information " * Publishing"
-        $result = dotnet publish --configuration Release --no-restore -r linux-x64 --self-contained:true /p:PublishSingleFile=true /p:PublishReadyToRun=False /p:PublishReadyToRunShowWarnings=true /p:PublishTrimmed=False /p:DisableSwagger=False /p:TreatWarningsAsErrors=true /p:Version=0.0.0.1-do-not-distribute /warnaserror /p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
-        if(!$?) {
-            Write-Information ">>> Publishing Failed"
-            DotNet-DumpOutput -result $result
+    $errorCode = "AD0001"
+    $NewLine = [System.Environment]::NewLine
 
-            return $false
+    Write-Information " * Publishing"
+    do
+    {
+        $result = dotnet publish --configuration Release --no-restore -r linux-x64 --self-contained: true /p:PublishSingleFile = true /p:PublishReadyToRun = False /p:PublishReadyToRunShowWarnings = true /p:PublishTrimmed = False /p:DisableSwagger = False /p:TreatWarningsAsErrors = true /p:Version = 0.0.0.1-do-not-distribute /warnaserror /p:IncludeNativeLibrariesForSelfExtract = false -nodeReuse:False
+        if (!$?)
+        {
+            $resultsAsText = $results -join $NewLine
+            $retry = $resultsAsText.Contains($errorCode)
+            if (!$retry)
+            {
+                Write-Information ">>> Publishing Failed"
+                DotNet-DumpOutput -result $result
+
+                return $false
+            }
         }
-
-        Write-Information "   - Publishing Succeded"
-
-        return $true
-    } catch  {
-        Write-Information ">>> Publishing Failed"
-        return $false
+        else
+        {
+            Write-Information "   - Publishing Succeded"
+            return $true
+        }
     }
+    while($true)
 }
 
 function DotNet-BuildRunUnitTestsLinux {
