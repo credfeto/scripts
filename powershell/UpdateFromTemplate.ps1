@@ -489,6 +489,31 @@ function MakeRelease($repo, $changeLog, $repoPath) {
         }
     }
 }
+
+function ShouldAlwaysCreatePatchRelease($repo) {
+    if($repo.Contains("template")) {
+        return $false
+    }
+        
+    if($repo.Contains("credfeto")) {
+        return $true
+    }
+
+    if($repo.Contains("BuildBot")) {
+        return $true
+    }
+
+    if($repo.Contains("CoinBot")) {
+        return $true
+    }
+
+    if($repo.Contains("funfair-server-balance-bot")) {
+        return $true
+    }
+
+    return $false
+}
+
 function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     
 
@@ -668,7 +693,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
         
         if(!$repo.Contains("template"))
         {
-            if ($repo.Contains("credfeto")) {
+            if (ShouldAlwaysCreatePatchRelease -repo $repo) {
                 Write-Information "**** MAKE RELEASE ****"
                 Write-Information "Changelog: $targetChangelogFile"
                 Write-Information "Repo: $repoFolder"
