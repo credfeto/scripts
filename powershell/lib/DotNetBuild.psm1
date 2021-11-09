@@ -47,37 +47,6 @@ function DotNet-BuildRestore {
     }
 }
 
-
-function BuildProject {
-    param([string]$FileName, [bool]$FullError)
-
-    $errorCode = "AD0001"
-    $NewLine = [System.Environment]::NewLine
-    do
-    {
-        $results = dotnet build $file.FullName -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
-        if(!$?) {
-            $resultsAsText = $results -join $NewLine
-            #Write-Information "**** FAILED ****"
-            $retry = $resultsAsText.Contains($errorCode)
-            if(!$retry)
-            {
-                if($FullError)
-                {
-                    Write-Error $resultsAsText
-                }
-                return $false
-            }
-        }
-        else {
-            #Write-Information "**** SUCCESS ****" 
-            return $true
-        }
-    }
-    while($true)
-}
-
-
 function DotNet-Build {
 
     $errorCode = "AD0001"
@@ -160,42 +129,59 @@ function DotNet-Publish {
 }
 
 function DotNet-BuildRunUnitTestsLinux {
-    try {
-        Write-Information " * Unit Tests"
-        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration
-        if(!$?) {
-            Write-Information ">>> Tests Failed"
-            DotNet-DumpOutput -result $result
-            return $false
-        }
+    $errorCode = "AD0001"
+    $NewLine = [System.Environment]::NewLine
 
-        Write-Information "   - Tests Succeded"
-        return $true
-    } catch  {
-        Write-Information ">>> Tests Failed"
-        return $false
+    Write-Information " * Unit Tests"
+    do
+    {
+        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration
+        if (!$?)
+        {
+            $resultsAsText = $results -join $NewLine
+            $retry = $resultsAsText.Contains($errorCode)
+            if (!$retry)
+            {
+                Write-Information ">>> Tests Failed"
+                DotNet-DumpOutput -result $result
+                return $false
+            }
+        }
+        else
+        {
+            Write-Information "   - Tests Succeded"
+            return $true
+        }            
     }
+    while($true)
 }
 
 function DotNet-BuildRunUnitTestsWindows {
-    try {
+    $errorCode = "AD0001"
+    $NewLine = [System.Environment]::NewLine
 
-        Write-Information " * Unit Tests"
+    Write-Information " * Unit Tests"
+    do
+    {
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration
-        if(!$?) {
-            # Didn't Build
-            Write-Information ">>> Tests Failed"
-            DotNet-DumpOutput -result $result
-            return $false
+        if (!$?)
+        {
+            $resultsAsText = $results -join $NewLine
+            $retry = $resultsAsText.Contains($errorCode)
+            if (!$retry)
+            {
+                Write-Information ">>> Tests Failed"
+                DotNet-DumpOutput -result $result
+                return $false
+            }
         }
-
-        Write-Information "   - Tests Succeded"
-        return $true
-    } catch  {
-        # Didn't Build
-        Write-Information ">>> Tests Failed"
-        return $false
+        else
+        {
+            Write-Information "   - Tests Succeded"
+            return $true
+        }
     }
+    while($true)
 }
 
 function DotNet-BuildRunUnitTests {
@@ -207,23 +193,31 @@ function DotNet-BuildRunUnitTests {
 }
 
 function DotNet-BuildRunIntegrationTests {
-    try {
-        Write-Information " * Unit Tests and Integration Tests"
-        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False
-        if(!$?) {
-            # Didn't Build
-            Write-Information ">>> Tests Failed"
-            DotNet-DumpOutput -result $result
-            return $false;
-        }
+    $errorCode = "AD0001"
+    $NewLine = [System.Environment]::NewLine
 
-        Write-Information "   - Tests Succeded"
-        return $true
-    } catch  {
-        # Didn't Build
-        Write-Information ">>> Tests Failed"
-        return $false
+    Write-Information " * Unit Tests and Integration Tests"
+    do
+    {
+        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False
+        if (!$?)
+        {
+            $resultsAsText = $results -join $NewLine
+            $retry = $resultsAsText.Contains($errorCode)
+            if (!$retry)
+            {
+                Write-Information ">>> Tests Failed"
+                DotNet-DumpOutput -result $result
+                return $false
+            }
+        }
+        else
+        {
+            Write-Information "   - Tests Succeded"
+            return $true
+        }
     }
+    while($true)
 }
 
 function DotNet-HasPackable {
