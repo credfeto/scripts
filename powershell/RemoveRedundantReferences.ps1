@@ -137,7 +137,7 @@ function BuildProject {
     $NewLine = [System.Environment]::NewLine
     do
     {
-        $results = dotnet build $file.FullName -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
+        $results = dotnet build $file.FullName -warnAsError -nodeReuse:False --no-restore /p:SolutionDir=$solutionDirectory
         if(!$?) {
             $resultsAsText = $results -join $NewLine
             #Write-Information "**** FAILED ****"
