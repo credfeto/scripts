@@ -163,17 +163,17 @@ function ShouldAlwaysCreatePatchRelease($repo) {
         return $true
     }
 
-#    if($repo.Contains("BuildBot")) {
-#        return $true
-#    }
+    if($repo.Contains("BuildBot")) {
+        return $true
+    }
 
-#    if($repo.Contains("CoinBot")) {
-#        return $true
-#    }
+    if($repo.Contains("CoinBot")) {
+        return $true
+    }
 
-#    if($repo.Contains("funfair-server-balance-bot")) {
-#        return $true
-#    }
+    if($repo.Contains("funfair-server-balance-bot")) {
+        return $true
+    }
 
     return $false
 }
