@@ -381,7 +381,7 @@ function processRepo($repo, $packages, $baseFolder)
                     Write-Information "**** MAKE RELEASE ****"
                     Write-Information "Changelog: $changeLog"
                     Write-Information "Repo: $repoFolder"
-                    #MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
+                    MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
                 }
                 else {
                     if(!$repo.Contains("server-content-package"))
