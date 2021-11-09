@@ -401,7 +401,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         {
             $dotnetVersion = $updated.NewVersion
             $changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
-            ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-1429" -message "Updated DotNet to $dotnetVersion"
+            ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-1429" -message "Updated DotNet SDK to $dotnetVersion"
 
             # Change branch name so its obvious its a dotnet update rather than just a change to the file
             $branchName = "depends/ff-1429/update-dotnet/$dotnetVersion/$fileName".Replace("\", "/")
