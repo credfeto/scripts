@@ -64,6 +64,11 @@ function IsDoNotRemovePackage {
         return $true
     }
 
+    if($PackageId.StartsWith("LibSassHost.Native.") {
+        # Referenced but not in an obvious way
+        return $true
+    }
+
     return $false
 }
 
