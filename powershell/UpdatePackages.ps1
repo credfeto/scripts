@@ -12,6 +12,7 @@ $ErrorActionPreference = "Stop"
 $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = $False
 $root = Get-Location
+$autoReleasePendingPackages = 5
 Write-Information $root
 
 
@@ -153,6 +154,67 @@ function BuildSolution([String]$srcPath, [String]$baseFolder, [String]$currentVe
     }
 }
 
+function ShouldAlwaysCreatePatchRelease($repo) {
+    if($repo.Contains("template")) {
+        return $false
+    }
+
+    if($repo.Contains("credfeto")) {
+        return $true
+    }
+
+#    if($repo.Contains("BuildBot")) {
+#        return $true
+#    }
+
+#    if($repo.Contains("CoinBot")) {
+#        return $true
+#    }
+
+#    if($repo.Contains("funfair-server-balance-bot")) {
+#        return $true
+#    }
+
+    return $false
+}
+
+function IsAllAutoUpdates {
+    param($releaseNotes)
+
+    $updateCount = 0
+
+    $hasContent = $false
+    foreach($line in $releaseNotes) {
+
+        if($line.StartsWith("#")) {
+            continue
+        }
+
+        $hasContent = $true
+
+        #if($line.StartsWith(" - FF-1429 - ")) {
+        if($line -match "^\s*\-\s*FF\-1429\s*\-\s*") {
+            # Package Update
+            $updateCount += 1
+            continue
+        }
+
+        if($line -match "^\s*\-\s*FF\-368\s*\-\s*") {
+            # GEO-IP update
+            $updateCount += 1
+            continue
+        }
+
+        return 0
+    }
+
+    if($hasContent) {
+        return $updateCount
+    }
+
+    return 0
+}
+
 function processRepo($repo, $packages, $baseFolder)
 {
 
@@ -222,6 +284,9 @@ function processRepo($repo, $packages, $baseFolder)
         Write-Information "* WARNING: Solution doesn't build without any changes - no point in trying to update packages"
         return;
     }
+    
+    $branchesCreated = 0
+    $packagesUpdated = 0
 
     ForEach ($package in $packages)
     {
@@ -240,6 +305,7 @@ function processRepo($repo, $packages, $baseFolder)
             Continue
         }
 
+        $packagesUpdated += 1
         $branchName = "depends/ff-1429/update-$packageId/$update"
         $branchExists = Git-DoesBranchExist -branchName $branchName
         if(!$branchExists) {
@@ -267,6 +333,8 @@ function processRepo($repo, $packages, $baseFolder)
                     ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                     Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
                     Git-PushOrigin -branchName $branchName
+
+                    $branchesCreated += 1
                 } else {
                     Write-Information ">>> ERROR: FAILED TO CREATE BRANCH <<<"
                 }
@@ -277,6 +345,42 @@ function processRepo($repo, $packages, $baseFolder)
         }
  
         Git-ResetToMaster        
+    }
+    
+    Write-Information "Updated run created $branchesCreated branches"
+    Write-Information "Updated run updated $packagesUpdated packages"
+    
+    if($branchesCreated -eq 0) {
+        # no branches created - check to see if we can create a release
+        
+        if(!$repo.Contains("template")) {
+            $releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
+            $autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes
+            
+            if( $autoUpdateCount -gt $autoReleasePendingPackages) {
+                # At least $autoReleasePendingPackages auto updates... consider creating a release
+            
+                if (ShouldAlwaysCreatePatchRelease -repo $repo) {
+                    Write-Information "**** MAKE RELEASE ****"
+                    Write-Information "Changelog: $changeLog"
+                    Write-Information "Repo: $repoFolder"
+                    #MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
+                }
+                else {
+                    if(!$repo.Contains("server-content-package"))
+                    {
+                        $publishable = DotNet-HasPublishableExe -srcFolder $srcPath
+                        if (!$publishable -and !$repo.Contains("template"))
+                        {
+                            Write-Information "**** MAKE RELEASE ****"
+                            Write-Information "Changelog: $changeLog"
+                            Write-Information "Repo: $repoFolder"
+                            #MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

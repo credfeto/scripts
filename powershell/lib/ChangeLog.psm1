@@ -55,5 +55,35 @@ function ChangeLog-CreateRelease {
     }
 }
 
+function ChangeLog-GetUnreleased {
+    param(
+        [string] $fileName
+    )
+
+    Write-Information ">>> Reading Changelog unreleased content <<<"
+
+    $releaseNotes = dotnet changelog --changelog $fileName --un-released $release
+    if($?) {
+
+        $skip = 0
+        while($skip -lt $releaseNotes.Length -and !$releaseNotes[$skip].StartsWith("#"))
+        {
+            ++$skip
+        }
+
+        $releaseNotes = $releaseNotes | Select-Object -Skip $skip
+
+        return $releaseNotes
+
+    }
+    else {
+        Write-Information "* Changelog NOT extracted"
+        throw "Failed to extract changelog"
+    }
+}
+
+
+
 Export-ModuleMember -Function ChangeLog-AddEntry
 Export-ModuleMember -Function ChangeLog-CreateRelease
+Export-ModuleMember -Function ChangeLog-GetUnreleased
