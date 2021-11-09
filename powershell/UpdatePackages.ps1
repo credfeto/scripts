@@ -357,7 +357,7 @@ function processRepo($repo, $packages, $baseFolder)
             $releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
             $autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes
             
-            if( $autoUpdateCount -gt $autoReleasePendingPackages) {
+            if( $autoUpdateCount -ge $autoReleasePendingPackages) {
                 # At least $autoReleasePendingPackages auto updates... consider creating a release
             
                 if (ShouldAlwaysCreatePatchRelease -repo $repo) {
