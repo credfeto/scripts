@@ -413,7 +413,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         {
             if($updated.UpdatingVersion -eq $true) {
                 Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
-                Git-Commit -message "FF-1429 - Updated DotNet to $dotnetVersion"
+                Git-Commit -message "[FF-1429] - Updated DotNet SDK to $dotnetVersion"
                 Git-Push
                 Git-DeleteBranch -branchName $branchName
                 
@@ -430,7 +430,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
             {
                 Write-Information "Create Branch $branchName"
                 if($updated.UpdatingVersion -eq $true) {
-                    Git-Commit -message "FF-1429 - Updated DotNet to $dotnetVersion"
+                    Git-Commit -message "[FF-1429] - Updated DotNet SDK to $dotnetVersion"
                 }
                 else {
                     doCommit -fileName $fileName
