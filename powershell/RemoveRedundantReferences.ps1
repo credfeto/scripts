@@ -315,7 +315,7 @@ foreach($file in $files) {
             }
             else
             {
-                Write-Host -NoNewline "Building $( $file.Name ) without package $( $node.Node.Include ) ($( $node.Node.Version ))... "
+                Write-Information -NoNewline "Building $( $file.Name ) without package $( $node.Node.Include ) ($( $node.Node.Version ))... "
             }
         }
         else
@@ -329,7 +329,7 @@ foreach($file in $files) {
             }
             else
             {
-                Write-Host -NoNewline "Building $($file.Name) without project $($node.Node.Include)... "
+                Write-Information -NoNewline "Building $($file.Name) without project $($node.Node.Include)... "
             }
         }
         

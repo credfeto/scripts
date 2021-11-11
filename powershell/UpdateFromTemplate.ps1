@@ -485,7 +485,7 @@ function MakeRelease($repo, $changeLog, $repoPath) {
         $branched = Git-CreateBranch -branchName $branch -repoPath $repoPath
         if($branch) {
             Git-PushOrigin -branchName $branch -repoPath $repoPath
-            Write-Host "*** Created new release branch $branch in $repo"
+            Write-Information "*** Created new release branch $branch in $repo"
         }
     }
 }

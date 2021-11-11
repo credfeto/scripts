@@ -15,6 +15,39 @@ function GetRepoPath{
 }
 
 
+function Git-GetRemoteBranches {
+param(
+        [string] $repoPath
+        [string] upstream = "origin"
+    )
+
+    $repoPath = GetRepoPath -repoPath $repoPath
+
+    $result = git -C $repoPath branch --remote
+
+    $branches = @()
+
+    $remotePrefix = "$upstream/"
+    
+    foreach($branch in $result) {
+        $branch = $branch.Trim()
+        if(!$branch.StartsWith($remotePrefix)) {
+                continue
+        }
+
+        $branch = $branch.SubString(7)
+
+        $branch = $branch.Split(" ")[0]
+        if($branch -eq "HEAD") {
+                continue
+        }
+
+        $branches += $branch
+    }
+
+    return $branches
+}
+
 function Git-RemoveAllLocalBranches {
 param(
         [string] $repoPath
@@ -324,3 +357,4 @@ Export-ModuleMember -Function Git-GetFolderForRepo
 Export-ModuleMember -Function Git-Get-HeadRev
 Export-ModuleMember -Function Git-ReNormalise
 Export-ModuleMember -Function Git-HasSubmodules
+Export-ModuleMember -Function Git-GetRemoteBranches

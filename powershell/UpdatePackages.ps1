@@ -227,10 +227,29 @@ function MakeRelease($repo, $changeLog, $repoPath) {
         $branched = Git-CreateBranch -branchName $branch -repoPath $repoPath
         if($branch) {
             Git-PushOrigin -branchName $branch -repoPath $repoPath
-            Write-Host "*** Created new release branch $branch in $repo"
+            Write-Information "*** Created new release branch $branch in $repo"
         }
     }
 }
+
+function HasPendingDependencyUpdateBranches($repoPath) {
+
+    $branches = Git-GetRemoteBranches -repoPath $repoPath -upstream "origin"
+    
+    foreach($branch in $branches) {
+        if($branch.StartsWith("depends/") {
+            Write-Information "Found dependency update branch: $branch"
+            return $true
+        }
+
+        if($branch.StartsWith("dependabot/") {
+            Write-Information "Found dependency update branch: $branch"
+            return $true
+        }
+    }
+    
+    return $false
+} 
 
 function processRepo($repo, $packages, $baseFolder)
 {
@@ -376,23 +395,26 @@ function processRepo($repo, $packages, $baseFolder)
             
             if( $autoUpdateCount -ge $autoReleasePendingPackages) {
                 # At least $autoReleasePendingPackages auto updates... consider creating a release
-            
-                if (ShouldAlwaysCreatePatchRelease -repo $repo) {
-                    Write-Information "**** MAKE RELEASE ****"
-                    Write-Information "Changelog: $changeLog"
-                    Write-Information "Repo: $repoFolder"
-                    MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
-                }
-                else {
-                    if(!$repo.Contains("server-content-package"))
-                    {
-                        $publishable = DotNet-HasPublishableExe -srcFolder $srcPath
-                        if (!$publishable -and !$repo.Contains("template"))
+                
+                $hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoPath
+                if(!$hasPendingDependencyUpdateBranches) {            
+                    if (ShouldAlwaysCreatePatchRelease -repo $repo) {
+                        Write-Information "**** MAKE RELEASE ****"
+                        Write-Information "Changelog: $changeLog"
+                        Write-Information "Repo: $repoFolder"
+                        MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
+                    }
+                    else {
+                        if(!$repo.Contains("server-content-package"))
                         {
-                            Write-Information "**** MAKE RELEASE ****"
-                            Write-Information "Changelog: $changeLog"
-                            Write-Information "Repo: $repoFolder"
-                            #MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
+                            $publishable = DotNet-HasPublishableExe -srcFolder $srcPath
+                            if (!$publishable -and !$repo.Contains("template"))
+                            {
+                                Write-Information "**** MAKE RELEASE ****"
+                                Write-Information "Changelog: $changeLog"
+                                Write-Information "Repo: $repoFolder"
+                                #MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
+                            }
                         }
                     }
                 }
