@@ -237,12 +237,12 @@ function HasPendingDependencyUpdateBranches($repoPath) {
     $branches = Git-GetRemoteBranches -repoPath $repoPath -upstream "origin"
     
     foreach($branch in $branches) {
-        if($branch.StartsWith("depends/") {
+        if($branch.StartsWith("depends/")) {
             Write-Information "Found dependency update branch: $branch"
             return $true
         }
 
-        if($branch.StartsWith("dependabot/") {
+        if($branch.StartsWith("dependabot/")) {
             Write-Information "Found dependency update branch: $branch"
             return $true
         }
