@@ -17,7 +17,7 @@ function GetRepoPath{
 
 function Git-GetRemoteBranches {
 param(
-        [string] $repoPath
+        [string] $repoPath,
         [string] upstream = "origin"
     )
 
