@@ -382,7 +382,7 @@ function processRepo($repo, $packages, $baseFolder)
  
         Git-ResetToMaster
         
-        $remoteBranches Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
+        $remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
         $branchPrefix = "depends/ff-1429/update-$packageId/"
         foreach($branch in $remoteBranches) {
             if($branch -eq $branchName) {
