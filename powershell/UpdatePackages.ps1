@@ -354,7 +354,7 @@ function processRepo($repo, $packages, $baseFolder)
                 Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
                 Git-Push
 
-                # Just built, commited and pushed so get the the revsions 
+                # Just built, committed and pushed so get the the revisions 
                 $currentRevision = Git-Get-HeadRev
                 $lastRevision = $currentRevision
                 Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
@@ -380,7 +380,20 @@ function processRepo($repo, $packages, $baseFolder)
                 Write-Information "Branch $branchName already exists - skipping"
         }
  
-        Git-ResetToMaster        
+        Git-ResetToMaster
+        
+        $remoteBranches Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
+        $branchPrefix = "depends/ff-1429/update-$packageId/"
+        foreach($branch in $remoteBranches) {
+            if($branch -eq $branchName) {
+                continue
+            }
+            
+            if($branch.StartsWith($branchPrefix)) {
+                Write-Information "Deleting older branch for package: $branch"
+                Git-DeleteBranch -branchName $branch -repoPath $repoFolder
+            }
+        }        
     }
     
     Write-Information "Updated run created $branchesCreated branches"
