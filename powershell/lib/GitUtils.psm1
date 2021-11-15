@@ -266,7 +266,7 @@ param(
 
     $repoPath = GetRepoPath -repoPath $repoPath
 
-    git -C $repoPath branch -d $branchName
+    git -C $repoPath branch -D $branchName
     git -C $repoPath push origin ":$branchName"
 
     return $true;
