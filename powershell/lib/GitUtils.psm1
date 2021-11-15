@@ -79,7 +79,7 @@ param(
     git -C $repoPath clean -f -x -d
     git -C $repoPath fetch
 
-    # NOTE Loses all local commmits on master
+    # NOTE Loses all local commits on master
     git -C $repoPath reset --hard origin/master
     git -C $repoPath remote update origin --prune
     git -C $repoPath prune
