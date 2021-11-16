@@ -106,7 +106,7 @@ function DotNet-Publish {
     Write-Information " * Publishing"
     do
     {
-        $result = dotnet publish --configuration Release --no-restore -r linux-x64 --self-contained: true /p:PublishSingleFile = true /p:PublishReadyToRun = False /p:PublishReadyToRunShowWarnings = true /p:PublishTrimmed = False /p:DisableSwagger = False /p:TreatWarningsAsErrors = true /p:Version = 0.0.0.1-do-not-distribute /warnaserror /p:IncludeNativeLibrariesForSelfExtract = false -nodeReuse:False
+        $result = dotnet publish --configuration Release --no-restore -r linux-x64 --self-contained:true /p:PublishSingleFile=true /p:PublishReadyToRun=False /p:PublishReadyToRunShowWarnings=true /p:PublishTrimmed=False /p:DisableSwagger=False /p:TreatWarningsAsErrors=true /p:Version=0.0.0.1-do-not-distribute /warnaserror /p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
         if (!$?)
         {
             $resultsAsText = $results -join $NewLine
