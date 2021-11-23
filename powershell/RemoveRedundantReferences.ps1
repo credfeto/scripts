@@ -272,14 +272,18 @@ function ShouldHaveNarrowerPackageReference {
 
     $sourceFiles = Get-ChildItem -Path $ProjectFolder -Filter *.cs -Recurse
     
-    $search = "using $PackageId"
+    $searchUsing = "using $PackageId"
+    $searchNamespace = "namespace $PackageId."
     #WriteProgress "Looking for $search"
     foreach($file in $sourceFiles) {
         #WriteProgress $file.FullName
         $content = Get-Content $file.FullName -Raw
         
-        if($content.Contains($search))
-        {
+        if($content.Contains($searchUsing)) {
+            return $false
+        }
+        
+        if($content.Contains($searchNamespace)) {
             return $false
         }
     }
