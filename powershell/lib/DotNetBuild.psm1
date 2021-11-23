@@ -79,7 +79,7 @@ param(
             }
         }
         else {
-            Write-Information "   - Build Succeded"
+            Write-Information "   - Build Succeeded"
 
             return $true
         }
@@ -110,7 +110,7 @@ param(
             }
         }
         else {
-            Write-Information "   - Packing Succeded"
+            Write-Information "   - Packing Succeeded"
 
             return $true
         }
@@ -200,7 +200,7 @@ param(
             }
         }
         else {
-            Write-Information "   - Tests Succeded"
+            Write-Information "   - Tests Succeeded"
             return $true
         }
     }
@@ -234,7 +234,7 @@ function DotNet-BuildRunIntegrationTests {
             }
         }
         else {
-            Write-Information "   - Tests Succeded"
+            Write-Information "   - Tests Succeeded"
             return $true
         }
     }
