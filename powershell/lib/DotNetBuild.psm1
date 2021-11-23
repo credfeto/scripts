@@ -208,14 +208,22 @@ param(
 }
 
 function DotNet-BuildRunUnitTests {
+param(
+    [string] $srcFolder
+)
+
     if($IsLinux -eq $true) {
-        return DotNet-BuildRunUnitTestsLinux
+        return DotNet-BuildRunUnitTestsLinux -srcFolder $srcFolder
     } else {
-        return DotNet-BuildRunUnitTestsWindows
+        return DotNet-BuildRunUnitTestsWindows -srcFolder $srcFolder
     }
 }
 
 function DotNet-BuildRunIntegrationTests {
+param(
+    [string] $srcFolder
+)
+
     $errorCode = "AD0001"
     $NewLine = [System.Environment]::NewLine
 
