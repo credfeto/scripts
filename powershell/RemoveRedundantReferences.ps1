@@ -315,7 +315,6 @@ param(
         $projectInstance = $projectInstance + 1
         
         WriteSectionStart "($projectInstance/$projectCount): Testing project: $($file.Name)"
-        WriteProgress "($projectInstance/$projectCount): Testing project: $($file.Name)"
     
         $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
     
