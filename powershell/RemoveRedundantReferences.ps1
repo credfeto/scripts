@@ -1,5 +1,6 @@
 ﻿
 #########################################################################
+# Based on code at
 # https://devblog.pekspro.com/posts/finding-redundant-project-references
 #########################################################################
 
@@ -142,30 +143,40 @@ function InTeamCity {
     return $false
 }
 
-function TeamCityProgress {
+function WriteProgress {
 param([string]$message)
     $tc = InTeamCity 
     if($tc) {
         Write-Information "##teamcity[progressMessage '$message']"
     }
+    else {
+        Write-Information $message
+    }
 }
 
-function TeamCityProgressStart {
+function WriteSectionStart {
 param([string]$message)
     $tc = InTeamCity 
     if($tc) {
         Write-Information "##teamcity[progressStart '$message']"
     }
+    else {
+        Write-Information ""
+        Write-Information $message
+    }
 }
 
-function TeamCityProgressEnd {
+function WriteSectionEnd {
 param([string]$message)
     $tc = InTeamCity 
     if($tc) {
         Write-Information "##teamcity[progressFinish '$message']"
     }
+    else {
+        Write-Information $message
+    }
 }
-function TeamCityStatistics {
+function WriteStatistics {
 param(
     [string]$Section,
     $Value)
@@ -185,7 +196,7 @@ function BuildProject {
         $results = dotnet build $file.FullName -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
         if(!$?) {
             $resultsAsText = $results -join $NewLine
-            #Write-Information "**** FAILED ****"
+            #WriteProgress "**** FAILED ****"
             $retry = $resultsAsText.Contains($errorCode) 
             if(!$retry)
             {
@@ -197,7 +208,7 @@ function BuildProject {
             }
         }
         else {
-            #Write-Information "**** SUCCESS ****" 
+            #WriteProgress "**** SUCCESS ****" 
             return $true
         }
     }
@@ -262,9 +273,9 @@ function ShouldHaveNarrowerPackageReference {
     $sourceFiles = Get-ChildItem -Path $ProjectFolder -Filter *.cs -Recurse
     
     $search = "using $PackageId"
-    #Write-Information "Looking for $search"
+    #WriteProgress "Looking for $search"
     foreach($file in $sourceFiles) {
-        #Write-Information $file.FullName
+        #WriteProgress $file.FullName
         $content = Get-Content $file.FullName -Raw
         
         if($content.Contains($search))
@@ -273,7 +284,7 @@ function ShouldHaveNarrowerPackageReference {
         }
     }
     
-    Write-Information "  - Did not Find $PackageId source reference in project"
+    WriteProgress "  - Did not Find $PackageId source reference in project"
     
     return $true
 }
@@ -285,7 +296,9 @@ param(
     $files = Get-ChildItem -Path $sourceDirectory -Filter *.csproj -Recurse
     
     
-    Write-Information "Number of projects: $($files.Length)"
+    WriteProgress "Number of projects: $($files.Length)"
+    
+    WriteSectionStart "Checking Projects"
     
     $stopWatch = [System.Diagnostics.Stopwatch]::startNew()
     
@@ -301,15 +314,14 @@ param(
     
         $projectInstance = $projectInstance + 1
         
-        Write-Information ""
-        TeamCityProgressStart "($projectInstance/$projectCount): Testing project: $($file.Name)"
-        Write-Information "($projectInstance/$projectCount): Testing project: $($file.Name)"
+        WriteSectionStart "($projectInstance/$projectCount): Testing project: $($file.Name)"
+        WriteProgress "($projectInstance/$projectCount): Testing project: $($file.Name)"
     
         $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
     
         $buildOk = BuildProject -FileName $file.FullName -FullError $true
         if(!$buildOk) {
-            Write-Information "* Does not build without changes"
+            WriteProgress "* Does not build without changes"
             throw "Failed to build a project"
         }
         
@@ -322,17 +334,17 @@ param(
         
         if($projectXml)
         {
-            TeamCityProgress "SDK"
+            WriteProgress "SDK"
             $sdk = $projectXml[0].Node.Sdk            
             if($sdk.StartsWith("Microsoft.NET.Sdk.")) {
                 $projectXml[0].Node.Sdk = $minimalSdk
                 $xml.Save($file.FullName)
                 
-                Write-Information "* Building $( $file.Name ) using $minimalSdk instead of $sdk..."
+                WriteProgress "* Building $( $file.Name ) using $minimalSdk instead of $sdk..."
                 $buildOk = BuildProject -FileName $file.FullName -FullError $false
                 if($buildOk) {
-                    Write-Information "  - Building succeeded."
-                    Write-Information "$( $file.Name ) references SDK $sdk that could be reduced to $minimalSdk."
+                    WriteProgress "  - Building succeeded."
+                    WriteProgress "$( $file.Name ) references SDK $sdk that could be reduced to $minimalSdk."
                     $changeSdk += [PSCustomObject]@{
                                                    File = $file;
                                                    Type = 'Sdk';
@@ -340,16 +352,15 @@ param(
                                                }
                 }
                 else {
-                    Write-Information "  = Building failed."
+                    WriteProgress "  = Building failed."
                 }
                 
                 $projectXml[0].Node.Sdk = $sdk
                 $xml.Save($file.FullName)
             } else {
-                Write-Information "= SDK does not need changing. Currently $minimalSdk."
+                WriteProgress "= SDK does not need changing. Currently $minimalSdk."
             }                   
         }
-         
     
         $packageReferences = $xml | Select-Xml -XPath "Project/ItemGroup/PackageReference"
         $projectReferences = $xml | Select-Xml -XPath "Project/ItemGroup/ProjectReference"
@@ -377,8 +388,8 @@ param(
                 continue
             }
             
-            TeamCityProgress $node.Node.Include
-    
+            $includeName = $node.Node.Include
+            WriteProgress "Checking: $includeName"
     
             $previousNode = $node.Node.PreviousSibling
             $parentNode = $node.Node.ParentNode
@@ -394,12 +405,12 @@ param(
     
                 if ($existingChildInclude)
                 {
-                    Write-Information "= $( $file.Name ) references package $( $node.Node.Include ) ($( $node.Node.Version )) that is also referenced in child project $( $existingChildInclude.File )."
+                    WriteProgress "= $( $file.Name ) references package $( $node.Node.Include ) ($( $node.Node.Version )) that is also referenced in child project $( $existingChildInclude.File )."
                     $needToBuild = $false
                 }
                 else
                 {
-                    Write-Information "* Building $( $file.Name ) without package $( $node.Node.Include ) ($( $node.Node.Version ))... "
+                    WriteProgress "* Building $( $file.Name ) without package $( $node.Node.Include ) ($( $node.Node.Version ))... "
                 }
             }
             else
@@ -408,12 +419,12 @@ param(
     
                 if($existingChildInclude)
                 {
-                    Write-Information "= $($file.Name) references project $($node.Node.Include) that is also referenced in child project $($existingChildInclude.File)."
+                    WriteProgress "= $($file.Name) references project $($node.Node.Include) that is also referenced in child project $($existingChildInclude.File)."
                     $needToBuild = $false
                 }
                 else
                 {
-                    Write-Information "* Building $($file.Name) without project $($node.Node.Include)... "
+                    WriteProgress "* Building $($file.Name) without project $($node.Node.Include)... "
                 }
             }
             
@@ -427,7 +438,7 @@ param(
             
             if($buildOk)
             {
-                Write-Information "  - Building succeeded."
+                WriteProgress "  - Building succeeded."
     
                 if($node.Node.Version)
                 {
@@ -449,7 +460,7 @@ param(
             }
             else
             {
-                Write-Information "  = Building failed."
+                WriteProgress "  = Building failed."
                 if($node.Node.Version)
                 {
                     $narrower = ShouldHaveNarrowerPackageReference -ProjectFolder $file.Directory.FullName -PackageId $node.Node.Include
@@ -505,76 +516,78 @@ param(
             throw "Failed to build project after restore"
         }
         
-        TeamCityProgressEnd "($projectInstance/$projectCount): Testing project: $($file.Name)"
+        WriteSectionEnd "($projectInstance/$projectCount): Testing project: $($file.Name)"
     }
-    
-    Write-Information ""
-    Write-Information "-------------------------------------------------------------------------"
-    Write-Information "Analyse completed in $($stopWatch.Elapsed.TotalSeconds) seconds"
-    Write-Information "$($changeSdk.Length) SDK reference(s) could potentially be narrowed."
-    Write-Information "$($obseletes.Length) reference(s) could potentially be removed."
-    Write-Information "$($reduceReferences.Length) reference(s) could potentially be switched to different packages."
+
+    WriteSectionEnd "Checking Projects"
+        
+    WriteProgress ""
+    WriteProgress "-------------------------------------------------------------------------"
+    WriteProgress "Analyse completed in $($stopWatch.Elapsed.TotalSeconds) seconds"
+    WriteProgress "$($changeSdk.Length) SDK reference(s) could potentially be narrowed."
+    WriteProgress "$($obseletes.Length) reference(s) could potentially be removed."
+    WriteProgress "$($reduceReferences.Length) reference(s) could potentially be switched to different packages."
     
     TeamCityStatistics -Section "SDK" -Value $changeSdk.Length
     TeamCityStatistics -Section "Obsolete" -Value $obseletes.Length
     TeamCityStatistics -Section "Reduce" -Value $reduceReferences.Length
     
-    Write-Information "SDK:"
+    WriteProgress "SDK:"
     $previousFile = $null
     foreach($sdkRef in $changeSdk)
     {
         if($previousFile -ne $sdkRef.File)
         {
-            Write-Information ""
-            Write-Information "Project: $($sdkRef.File.Name)"
+            WriteProgress ""
+            WriteProgress "Project: $($sdkRef.File.Name)"
         }
     
-        Write-Information "* Project reference: $($sdkRef.Name)"
+        WriteProgress "* Project reference: $($sdkRef.Name)"
     
         $previousFile = $sdkRef.File
     }
     
     
-    Write-Information "Obsolete:"
+    WriteProgress "Obsolete:"
     $previousFile = $null
     foreach($obselete in $obseletes)
     {
         if($previousFile -ne $obselete.File)
         {
-            Write-Information ""
-            Write-Information "Project: $($obselete.File.Name)"
+            WriteProgress ""
+            WriteProgress "Project: $($obselete.File.Name)"
         }
     
         if($obselete.Type -eq 'Package')
         {
-            Write-Information "* Package reference: $($obselete.Name) ($($obselete.Version))"
+            WriteProgress "* Package reference: $($obselete.Name) ($($obselete.Version))"
         }
         else
         {
-            Write-Information "* Project reference: $($obselete.Name)"
+            WriteProgress "* Project reference: $($obselete.Name)"
         }
     
         $previousFile = $obselete.File
     }
     
-    Write-Information ""
-    Write-Information "Reduce Scope:"
+    WriteProgress ""
+    WriteProgress "Reduce Scope:"
     $previousFile = $null
     foreach($reduce in $reduceReferences)
     {
         if($previousFile -ne $reduce.File)
         {
-            Write-Information ""
-            Write-Information "Project: $($reduce.File.Name)"
+            WriteProgress ""
+            WriteProgress "Project: $($reduce.File.Name)"
         }
     
         if($reduce.Type -eq 'Package')
         {
-            Write-Information "* Package reference: $($reduce.Name) ($($reduce.Version))"
+            WriteProgress "* Package reference: $($reduce.Name) ($($reduce.Version))"
         }
         else
         {
-            Write-Information "* Project reference: $($reduce.Name)"
+            WriteProgress "* Project reference: $($reduce.Name)"
         }
     
         $previousFile = $reduce.File
@@ -593,3 +606,6 @@ if(!$solutionDirectory.EndsWith("\")) {
 $result = CheckReferences -sourceDirectory $solutionDirectory
 
 Exit $result
+
+#########################################################################
+
