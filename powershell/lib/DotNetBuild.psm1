@@ -68,7 +68,7 @@ param(
     do {
         Set-Location -Path $srcFolder
 
-        $result = dotnet build --no-restore -warnAsError --configuration=Release-nodeReuse:False -p:Version=0.0.0.1-do-not-distribute
+        $result = dotnet build --no-restore -warnAsError --configuration=Release -nodeReuse:False -p:Version=0.0.0.1-do-not-distribute
         if(!$?) {
             $resultsAsText = $results -join $NewLine
             $retry = $resultsAsText.Contains($errorCode)
