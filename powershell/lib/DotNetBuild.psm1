@@ -9,6 +9,51 @@ function DotNet-DumpOutput {
     }
 }
 
+function DotNet-GetPublishableFramework {
+param(
+    [string] $srcFolder
+)
+    $targets = @()
+
+    $projects = Get-ChildItem -Path $srcFolder -Filter *.csproj -Recurse
+
+    ForEach($project in $projects) {
+        $projectFileName = $project.FullName
+
+        $data = [xml](Get-Content $projectFileName)
+
+        $projectType = $data.SelectSingleNode("/Project/PropertyGroup/OutputType");
+        if($projectType -ne $null) {
+            $projectTypeValue = $projectType.InnerText.Trim()
+            if($projectTypeValue -eq "Exe") {
+                $publishable = $data.SelectSingleNode("/Project/PropertyGroup/TargetFramework");
+                if($publishable -ne $null) {
+                    $publishableValue = $publishable.InnerText.Trim()
+                    if(!$targets.Contains($publishableValue)) {
+                        $targets += $publishableValue
+                    }
+                }
+                
+                $publishable = $data.SelectSingleNode("/Project/PropertyGroup/TargetFrameworks");
+                if($publishable -ne $null) {
+                    $publishableValues = $publishable.InnerText.Trim().Split(";")
+                    foreach($publishableValue in $publishableValues) {
+                        if(!$targets.Contains($publishableValue)) {
+                            $targets += $publishableValue
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    if($targets) {
+        $targets = $targets | Sort-Object
+        return $targets[$targets.Length - 1]
+    }
+    
+    return $null
+}
 
 function DotNet-BuildClean {
 param(
@@ -121,6 +166,8 @@ param(
 function DotNet-Publish {
 param(
     [string] $srcFolder)
+    
+    $framework = DotNet-GetPublishableFramework -srcFolder $srcFolder
      
     $errorCode = "AD0001"
     $NewLine = [System.Environment]::NewLine
@@ -129,7 +176,11 @@ param(
     do {
         Set-Location -Path $srcFolder
 
-        $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=0.0.0.1-do-not-distribute -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+        if($framework) {
+            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=0.0.0.1-do-not-distribute -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+        } else {
+            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=0.0.0.1-do-not-distribute -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+        }
         if (!$?) {
             $resultsAsText = $results -join $NewLine
             $retry = $resultsAsText.Contains($errorCode)
