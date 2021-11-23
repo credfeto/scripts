@@ -162,7 +162,7 @@ function TeamCityProgressEnd {
 param([string]$message)
     $tc = InTeamCity 
     if($tc) {
-        Write-Information "##teamcity[progressStart '$message']"
+        Write-Information "##teamcity[progressFinish '$message']"
     }
 }
 function TeamCityStatistics {
@@ -302,8 +302,8 @@ param(
         $projectInstance = $projectInstance + 1
         
         Write-Information ""
-        Write-Information "($projectInstance/$projectCount): Testing project: $($file.Name)"
         TeamCityProgressStart "($projectInstance/$projectCount): Testing project: $($file.Name)"
+        Write-Information "($projectInstance/$projectCount): Testing project: $($file.Name)"
     
         $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
     
