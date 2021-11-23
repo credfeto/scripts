@@ -233,245 +233,299 @@ function ShouldHaveNarrowerPackageReference {
     return $true
 }
 
-
-$files = Get-ChildItem -Path $solutionDirectory -Filter *.csproj -Recurse
-
-if(!$solutionDirectory.EndsWith("\")) {
-    $solutionDirectory = $solutionDirectory + "\"
-    Write-Output $solutionDirectory
-}
-
-Write-Output "Number of projects: $($files.Length)"
-
-$stopWatch = [System.Diagnostics.Stopwatch]::startNew()
-
-$obseletes = @()
-$reduceReferences = @()
-
-$projectCount = $files.Length
-$projectInstance = 0
-
-foreach($file in $files) {
-
-    $projectInstance = $projectInstance + 1
+function CheckReferences {
+param(
+    [string]$sourceDirectory
+)
+    $files = Get-ChildItem -Path $sourceDirectory -Filter *.csproj -Recurse
     
-    Write-Output ""
-    Write-Output "($projectInstance/$projectCount): Testing project: $($file.Name)"
-
-    $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
-
-    $buildOk = BuildProject -FileName $file.FullName -FullError $true
-    if(!$buildOk) {
-        Write-Output " * Does not build without changes"
-        throw "Failed to build a project"
-    }
     
-    $childPackageReferences = Get-PackageReferences $file.FullName $false $true
-    $childProjectReferences = Get-ProjectReferences $file.FullName $false $true
-
-    $xml = [xml] (Get-Content $file.FullName)
-
-    $packageReferences = $xml | Select-Xml -XPath "Project/ItemGroup/PackageReference"
-    $projectReferences = $xml | Select-Xml -XPath "Project/ItemGroup/ProjectReference"
-
-    $nodes = @($packageReferences) + @($projectReferences)
-
-    foreach($node in $nodes)
-    {
-        if($node.Node.PrivateAssets)
-        {
-            continue
+    Write-Output "Number of projects: $($files.Length)"
+    
+    $stopWatch = [System.Diagnostics.Stopwatch]::startNew()
+    
+    $obseletes = @()
+    $reduceReferences = @()
+    $changeSdk = @()
+    
+    $projectCount = $files.Length
+    $projectInstance = 0
+    
+    foreach($file in $files) {
+    
+        $projectInstance = $projectInstance + 1
+        
+        Write-Output ""
+        Write-Output "($projectInstance/$projectCount): Testing project: $($file.Name)"
+    
+        $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
+    
+        $buildOk = BuildProject -FileName $file.FullName -FullError $true
+        if(!$buildOk) {
+            Write-Output " * Does not build without changes"
+            throw "Failed to build a project"
         }
-
-        if($node.Node.Include)
+        
+        $childPackageReferences = Get-PackageReferences $file.FullName $false $true
+        $childProjectReferences = Get-ProjectReferences $file.FullName $false $true
+    
+        $xml = [xml] (Get-Content $file.FullName)
+        
+        $projectXml = $xml | Select-Xml -XPath "Project"
+        
+        if($projectXml)
         {
-            $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include
-            if($doNotRemove)
+            $minimalSdk = "Microsoft.NET.Sdk"
+            $sdk = $projectXml[0].Node.Sdk            
+            if($sdk.StartsWith("Microsoft.NET.Sdk.")) {
+                $projectXml[0].Node.Sdk = $minimalSdk
+                $xml.Save($file.FullName)
+                
+                Write-Information "Building $( $file.Name ) using $minimalSdk instead of $sdk"
+                $buildOk = BuildProject -FileName $file.FullName -FullError $false
+                if($buildOk) {
+                    Write-Output "$( $file.Name ) references SDK $sdk that could be reduced to $minimalSdk."
+                    $changeSdk += [PSCustomObject]@{
+                                                   File = $file;
+                                                   Type = 'Sdk';
+                                                   Name = $sdk;                                               
+                                               }
+                }
+                
+                $projectXml[0].Node.Sdk = $sdk
+                $xml.Save($file.FullName)
+            }        
+        }
+         
+    
+        $packageReferences = $xml | Select-Xml -XPath "Project/ItemGroup/PackageReference"
+        $projectReferences = $xml | Select-Xml -XPath "Project/ItemGroup/ProjectReference"
+    
+        $nodes = @($packageReferences) + @($projectReferences)
+    
+        foreach($node in $nodes)
+        {
+            if($node.Node.PrivateAssets)
             {
                 continue
             }
-        }
-        else {
-            continue
-        }
-        
-
-        $previousNode = $node.Node.PreviousSibling
-        $parentNode = $node.Node.ParentNode
-        $parentNode.RemoveChild($node.Node) > $null
-        
-        $needToBuild = $true
-        
-        $xml.Save($file.FullName)
-
-        if($node.Node.Version)
-        {
-            $existingChildInclude = $childPackageReferences | Where-Object { $_.Name -eq $node.Node.Include -and $_.Version -eq $node.Node.Version } | Select-Object -First 1
-
-            if ($existingChildInclude)
+    
+            if($node.Node.Include)
             {
-                Write-Output "$( $file.Name ) references package $( $node.Node.Include ) ($( $node.Node.Version )) that is also referenced in child project $( $existingChildInclude.File )."
-                $needToBuild = $false
-            }
-            else
-            {
-                Write-Information -NoNewline "Building $( $file.Name ) without package $( $node.Node.Include ) ($( $node.Node.Version ))... "
-            }
-        }
-        else
-        {
-            $existingChildInclude = $childProjectReferences | Where-Object { $_.Name -eq $node.Node.Include } | Select-Object -First 1
-
-            if($existingChildInclude)
-            {
-                Write-Output "$($file.Name) references project $($node.Node.Include) that is also referenced in child project $($existingChildInclude.File)."
-                $needToBuild = $false
-            }
-            else
-            {
-                Write-Information -NoNewline "Building $($file.Name) without project $($node.Node.Include)... "
-            }
-        }
-        
-        if($needToBuild) {
-            $buildOk = BuildProject -FileName $file.FullName -FullError $false    
-        }
-        else
-        {
-            $buildOk = $true
-        }
-        
-        if($buildOk)
-        {
-            Write-Output "Building succeeded."
-
-            if($node.Node.Version)
-            {
-                $obseletes += [PSCustomObject]@{
-                    File = $file;
-                    Type = 'Package';
-                    Name = $node.Node.Include;
-                    Version = $node.Node.Version;
-                }
-            }
-            else
-            {
-                $obseletes += [PSCustomObject]@{
-                    File = $file;
-                    Type = 'Project';
-                    Name = $node.Node.Include;
-                }
-            }
-        }
-        else
-        {
-            Write-Output "Building failed."
-            if($node.Node.Version)
-            {
-                $narrower = ShouldHaveNarrowerPackageReference -ProjectFolder $file.Directory.FullName -PackageId $node.Node.Include
-                if($narrower)
+                $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include
+                if($doNotRemove)
                 {
-                    $reduceReferences += [PSCustomObject]@{
+                    continue
+                }
+            }
+            else {
+                continue
+            }
+            
+    
+            $previousNode = $node.Node.PreviousSibling
+            $parentNode = $node.Node.ParentNode
+            $parentNode.RemoveChild($node.Node) > $null
+            
+            $needToBuild = $true
+            
+            $xml.Save($file.FullName)
+    
+            if($node.Node.Version)
+            {
+                $existingChildInclude = $childPackageReferences | Where-Object { $_.Name -eq $node.Node.Include -and $_.Version -eq $node.Node.Version } | Select-Object -First 1
+    
+                if ($existingChildInclude)
+                {
+                    Write-Output "$( $file.Name ) references package $( $node.Node.Include ) ($( $node.Node.Version )) that is also referenced in child project $( $existingChildInclude.File )."
+                    $needToBuild = $false
+                }
+                else
+                {
+                    Write-Information "Building $( $file.Name ) without package $( $node.Node.Include ) ($( $node.Node.Version ))... "
+                }
+            }
+            else
+            {
+                $existingChildInclude = $childProjectReferences | Where-Object { $_.Name -eq $node.Node.Include } | Select-Object -First 1
+    
+                if($existingChildInclude)
+                {
+                    Write-Output "$($file.Name) references project $($node.Node.Include) that is also referenced in child project $($existingChildInclude.File)."
+                    $needToBuild = $false
+                }
+                else
+                {
+                    Write-Information "Building $($file.Name) without project $($node.Node.Include)... "
+                }
+            }
+            
+            if($needToBuild) {
+                $buildOk = BuildProject -FileName $file.FullName -FullError $false    
+            }
+            else
+            {
+                $buildOk = $true
+            }
+            
+            if($buildOk)
+            {
+                Write-Output "Building succeeded."
+    
+                if($node.Node.Version)
+                {
+                    $obseletes += [PSCustomObject]@{
                         File = $file;
                         Type = 'Package';
                         Name = $node.Node.Include;
                         Version = $node.Node.Version;
                     }
-                } 
-            }
-            else {
-                $packageId = ExtractProjectFromReference -paclageId $node.Node.Include
-                if($packageId)
+                }
+                else
                 {
-                    $narrower = ShouldHaveNarrowerPackageReference -ProjectFolder $file.Directory.FullName -PackageId $packageId
-                    if ($narrower)
+                    $obseletes += [PSCustomObject]@{
+                        File = $file;
+                        Type = 'Project';
+                        Name = $node.Node.Include;
+                    }
+                }
+            }
+            else
+            {
+                Write-Output "Building failed."
+                if($node.Node.Version)
+                {
+                    $narrower = ShouldHaveNarrowerPackageReference -ProjectFolder $file.Directory.FullName -PackageId $node.Node.Include
+                    if($narrower)
                     {
                         $reduceReferences += [PSCustomObject]@{
                             File = $file;
-                            Type = 'Project';
+                            Type = 'Package';
                             Name = $node.Node.Include;
                             Version = $node.Node.Version;
+                        }
+                    } 
+                }
+                else {
+                    $packageId = ExtractProjectFromReference -paclageId $node.Node.Include
+                    if($packageId)
+                    {
+                        $narrower = ShouldHaveNarrowerPackageReference -ProjectFolder $file.Directory.FullName -PackageId $packageId
+                        if ($narrower)
+                        {
+                            $reduceReferences += [PSCustomObject]@{
+                                File = $file;
+                                Type = 'Project';
+                                Name = $node.Node.Include;
+                                Version = $node.Node.Version;
+                            }
                         }
                     }
                 }
             }
+    
+    
+            if($null -eq $previousNode)
+            {
+                $parentNode.PrependChild($node.Node) > $null
+            }
+            else
+            {
+                $parentNode.InsertAfter($node.Node, $previousNode.Node) > $null
+            }
+    
+            # $xml.OuterXml
+    
+            $xml.Save($file.FullName)
         }
-
-
-        if($null -eq $previousNode)
+    
+        [System.IO.File]::WriteAllBytes($file.FullName, $rawFileContent)
+    
+        $buildOk = BuildProject -FileName $file.FullName -FullError $true
+        if(!$buildOk)
         {
-            $parentNode.PrependChild($node.Node) > $null
+            Write-Error "Failed to build $($file.FullName) after project file restore. Was project broken before?"
+            return
+        }
+    }
+    
+    Write-Output ""
+    Write-Output "-------------------------------------------------------------------------"
+    Write-Output "Analyse completed in $($stopWatch.Elapsed.TotalSeconds) seconds"
+    Write-Output "$($changeSdk.Length) SDK reference(s) could potentially be narrowed."
+    Write-Output "$($obseletes.Length) reference(s) could potentially be removed."
+    Write-Output "$($reduceReferences.Length) reference(s) could potentially be switched to different packages."
+    
+    Write-Output "SDK:"
+    $previousFile = $null
+    foreach($sdkRef in $changeSdk)
+    {
+        if($previousFile -ne $sdkRef.File)
+        {
+            Write-Output ""
+            Write-Output "Project: $($sdkRef.File.Name)"
+        }
+    
+        Write-Output "* Project reference: $($sdkRef.Name)"
+    
+        $previousFile = $sdkRef.File
+    }
+    
+    
+    Write-Output "Obsolete:"
+    $previousFile = $null
+    foreach($obselete in $obseletes)
+    {
+        if($previousFile -ne $obselete.File)
+        {
+            Write-Output ""
+            Write-Output "Project: $($obselete.File.Name)"
+        }
+    
+        if($obselete.Type -eq 'Package')
+        {
+            Write-Output "* Package reference: $($obselete.Name) ($($obselete.Version))"
         }
         else
         {
-            $parentNode.InsertAfter($node.Node, $previousNode.Node) > $null
+            Write-Output "* Project reference: $($obselete.Name)"
         }
-
-        # $xml.OuterXml
-
-        $xml.Save($file.FullName)
+    
+        $previousFile = $obselete.File
     }
-
-    [System.IO.File]::WriteAllBytes($file.FullName, $rawFileContent)
-
-    $buildOk = BuildProject -FileName $file.FullName -FullError $true
-    if(!$buildOk)
+    
+    Write-Output ""
+    Write-Output "Reduce Scope:"
+    $previousFile = $null
+    foreach($reduce in $reduceReferences)
     {
-        Write-Error "Failed to build $($file.FullName) after project file restore. Was project broken before?"
-        return
+        if($previousFile -ne $reduce.File)
+        {
+            Write-Output ""
+            Write-Output "Project: $($reduce.File.Name)"
+        }
+    
+        if($reduce.Type -eq 'Package')
+        {
+            Write-Output "* Package reference: $($reduce.Name) ($($reduce.Version))"
+        }
+        else
+        {
+            Write-Output "* Project reference: $($reduce.Name)"
+        }
+    
+        $previousFile = $reduce.File
     }
+    
+    # No obsoletes and no SDK changes then exit code = 0 = Success
+    return $obseletes.Length + $changeSdk.Length
 }
 
-Write-Output ""
-Write-Output "-------------------------------------------------------------------------"
-Write-Output "Analyse completed in $($stopWatch.Elapsed.TotalSeconds) seconds"
-Write-Output "$($obseletes.Length) reference(s) could potentially be removed."
-Write-Output "$($reduceReferences.Length) reference(s) could potentially be switched to different packages."
 
-Write-Output "Obsolete:"
-$previousFile = $null
-foreach($obselete in $obseletes)
-{
-    if($previousFile -ne $obselete.File)
-    {
-        Write-Output ""
-        Write-Output "Project: $($obselete.File.Name)"
-    }
-
-    if($obselete.Type -eq 'Package')
-    {
-        Write-Output "* Package reference: $($obselete.Name) ($($obselete.Version))"
-    }
-    else
-    {
-        Write-Output "* Project reference: $($obselete.Name)"
-    }
-
-    $previousFile = $obselete.File
+if(!$solutionDirectory.EndsWith("\")) {
+    $solutionDirectory = $solutionDirectory + "\"
 }
 
-Write-Output ""
-Write-Output "Reduce Scope:"
-$previousFile = $null
-foreach($reduce in $reduceReferences)
-{
-    if($previousFile -ne $reduce.File)
-    {
-        Write-Output ""
-        Write-Output "Project: $($reduce.File.Name)"
-    }
+$result = CheckReferences -sourceDirectory $solutionDirectory
 
-    if($reduce.Type -eq 'Package')
-    {
-        Write-Output "* Package reference: $($reduce.Name) ($($reduce.Version))"
-    }
-    else
-    {
-        Write-Output "* Project reference: $($reduce.Name)"
-    }
-
-    $previousFile = $reduce.File
-}
-
-# No obsoletes then exit code = 0 = Success
-Exit $obseletes.Length
+Exit $result
