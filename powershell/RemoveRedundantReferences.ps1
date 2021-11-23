@@ -527,9 +527,9 @@ param(
     WriteProgress "$($obseletes.Length) reference(s) could potentially be removed."
     WriteProgress "$($reduceReferences.Length) reference(s) could potentially be switched to different packages."
     
-    TeamCityStatistics -Section "SDK" -Value $changeSdk.Length
-    TeamCityStatistics -Section "Obsolete" -Value $obseletes.Length
-    TeamCityStatistics -Section "Reduce" -Value $reduceReferences.Length
+    WriteStatistics -Section "SDK" -Value $changeSdk.Length
+    WriteStatistics -Section "Obsolete" -Value $obseletes.Length
+    WriteStatistics -Section "Reduce" -Value $reduceReferences.Length
     
     WriteProgress "SDK:"
     $previousFile = $null
