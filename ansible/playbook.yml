@@ -26,15 +26,15 @@
         state: restarted
       when: reboot_required_file.stat.exists == False
 
-#    - name: Reboot the box if kernel updated
-#      reboot:
-#        msg: "Reboot initiated by Ansible for kernel updates"
-#        connect_timeout: 5
-#        reboot_timeout: 300
-#        pre_reboot_delay: 0
-#        post_reboot_delay: 30
-#        test_command: uptime
-#      when: reboot_required_file.stat.exists
+    - name: Reboot the box if kernel updated
+      reboot:
+        msg: "Reboot initiated by Ansible for kernel updates"
+        connect_timeout: 5
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: uptime
+      when: reboot_required_file.stat.exists
 
 - name: Update Build
   hosts: build
