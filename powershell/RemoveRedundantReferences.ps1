@@ -376,18 +376,18 @@ param(
                 $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include
                 if($doNotRemove)
                 {
-                    Write-Host "= Skipping $( $node.Node.Include ) as it is marked as do not remove"
+                    WriteProgress "= Skipping $( $node.Node.Include ) as it is marked as do not remove"
                     continue
                 }
             }
             else {
-                Write-Host "= Skipping malformed include"
+                WriteProgress "= Skipping malformed include"
                 continue
             }
             
             if($node.Node.PrivateAssets)
             {
-                Write-Host "= Skipping $( $node.Node.Include ) as it uses private assets"
+                WriteProgress "= Skipping $( $node.Node.Include ) as it uses private assets"
                 continue
             }
             
