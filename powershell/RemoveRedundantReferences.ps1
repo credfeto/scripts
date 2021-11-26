@@ -306,7 +306,7 @@ param(
     
     $stopWatch = [System.Diagnostics.Stopwatch]::startNew()
     
-    $obseletes = @()
+    $obsoletes = @()
     $reduceReferences = @()
     $changeSdk = @()
     
@@ -445,7 +445,7 @@ param(
     
                 if($node.Node.Version)
                 {
-                    $obseletes += [PSCustomObject]@{
+                    $obsoletes += [PSCustomObject]@{
                         File = $file;
                         Type = 'Package';
                         Name = $node.Node.Include;
@@ -454,7 +454,7 @@ param(
                 }
                 else
                 {
-                    $obseletes += [PSCustomObject]@{
+                    $obsoletes += [PSCustomObject]@{
                         File = $file;
                         Type = 'Project';
                         Name = $node.Node.Include;
@@ -528,11 +528,11 @@ param(
     WriteProgress "-------------------------------------------------------------------------"
     WriteProgress "Analyse completed in $($stopWatch.Elapsed.TotalSeconds) seconds"
     WriteProgress "$($changeSdk.Length) SDK reference(s) could potentially be narrowed."
-    WriteProgress "$($obseletes.Length) reference(s) could potentially be removed."
+    WriteProgress "$($obsoletes.Length) reference(s) could potentially be removed."
     WriteProgress "$($reduceReferences.Length) reference(s) could potentially be switched to different packages."
     
     WriteStatistics -Section "SDK" -Value $changeSdk.Length
-    WriteStatistics -Section "Obsolete" -Value $obseletes.Length
+    WriteStatistics -Section "Obsolete" -Value $obsoletes.Length
     WriteStatistics -Section "Reduce" -Value $reduceReferences.Length
     
     WriteProgress "SDK:"
@@ -553,7 +553,7 @@ param(
     
     WriteProgress "Obsolete:"
     $previousFile = $null
-    foreach($obselete in $obseletes)
+    foreach($obselete in $obsoletes)
     {
         if($previousFile -ne $obselete.File)
         {
@@ -597,7 +597,7 @@ param(
     }
     
     # No obsoletes and no SDK changes then exit code = 0 = Success
-    $totalOptimisations = $obseletes.Length + $changeSdk.Length + $reduceReferences.Length
+    $totalOptimisations = $obsoletes.Length + $changeSdk.Length + $reduceReferences.Length
     return $totalOptimisations
 }
 
