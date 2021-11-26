@@ -388,7 +388,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
     $sourceFileName = makePath -Path $sourceRepo -ChildPath $localFileName
     $targetFileName = makePath -Path $targetRepo -ChildPath $localFileName
 
-    $branchName = "template/ff-1429/$fileName".Replace("\", "/")
+    $branchName = "template/ff-3881/$fileName".Replace("\", "/")
 
     $updated = GlobalJson_Update -sourceFileName $sourceFileName -targetFileName $targetFileName
 
@@ -401,10 +401,10 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         {
             $dotnetVersion = $updated.NewVersion
             $changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
-            ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-1429" -message "Updated DotNet SDK to $dotnetVersion"
+            ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-3881" -message "Updated DotNet SDK to $dotnetVersion"
 
             # Change branch name so its obvious its a dotnet update rather than just a change to the file
-            $branchName = "depends/ff-1429/update-dotnet/$dotnetVersion/$fileName".Replace("\", "/")
+            $branchName = "depends/ff-3881/update-dotnet/$dotnetVersion/$fileName".Replace("\", "/")
         }
 
         $codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
@@ -413,7 +413,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         {
             if($updated.UpdatingVersion -eq $true) {
                 Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
-                Git-Commit -message "[FF-1429] - Updated DotNet SDK to $dotnetVersion"
+                Git-Commit -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
                 Git-Push
                 Git-DeleteBranch -branchName $branchName
                 
@@ -430,7 +430,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
             {
                 Write-Information "Create Branch $branchName"
                 if($updated.UpdatingVersion -eq $true) {
-                    Git-Commit -message "[FF-1429] - Updated DotNet SDK to $dotnetVersion"
+                    Git-Commit -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
                 }
                 else {
                     doCommit -fileName $fileName
