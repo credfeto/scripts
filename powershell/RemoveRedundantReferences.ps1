@@ -293,6 +293,27 @@ function ShouldHaveNarrowerPackageReference {
     return $true
 }
 
+function ShouldCheckSdk {
+param(
+    [string]$sdk,
+    [string]$projectFolder
+)
+    if(!$sdk.StartsWith("Microsoft.NET.Sdk.")) {
+        return $false
+    }
+    
+    if($sdk -eq "Microsoft.NET.Sdk.Razor") {
+        $cshtmlFiles = Get-ChildItem -Path $projectFolder -Filter *.cshtml -Recurse
+        if($cshtmlFiles.Length -eq 0) {
+            return $true
+        }
+        
+        return $false
+    }
+    
+    return $true
+}
+
 function CheckReferences {
 param(
     [string]$sourceDirectory
@@ -338,8 +359,9 @@ param(
         if($projectXml)
         {
             WriteProgress "SDK"
-            $sdk = $projectXml[0].Node.Sdk            
-            if($sdk.StartsWith("Microsoft.NET.Sdk.")) {
+            $sdk = $projectXml[0].Node.Sdk
+            $shouldReplaceSdk = ShouldCheckSdk -Sdk $sdk -Project $file.Directory.FullName            
+            if($shouldReplaceSdk) {
                 $projectXml[0].Node.Sdk = $minimalSdk
                 $xml.Save($file.FullName)
                 
