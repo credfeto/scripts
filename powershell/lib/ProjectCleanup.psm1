@@ -33,12 +33,12 @@ param (
         $toRemove += $include
         
         if([string]::IsNullOrEmpty($private)) {
-          if(!$normalItems.Contains($packageId.ToUpper()) {
+          if(!$normalItems.Contains($packageId.ToUpper())) {
             $normalItems.Add($packageId.ToUpper(), $include)
           }
         }
         else {
-          if(!$privateItems.Contains($packageId.ToUpper()) {
+          if(!$privateItems.Contains($packageId.ToUpper())) {
             $privateItems.Add($packageId.ToUpper(), $include)
           }          
         }
@@ -54,7 +54,7 @@ param (
         $projectPath = $include.GetAttribute("Include")
         
         $toRemove += $include
-        if(!$projectItems.Contains($projectPath.ToUpper()) {}
+        if(!$projectItems.Contains($projectPath.ToUpper())) {
           $projectItems.Add($projectPath.ToUpper(), $include)
         }
       }
