@@ -115,8 +115,10 @@ function runCodeCleanup($solutionFile) {
         $projectFile = $project.FullName
         Write-Information "  - Project $projectFile"
         
+        Write-Host "     - Reorder CSPROJ"
         Project_Cleanup -projectFile $projectFile
 
+        Write-Host "     - JB Code Cleanup"
         dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
         if(!$?) {
             Write-Information ">>>>> Code Cleanup failed"
