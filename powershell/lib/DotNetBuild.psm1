@@ -48,7 +48,11 @@ param(
     }
     
     if($targets) {
+        Write-Host "Targets Before Sort:"
+        Write-Host $targets
         $targets = $targets | Sort-Object
+        Write-Host "Targets After Sort:"
+        Write-Host $targets
         return $targets[$targets.Length - 1]
     }
     
