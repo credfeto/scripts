@@ -1,7 +1,7 @@
 
 function Project_ReOrderPropertyGroups {
 param (
-    [xml] $project
+    $project
 )
     $toRemove = @{}
     
@@ -47,7 +47,7 @@ param (
 
 function Project_ReOrderIncludes {
 param (
-    [xml] $project
+    $project
 )
 
     $itemGroups = $project.SelectNodes("ItemGroup")
