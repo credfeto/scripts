@@ -110,15 +110,16 @@ function runCodeCleanup($solutionFile) {
     Write-Information "  - Settings File: $settingsFile"
 
     # Cleanup each project
+    Write-Information "  * Cleaning Projects"
     $projects = Get-ChildItem -Path $sourceFolder -Filter "*.csproj" -Recurse
     ForEach($project in $projects) {
         $projectFile = $project.FullName
-        Write-Information "  - Project $projectFile"
+        Write-Information "    - Project $projectFile"
         
-        Write-Host "     - Reorder CSPROJ"
+        Write-Information        "    - Reorder CSPROJ"
         Project_Cleanup -projectFile $projectFile
 
-        Write-Host "     - JB Code Cleanup"
+        Write-Information "    - JB Code Cleanup"
         dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
          # --no-buildin-settings
         if(!$?) {
@@ -129,6 +130,7 @@ function runCodeCleanup($solutionFile) {
     }
 
     # Cleanup the solution
+    Write-Information "  * Cleaning Whole Solution"
     dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
      
      # --no-buildin-settings
