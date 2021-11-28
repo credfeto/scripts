@@ -3,7 +3,7 @@ function Project_ReOrderPropertyGroups {
 param (
     $project
 )
-    $toRemove = @{}
+    $toRemove = @()
     
     $propertyGroups = $project.SelectNodes("PropertyGroup")
     foreach($propertyGroup in $propertyGroups) {
