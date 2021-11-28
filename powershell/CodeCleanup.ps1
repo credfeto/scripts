@@ -119,7 +119,8 @@ function runCodeCleanup($solutionFile) {
         Project_Cleanup -projectFile $projectFile
 
         Write-Host "     - JB Code Cleanup"
-        dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
+        dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
+         # --no-buildin-settings
         if(!$?) {
             Write-Information ">>>>> Code Cleanup failed"
             throw "Code Cleanup for project failed"
@@ -128,7 +129,9 @@ function runCodeCleanup($solutionFile) {
     }
 
     # Cleanup the solution
-    dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO --no-buildin-settings
+    dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
+     
+     # --no-buildin-settings
     if(!$?) {
         Write-Information ">>>>> Code Cleanup failed"
         throw "Code Cleanup for solution failed"
