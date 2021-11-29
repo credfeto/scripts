@@ -296,7 +296,8 @@ function ShouldHaveNarrowerPackageReference {
 function ShouldCheckSdk {
 param(
     [string]$sdk,
-    [string]$projectFolder
+    [string]$projectFolder,
+    $projectXml
 )
     if(!$sdk.StartsWith("Microsoft.NET.Sdk.")) {
         return $false
@@ -309,6 +310,16 @@ param(
         }
         
         return $false
+    }
+    
+    if($sdk -eq "Microsoft.NET.Sdk.Web") {
+        $outputType = $projectXml.SelectSingleNode("/Project/PropertyGroup/OutputType")
+        if($outputType) {   
+            if($outputType.InnerText -eq "Exe") {
+                # Assume Exes are of the right type
+                return $false
+            }
+        }
     }
     
     return $true
@@ -360,7 +371,7 @@ param(
         {
             WriteProgress "SDK"
             $sdk = $projectXml[0].Node.Sdk
-            $shouldReplaceSdk = ShouldCheckSdk -Sdk $sdk -Project $file.Directory.FullName            
+            $shouldReplaceSdk = ShouldCheckSdk -Sdk $sdk -projectFolder $file.Directory.FullName -projectXml $projectXml            
             if($shouldReplaceSdk) {
                 $projectXml[0].Node.Sdk = $minimalSdk
                 $xml.Save($file.FullName)
