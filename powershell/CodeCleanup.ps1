@@ -96,7 +96,7 @@ function runCodeCleanup($solutionFile) {
 
     $changed = Resharper_ConvertSuppressionCommentToSuppressMessage -sourceFolder $sourceFolder
     if($changed) {
-        Write-Information "* Building after simple cleanuo"
+        Write-Information "* Building after simple cleanup"
         $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
         if(!$buildOk) {
             Write-Information ">>>>> Build Failed! [From simple cleanup]"
