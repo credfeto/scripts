@@ -399,6 +399,8 @@ function processRepo($repo, $packages, $baseFolder)
     Write-Information "Updated run created $branchesCreated branches"
     Write-Information "Updated run updated $packagesUpdated packages"
     
+    Git-ResetToMaster
+    
     if($branchesCreated -eq 0) {
         # no branches created - check to see if we can create a release
         
