@@ -688,6 +688,8 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
     
     Git-ReNormalise
     
+    Git-ResetToMaster
+        
     if($dotnetVersionUpdated -eq $true) {
         Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
         
