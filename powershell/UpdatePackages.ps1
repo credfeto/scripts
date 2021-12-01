@@ -220,7 +220,7 @@ function MakeRelease($repo, $changeLog, $repoPath) {
     $nextPatch = BuildVersion-GetNextPatch
     if($nextPatch) {
         ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
-        Git-Commit-Named -message "Release notes for $nextPatch"
+        Git-Commit -message "Release notes for $nextPatch"
         Git-Push --repoPath  $repoPath
 
         $branch = "release/$nextPatch"
