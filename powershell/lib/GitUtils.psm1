@@ -29,19 +29,23 @@ param(
 
     $remotePrefix = "$upstream/"
     
+    Write-Information "Looking for Remote Branches for : $remotePrefix"
+    
     foreach($branch in $result) {
         $branch = $branch.Trim()
         if(!$branch.StartsWith($remotePrefix)) {
-                continue
+            Write-Information "- Skipping $branch"
+            continue
         }
 
-        $branch = $branch.SubString(7)
-
+        $branch = $branch.SubString($remotePrefix.Length)
         $branch = $branch.Split(" ")[0]
         if($branch -eq "HEAD") {
-                continue
+            Write-Information "- Skipping $branch"
+            continue
         }
 
+        Write-Information "+ Found $upstream/$branch"
         $branches += $branch
     }
 
