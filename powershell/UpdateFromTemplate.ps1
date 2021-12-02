@@ -475,19 +475,20 @@ function updateLabel($baseFolder) {
 
 function MakeRelease($repo, $changeLog, $repoPath) {
     
-    $nextPatch = BuildVersion-GetNextPatch
-    if($nextPatch) {
-        ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
-        Git-Commit -message "Release notes for $nextPatch"
-        Git-Push --repoPath  $repoPath
+#     $nextPatch = BuildVersion-GetNextPatch
+#     if($nextPatch) {
+#         ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
+#         Git-Commit -message "Release notes for $nextPatch"
+#         Git-Push --repoPath  $repoPath
+# 
+#         $branch = "release/$nextPatch"
+#         $branched = Git-CreateBranch -branchName $branch -repoPath $repoPath
+#         if($branch) {
+#             Git-PushOrigin -branchName $branch -repoPath $repoPath
+#             Write-Information "*** Created new release branch $branch in $repo"
+#         }
+#     }
 
-        $branch = "release/$nextPatch"
-        $branched = Git-CreateBranch -branchName $branch -repoPath $repoPath
-        if($branch) {
-            Git-PushOrigin -branchName $branch -repoPath $repoPath
-            Write-Information "*** Created new release branch $branch in $repo"
-        }
-    }
 }
 
 function ShouldAlwaysCreatePatchRelease($repo) {
