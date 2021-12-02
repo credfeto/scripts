@@ -226,19 +226,21 @@ function IsAllAutoUpdates {
 
 function MakeRelease($repo, $changeLog, $repoPath) {
 
-#     $nextPatch = BuildVersion-GetNextPatch
-#     if($nextPatch) {
+     $nextPatch = BuildVersion-GetNextPatch
+     if($nextPatch) {
 #         ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
 #         Git-Commit -message "Release notes for $nextPatch"
 #         Git-Push --repoPath  $repoPath
 # 
-#         $branch = "release/$nextPatch"
+         $branch = "release/$nextPatch"
+         Write-Information "MAKERELEASE: Should have created branch: $branch"
+
 #         $branched = Git-CreateBranch -branchName $branch -repoPath $repoPath
 #         if($branch) {
 #             Git-PushOrigin -branchName $branch -repoPath $repoPath
 #             Write-Information "*** Created new release branch $branch in $repo"
 #         }
-#     }
+     }
 }
 
 function HasPendingDependencyUpdateBranches($repoPath) {
