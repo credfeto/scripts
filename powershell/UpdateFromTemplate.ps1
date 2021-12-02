@@ -413,13 +413,12 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
 
             # Change branch name so its obvious its a dotnet update rather than just a change to the file
             $branchName = "depends/ff-3881/update-dotnet/$dotnetVersion/$fileName".Replace("\", "/")
-        }
 
-        $codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
-        Set-Location -Path $targetRepo
-        if ($codeOK -eq $true) {
-            Write-Information "**** BUILD OK ****"
-            if($updated.UpdatingVersion -eq $true) {
+            $codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
+            Set-Location -Path $targetRepo
+            if ($codeOK -eq $true) {
+                Write-Information "**** BUILD OK ****"
+                
                 Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
                 Git-Commit -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
                 Git-Push
@@ -428,24 +427,38 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
                 return $true
             }
             else {
-                doCommit -fileName $fileName
+                Write-Information "**** BUILD FAILURE ****"
+                $branchOk = Git-CreateBranch -branchName $branchName
+                if ($branchOk -eq $true) {
+                    Write-Information "Create Branch $branchName"
+                    Git-Commit -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
+                    Git-PushOrigin -branchName $branchName
+                }
+    
+                Git-ResetToMaster
             }
         }
         else {
-            Write-Information "**** BUILD FAILURE ****"
-            $branchOk = Git-CreateBranch -branchName $branchName
-            if ($branchOk -eq $true) {
-                Write-Information "Create Branch $branchName"
-                if($updated.UpdatingVersion -eq $true) {
-                    Git-Commit -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
-                }
-                else {
-                    doCommit -fileName $fileName
-                }
-                Git-PushOrigin -branchName $branchName
-            }
+        
+            Write-Information "** GLOBAL.JSON VERSION UNCHANGED BUT CONTENT CHANGED"
 
-            Git-ResetToMaster
+            $codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
+            Set-Location -Path $targetRepo
+            if ($codeOK -eq $true) {
+                Write-Information "**** BUILD OK ****"
+                doCommit -fileName $fileName
+            }
+            else {
+                Write-Information "**** BUILD FAILURE ****"
+                $branchOk = Git-CreateBranch -branchName $branchName
+                if ($branchOk -eq $true) {
+                    Write-Information "Create Branch $branchName"
+                    doCommit -fileName $fileName
+                    Git-PushOrigin -branchName $branchName
+                }
+    
+                Git-ResetToMaster
+            }
         }
     }
     else {
