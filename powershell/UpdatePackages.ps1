@@ -353,7 +353,8 @@ function processRepo($repo, $packages, $baseFolder)
         }
 
         $packagesUpdated += 1
-        $branchName = "depends/ff-1429/update-$packageId/$update"
+        $branchPrefix = "depends/ff-1429/update-$packageId/"
+        $branchName = "$branchPrefix/$update"
         $branchExists = Git-DoesBranchExist -branchName $branchName
         if(!$branchExists) {
 
@@ -393,8 +394,7 @@ function processRepo($repo, $packages, $baseFolder)
  
         Git-ResetToMaster
         
-        $remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
-        $branchPrefix = "depends/ff-1429/update-$packageId/"
+        $remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"        
         foreach($branch in $remoteBranches) {
             if($branch -eq $branchName) {
                 continue
