@@ -394,6 +394,10 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
     Write-Information "** GLOBAL.JSON **"
     Write-Information "*****************"
     $updated = GlobalJson_Update -sourceFileName $sourceFileName -targetFileName $targetFileName
+    
+    Write-Information "File Changed: $( $updated.Update )"
+    Write-Information "Version Changed: $( $updated.UpdatingVersion )"
+    Write-Information "New Version: $( $updated.NewVersion )"
 
     if ($updated.Update -eq $true) {    
         Write-Information "** PROCESSING GLOBAL.JSON UPDATE"
