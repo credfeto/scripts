@@ -69,6 +69,15 @@ catch
     Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: Tracking"
 }
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "BuildVersion.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: BuildVersion"
+}
 #endregion
 
 function checkForUpdatesExact([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch)
@@ -452,7 +461,14 @@ $installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseV
 
 if($installed -eq $false) {
     Write-Error ""
-	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install Credfeto.Changelog.Cmd']"
+	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
+}
+
+$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
+
+if($installed -eq $false) {
+    Write-Error ""
+	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
 }
 
 
