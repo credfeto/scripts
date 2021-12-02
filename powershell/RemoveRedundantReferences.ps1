@@ -297,7 +297,7 @@ function ShouldCheckSdk {
 param(
     [string]$sdk,
     [string]$projectFolder,
-    $projectXml
+    [xml] $xml
 )
     if(!$sdk.StartsWith("Microsoft.NET.Sdk.")) {
         return $false
@@ -313,9 +313,9 @@ param(
     }
     
     if($sdk -eq "Microsoft.NET.Sdk.Web") {
-        $outputType = $projectXml.SelectSingleNode("/Project/PropertyGroup/OutputType")
+        $outputType = $xml | Select-Xml -XPath "/Project/PropertyGroup/OutputType"
         if($outputType) {   
-            if($outputType.InnerText -eq "Exe") {
+            if($outputType[0].Node.InnerText -eq "Exe") {
                 # Assume Exes are of the right type
                 return $false
             }
@@ -371,7 +371,7 @@ param(
         {
             WriteProgress "SDK"
             $sdk = $projectXml[0].Node.Sdk
-            $shouldReplaceSdk = ShouldCheckSdk -Sdk $sdk -projectFolder $file.Directory.FullName -projectXml $projectXml            
+            $shouldReplaceSdk = ShouldCheckSdk -Sdk $sdk -projectFolder $file.Directory.FullName -xml $xml            
             if($shouldReplaceSdk) {
                 $projectXml[0].Node.Sdk = $minimalSdk
                 $xml.Save($file.FullName)
