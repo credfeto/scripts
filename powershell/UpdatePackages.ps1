@@ -260,6 +260,29 @@ function HasPendingDependencyUpdateBranches($repoPath) {
     }
     
     return $false
+}
+
+function removeBranchesForPrefix($repoPath, $branchForUpdate, $branchPrefix)
+{
+    $remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
+    
+    Write-Information "Looking for branches to remove based on prefix: $branchPrefix"        
+    foreach($branch in $remoteBranches) {
+        if($branchForUpdate) {
+            if($branch -eq $branchName) {
+                Write-Information "- Skipping branch just pushed to: $branch"
+                continue
+            }
+        }
+        
+        if($branch.StartsWith($branchPrefix)) {
+            Write-Information "+ Deleting older branch for package: $branch"
+            Git-DeleteBranch -branchName $branch -repoPath $repoFolder
+        }
+        else {
+            Write-Information "+ Skipping branch for other package: $branch"
+        }
+    }        
 } 
 
 function processRepo($repo, $packages, $baseFolder)
@@ -346,14 +369,18 @@ function processRepo($repo, $packages, $baseFolder)
         Write-Information "Looking for updates of $packageId"
         Write-Information "Exact Match: $exactMatch"
         
+        $branchPrefix = "depends/ff-1429/update-$packageId/"
         $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
         
         if($update -eq $null) {
+            Git-ResetToMaster
+            
+            removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
+            
             Continue
         }
 
         $packagesUpdated += 1
-        $branchPrefix = "depends/ff-1429/update-$packageId/"
         $branchName = "$branchPrefix/$update"
         $branchExists = Git-DoesBranchExist -branchName $branchName
         if(!$branchExists) {
@@ -394,17 +421,7 @@ function processRepo($repo, $packages, $baseFolder)
  
         Git-ResetToMaster
         
-        $remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"        
-        foreach($branch in $remoteBranches) {
-            if($branch -eq $branchName) {
-                continue
-            }
-            
-            if($branch.StartsWith($branchPrefix)) {
-                Write-Information "Deleting older branch for package: $branch"
-                Git-DeleteBranch -branchName $branch -repoPath $repoFolder
-            }
-        }        
+        removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
     }
     
     Write-Information "Updated run created $branchesCreated branches"
