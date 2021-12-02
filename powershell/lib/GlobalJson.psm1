@@ -18,17 +18,18 @@ function GlobalJson_Update
     )
     $targetFreezeFileName = $targetFileName + ".freeze"
     $trgFreezeExists = Test-Path -Path $targetFreezeFileName
-    if ($trgFreezeExists -eq $true)
-    {
+    if ($trgFreezeExists -eq $true) {
         # no source to update
         Write-Information "* no global.json is frozen in target"
-        #(update: $false, isVersionUpdate: $false, newVersion: $null)
-        return $false
+        return [pscustomobject]@{
+            Update = $false
+            UpdatingVersion = $false
+            NewVersion = $null
+        }
     }
 
     $srcExists = Test-Path -Path $sourceFileName
-    if ($srcExists -eq $false)
-    {
+    if ($srcExists -eq $false) {
         # no source to update
         Write-Information "* no global.json in template"
 
@@ -43,56 +44,61 @@ function GlobalJson_Update
     $srcGlobal = $srcContent | ConvertFrom-Json
 
     $trgExists = Test-Path -Path $targetFileName
-    if ($trgExists -eq $true)
-    {
+    if ($trgExists -ne $true) {
+        Write-Information "Target global.json does not exist: creating"
 
-        $trgContent = Get-Content -Path $targetFileName -Raw
-
-        if ($srcContent -eq $trgContent)
-        {
-            Write-Information "* target global.json same as source"
-            
-            return [pscustomobject]@{
-                Update = $false
-                UpdatingVersion = $false
-                NewVersion = $null
-            }
-        }
-
-        $trgGlobal = $trgContent | ConvertFrom-Json
-
-        $sourceVersion = $srcGlobal.sdk.version
-        $targetVersion = $trgGlobal.sdk.version
-        Write-Information "Source Version: $sourceVersion"
-        Write-Information "Target Version: $targetVersion"
-
-        if ($targetVersion -gt $sourceVersion) {
-            Write-Information "* Target global.json specifies a newer version of .net ($targetVersion > $sourceVersion)"
-            
-            return [pscustomobject]@{
-                Update = $false
-                UpdatingVersion = $false
-                NewVersion = $null
-            }
-        }
-
-        if ($targetVersion -lt $sourceVersion) {
-            Write-Information "* Target global.json specifies a older version of .net ($targetVersion) < $sourceVersion)"
-
-            Set-Content -Path $targetFileName -Value $srcContent
-
-            return [pscustomobject]@{
-                Update = $true
-                UpdatingVersion = $true
-                NewVersion = $sourceVersion
-            }
-        }
-    }
-    else
-    {
-        Write-Information "Target global.json does not exist"
+        Set-Content -Path $targetFileName -Value $srcContent
+    
+        return [pscustomobject]@{
+            Update = $true
+            UpdatingVersion = $false
+            NewVersion = $null
+        }   
     }
 
+    $trgContent = Get-Content -Path $targetFileName -Raw
+
+    if ($srcContent -eq $trgContent)
+    {
+        Write-Information "* target global.json same as source"
+        
+        return [pscustomobject]@{
+            Update = $false
+            UpdatingVersion = $false
+            NewVersion = $null
+        }
+    }
+
+    $trgGlobal = $trgContent | ConvertFrom-Json
+
+    $sourceVersion = $srcGlobal.sdk.version
+    $targetVersion = $trgGlobal.sdk.version
+    Write-Information "Source Version: $sourceVersion"
+    Write-Information "Target Version: $targetVersion"
+
+    if ($targetVersion -gt $sourceVersion) {
+        Write-Information "* Target global.json specifies a newer version of .net ($targetVersion > $sourceVersion)"
+        
+        return [pscustomobject]@{
+            Update = $false
+            UpdatingVersion = $false
+            NewVersion = $null
+        }
+    }
+
+    if ($targetVersion -lt $sourceVersion) {
+        Write-Information "* Target global.json specifies a older version of .net ($targetVersion) < $sourceVersion)"
+
+        Set-Content -Path $targetFileName -Value $srcContent
+
+        return [pscustomobject]@{
+            Update = $true
+            UpdatingVersion = $true
+            NewVersion = $sourceVersion
+        }
+    }
+    
+    Write-Information "* Target global.json different but not by version"
     Set-Content -Path $targetFileName -Value $srcContent
 
     return [pscustomobject]@{

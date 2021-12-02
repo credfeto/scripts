@@ -390,15 +390,19 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
 
     $branchName = "template/ff-3881/$fileName".Replace("\", "/")
 
+    Write-Information "*****************"
+    Write-Information "** GLOBAL.JSON **"
+    Write-Information "*****************"
     $updated = GlobalJson_Update -sourceFileName $sourceFileName -targetFileName $targetFileName
 
-    if ($updated.Update -eq $true)
-    {
+    if ($updated.Update -eq $true) {    
+        Write-Information "** PROCESSING GLOBAL.JSON UPDATE"
         $sourceCodeFolder = makePath -Path $targetRepo -ChildPath "src"
         Write-Information "Src Folder: $sourceCodeFolder"
 
-        if($updated.UpdatingVersion -eq $true)
-        {
+        if($updated.UpdatingVersion -eq $true) {
+        
+            Write-Information "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
             $dotnetVersion = $updated.NewVersion
             $changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
             ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-3881" -message "Updated DotNet SDK to $dotnetVersion"
@@ -409,8 +413,8 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
 
         $codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
         Set-Location -Path $targetRepo
-        if ($codeOK -eq $true)
-        {
+        if ($codeOK -eq $true) {
+            Write-Information "**** BUILD OK ****"
             if($updated.UpdatingVersion -eq $true) {
                 Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
                 Git-Commit -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
@@ -423,11 +427,10 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
                 doCommit -fileName $fileName
             }
         }
-        else
-        {
+        else {
+            Write-Information "**** BUILD FAILURE ****"
             $branchOk = Git-CreateBranch -branchName $branchName
-            if ($branchOk -eq $true)
-            {
+            if ($branchOk -eq $true) {
                 Write-Information "Create Branch $branchName"
                 if($updated.UpdatingVersion -eq $true) {
                     Git-Commit -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
@@ -442,6 +445,7 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
         }
     }
     else {
+        Write-Information "No GLOBAL.JSON UPDATE"
         Write-Information "Ensuring $branchName no longer exists"
         Git-DeleteBranch -branchName $branchName
     }
@@ -584,6 +588,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
             # Process files in src folder
             updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
             $dotnetVersionUpdated = updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+            Write-Host ".NET VERSION UPDATED: $dotnetVersionUpdated"
         }
         
         if($repoFolder.Contains("funfair")) {
