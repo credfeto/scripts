@@ -58,8 +58,7 @@ function GlobalJson_Update
 
     $trgContent = Get-Content -Path $targetFileName -Raw
 
-    if ($srcContent -eq $trgContent)
-    {
+    if ($srcContent -eq $trgContent) {
         Write-Information "* target global.json same as source"
         
         return [pscustomobject]@{
