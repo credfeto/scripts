@@ -475,12 +475,13 @@ if($installed -eq $false) {
 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
 }
 
-$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
+$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
 
 if($installed -eq $false) {
     Write-Error ""
-	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
+    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
 }
+
 
 
 Write-Information ""
