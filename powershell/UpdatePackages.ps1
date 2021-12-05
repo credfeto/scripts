@@ -78,6 +78,16 @@ catch {
     Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: BuildVersion"
 }
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Release.psm1") -Force -DisableNameChecking
+}
+catch
+{
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: Release"
+}
 #endregion
 
 function checkForUpdatesExact([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch)
@@ -224,24 +234,6 @@ function IsAllAutoUpdates {
     return 0
 }
 
-function MakeRelease($repo, $changeLog, $repoPath) {
-
-     $nextPatch = BuildVersion-GetNextPatch
-     if($nextPatch) {
-#         ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
-#         Git-Commit -message "Release notes for $nextPatch"
-#         Git-Push --repoPath  $repoPath
-# 
-         $branch = "release/$nextPatch"
-         Write-Information "MAKERELEASE: Should have created branch: $branch"
-
-#         $branched = Git-CreateBranch -branchName $branch -repoPath $repoPath
-#         if($branch) {
-#             Git-PushOrigin -branchName $branch -repoPath $repoPath
-#             Write-Information "*** Created new release branch $branch in $repo"
-#         }
-     }
-}
 
 function HasPendingDependencyUpdateBranches($repoPath) {
 
@@ -445,7 +437,7 @@ function processRepo($repo, $packages, $baseFolder)
                         Write-Information "**** MAKE RELEASE ****"
                         Write-Information "Changelog: $changeLog"
                         Write-Information "Repo: $repoFolder"
-                        MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
+                        Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                     }
                     else {
                         if(!$repo.Contains("server-content-package"))
@@ -456,7 +448,7 @@ function processRepo($repo, $packages, $baseFolder)
                                 Write-Information "**** MAKE RELEASE ****"
                                 Write-Information "Changelog: $changeLog"
                                 Write-Information "Repo: $repoFolder"
-                                #MakeRelease -repo $repo -changelog $changeLog -repoPath $repoFolder
+                                #Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                             }
                         }
                     }

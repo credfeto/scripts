@@ -100,6 +100,16 @@ catch
     Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: Dependabot"
 }
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Release.psm1") -Force -DisableNameChecking
+}
+catch
+{
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: Release"
+}
 #endregion
 
 $scriptsHash = Git-Get-HeadRev -repoPath $ScriptDirectory
@@ -494,26 +504,6 @@ function updateLabel($baseFolder) {
     Git-Push
 }
 
-function MakeRelease($repo, $changeLog, $repoPath) {
-    
-     $nextPatch = BuildVersion-GetNextPatch
-     if($nextPatch) {
-#         ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
-#         Git-Commit -message "Release notes for $nextPatch"
-#         Git-Push --repoPath  $repoPath
-# 
-         $branch = "release/$nextPatch"
-         Write-Information "MAKERELEASE: Should have created branch: $branch"
-
-#         $branched = Git-CreateBranch -branchName $branch -repoPath $repoPath
-#         if($branch) {
-#             Git-PushOrigin -branchName $branch -repoPath $repoPath
-#             Write-Information "*** Created new release branch $branch in $repo"
-#         }
-     }
-
-}
-
 function ShouldAlwaysCreatePatchRelease($repo) {
     if($repo.Contains("template")) {
         return $false
@@ -724,7 +714,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
                 Write-Information "**** MAKE RELEASE ****"
                 Write-Information "Changelog: $targetChangelogFile"
                 Write-Information "Repo: $repoFolder"
-                MakeRelease -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
+                Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
             }
             else {
                 if(!$repo.Contains("server-content-package"))
@@ -735,7 +725,7 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
                         Write-Information "**** MAKE RELEASE ****"
                         Write-Information "Changelog: $targetChangelogFile"
                         Write-Information "Repo: $repoFolder"
-                        MakeRelease -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
+                        Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
                     }
                 }
             }
