@@ -6,6 +6,7 @@ param(
 )
      $nextPatch = BuildVersion-GetNextPatch
      if($nextPatch) {
+        Write-Information "$repo => Create release $nextPatch"
 #         ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
 #         Git-Commit -message "Release notes for $nextPatch"
 #         Git-Push --repoPath  $repoPath

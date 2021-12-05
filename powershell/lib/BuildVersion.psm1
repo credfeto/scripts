@@ -12,10 +12,13 @@ function BuildVersion-GetNextPatch {
         Write-Error $result
         throw "Could Not Determine Release (command failed)"
     }
+    
+    Write-Information $result
 
     $match = select-string "Version:\s(\d+\.\d+\.\d+)\.\d+\-master" -InputObject $result
     if($match) {
         $version = $match.Matches.Groups[1].Value
+        Write-Information "Found Release Branch ($version)"
         return $version
     }
 
