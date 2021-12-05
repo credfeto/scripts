@@ -448,7 +448,7 @@ function processRepo($repo, $packages, $baseFolder)
                                 Write-Information "**** MAKE RELEASE ****"
                                 Write-Information "Changelog: $changeLog"
                                 Write-Information "Repo: $repoFolder"
-                                #Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
+                                Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                             }
                         }
                     }
