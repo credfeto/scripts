@@ -1,5 +1,6 @@
 [build]
 mandingo-i7.lan
+arch-ryzen9.lan
 
 [ethereum]
 novichok-rpc.funfair.io
