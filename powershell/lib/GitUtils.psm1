@@ -6,7 +6,7 @@ function GetRepoPath{
     )
 
     if([string]::IsNullOrWhiteSpace($repoPath)) {
-        $currentDir = Get-Location
+        [string]$currentDir = Get-Location
         return $currentDir.Path
     }
     else {
@@ -21,18 +21,18 @@ param(
         [string] $upstream = "origin"
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath branch --remote
+    [string[]]$result = git -C $repoPath branch --remote
 
     $branches = @()
 
-    $remotePrefix = "$upstream/"
+    [string]$remotePrefix = "$upstream/"
     
     Write-Information "Looking for Remote Branches for : $remotePrefix"
     
-    foreach($branch in $result) {
-        $branch = $branch.Trim()
+    foreach([string]$item in $result) {
+        [string]$branch = $item.Trim()
         if(!$branch.StartsWith($remotePrefix)) {
             Write-Information "- Skipping $branch"
             continue
@@ -49,7 +49,7 @@ param(
         $branches += $branch
     }
 
-    return $branches
+    return [string[]]$branches
 }
 
 function Git-RemoveAllLocalBranches {
@@ -57,11 +57,11 @@ param(
         [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath branch
-    foreach($branch in $result) {
-        $branch = $branch.Trim()
+    [string[]$result = git -C $repoPath branch
+    foreach([string]$item in $result) {
+        [string]$branch = $item.Trim()
         if(!$branch.StartsWith("* ")) {
             git branch -d $branch
         }
@@ -73,7 +73,7 @@ param(
         [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     # junk any existing checked out files
     git -C $repoPath reset HEAD --hard
@@ -97,7 +97,7 @@ param(
     [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     git -C $repoPath diff --no-patch --exit-code
     if(!$?) {
@@ -128,12 +128,12 @@ param(
     Write-Information "Repo: $repo"
     Write-Information "Folder: $repofolder"
 
-    $gitHead = Join-Path -Path $repoFolder -ChildPath ".git" 
-    $gitHead = Join-Path -Path $gitHead -ChildPath "HEAD" 
+    [string]$gitHead = Join-Path -Path $repoFolder -ChildPath ".git" 
+    [string]$gitHead = Join-Path -Path $gitHead -ChildPath "HEAD" 
     
     Write-Information "Head: $gitHead"
 
-    $gitHeadCloned = Test-Path -path $gitHead
+    [bool]$gitHeadCloned = Test-Path -path $gitHead
 
     if ($gitHeadCloned -eq $True) {
         Write-Information "Already Cloned"
@@ -154,7 +154,7 @@ param(
     [string] $message
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     git -C $repoPath add -A
     git -C $repoPath commit -m"$message"
@@ -167,10 +167,10 @@ param(
     [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    foreach($file in $files) {
-        $fileUnix = $file.Replace("\", "/")
+    foreach([string]$file in $files) {
+        [string]$fileUnix = $file.Replace("\", "/")
         Write-Information "Staging $fileUnix"
         git -C $repoPath add $fileUnix
     }
@@ -184,7 +184,7 @@ param(
     [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     git -C $repoPath push
 }
@@ -203,7 +203,7 @@ param(
         throw "Invalid branch: [$branchName]"
     }
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     git -C $repoPath push --set-upstream origin $branchName -v
 }
@@ -215,17 +215,18 @@ param(
     [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     $result = git -C $repoPath branch --remote
 
-    $regex = $branchName.replace(".", "\.") + "$"
+    [string]$regex = $branchName.replace(".", "\.") + "$"
 
     $result -match $regex
     if($result -eq $null) {
 	return $false;
     }
-    $result = $result.Trim()
+    
+    [string]$result = $result.Trim()
     if($result -eq $branchName) {
         return $true
     }
@@ -243,9 +244,9 @@ param(
     [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $branchExists = Git-DoesBranchExist -branchName $branchName -repoPath $repoPath
+    [bool]$branchExists = Git-DoesBranchExist -branchName $branchName -repoPath $repoPath
     if($branchExists -eq $true) {
         Write-Information "Failed to create branch $branchName - branch already exists"
         return $false
@@ -268,7 +269,7 @@ param(
     [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     git -C $repoPath branch -D $branchName
     git -C $repoPath push origin ":$branchName"
@@ -281,10 +282,10 @@ param(
         [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
     
     git -C $repoPath add . --renormalize
-    $hasChanged = Git-HasUnCommittedChanges -repoPath $repoPath
+    [bool]$hasChanged = Git-HasUnCommittedChanges -repoPath $repoPath
     if($hasChanged -eq $true) {
         git -C $repoPath commit -m"Renormalised files"
         git -C $repoPath push
@@ -297,7 +298,7 @@ param(
     [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
     
     $result = git -C $repoPath rev-parse HEAD    
 
@@ -314,7 +315,7 @@ function Git-HasSubmodules {
         [string] $repoPath
     )
 
-    $repoPath = GetRepoPath -repoPath $repoPath
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     $result = git -C $repoPath submodule
 
