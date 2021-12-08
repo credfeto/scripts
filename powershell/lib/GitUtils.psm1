@@ -31,7 +31,7 @@ param(
     
     Write-Information "Looking for Remote Branches for : $remotePrefix"
     
-    foreach([string]$item in $result) {
+    foreach($item in $result) {
         [string]$branch = $item.Trim()
         if(!$branch.StartsWith($remotePrefix)) {
             Write-Information "- Skipping $branch"
@@ -60,7 +60,7 @@ param(
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     [string[]$result = git -C $repoPath branch
-    foreach([string]$item in $result) {
+    foreach($item in $result) {
         [string]$branch = $item.Trim()
         if(!$branch.StartsWith("* ")) {
             git branch -d $branch
@@ -169,7 +169,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    foreach([string]$file in $files) {
+    foreach($file in $files) {
         [string]$fileUnix = $file.Replace("\", "/")
         Write-Information "Staging $fileUnix"
         git -C $repoPath add $fileUnix

@@ -273,7 +273,7 @@ param(
 
     [string[]]$branches = Git-GetRemoteBranches -repoPath $repoPath -upstream "origin"
     
-    foreach([string]$branch in $branches) {
+    foreach($branch in $branches) {
         if($branch.StartsWith("depends/")) {
             Write-Information "Found dependency update branch: $branch"
             return $true
@@ -297,7 +297,7 @@ param(
     [string[]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
     
     Write-Information "Looking for branches to remove based on prefix: $branchPrefix"        
-    foreach([string]$branch in $remoteBranches) {
+    foreach($branch in $remoteBranches) {
         if($branchForUpdate) {
             if($branch -eq $branchName) {
                 Write-Information "- Skipping branch just pushed to: $branch"
