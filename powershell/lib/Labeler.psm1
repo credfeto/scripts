@@ -1,8 +1,11 @@
 ﻿
 
-function getLabelColour($name) {
+function getLabelColour{
+param(
+    [string]$name
+    )
 
-    $lowerName = $name.ToLowerInvariant()
+    [string]$lowerName = $name.ToLowerInvariant()
 
     if($lowerName.EndsWith(".tests")) {
         return "0e8a16"
@@ -261,14 +264,14 @@ param(
             $projectList = Get-ChildItem -Path $projects.FullName -Filter "*.csproj"
             if($projectList.Count -ne 0) {
 
-                $name = $project.Name
+                [string]$name = $project.Name
 
-                $labelName = $name
+                [string]$labelName = $name
                 if($name.StartsWith($prefix +".") -eq $true) {
-                    $labelName = $name.SubString($prefix.Length + 1)
+                    [string]$labelName = $name.SubString($prefix.Length + 1)
                 }
 
-                $colour = getLabelColour($name)
+                [string]$colour = getLabelColour($name)
 
                 $newLabel = [pscustomobject]@{
                     Name = $labelName
@@ -293,8 +296,8 @@ param(
 
         if ($group.Paths -and $group.PathsExclude)
         {
-            $first = $true
-            $all = ' - any: [ '
+            [bool]$first = $true
+            [string]$all = ' - any: [ '
             if ($group.Paths)
             {
                 $sortedPaths = $group.Paths

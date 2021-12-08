@@ -16,8 +16,9 @@ function GlobalJson_Update
         [String] $sourceFileName,
         [String] $targetFileName
     )
-    $targetFreezeFileName = $targetFileName + ".freeze"
-    $trgFreezeExists = Test-Path -Path $targetFreezeFileName
+    
+    [string] $targetFreezeFileName = $targetFileName + ".freeze"
+    [bool]$trgFreezeExists = Test-Path -Path $targetFreezeFileName
     if ($trgFreezeExists -eq $true) {
         # no source to update
         Write-Information "* no global.json is frozen in target"
@@ -28,7 +29,7 @@ function GlobalJson_Update
         }
     }
 
-    $srcExists = Test-Path -Path $sourceFileName
+    [bool]$srcExists = Test-Path -Path $sourceFileName
     if ($srcExists -eq $false) {
         # no source to update
         Write-Information "* no global.json in template"
@@ -40,10 +41,10 @@ function GlobalJson_Update
         }
     }
 
-    $srcContent = Get-Content -Path $sourceFileName -Raw
+    [string]$srcContent = Get-Content -Path $sourceFileName -Raw
     $srcGlobal = $srcContent | ConvertFrom-Json
 
-    $trgExists = Test-Path -Path $targetFileName
+    [bool]$trgExists = Test-Path -Path $targetFileName
     if ($trgExists -ne $true) {
         Write-Information "Target global.json does not exist: creating"
 
@@ -56,7 +57,7 @@ function GlobalJson_Update
         }   
     }
 
-    $trgContent = Get-Content -Path $targetFileName -Raw
+    [string]$trgContent = Get-Content -Path $targetFileName -Raw
 
     if ($srcContent -eq $trgContent) {
         Write-Information "* target global.json same as source"
@@ -70,8 +71,8 @@ function GlobalJson_Update
 
     $trgGlobal = $trgContent | ConvertFrom-Json
 
-    $sourceVersion = $srcGlobal.sdk.version
-    $targetVersion = $trgGlobal.sdk.version
+    [string]$sourceVersion = $srcGlobal.sdk.version
+    [string]$targetVersion = $trgGlobal.sdk.version
     Write-Information "Source Version: $sourceVersion"
     Write-Information "Target Version: $targetVersion"
 
