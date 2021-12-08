@@ -469,7 +469,8 @@ function updateGlobalJson{
 param(
     [string]$sourceRepo, 
     [string]$targetRepo, 
-    [string]$fileName) {
+    [string]$fileName
+    )
 
     [string]$localFileName = convertToOsPath -path $fileName
 
