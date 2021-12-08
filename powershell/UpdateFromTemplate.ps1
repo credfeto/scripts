@@ -2,6 +2,7 @@
 
 param(
     [string] $repos = $(throw "repos.lst file containing list of repositories"),
+    [string] $work = $(throw "folder where to clone repositories"),
     [string] $templateRepo = $(throw "Template repo")
 )
 
@@ -776,7 +777,7 @@ if($installed -eq $false) {
 }
 
 
-$root = (Get-Location).Path
+$root = $work
 Write-Information $root
 
 Write-Information "Repository List: $repos"
