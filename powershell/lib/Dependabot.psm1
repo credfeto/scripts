@@ -193,7 +193,7 @@ function githubSubmodulesDependabotTemplate {
 
 function makePath($Path, $ChildPath)
 {
-    $ChildPath = convertToOsPath -path $ChildPath
+    [string]$ChildPath = convertToOsPath -path $ChildPath
 
     return [System.IO.Path]::Combine($Path, $ChildPath)
 }
@@ -218,71 +218,70 @@ param(
     )
 
     Write-Information "Building Dependabot Config:"
-    $trgContent = "version: 2
+    [string]$trgContent = "version: 2
 updates:
 "
     
-    $newline = "`r`n"
+    [string]$newline = "`r`n"
 
     if($hasSubModules -eq $true)
     {
         Write-Information " --> Adding Git Submodules"
-        $templateContent = githubSubmodulesDependabotTemplate
-        $trgContent = $trgContent.Trim() + $newline + $newline
-        $trgContent = $trgContent + $templateContent
+        [string]$templateContent = githubSubmodulesDependabotTemplate
+        [string]$trgContent = $trgContent.Trim() + $newline + $newline
+        [string]$trgContent = $trgContent + $templateContent
     }
 
     $files = Get-ChildItem -Path $trgRepo -Filter *.csproj -Recurse
     if($files -ne $null) {
         Write-Information " --> Adding .NET"
-        $templateContent = dotNetDependabotTemplate
-        $trgContent = $trgContent.Trim() + $newline + $newline
-        $trgContent = $trgContent + $templateContent
+        [string]$templateContent = dotNetDependabotTemplate
+        [string]$trgContent = $trgContent.Trim() + $newline + $newline
+        [string]$trgContent = $trgContent + $templateContent
     }
     
     $files = Get-ChildItem -Path $trgRepo -Filter 'package.json' -Recurse
     if($files -ne $null) {
         Write-Information " --> Adding Javascript"
-        $templateContent = javascriptDependabotTemplate
-        $trgContent = $trgContent.Trim() + $newline + $newline
-        $trgContent = $trgContent + $templateContent
+        [string]$templateContent = javascriptDependabotTemplate
+        [string]$trgContent = $trgContent.Trim() + $newline + $newline
+        [string]$trgContent = $trgContent + $templateContent
     }
     
     $files = Get-ChildItem -Path $trgRepo -Filter 'Dockerfile' -Recurse
     if($files -ne $null) {
         Write-Information " --> Adding Docker"
-        $templateContent = dockerDependabotTemplate
-        $trgContent = $trgContent.Trim() + $newline + $newline
-        $trgContent = $trgContent + $templateContent
+        [string]$templateContent = dockerDependabotTemplate
+        [string]$trgContent = $trgContent.Trim() + $newline + $newline
+        [string]$trgContent = $trgContent + $templateContent
     }
     
     if($updateGitHubActions -eq $true)
     {
-        $actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
+        [string]$actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
         $files = Get-ChildItem -Path $actionsTargetPath -Filter *.yml -Recurse
         if ($files -ne $null)
         {
             Write-Information " --> Adding Github Actions"
-            $templateContent = githubActionsDependabotTemplate
-            $trgContent = $trgContent.Trim() + $newline + $newline
-            $trgContent = $trgContent + $templateContent
+            [string]$templateContent = githubActionsDependabotTemplate
+            [string]$trgContent = $trgContent.Trim() + $newline + $newline
+            [string]$trgContent = $trgContent + $templateContent
         }
     }
 
-    $actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
+    [string]$actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
     $files = Get-ChildItem -Path $actionsTargetPath -Filter requirements.txt -Recurse
     if($files -ne $null) {
         Write-Information " --> Adding Python"
-        $templateContent = pythonDependabotTemplate
-        $trgContent = $trgContent.Trim() + $newline + $newline
-        $trgContent = $trgContent +  $templateContent
+        [string]$templateContent = pythonDependabotTemplate
+        [string]$trgContent = $trgContent.Trim() + $newline + $newline
+        [string]$trgContent = $trgContent +  $templateContent
     }
     
-    $trgContent = $trgContent.Trim() + $newline
+    [string]$trgContent = $trgContent.Trim() + $newline
     
     Write-Information " --> Done"
     Set-Content -Path $configFileName -Value $trgContent
-
 }
 
 Export-ModuleMember -Function Dependabot-BuildConfig
