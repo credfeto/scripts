@@ -59,7 +59,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    [string[]$result = git -C $repoPath branch
+    [string[]]$result = git -C $repoPath branch
     foreach($item in $result) {
         [string]$branch = $item.Trim()
         if(!$branch.StartsWith("* ")) {
@@ -175,8 +175,7 @@ param(
         git -C $repoPath add $fileUnix
     }
 
-    
-    git commit -m"$message"
+    git -C $repoPath commit -m"$message"
 }
 
 function Git-Push() {
