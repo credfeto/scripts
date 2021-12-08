@@ -838,7 +838,7 @@ param (
 
 function processAll{
 param(
-    [string[]$repositoryList, 
+    [string[]]$repositoryList, 
     [string]$templateRepositoryFolder, 
     [string]$baseFolder, 
     [string]$templateRepoHash
