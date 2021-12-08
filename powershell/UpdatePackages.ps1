@@ -294,7 +294,7 @@ param(
     [string]$branchForUpdate, 
     [string]$branchPrefix)
 
-    [string[]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
+    [string[]]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
     
     Write-Information "Looking for branches to remove based on prefix: $branchPrefix"        
     foreach($branch in $remoteBranches) {
