@@ -12,7 +12,7 @@ $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = $False
-$root = $work
+$root = Resolve-Path -path $work
 $autoReleasePendingPackages = 5
 
 Write-Information $root

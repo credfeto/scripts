@@ -11,7 +11,7 @@ $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "JetBrains.ReSharper.GlobalTools"
 $preRelease = $False
-$root = $work
+$root = Resolve-Path -path $work
 
 Write-Information $root
 Write-Information "Base folder: $root"

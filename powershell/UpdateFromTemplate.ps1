@@ -11,7 +11,7 @@ Remove-Module *
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
 $preRelease = $False
-$root = $work
+$root = Resolve-Path -path $work
 
 $root = $work
 Write-Information $root
