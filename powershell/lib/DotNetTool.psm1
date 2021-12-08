@@ -1,5 +1,4 @@
 
-# $privateSource = '....'
 $standardSource = 'https://api.nuget.org/v3/index.json'
 
 function getLatestPreReleasePackage($packageId) {
@@ -9,18 +8,10 @@ function getLatestPreReleasePackage($packageId) {
         Write-Information "Looking for $packageId in $standardSource"
         $packages = Find-Package -Name $packageId -Source $standardSource -AllowPrereleaseVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
         if($packages) {
-			$foundVersion = $packages[0].Version
+			[string]$foundVersion = $packages[0].Version
 			Write-Information "* Found $foundVersion"
             return $foundVersion
         }
-
-#         Write-Information "Looking for $packageId in $privateSource"
-#         $packages = Find-Package -Name $packageId -Source $privateSource -AllowPrereleaseVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
-#         if($packages) {
-# 			$foundVersion = $packages[0].Version
-# 			Write-Information "* Found $foundVersion"
-#             return $foundVersion
-#         }
 
 		Write-Information "- Not Found"
         return $null
@@ -35,7 +26,7 @@ function findPreReleasePackageVersion( $packageId) {
 
     Write-Information "Looking for latest version of $packageId (Includes pre-release)"
 
-    package = getLatestPreReleasePackage -packageId $packageId
+    [string]$package = getLatestPreReleasePackage -packageId $packageId
     if($package) {
         return $package
     }
@@ -44,9 +35,9 @@ function findPreReleasePackageVersion( $packageId) {
 }
 
 function isInstalled($packageId) {
-    $packageIdRegex = $packageId.Replace(".", "\.").ToLowerInvariant();
+    [string]$packageIdRegex = $packageId.Replace(".", "\.").ToLowerInvariant();
 
-    $entry = &dotnet tool list --local | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
+    [string]$entry = &dotnet tool list --local | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
 
 	Write-Information "Found: $entry"
     return $entry -ne $null
@@ -94,7 +85,7 @@ param(
     [bool] $preReleaseVersion = $false
     )
 
-    $manifestExists = Test-Path -path '.config\dotnet-tools.json'
+    [bool]$manifestExists = Test-Path -path '.config\dotnet-tools.json'
     if ($manifestExists -ne $true)
     {
         dotnet new tool-manifest
@@ -103,13 +94,13 @@ param(
     DotNetTool-Uninstall -packageId $packageId
 
     if($preReleaseVersion -eq $true) {
-        $version = findPreReleasePackageVersion -packageId $packageId
+        [string]$version = findPreReleasePackageVersion -packageId $packageId
 
-        if( $version -ne $null) {
+        if($version -ne $null) {
             Write-Information "Installing $version of $packageId"
             dotnet tool install --local $packageId --version $version
             
-            $installed = isInstalled -packageId $packageId
+            [bool]$installed = isInstalled -packageId $packageId
 			return $installed
         }
     }
@@ -117,7 +108,7 @@ param(
     Write-Information "Installing latest release version of $packageId"
     dotnet tool install --local $packageId
     
-    $installed = isInstalled -packageId $packageId
+    [bool]$installed = isInstalled -packageId $packageId
 	return $installed
 }
 
