@@ -5,7 +5,7 @@ param (
 
     $content = @{}
 
-    $srcExists = Test-Path -Path $fileName
+    [string]$srcExists = Test-Path -Path $fileName
     if($srcExists -eq $true) {
 
         $obj = Get-Content -Path $srcPath| Out-String | ConvertFrom-Json
@@ -34,10 +34,9 @@ param(
     [string] $repo
     )
 
-    $srcPath = Join-Path -Path $basePath -ChildPath "tracking.json"
+    [string]$srcPath = Join-Path -Path $basePath -ChildPath "tracking.json"
 
     $content = Tracking_Read -fileName $srcPath
-
 
     if($content.Contains($repo) -eq $true) {
         return $content[$repo]
@@ -68,7 +67,7 @@ param(
     [string] $value
     )
 
-    $srcPath = Join-Path -Path $basePath -ChildPath "tracking.json"
+    [string]$srcPath = Join-Path -Path $basePath -ChildPath "tracking.json"
 
     $content = Tracking_Read -fileName $srcPath
 
