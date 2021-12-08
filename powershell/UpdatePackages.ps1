@@ -10,13 +10,13 @@ Remove-Module *
 
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
-$packageIdToInstall = "Credfeto.Package.Update"
-$preRelease = $False
-$autoReleasePendingPackages = 5
+[string]$packageIdToInstall = "Credfeto.Package.Update"
+[bool]$preRelease = $False
+[int]$autoReleasePendingPackages = 5
 
 # Ensure $root is set to a valid path
 $workDir = Resolve-Path -path $work
-$root = $workDir.Path
+[string]$root = $workDir.Path
 if($root.Contains("/../")){
     Write-Error "Work folder: $work"
     Write-Error "Base folder: $root"
@@ -101,24 +101,27 @@ catch
 }
 #endregion
 
-function checkForUpdatesExact([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch)
-{
+function checkForUpdatesExact{
+param(
+    [String]$repoFolder, 
+    [String]$packageId, 
+    [Boolean]$exactMatch
+    )
+
 
     Write-Information "Updating Package Exact"
     $results = dotnet updatepackages -folder $repoFolder -packageId $packageId
-
-
     if ($?)
     {
 
         # has updates
-        $packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
-        $regexPattern = "echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
+        [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
+        [string]$regexPattern = "echo ::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
 
         $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
         $regexMatches = $regex.Matches($results.ToLower());
         if($regexMatches.Count -gt 0) {
-            $version = $regexMatches[0].Groups["Version"].Value
+            [string]$version = $regexMatches[0].Groups["Version"].Value
             Write-Information "Found: $version"
             return $version
         }
@@ -130,7 +133,11 @@ function checkForUpdatesExact([String]$repoFolder, [String]$packageId, [Boolean]
 }
 
 
-function checkForUpdatesPrefix([String]$repoFolder, [String]$packageId) {
+function checkForUpdatesPrefix{
+param(
+    [String]$repoFolder,
+    [String]$packageId
+    )
 
     Write-Information "Updating Package Prefix"
     $results = dotnet updatepackages -folder $repoFolder -packageprefix $packageId 
@@ -138,25 +145,29 @@ function checkForUpdatesPrefix([String]$repoFolder, [String]$packageId) {
     if($?) {
         
         # has updates
-        $packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
-        $regexPattern = "echo ::set-env name=$packageIdAsRegex(.*?)::(?<Version>\d+(\.\d+)+)"
+        [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
+        [string]$regexPattern = "echo ::set-env name=$packageIdAsRegex(.*?)::(?<Version>\d+(\.\d+)+)"
 
         $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
         $regexMatches = $regex.Matches($results.ToLower());
         if($regexMatches.Count -gt 0) {
-            $version = $regexMatches[0].Groups["Version"].Value
+            [string]$version = $regexMatches[0].Groups["Version"].Value
             Write-Information "Found: $version"
             return $version
         }
     }
     
-
     Write-Information " * No Changes"    
     return $null
 }
 
-function checkForUpdates([String]$repoFolder, [String]$packageId, [Boolean]$exactMatch)
-{
+function checkForUpdates{
+param(
+    [String]$repoFolder,
+    [String]$packageId,
+    [Boolean]$exactMatch
+)
+
     if ($exactMatch -eq $true)
     {
         return checkForUpdatesExact -repoFolder $repoFolder -packageId $packageId
@@ -167,9 +178,12 @@ function checkForUpdates([String]$repoFolder, [String]$packageId, [Boolean]$exac
     }
 }
 
-function BuildSolution([String]$srcPath, [String]$baseFolder, [String]$currentVersion)
-{
-
+function BuildSolution{
+param(
+    [String]$srcPath,
+    [String]$baseFolder,
+    [String]$currentVersion
+    )
 
     if ($lastRevision -eq $currentRevision)
     {
@@ -177,14 +191,18 @@ function BuildSolution([String]$srcPath, [String]$baseFolder, [String]$currentVe
         Return $true
     }
 
-    $codeOK = DotNet-BuildSolution -srcFolder $srcPath
+    [bool]$codeOK = DotNet-BuildSolution -srcFolder $srcPath
     if ($codeOK -eq $true)
     {
         Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
     }
 }
 
-function ShouldAlwaysCreatePatchRelease($repo) {
+function ShouldAlwaysCreatePatchRelease{
+param(
+    [string]$repo
+    )
+    
     if($repo.Contains("template")) {
         return $false
     }
@@ -209,11 +227,13 @@ function ShouldAlwaysCreatePatchRelease($repo) {
 }
 
 function IsAllAutoUpdates {
-    param($releaseNotes)
+param(
+    [string]$releaseNotes
+    )
 
-    $updateCount = 0
+    [int]$updateCount = 0
 
-    $hasContent = $false
+    [bool]$hasContent = $false
     foreach($line in $releaseNotes) {
 
         if($line.StartsWith("#")) {
@@ -246,11 +266,14 @@ function IsAllAutoUpdates {
 }
 
 
-function HasPendingDependencyUpdateBranches($repoPath) {
+function HasPendingDependencyUpdateBranches{
+param(
+    [string]$repoPath
+    )
 
-    $branches = Git-GetRemoteBranches -repoPath $repoPath -upstream "origin"
+    [string[]]$branches = Git-GetRemoteBranches -repoPath $repoPath -upstream "origin"
     
-    foreach($branch in $branches) {
+    foreach([string]$branch in $branches) {
         if($branch.StartsWith("depends/")) {
             Write-Information "Found dependency update branch: $branch"
             return $true
@@ -265,12 +288,16 @@ function HasPendingDependencyUpdateBranches($repoPath) {
     return $false
 }
 
-function removeBranchesForPrefix($repoPath, $branchForUpdate, $branchPrefix)
-{
-    $remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
+function removeBranchesForPrefix{
+param(
+    [string]$repoPath, 
+    [string]$branchForUpdate, 
+    [string]$branchPrefix)
+
+    [string[]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
     
     Write-Information "Looking for branches to remove based on prefix: $branchPrefix"        
-    foreach($branch in $remoteBranches) {
+    foreach([string]$branch in $remoteBranches) {
         if($branchForUpdate) {
             if($branch -eq $branchName) {
                 Write-Information "- Skipping branch just pushed to: $branch"
@@ -288,8 +315,13 @@ function removeBranchesForPrefix($repoPath, $branchForUpdate, $branchPrefix)
     }        
 } 
 
-function processRepo($repo, $packages, $baseFolder)
-{
+function processRepo{
+param(
+    [string]$repo,
+    $packages, 
+    [string]$baseFolder
+    )
+
 
     Set-Location -Path $root
 
@@ -302,15 +334,15 @@ function processRepo($repo, $packages, $baseFolder)
     Write-Information "Processing Repo: $repo"
 
     # Extract the folder from the repo name
-    $folder = Git-GetFolderForRepo -repo $repo
+    [string]$folder = Git-GetFolderForRepo -repo $repo
 
     Write-Information "Folder: $folder"
-    $repoFolder = Join-Path -Path $root -ChildPath $folder
+    [string]$repoFolder = Join-Path -Path $root -ChildPath $folder
 
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
 
-    $srcPath = Join-Path -Path $repoFolder -ChildPath "src"
-    $srcExists = Test-Path -Path $srcPath
+    [string]$srcPath = Join-Path -Path $repoFolder -ChildPath "src"
+    [bool]$srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $false) {
         # no source to update
         Write-Information "* No src folder in repo"
@@ -325,15 +357,15 @@ function processRepo($repo, $packages, $baseFolder)
         return;
     }
 
-    $lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
-    $currentRevision = Git-Get-HeadRev
+    [string]$lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
+    [string]$currentRevision = Git-Get-HeadRev
 
     Write-Information "Last Revision:    $lastRevision"
     Write-Information "Current Revision: $currentRevision"
 
-    $changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
+    [string]$changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
 
-    $codeOK = $false
+    [bool]$codeOK = $false
     if ($lastRevision -eq $currentRevision)
     {
         # no need to build - it last built successfully with this code revision
@@ -345,7 +377,7 @@ function processRepo($repo, $packages, $baseFolder)
         if ($codeOk -eq $true)
         {
             # Update last successful revision
-            $lastRevision = $currentRevision
+            [string]$lastRevision = $currentRevision
             Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
         }
     }
@@ -358,22 +390,22 @@ function processRepo($repo, $packages, $baseFolder)
         return;
     }
     
-    $branchesCreated = 0
-    $packagesUpdated = 0
+    [int]$branchesCreated = 0
+    [int]$packagesUpdated = 0
 
     ForEach ($package in $packages)
     {
-        $packageId = $package.packageId.Trim('.')
-        $type = $package.type
-        $exactMatch = $package.'exact-match'
+        [string]$packageId = $package.packageId.Trim('.')
+        [string]$type = $package.type
+        [bool]$exactMatch = $package.'exact-match'
 
         Write-Information ""
         Write-Information "------------------------------------------------"
         Write-Information "Looking for updates of $packageId"
         Write-Information "Exact Match: $exactMatch"
         
-        $branchPrefix = "depends/ff-1429/update-$packageId/"
-        $update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
+        [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
+        [bool]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
         
         if($update -eq $null) {
             Git-ResetToMaster
@@ -384,8 +416,8 @@ function processRepo($repo, $packages, $baseFolder)
         }
 
         $packagesUpdated += 1
-        $branchName = "$branchPrefix/$update"
-        $branchExists = Git-DoesBranchExist -branchName $branchName
+        [string]$branchName = "$branchPrefix/$update"
+        [bool]$branchExists = Git-DoesBranchExist -branchName $branchName
         if(!$branchExists) {
 
             Write-Information ">>>> Checking to see if code builds against $packageId $update <<<<"
@@ -397,8 +429,8 @@ function processRepo($repo, $packages, $baseFolder)
                 Git-Push
 
                 # Just built, committed and pushed so get the the revisions 
-                $currentRevision = Git-Get-HeadRev
-                $lastRevision = $currentRevision
+                [string]$currentRevision = Git-Get-HeadRev
+                [string]$lastRevision = $currentRevision
                 Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
 
                 Write-Information "Last Revision:    $lastRevision"
@@ -406,7 +438,7 @@ function processRepo($repo, $packages, $baseFolder)
             }
             else {
                 Write-Information "Create Branch $branchName"
-                $branchOk = Git-CreateBranch -branchName $branchName
+                [bool]$branchOk = Git-CreateBranch -branchName $branchName
                 if($branchOk) {
                     ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                     Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
@@ -436,13 +468,13 @@ function processRepo($repo, $packages, $baseFolder)
         # no branches created - check to see if we can create a release
         
         if(!$repo.Contains("template")) {
-            $releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
-            $autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes
+            [string]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
+            [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes
             
             if( $autoUpdateCount -ge $autoReleasePendingPackages) {
                 # At least $autoReleasePendingPackages auto updates... consider creating a release
                 
-                $hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoPath
+                [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoPath
                 if(!$hasPendingDependencyUpdateBranches) {            
                     if (ShouldAlwaysCreatePatchRelease -repo $repo) {
                         Write-Information "**** MAKE RELEASE ****"
@@ -453,7 +485,7 @@ function processRepo($repo, $packages, $baseFolder)
                     else {
                         if(!$repo.Contains("server-content-package"))
                         {
-                            $publishable = DotNet-HasPublishableExe -srcFolder $srcPath
+                            [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
                             if (!$publishable -and !$repo.Contains("template"))
                             {
                                 Write-Information "**** MAKE RELEASE ****"
@@ -472,21 +504,21 @@ function processRepo($repo, $packages, $baseFolder)
 #########################################################################
 
 
-$installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
+[bool]$installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
 
 if($installed -eq $false) {
     Write-Error ""
 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
 }
 
-$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
+[bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
 
 if($installed -eq $false) {
     Write-Error ""
 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
 }
 
-$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
+[bool]$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
 
 if($installed -eq $false) {
     Write-Error ""
@@ -503,7 +535,7 @@ Write-Information ""
 $packages = Get-Content -Path $packagesToUpdate -Raw | ConvertFrom-Json
 
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
-ForEach($repo in $repoList) {
+ForEach([string]$repo in $repoList) {
     if($repo.Trim() -eq "") {
         continue
     }
@@ -514,10 +546,4 @@ ForEach($repo in $repoList) {
 Set-Location -Path $root
 
 Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
-
-
-
-
-
-#$repos | ConvertFrom-Json
 
