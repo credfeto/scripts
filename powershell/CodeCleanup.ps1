@@ -1,7 +1,8 @@
 ﻿#########################################################################
 
 param(
-    [string] $repos = $(throw "repos.lst file containing list of repositories")
+    [string] $repos = $(throw "repos.lst file containing list of repositories"),
+    [string] $work = $(throw "folder where to clone repositories")        
 )
 
 Remove-Module *
@@ -10,8 +11,11 @@ $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "JetBrains.ReSharper.GlobalTools"
 $preRelease = $False
-$root = Get-Location
+$root = $work
+
 Write-Information $root
+Write-Information "Base folder: $root"
+Set-Location -Path $root
 
 
 #########################################################################

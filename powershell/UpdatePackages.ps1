@@ -14,7 +14,10 @@ $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = $False
 $root = $work
 $autoReleasePendingPackages = 5
+
 Write-Information $root
+Write-Information "Base folder: $root"
+Set-Location -Path $root
 
 
 #########################################################################

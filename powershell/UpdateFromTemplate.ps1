@@ -11,6 +11,12 @@ Remove-Module *
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
 $preRelease = $False
+$root = $work
+
+$root = $work
+Write-Information $root
+Write-Information "Base folder: $root"
+Set-Location -Path $root
 
 
 #########################################################################
@@ -777,14 +783,10 @@ if($installed -eq $false) {
 }
 
 
-$root = $work
-Write-Information $root
 
 Write-Information "Repository List: $repos"
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
 
-Write-Information "Base folder: $root"
-Set-Location -Path $root
     
 Write-Information ""
 Write-Information "***************************************************************"
