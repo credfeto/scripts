@@ -9,9 +9,9 @@ param (
     foreach($propertyGroup in $propertyGroups) {
         $children = $propertyGroup.SelectNodes("*")
         $orderedChildren = @{}
-        $replace = $true
+        [bool]$replace = $true
         foreach($child in $children) {
-            $name = ($child.Name).ToString().ToUpper()
+            [string]$name = ($child.Name).ToString().ToUpper()
             if($name -eq "#COMMENT") {
                 $replace = $false;
                 Write-Information "SKIPPING GROUP AS Found Comment"
@@ -24,7 +24,8 @@ param (
                 Break
             }
             $orderedChildren.Add($name, $child)
-        }              
+        }
+                      
         if($replace) {
             if($orderedChildren) {
                 $propertyGroup.RemoveAll()
@@ -71,9 +72,9 @@ param (
         
             foreach($include in $includes) {
             
-                $packageId = $include.GetAttribute("Include")
-                $private = $include.GetAttribute("PrivateAssets")
-                $toRemove += $include
+                [string]$packageId = $include.GetAttribute("Include")
+                [string]$private = $include.GetAttribute("PrivateAssets")
+                [string]$toRemove += $include
             
                 if([string]::IsNullOrEmpty($private)) {
                     if(!$normalItems.Contains($packageId.ToUpper())) {
@@ -94,7 +95,7 @@ param (
         
             foreach($include in $includes) {
             
-                $projectPath = $include.GetAttribute("Include")
+                [string]$projectPath = $include.GetAttribute("Include")
             
                 $toRemove += $include
                 if(!$projectItems.Contains($projectPath.ToUpper())) {
