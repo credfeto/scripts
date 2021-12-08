@@ -6,12 +6,12 @@ param (
     Write-Information "* Changing Resharper disable once comments to SuppressMessage"
     Write-Information "  - Folder: $sourceFolder"
 
-    $emptyLine = [char]13 + [char]10
+    [string]$emptyLine = [char]13 + [char]10
 
-    $linesToRemoveRegex = "(?<LinesToRemove>((\r\n){2,}))"
-    $suppressMessageRegex = "(?<End>\s+\[(System\.Diagnostics\.CodeAnalysis\.)?SuppressMessage)"
-    $removeBlankLinesRegex = "(?ms)" +  "(?<Start>(^((\s+)///\s+</(.*?)\>)))" + $linesToRemoveRegex + $suppressMessageRegex
-    $removeBlankLines2Regex = "(?ms)" + "(?<Start>(^((\s+)///\s+<(.*?)/\>)))" + $linesToRemoveRegex + $suppressMessageRegex
+    [string]$linesToRemoveRegex = "(?<LinesToRemove>((\r\n){2,}))"
+    [string]$suppressMessageRegex = "(?<End>\s+\[(System\.Diagnostics\.CodeAnalysis\.)?SuppressMessage)"
+    [string]$removeBlankLinesRegex = "(?ms)" +  "(?<Start>(^((\s+)///\s+</(.*?)\>)))" + $linesToRemoveRegex + $suppressMessageRegex
+    [string]$removeBlankLines2Regex = "(?ms)" + "(?<Start>(^((\s+)///\s+<(.*?)/\>)))" + $linesToRemoveRegex + $suppressMessageRegex
 
     $replacements = @(
         "AccessToModifiedClosure",
@@ -69,33 +69,33 @@ param (
         "VirtualMemberCallInConstructor"
     )
 
-    $changed = $false
+    [bool]$changed = $false
     $files = Get-ChildItem -Path $sourceFolder -Filter "*.cs" -Recurse
     ForEach($file in $files) {
-        $fileName = $file.FullName
+        [string]$fileName = $file.FullName
 
-        $content = Get-Content -Path $fileName -Raw
-        $originalContent = $content
-        $updatedContent = $content
+        [string]$content = Get-Content -Path $fileName -Raw
+        [string]$originalContent = $content
+        [string]$updatedContent = $content
 
-        $changedFile = $False
+        [bool]$changedFile = $False
 
         ForEach($replacement in $replacements) {
             if($replacement -eq $null) {
                 continue
             }
             
-            $code = $replacement.Replace(".", "\.")
-            $regex = "//\s+ReSharper\s+disable\s+once\s+$code"
-            $replacementText = "[System.Diagnostics.CodeAnalysis.SuppressMessage(""ReSharper"", ""$replacement"", Justification=""TODO: Review"")]"
+            [string]$code = $replacement.Replace(".", "\.")
+            [string]$regex = "//\s+ReSharper\s+disable\s+once\s+$code"
+            [string]$replacementText = "[System.Diagnostics.CodeAnalysis.SuppressMessage(""ReSharper"", ""$replacement"", Justification=""TODO: Review"")]"
 
-            $updatedContent = $content -replace $regex, $replacementText
+            [string]$updatedContent = $content -replace $regex, $replacementText
             if($content -ne $updatedContent)
             {
-                $content = $updatedContent
+                [string]$content = $updatedContent
                 if($changedFile -eq $False) {
                     Write-Information "* $fileName"
-                    $changedFile = $True
+                    [bool]$changedFile = $True
                 }
 
                 Write-Information "   - Changed $replacement comment to SuppressMessage"
@@ -107,51 +107,51 @@ param (
                 continue
             }
 
-            $code = $replacement.Replace(".", "\.")
-            $regex = "//\s+ReSharper\s+disable\s+once\s+$code"
-            $replacementText = ""
+            [string]$code = $replacement.Replace(".", "\.")
+            [string]$regex = "//\s+ReSharper\s+disable\s+once\s+$code"
+            [string]$replacementText = ""
 
-            $updatedContent = $content -replace $regex, $replacementText
+            [string]$updatedContent = $content -replace $regex, $replacementText
             if($content -ne $updatedContent)
             {
-                $content = $updatedContent
+                [string]$content = $updatedContent
                 if($changedFile -eq $False) {
                     Write-Information "* $fileName"
-                    $changedFile = $True
+                    [bool]$changedFile = $True
                 }
 
                 Write-Information "   - Removed $replacement comment"
             }
         }
 
-        $replacementText = '${Start}' + $emptyLine + '${End}'
-        $updatedContent = $content -replace $removeBlankLinesRegex, $replacementText
+        [string]$replacementText = '${Start}' + $emptyLine + '${End}'
+        [string]$updatedContent = $content -replace $removeBlankLinesRegex, $replacementText
         if($content -ne $updatedContent)
         {
-            $content = $updatedContent
+            [string]$content = $updatedContent
             if($changedFile -eq $False) {
                 Write-Information "* $fileName"
-                $changedFile = $True
+                [bool]$changedFile = $True
             }
 
             Write-Information "   - Removed blank lines (end tag)"
         }
 
-        $replacementText = '${Start}' + $emptyLine + '${End}'
-        $updatedContent = $content -replace $removeBlankLines2Regex, $replacementText
+        [string]$replacementText = '${Start}' + $emptyLine + '${End}'
+        [string]$updatedContent = $content -replace $removeBlankLines2Regex, $replacementText
         if($content -ne $updatedContent)
         {
-            $content = $updatedContent
+            [string]$content = $updatedContent
             if($changedFile -eq $False) {
                 Write-Information "* $fileName"
-                $changedFile = $True
+                [bool]$changedFile = $True
             }
 
             Write-Information "   - Removed blank lines (single tag)"
         }
 
         if($content -ne $originalContent) {
-            $changed = $true
+            [bool]$changed = $true
             Set-Content -Path $fileName -Value $content
         }
     }
