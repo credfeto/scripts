@@ -2,6 +2,7 @@
 
 param(
     [string] $repos = $(throw "repos.lst file containing list of repositories"),
+    [string] $work = $(throw "folder where to clone repositories"),
     [string] $packagesToUpdate = $(throw "Packages.json file to load")
 )
 
@@ -11,7 +12,7 @@ $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = $False
-$root = Get-Location
+$root = $work
 $autoReleasePendingPackages = 5
 Write-Information $root
 
