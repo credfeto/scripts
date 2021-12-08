@@ -62,16 +62,16 @@ function ChangeLog-GetUnreleased {
 
     Write-Information ">>> Reading Changelog unreleased content <<<"
 
-    $releaseNotes = dotnet changelog --changelog $fileName --un-released $release
+    [string[]]$releaseNotes = dotnet changelog --changelog $fileName --un-released $release
     if($?) {
 
-        $skip = 0
+        [int]$skip = 0
         while($skip -lt $releaseNotes.Length -and !$releaseNotes[$skip].StartsWith("#"))
         {
             ++$skip
         }
 
-        $releaseNotes = $releaseNotes | Select-Object -Skip $skip
+        [string[]]$releaseNotes = $releaseNotes | Select-Object -Skip $skip
 
         return $releaseNotes
 
