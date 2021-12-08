@@ -18,7 +18,7 @@ param(
     $projects = Get-ChildItem -Path $srcFolder -Filter *.csproj -Recurse
 
     ForEach($project in $projects) {
-        $projectFileName = $project.FullName
+        [string]$projectFileName = $project.FullName
 
         $data = [xml](Get-Content $projectFileName)
 
@@ -51,7 +51,7 @@ param(
         $targets = $targets | Sort-Object
         
         Write-Information "Found Targets:"
-        $target = $null
+        [string]$target = $null
         foreach($candidate in $targets) {
             Write-Information "* $candidate"
             $target = $candidate 
@@ -61,7 +61,7 @@ param(
         return $target
     }
     
-    return $null
+    return [string]$null
 }
 
 function DotNet-BuildClean {
@@ -115,8 +115,8 @@ function DotNet-Build {
 param(
     [string] $srcFolder)
      
-    $errorCode = "AD0001"
-    $NewLine = [System.Environment]::NewLine
+    [string]$errorCode = "AD0001"
+    [string]$NewLine = [System.Environment]::NewLine
 
     Write-Information " * Building"
     do {
@@ -124,8 +124,8 @@ param(
 
         $result = dotnet build --no-restore -warnAsError --configuration=Release -nodeReuse:False -p:Version=0.0.0.1-do-not-distribute
         if(!$?) {
-            $resultsAsText = $results -join $NewLine
-            $retry = $resultsAsText.Contains($errorCode)
+            [string]$resultsAsText = $results -join $NewLine
+            [bool]$retry = $resultsAsText.Contains($errorCode)
             if (!$retry) {
                 Write-Information ">>> Build Failed"
                 DotNet-DumpOutput -result $result
@@ -145,8 +145,8 @@ function DotNet-Pack {
 param(
     [string] $srcFolder)
      
-    $errorCode = "AD0001"
-    $NewLine = [System.Environment]::NewLine
+    [string]$errorCode = "AD0001"
+    [string]$NewLine = [System.Environment]::NewLine
 
     Write-Information " * Packing"
     do {
@@ -154,8 +154,8 @@ param(
 
         $result = dotnet pack --no-build --no-restore --configuration=Release -nodeReuse:False -p:Version=0.0.0.1-do-not-distribute
         if(!$?) {
-            $resultsAsText = $results -join $NewLine
-            $retry = $resultsAsText.Contains($errorCode)
+            [string]$resultsAsText = $results -join $NewLine
+            [bool]$retry = $resultsAsText.Contains($errorCode)
             if (!$retry) {
                 Write-Information ">>> Packing Failed"
                 DotNet-DumpOutput -result $result
@@ -176,10 +176,10 @@ function DotNet-Publish {
 param(
     [string] $srcFolder)
     
-    $framework = DotNet-GetPublishableFramework -srcFolder $srcFolder
+    [string]$framework = DotNet-GetPublishableFramework -srcFolder $srcFolder
      
-    $errorCode = "AD0001"
-    $NewLine = [System.Environment]::NewLine
+    [string]$errorCode = "AD0001"
+    [string]$NewLine = [System.Environment]::NewLine
 
     Write-Information " * Publishing"
     do {
@@ -191,8 +191,8 @@ param(
             $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=0.0.0.1-do-not-distribute -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
         }
         if (!$?) {
-            $resultsAsText = $results -join $NewLine
-            $retry = $resultsAsText.Contains($errorCode)
+            [string]$resultsAsText = $results -join $NewLine
+            [bool]$retry = $resultsAsText.Contains($errorCode)
             if (!$retry)
             {
                 Write-Information ">>> Publishing Failed"
@@ -213,8 +213,8 @@ function DotNet-BuildRunUnitTestsLinux {
 param(
     [string] $srcFolder)
      
-    $errorCode = "AD0001"
-    $NewLine = [System.Environment]::NewLine
+    [string]$errorCode = "AD0001"
+    [string]$NewLine = [System.Environment]::NewLine
 
     Write-Information " * Unit Tests"
     do {
@@ -222,8 +222,8 @@ param(
 
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration
         if (!$?) {
-            $resultsAsText = $results -join $NewLine
-            $retry = $resultsAsText.Contains($errorCode)
+            [string]$resultsAsText = $results -join $NewLine
+            [bool]$retry = $resultsAsText.Contains($errorCode)
             if (!$retry) {
                 Write-Information ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
@@ -242,8 +242,8 @@ function DotNet-BuildRunUnitTestsWindows {
 param(
     [string] $srcFolder)
      
-    $errorCode = "AD0001"
-    $NewLine = [System.Environment]::NewLine
+    [string]$errorCode = "AD0001"
+    [string]$NewLine = [System.Environment]::NewLine
 
     Write-Information " * Unit Tests"
     do {
@@ -251,8 +251,8 @@ param(
 
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration
         if (!$?) {
-            $resultsAsText = $results -join $NewLine
-            $retry = $resultsAsText.Contains($errorCode)
+            [string]$resultsAsText = $results -join $NewLine
+            [bool]$retry = $resultsAsText.Contains($errorCode)
             if (!$retry) {
                 Write-Information ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
@@ -284,8 +284,8 @@ param(
     [string] $srcFolder
 )
 
-    $errorCode = "AD0001"
-    $NewLine = [System.Environment]::NewLine
+    [string]$errorCode = "AD0001"
+    [string]$NewLine = [System.Environment]::NewLine
 
     Write-Information " * Unit Tests and Integration Tests"
     do {
@@ -293,8 +293,8 @@ param(
 
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False
         if (!$?) {
-            $resultsAsText = $results -join $NewLine
-            $retry = $resultsAsText.Contains($errorCode)
+            [string]$resultsAsText = $results -join $NewLine
+            [bool]$retry = $resultsAsText.Contains($errorCode)
             if (!$retry) {
                 Write-Information ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
@@ -317,18 +317,18 @@ function DotNet-HasPackable {
     $projects = Get-ChildItem -Path $srcFolder -Filter *.csproj -Recurse
     
     ForEach($project in $projects) {
-        $projectFileName = $project.FullName
+        [string]$projectFileName = $project.FullName
 
         $data = [xml](Get-Content $projectFileName)
 
         $projectType = $data.SelectSingleNode("/Project/PropertyGroup/OutputType");
         if($projectType -ne $null) {
-            $projectTypeValue = $projectType.InnerText.Trim()
+            [string]$projectTypeValue = $projectType.InnerText.Trim()
 
             if($projectTypeValue -eq "Library") {
                 $publishable = $data.SelectSingleNode("/Project/PropertyGroup/IsPackable");
                 if($publishable -ne $null) {
-                    $publishableValue = $publishable.InnerText.Trim()
+                    [string]$publishableValue = $publishable.InnerText.Trim()
                     if($publishableValue -eq "True") {
                         Write-Information "*** Found Packable Library"
                         return $true
@@ -350,17 +350,17 @@ param(
     $projects = Get-ChildItem -Path $srcFolder -Filter *.csproj -Recurse
 
     ForEach($project in $projects) {
-        $projectFileName = $project.FullName
+        [string]$projectFileName = $project.FullName
 
         $data = [xml](Get-Content $projectFileName)
 
         $projectType = $data.SelectSingleNode("/Project/PropertyGroup/OutputType");
         if($projectType -ne $null) {
-            $projectTypeValue = $projectType.InnerText.Trim()
+            [string]$projectTypeValue = $projectType.InnerText.Trim()
             if($projectTypeValue -eq "Exe") {
                 $publishable = $data.SelectSingleNode("/Project/PropertyGroup/IsPublishable");
                 if($publishable -ne $null) {
-                    $publishableValue = $publishable.InnerText.Trim()
+                    [string]$publishableValue = $publishable.InnerText.Trim()
                     if($publishableValue -eq "True") {
                         Write-Information "*** Found Publishable Executable"
                         return $true
@@ -397,44 +397,43 @@ param(
     [bool] $includeIntegrationTests = $false
     )
 
-    
-    $originalPath = (Get-Location).Path
+    [string]$originalPath = (Get-Location).Path
     Set-Location -Path $srcFolder
 
     try
     {
         Write-Information "Building Source in $srcFolder"
 
-        $buildOk = DotNet-BuildClean -srcFolder $srcFolder
+        [bool]$buildOk = DotNet-BuildClean -srcFolder $srcFolder
         Write-Information "Result $buildOk" 
         if(!$buildOk) {
             return $false
         }
         
-        $buildOk = DotNet-BuildRestore -srcFolder $srcFolder
+        [bool]$buildOk = DotNet-BuildRestore -srcFolder $srcFolder
         Write-Information "Result $buildOk"
         if(!$buildOk) {
             return $false
         }
 
-        $buildOk = DotNet-Build -srcFolder $srcFolder
+        [bool]$buildOk = DotNet-Build -srcFolder $srcFolder
         Write-Information "Result $buildOk"
         if(!$buildOk) {
             return $false
         }
         
-        $isPackable = DotNet-HasPackable -srcFolder $srcFolder
+        [bool]$isPackable = DotNet-HasPackable -srcFolder $srcFolder
         if($isPackable -eq $true) {
-            $buildOk = DotNet-Pack -srcFolder $srcFolder
+            [bool]$buildOk = DotNet-Pack -srcFolder $srcFolder
             Write-Information "Result $buildOk"
             if(!$buildOk) {
                 return $false
             }
         }
 
-        $isPublishable = DotNet-HasPublishableExe -srcFolder $srcFolder
+        [bool]$isPublishable = DotNet-HasPublishableExe -srcFolder $srcFolder
         if($isPublishable -eq $true) {
-            $buildOk = DotNet-Publish -srcFolder $srcFolder
+            [bool]$buildOk = DotNet-Publish -srcFolder $srcFolder
             Write-Information "Result $buildOk"
             if(!$buildOk) {
                 return $false
@@ -446,14 +445,14 @@ param(
         }
         
         if($includeIntegrationTests -eq $false) {
-            $buildOk = DotNet-BuildRunUnitTests -srcFolder $srcFolder
+            [bool]$buildOk = DotNet-BuildRunUnitTests -srcFolder $srcFolder
             Write-Information "Result $buildOk"
             if(!$buildOk) {
                 return $false
             }
         }
         else {
-            $buildOk = DotNet-BuildRunIntegrationTests -srcFolder $srcFolder
+            [bool]$buildOk = DotNet-BuildRunIntegrationTests -srcFolder $srcFolder
             Write-Information "Result $buildOk"
             if(!$buildOk) {
                 return $false
