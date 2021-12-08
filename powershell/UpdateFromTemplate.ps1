@@ -614,10 +614,11 @@ function processRepo($srcRepo, $repo, $baseFolder, $templateRepoHash) {
             # Process files in src folder
             updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
             $dotnetVersionUpdated = updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
-            Write-Host ".NET VERSION UPDATED: $dotnetVersionUpdated"
+            Write-Information ".NET VERSION UPDATED: $dotnetVersionUpdated"
         }
         
         if($repoFolder.Contains("funfair")) {
+            Write-Information "Repo Folder contains 'funfair': $repo"
             updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\FunFair.props"
             updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\packageicon.png"
         }

@@ -50,22 +50,19 @@ param(
     if($targets) {
         $targets = $targets | Sort-Object
         
-        Write-Host "Found Targets:"
+        Write-Information "Found Targets:"
         $target = $null
         foreach($candidate in $targets) {
-            Write-Host "* $candidate"
+            Write-Information "* $candidate"
             $target = $candidate 
         }
         
-        Write-Host "Matching Target : $target" 
+        Write-Information "Matching Target : $target" 
         return $target
     }
     
     return $null
 }
-
-#$framework = DotNet-GetPublishableFramework -srcFolder '/data/work/funfair/funfair-ethereum-proxy-server/src'
-#Write-Host $framework
 
 function DotNet-BuildClean {
 param(

@@ -59,7 +59,7 @@ param (
     foreach($itemGroup in $itemGroups) {
         if($itemGroup.HasAttributes) {
             # Skip groups that have attributes
-            Write-Output "Has Attributes"
+            Write-Information "Has Attributes"
             Continue
         }
     
