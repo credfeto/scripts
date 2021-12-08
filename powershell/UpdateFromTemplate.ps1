@@ -460,6 +460,8 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
                 }
     
                 Git-ResetToMaster
+                
+                return $false
             }
         }
         else {
@@ -483,15 +485,16 @@ function updateGlobalJson($sourceRepo, $targetRepo, $fileName) {
     
                 Git-ResetToMaster
             }
+            return $false
         }
     }
     else {
         Write-Information "No GLOBAL.JSON UPDATE"
         Write-Information "Ensuring $branchName no longer exists"
         Git-DeleteBranch -branchName $branchName
+        
+        return $false
     }
-    
-    return $false
 }
 
 function updateLabel($baseFolder) {
