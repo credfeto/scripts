@@ -5,14 +5,14 @@ param(
     [string]$repoPath
 )
     Write-Information "Looking for next RELEASE version"
-    $nextPatch = BuildVersion-GetNextPatch
+    [string]$nextPatch = BuildVersion-GetNextPatch
     if($nextPatch) {
         Write-Information "$repo => Create release $nextPatch"
 #         ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
 #         Git-Commit -message "Release notes for $nextPatch"
 #         Git-Push --repoPath  $repoPath
 # 
-         $branch = "release/$nextPatch"
+         [string]$branch = "release/$nextPatch"
          Write-Information "RELEASE: Should have created branch: $branch"
 
 #         $branched = Git-CreateBranch -branchName $branch -repoPath $repoPath
