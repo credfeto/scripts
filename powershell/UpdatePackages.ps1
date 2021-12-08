@@ -12,9 +12,16 @@ $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "Credfeto.Package.Update"
 $preRelease = $False
-$root = Resolve-Path -path $work
 $autoReleasePendingPackages = 5
 
+# Ensure $root is set to a valid path
+$workDir = Resolve-Path -path $work
+$root = $workDir.Path
+if($root.Contains("/../")){
+    Write-Error "Work folder: $work"
+    Write-Error "Base folder: $root"
+    throw "Invalid Base Folder: $root"
+}
 Write-Information $root
 Write-Information "Base folder: $root"
 Set-Location -Path $root

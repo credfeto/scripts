@@ -11,9 +11,16 @@ Remove-Module *
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
 $preRelease = $False
-$root = Resolve-Path -path $work
 
-$root = $work
+# Ensure $root is set to a valid path
+$workDir = Resolve-Path -path $work
+$root = $workDir.Path
+if($root.Contains("/../")){
+    Write-Error "Work folder: $work"
+    Write-Error "Base folder: $root"
+    throw "Invalid Base Folder: $root"
+}
+
 Write-Information $root
 Write-Information "Base folder: $root"
 Set-Location -Path $root

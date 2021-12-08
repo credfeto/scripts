@@ -11,7 +11,15 @@ $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 $packageIdToInstall = "JetBrains.ReSharper.GlobalTools"
 $preRelease = $False
-$root = Resolve-Path -path $work
+
+# Ensure $root is set to a valid path
+$workDir = Resolve-Path -path $work
+$root = $workDir.Path
+if($root.Contains("/../")){
+    Write-Error "Work folder: $work"
+    Write-Error "Base folder: $root"
+    throw "Invalid Base Folder: $root"
+}
 
 Write-Information $root
 Write-Information "Base folder: $root"
