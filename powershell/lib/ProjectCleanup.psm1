@@ -74,7 +74,7 @@ param (
             
                 [string]$packageId = $include.GetAttribute("Include")
                 [string]$private = $include.GetAttribute("PrivateAssets")
-                [string]$toRemove += $include
+                $toRemove += $include
             
                 if([string]::IsNullOrEmpty($private)) {
                     if(!$normalItems.Contains($packageId.ToUpper())) {
