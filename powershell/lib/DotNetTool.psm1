@@ -37,7 +37,7 @@ function findPreReleasePackageVersion( $packageId) {
 function isInstalled($packageId) {
     [string]$packageIdRegex = $packageId.Replace(".", "\.").ToLowerInvariant();
 
-    [string]$entry = &dotnet tool list --local | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
+    $entry = &dotnet tool list --local | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
 
 	Write-Information "Found: $entry"
     return $entry -ne $null
