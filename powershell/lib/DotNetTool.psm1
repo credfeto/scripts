@@ -37,7 +37,8 @@ function findPreReleasePackageVersion( $packageId) {
 function isInstalled($packageId) {
     [string]$packageIdRegex = $packageId.Replace(".", "\.").ToLowerInvariant();
 
-    $entry = &dotnet tool list --local | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
+    $result = &dotnet tool list --local
+    $entry = $result | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
 
 	Write-Information "Found: $entry"
 	
@@ -66,7 +67,11 @@ param(
     if(isInstalled -packageId $packageId) {
 
         Write-Information "Removing currently installed $packageId"
-        dotnet tool uninstall --local $packageId
+        $result = dotnet tool uninstall --local $packageId
+        if(!$?) {
+            Write-Error $result
+            throw "Failed to uninstall $packageId"
+        }        
     }
 }
 
@@ -93,7 +98,11 @@ param(
     [bool]$manifestExists = Test-Path -path '.config\dotnet-tools.json'
     if ($manifestExists -ne $true)
     {
-        dotnet new tool-manifest
+        $result = dotnet new tool-manifest
+        if(!$?) {
+            Write-Error $result
+            throw "Failed to uninstall $packageId"
+        }        
     }
 
     # Uninstall if already installed 
@@ -108,8 +117,9 @@ param(
 
         if($version -ne $null) {
             Write-Information "Installing $version of $packageId"
-            dotnet tool install --local $packageId --version $version
+            $result = dotnet tool install --local $packageId --version $version 2>&1
             if(!$?) {
+                Write-Error $result
                 return $false
             }
             
@@ -120,8 +130,9 @@ param(
 
     # Install released version
     Write-Information "Installing latest release version of $packageId"
-    dotnet tool install --local $packageId
+    $result = dotnet tool install --local $packageId 2>&1
     if(!$?) {
+        Write-Error $result
         return $false
     }
     
