@@ -106,7 +106,7 @@ param(
             dotnet tool install --local $packageId --version $version
             
             [bool]$installed = isInstalled -packageId $packageId
-			return $installed
+			return [bool]$installed
         }
     }
 
@@ -114,7 +114,7 @@ param(
     dotnet tool install --local $packageId
     
     [bool]$installed = isInstalled -packageId $packageId
-	return $installed
+	return [bool]$installed
 }
 
 Export-ModuleMember -Function DotNetTool-Install

@@ -10,7 +10,7 @@ Remove-Module *
 
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
-$preRelease = $False
+[bool]$preRelease = $False
 
 # Ensure $root is set to a valid path
 $workDir = Resolve-Path -path $work
