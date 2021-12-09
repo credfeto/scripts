@@ -270,8 +270,8 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $deleted = git -C $repoPath branch -D $branchName 2>1
-    $deleted = git -C $repoPath push origin ":$branchName" 2>1
+    $deleted = git -C $repoPath branch -D $branchName
+    $deleted = git -C $repoPath push origin ":$branchName"
 
     return $true;
 }
