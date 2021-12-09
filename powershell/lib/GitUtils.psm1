@@ -6,12 +6,15 @@ function GetRepoPath{
     )
 
     if([string]::IsNullOrWhiteSpace($repoPath)) {
-        [string]$currentDir = Get-Location
-        return $currentDir.Path
+        $currentDir = Get-Location
+        $repoPath = $currentDir.Path
     }
-    else {
-        return $repoPath
+    
+    if([string]::IsNullOrWhiteSpace($repoPath)) {
+        throw "Could not determine repo path"
     }
+    
+    return $repoPath
 }
 
 
