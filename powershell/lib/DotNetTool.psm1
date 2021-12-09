@@ -96,22 +96,34 @@ param(
         dotnet new tool-manifest
     }
 
-    DotNetTool-Uninstall -packageId $packageId
+    # Uninstall if already installed 
+    [bool]$installed = isInstalled -packageId $packageId
+    if($installed) {
+        DotNetTool-Uninstall -packageId $packageId
+    }
 
+    # Install pre-release if requested
     if($preReleaseVersion -eq $true) {
         [string]$version = findPreReleasePackageVersion -packageId $packageId
 
         if($version -ne $null) {
             Write-Information "Installing $version of $packageId"
             dotnet tool install --local $packageId --version $version
+            if(!$?) {
+                return $false
+            }
             
             [bool]$installed = isInstalled -packageId $packageId
 			return [bool]$installed
         }
     }
 
+    # Install released version
     Write-Information "Installing latest release version of $packageId"
     dotnet tool install --local $packageId
+    if(!$?) {
+        return $false
+    }
     
     [bool]$installed = isInstalled -packageId $packageId
 	return [bool]$installed
