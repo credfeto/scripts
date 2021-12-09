@@ -40,7 +40,12 @@ function isInstalled($packageId) {
     $entry = &dotnet tool list --local | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
 
 	Write-Information "Found: $entry"
-    return $entry -ne $null
+	
+	if($entry -ne $null) {
+	    return $true
+	}
+	
+    return $false
 }
 
 <#
