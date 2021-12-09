@@ -63,7 +63,7 @@ param(
     foreach($item in $result) {
         [string]$branch = $item.Trim()
         if(!$branch.StartsWith("* ")) {
-            $complete = git -C $repoPath branch -d $branch 2>&1
+            $complete = git -C $repoPath branch -d $branch
         }
     }
 }
