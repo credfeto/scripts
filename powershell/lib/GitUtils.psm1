@@ -63,7 +63,7 @@ param(
     foreach($item in $result) {
         [string]$branch = $item.Trim()
         if(!$branch.StartsWith("* ")) {
-            git branch -d $branch
+            $complete = git -C $repoPath branch -d $branch 2>&1
         }
     }
 }
@@ -270,8 +270,8 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    git -C $repoPath branch -D $branchName
-    git -C $repoPath push origin ":$branchName"
+    $deleted = git -C $repoPath branch -D $branchName 2>1
+    $deleted = git -C $repoPath push origin ":$branchName" 2>1
 
     return $true;
 }
