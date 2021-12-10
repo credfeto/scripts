@@ -415,8 +415,6 @@ param(
 
         Write-Information "***** $repo FOUND UPDATE TO $packageId for $update ******"
         
-        throw "Aborting updates for checks"
-
         $packagesUpdated += 1
         [string]$branchName = "$branchPrefix/$update"
         [bool]$branchExists = Git-DoesBranchExist -branchName $branchName  -repoPath $repoFolder
