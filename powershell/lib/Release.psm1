@@ -6,7 +6,7 @@ param(
 )
     Write-Information "Looking for next RELEASE version"
     [string]$nextPatch = BuildVersion-GetNextPatch
-    if(! [string]::IsNullOrEmpty($nextPatch) {
+    if(! [string]::IsNullOrEmpty($nextPatch)) {
         Write-Information "$repo => Create release $nextPatch"
          ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
 ##         Git-Commit -message "Release notes for $nextPatch"
