@@ -407,7 +407,7 @@ param(
         [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
         [string]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
         
-        if($update -eq $null) {
+        if([string]::IsNullOrEmpty($update)) {
             Write-Information "***** NO UPDATES TO $packageId ******"
             Git-ResetToMaster -repoPath $repoFolder
             
