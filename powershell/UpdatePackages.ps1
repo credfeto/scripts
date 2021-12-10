@@ -358,7 +358,7 @@ param(
     }
 
     [string]$lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
-    [string]$currentRevision = Git-Get-HeadRev
+    [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
 
     Write-Information "Last Revision:    $lastRevision"
     Write-Information "Current Revision: $currentRevision"
@@ -409,7 +409,7 @@ param(
         
         if($update -eq $null) {
             Write-Information "***** NO UPDATES TO $packageId ******"
-            Git-ResetToMaster
+            Git-ResetToMaster -repoPath $repoFolder
             
             removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
             
@@ -417,10 +417,12 @@ param(
         }
 
         Write-Information "***** FOUND UPDATE TO $packageId for $update ******"
+        
+        throw "Aborting updates for checks"
 
         $packagesUpdated += 1
         [string]$branchName = "$branchPrefix/$update"
-        [bool]$branchExists = Git-DoesBranchExist -branchName $branchName
+        [bool]$branchExists = Git-DoesBranchExist -branchName $branchName  -repoPath $repoFolder
         if(!$branchExists) {
 
             Write-Information ">>>> Checking to see if code builds against $packageId $update <<<<"
@@ -428,11 +430,11 @@ param(
             Set-Location -Path $repoFolder
             if($codeOK) {
                 ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-                Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
-                Git-Push
+                Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"  -repoPath $repoFolder
+                Git-Push -repoPath $repoFolder
 
                 # Just built, committed and pushed so get the the revisions 
-                [string]$currentRevision = Git-Get-HeadRev
+                [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
                 [string]$lastRevision = $currentRevision
                 Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
 
@@ -441,11 +443,11 @@ param(
             }
             else {
                 Write-Information "Create Branch $branchName"
-                [bool]$branchOk = Git-CreateBranch -branchName $branchName
+                [bool]$branchOk = Git-CreateBranch -branchName $branchName  -repoPath $repoFolder
                 if($branchOk) {
                     ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-                    Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"
-                    Git-PushOrigin -branchName $branchName
+                    Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"  -repoPath $repoFolder
+                    Git-PushOrigin -branchName $branchName  -repoPath $repoFolder
 
                     $branchesCreated += 1
                 } else {
@@ -457,7 +459,7 @@ param(
                 Write-Information "Branch $branchName already exists - skipping"
         }
  
-        Git-ResetToMaster
+        Git-ResetToMaster -repoPath $repoFolder
         
         removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
     }
@@ -465,7 +467,7 @@ param(
     Write-Information "Updated run created $branchesCreated branches"
     Write-Information "Updated run updated $packagesUpdated packages"
     
-    Git-ResetToMaster
+    Git-ResetToMaster -repoPath $repoFolder
     
     if($branchesCreated -eq 0) {
         # no branches created - check to see if we can create a release
