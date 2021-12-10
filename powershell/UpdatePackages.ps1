@@ -405,15 +405,18 @@ param(
         Write-Information "Exact Match: $exactMatch"
         
         [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
-        [bool]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
+        [string]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
         
         if($update -eq $null) {
+            Write-Information "***** NO UPDATES TO $packageId ******"
             Git-ResetToMaster
             
             removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
             
             Continue
         }
+
+        Write-Information "***** FOUND UPDATE TO $packageId for $update ******"
 
         $packagesUpdated += 1
         [string]$branchName = "$branchPrefix/$update"
