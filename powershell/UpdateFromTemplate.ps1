@@ -479,7 +479,8 @@ param(
     [string]$sourceFileName = makePath -Path $sourceRepo -ChildPath $localFileName
     [string]$targetFileName = makePath -Path $targetRepo -ChildPath $localFileName
 
-    [string]$branchName = "template/ff-3881/$fileName".Replace("\", "/")
+    [string]$originalBranchPrefix = "template/ff-3881/$fileName".Replace("\", "/")
+    [string]$branchName = $originalBranchPrefix
 
     Write-Information "*****************"
     Write-Information "** GLOBAL.JSON **"
@@ -515,6 +516,11 @@ param(
                 Git-Push
                 Git-DeleteBranch -branchName $branchName
                 
+                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+                
+                # Remove any previous template updates that didn't create a version specific branch
+                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+                
                 return $true
             }
             else {
@@ -528,6 +534,11 @@ param(
     
                 Git-ResetToMaster
                 
+                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+
+                # Remove any previous template updates that didn't create a version specific branch
+                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+                
                 return $false
             }
         }
@@ -540,6 +551,9 @@ param(
             if ($codeOK -eq $true) {
                 Write-Information "**** BUILD OK ****"
                 doCommit -fileName $fileName
+
+                # Remove any previous template updates that didn't create a version specific branch
+                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
             }
             else {
                 Write-Information "**** BUILD FAILURE ****"
@@ -552,6 +566,7 @@ param(
     
                 Git-ResetToMaster
             }
+            
             return $false
         }
     }
