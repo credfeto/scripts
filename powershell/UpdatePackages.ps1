@@ -535,7 +535,7 @@ Write-Information ""
 $packages = Get-Content -Path $packagesToUpdate -Raw | ConvertFrom-Json
 
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
-ForEach([string]$repo in $repoList) {
+ForEach($repo in $repoList) {
     if($repo.Trim() -eq "") {
         continue
     }
