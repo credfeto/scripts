@@ -309,9 +309,6 @@ param(
             Write-Information "+ Deleting older branch for package: $branch"
             Git-DeleteBranch -branchName $branch -repoPath $repoFolder
         }
-        else {
-            Write-Information "+ Skipping branch for other package: $branch"
-        }
     }        
 } 
 
