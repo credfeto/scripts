@@ -408,7 +408,7 @@ param(
         [string]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
         
         if([string]::IsNullOrEmpty($update)) {
-            Write-Information "***** NO UPDATES TO $packageId ******"
+            Write-Information "***** $repo NO UPDATES TO $packageId ******"
             Git-ResetToMaster -repoPath $repoFolder
             
             removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
@@ -416,7 +416,7 @@ param(
             Continue
         }
 
-        Write-Information "***** FOUND UPDATE TO $packageId for $update ******"
+        Write-Information "***** $repo FOUND UPDATE TO $packageId for $update ******"
         
         throw "Aborting updates for checks"
 
