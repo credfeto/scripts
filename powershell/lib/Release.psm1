@@ -27,7 +27,4 @@ param(
     }
 }
 
-
-
-
 Export-ModuleMember -Function Release-Create
