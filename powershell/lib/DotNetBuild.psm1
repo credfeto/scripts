@@ -79,7 +79,7 @@ param(
             return $false
         }
         
-        Write-Information "   - Clean Succeded"
+        Write-Information "   - Clean Succeeded"
 
         return $true
     } catch  {
