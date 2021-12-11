@@ -1,3 +1,6 @@
+function BuildVersion {
+    return "0.0.0.1-do-not-distribute"
+}
 
 function DotNet-DumpOutput {
     param(
@@ -117,12 +120,13 @@ param(
      
     [string]$errorCode = "AD0001"
     [string]$NewLine = [System.Environment]::NewLine
+    [string]$version = BuildVersion
 
     Write-Information " * Building"
     do {
         Set-Location -Path $srcFolder
 
-        $result = dotnet build --no-restore -warnAsError --configuration=Release -nodeReuse:False -p:Version=0.0.0.1-do-not-distribute
+        $result = dotnet build --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version
         if(!$?) {
             [string]$resultsAsText = $results -join $NewLine
             [bool]$retry = $resultsAsText.Contains($errorCode)
@@ -147,12 +151,14 @@ param(
      
     [string]$errorCode = "AD0001"
     [string]$NewLine = [System.Environment]::NewLine
-
+    [string]$version = BuildVersion
+    [string]$buildOpt = "--no-build"
+    
     Write-Information " * Packing"
     do {
         Set-Location -Path $srcFolder
 
-        $result = dotnet pack --no-build --no-restore --configuration=Release -nodeReuse:False -p:Version=0.0.0.1-do-not-distribute
+        $result = dotnet pack $buildOpt --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version
         if(!$?) {
             [string]$resultsAsText = $results -join $NewLine
             [bool]$retry = $resultsAsText.Contains($errorCode)
@@ -162,6 +168,8 @@ param(
 
                 return $false
             }
+            
+            $buildOpt = ""
         }
         else {
             Write-Information "   - Packing Succeeded"
@@ -180,15 +188,16 @@ param(
      
     [string]$errorCode = "AD0001"
     [string]$NewLine = [System.Environment]::NewLine
+    [string]$version = BuildVersion
 
     Write-Information " * Publishing"
     do {
         Set-Location -Path $srcFolder
 
         if($framework) {
-            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=0.0.0.1-do-not-distribute -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$ -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
         } else {
-            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=0.0.0.1-do-not-distribute -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$ -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
         }
         if (!$?) {
             [string]$resultsAsText = $results -join $NewLine
