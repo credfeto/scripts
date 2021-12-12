@@ -152,13 +152,12 @@ param(
     [string]$errorCode = "AD0001"
     [string]$NewLine = [System.Environment]::NewLine
     [string]$version = BuildVersion
-    [string]$buildOpt = "--no-build"
     
     Write-Information " * Packing"
     do {
         Set-Location -Path $srcFolder
 
-        $result = dotnet pack $buildOpt --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version
+        $result = dotnet pack --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version
         if(!$?) {
             [string]$resultsAsText = $results -join $NewLine
             [bool]$retry = $resultsAsText.Contains($errorCode)
@@ -168,8 +167,6 @@ param(
 
                 return $false
             }
-            
-            $buildOpt = ""
         }
         else {
             Write-Information "   - Packing Succeeded"
