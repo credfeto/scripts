@@ -157,7 +157,7 @@ param(
     do {
         Set-Location -Path $srcFolder
 
-        $result = dotnet pack --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version
+        $result = dotnet pack --no-restore -nodeReuse:False --configuration=Release -p:Version=$version
         if(!$?) {
             [string]$resultsAsText = $results -join $NewLine
             [bool]$retry = $resultsAsText.Contains($errorCode)
