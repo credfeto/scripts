@@ -473,6 +473,9 @@ param(
                             }
                         }
                     }
+                } 
+                else {
+                    Write-Information "SKIPPING RELEASE: Found pending update branches in $repo"
                 }
             }
         }
