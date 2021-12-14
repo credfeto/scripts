@@ -273,8 +273,15 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $deleted = git -C $repoPath branch -D $branchName
-    $deleted = git -C $repoPath push origin ":$branchName"
+    [bool]$branchExists = Git-DoesBranchExist -branchName $branchName -repoPath $repoPath
+    if($branchExists) {
+        $deleted = git -C $repoPath branch -D $branchName
+    }
+    
+    [bool]$branchExists = Git-DoesBranchExist -branchName "origin/$branchName" -repoPath $repoPath
+    if($branchExists) {
+        $deleted = git -C $repoPath push origin ":$branchName"
+    }
 
     return $true;
 }

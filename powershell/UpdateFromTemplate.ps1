@@ -708,7 +708,7 @@ param (
 
             # Process files in src folder
             updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
-            $dotnetVersionUpdated = updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+            [bool]$dotnetVersionUpdated = updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
             Write-Information ".NET VERSION UPDATED: $dotnetVersionUpdated"
         }
         
