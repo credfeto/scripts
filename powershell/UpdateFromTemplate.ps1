@@ -521,7 +521,7 @@ param(
                 # Remove any previous template updates that didn't create a version specific branch
                 Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
                 
-                return $true
+                return "VERSION"
             }
             else {
                 Write-Information "**** BUILD FAILURE ****"
@@ -539,7 +539,7 @@ param(
                 # Remove any previous template updates that didn't create a version specific branch
                 Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
                 
-                return $false
+                return "PENDING"
             }
         }
         else {
@@ -567,15 +567,15 @@ param(
                 Git-ResetToMaster
             }
             
-            return $false
+            return "CONTENT"
         }
     }
     else {
         Write-Information "No GLOBAL.JSON UPDATE"
         Write-Information "Ensuring $branchName no longer exists"
-        Git-DeleteBranch -branchName $branchName
+        Git-DeleteBranch -branchName $branchName        
         
-        return $false
+        return "NONE"
     }
 }
 
@@ -708,7 +708,9 @@ param (
 
             # Process files in src folder
             updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
-            [bool]$dotnetVersionUpdated = updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+            [string]$versionResult = updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+            Write-Information ".NET VERSION UPDATED: $versionResult"
+            [bool]$dotnetVersionUpdated = $versionResult -eq "VERSION"
             Write-Information ".NET VERSION UPDATED: $dotnetVersionUpdated"
         }
         
