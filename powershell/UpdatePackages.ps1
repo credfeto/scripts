@@ -437,16 +437,21 @@ param(
     
     Write-Information "Updated run created $branchesCreated branches"
     Write-Information "Updated run updated $packagesUpdated packages"
+    Write-Information "Branches Created $branchesCreated"  
     
     Git-ResetToMaster -repoPath $repoFolder
     
     if($branchesCreated -eq 0) {
         # no branches created - check to see if we can create a release
+        Write-Information "Checking if can create release for $repo"
         
         if(!$repo.Contains("template")) {
+            Write-Information "Processing Release Notes in $changeLog"
+            
             [string]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
             [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes
             
+            Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
             if( $autoUpdateCount -ge $autoReleasePendingPackages) {
                 # At least $autoReleasePendingPackages auto updates... consider creating a release
                 
@@ -459,11 +464,9 @@ param(
                         Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                     }
                     else {
-                        if(!$repo.Contains("server-content-package"))
-                        {
+                        if(!$repo.Contains("server-content-package")) {
                             [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
-                            if (!$publishable -and !$repo.Contains("template"))
-                            {
+                            if (!$publishable -and !$repo.Contains("template")) {
                                 Write-Information "**** MAKE RELEASE ****"
                                 Write-Information "Changelog: $changeLog"
                                 Write-Information "Repo: $repoFolder"
