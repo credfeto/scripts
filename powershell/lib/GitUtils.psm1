@@ -337,7 +337,7 @@ function Git-HasSubmodules {
     return $true
 }
 
-function Git-Git-RemoveBranchesForPrefix{
+function Git-RemoveBranchesForPrefix{
 param(
     [string]$repoPath, 
     [string]$branchForUpdate, 
@@ -389,4 +389,4 @@ Export-ModuleMember -Function Git-Get-HeadRev
 Export-ModuleMember -Function Git-ReNormalise
 Export-ModuleMember -Function Git-HasSubmodules
 Export-ModuleMember -Function Git-GetRemoteBranches
-Export-ModuleMember -Function Git-Git-RemoveBranchesForPrefix
+Export-ModuleMember -Function Git-RemoveBranchesForPrefix
