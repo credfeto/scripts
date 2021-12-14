@@ -465,12 +465,18 @@ param(
                     else {
                         if(!$repo.Contains("server-content-package")) {
                             [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
-                            if (!$publishable -and !$repo.Contains("template")) {
+                            if (!$publishable) {
                                 Write-Information "**** MAKE RELEASE ****"
                                 Write-Information "Changelog: $changeLog"
                                 Write-Information "Repo: $repoFolder"
                                 Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                             }
+                            else {
+                                Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
+                            }
+                        }
+                        else {
+                            Write-Information "SKIPPING RELEASE: $repo is a explicitly prohibited"
                         }
                     }
                 } 
@@ -478,7 +484,16 @@ param(
                     Write-Information "SKIPPING RELEASE: Found pending update branches in $repo"
                 }
             }
+            else {
+                Write-Information "SKIPPING RELEASE: insufficient pending updates : $autoUpdateCount"
+            }
         }
+        else {
+            Write-Information "SKIPPING RELEASE: $repo is a template"
+        }
+    }
+    else {
+        Write-Information "SKIPPING RELEASE: Created $branchesCreated during this run"
     }
 }
 
