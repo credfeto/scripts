@@ -228,7 +228,7 @@ param(
 
 function IsAllAutoUpdates {
 param(
-    [string]$releaseNotes
+    [string[]]$releaseNotes
     )
 
     [int]$updateCount = 0
@@ -447,7 +447,8 @@ param(
         if(!$repo.Contains("template")) {
             Write-Information "Processing Release Notes in $changeLog"
             
-            [string]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
+            [string[]]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
+            Write-Information $releaseNotes
             [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes
             
             Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
