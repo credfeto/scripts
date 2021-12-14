@@ -1,4 +1,15 @@
-﻿<#
+﻿function ReformatJson {
+param( [string] $source
+    )
+    
+    $obj = $source | ConvertFrom-Json
+    
+    [string] $reformatted = $obj | ConvertTo-Json -Compress
+    
+    return $reformatted
+}
+
+<#
  .Synopsis
   Updates the global.json file
 
@@ -58,6 +69,10 @@ function GlobalJson_Update
     }
 
     [string]$trgContent = Get-Content -Path $targetFileName -Raw
+    
+    # Ensure that the Json files are reformatted the same way for any comparisons
+    [string]$srcContent = ReformatJson -source $srcContent
+    [string]$trgContent = ReformatJson -source $trgContent
 
     if ($srcContent -eq $trgContent) {
         Write-Information "* target global.json same as source"
