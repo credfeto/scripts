@@ -437,7 +437,6 @@ param(
     
     Write-Information "Updated run created $branchesCreated branches"
     Write-Information "Updated run updated $packagesUpdated packages"
-    Write-Information "Branches Created $branchesCreated"  
     
     Git-ResetToMaster -repoPath $repoFolder
     
