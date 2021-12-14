@@ -516,10 +516,10 @@ param(
                 Git-Push
                 Git-DeleteBranch -branchName $branchName
                 
-                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
                 
                 # Remove any previous template updates that didn't create a version specific branch
-                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
                 
                 return $true
             }
@@ -534,10 +534,10 @@ param(
     
                 Git-ResetToMaster
                 
-                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
 
                 # Remove any previous template updates that didn't create a version specific branch
-                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
                 
                 return $false
             }
@@ -553,7 +553,7 @@ param(
                 doCommit -fileName $fileName
 
                 # Remove any previous template updates that didn't create a version specific branch
-                removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
             }
             else {
                 Write-Information "**** BUILD FAILURE ****"

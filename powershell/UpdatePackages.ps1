@@ -288,30 +288,6 @@ param(
     return $false
 }
 
-function removeBranchesForPrefix{
-param(
-    [string]$repoPath, 
-    [string]$branchForUpdate, 
-    [string]$branchPrefix)
-
-    [string[]]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
-    
-    Write-Information "Looking for branches to remove based on prefix: $branchPrefix"        
-    foreach($branch in $remoteBranches) {
-        if($branchForUpdate) {
-            if($branch -eq $branchName) {
-                Write-Information "- Skipping branch just pushed to: $branch"
-                continue
-            }
-        }
-        
-        if($branch.StartsWith($branchPrefix)) {
-            Write-Information "+ Deleting older branch for package: $branch"
-            Git-DeleteBranch -branchName $branch -repoPath $repoFolder
-        }
-    }        
-} 
-
 function processRepo{
 param(
     [string]$repo,
@@ -408,7 +384,7 @@ param(
             Write-Information "***** $repo NO UPDATES TO $packageId ******"
             Git-ResetToMaster -repoPath $repoFolder
             
-            removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
+            Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
             
             Continue
         }
@@ -456,7 +432,7 @@ param(
  
         Git-ResetToMaster -repoPath $repoFolder
         
-        removeBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
+        Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
     }
     
     Write-Information "Updated run created $branchesCreated branches"

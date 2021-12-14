@@ -337,6 +337,30 @@ function Git-HasSubmodules {
     return $true
 }
 
+function Git-Git-RemoveBranchesForPrefix{
+param(
+    [string]$repoPath, 
+    [string]$branchForUpdate, 
+    [string]$branchPrefix)
+
+    [string[]]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
+    
+    Write-Information "Looking for branches to remove based on prefix: $branchPrefix"        
+    foreach($branch in $remoteBranches) {
+        if($branchForUpdate) {
+            if($branch -eq $branchName) {
+                Write-Information "- Skipping branch just pushed to: $branch"
+                continue
+            }
+        }
+        
+        if($branch.StartsWith($branchPrefix)) {
+            Write-Information "+ Deleting older branch for package: $branch"
+            Git-DeleteBranch -branchName $branch -repoPath $repoFolder
+        }
+    }        
+} 
+
 
 function Git-LoadRepoList {
 param(
@@ -365,3 +389,4 @@ Export-ModuleMember -Function Git-Get-HeadRev
 Export-ModuleMember -Function Git-ReNormalise
 Export-ModuleMember -Function Git-HasSubmodules
 Export-ModuleMember -Function Git-GetRemoteBranches
+Export-ModuleMember -Function Git-Git-RemoveBranchesForPrefix
