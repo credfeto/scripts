@@ -288,6 +288,19 @@ param(
     return $false
 }
 
+function CheckRepoForAllowedAutoUpgrade {
+param ([string]$repo)
+    if($repo.Contains("server-content-package")) {
+        return $false
+    }
+    
+    if($repo.Contains("code-analysis")) {
+        return $false
+    }
+
+    return $true
+}
+
 function processRepo{
 param(
     [string]$repo,
@@ -464,7 +477,8 @@ param(
                         Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                     }
                     else {
-                        if(!$repo.Contains("server-content-package")) {
+                        $allowUpdates = CheckRepoForAllowedAutoUpgrade -repo $repo
+                        if($allowUpdates) {
                             [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
                             if (!$publishable) {
                                 Write-Information "**** MAKE RELEASE ****"
