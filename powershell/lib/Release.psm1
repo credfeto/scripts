@@ -11,7 +11,7 @@ param(
     }
     
     Write-Information "$repo => Create release $nextPatch"
-    throw "Not Creating releases"
+    #throw "Not Creating releases"
     
     ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
     Git-Commit -message "Release notes for $nextPatch"
