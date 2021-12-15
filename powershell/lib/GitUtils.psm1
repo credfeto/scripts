@@ -78,6 +78,8 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
+    $head = Git-Get-HeadRev -repoPath $repoPath
+    
     # junk any existing checked out files
     git -C $repoPath reset HEAD --hard
     git -C $repoPath clean -f -x -d
@@ -90,9 +92,16 @@ param(
     git -C $repoPath reset --hard origin/master
     git -C $repoPath remote update origin --prune
     git -C $repoPath prune
-    git -C $repoPath gc --aggressive --prune
+    
+    $newHead = Git-Get-HeadRev -repoPath $repoPath
+    if($head -ne $newHead) {
+        # ONLY GC if head is different, i.e. something has changed    
+        git -C $repoPath gc --aggressive --prune
+    }
 
     Git-RemoveAllLocalBranches -repoPath $repoPath
+    
+    return $newHead
 }
 
 function Git-HasUnCommittedChanges {
