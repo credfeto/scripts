@@ -192,9 +192,9 @@ param(
         Set-Location -Path $srcFolder
 
         if($framework) {
-            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$ -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
         } else {
-            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$ -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
+            $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False
         }
         if (!$?) {
             [string]$resultsAsText = $results -join $NewLine
