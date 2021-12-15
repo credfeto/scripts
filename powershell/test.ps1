@@ -44,7 +44,8 @@ $unixTime = git log -1 --format=%ct
 [DateTime]$when = [DateTimeOffset]::FromUnixTimeSeconds($unixTime).UtcDateTime
 [DateTime]$now = $now = [DateTime]::UtcNow
 
-[double]$duration = ($now - $when).TotalHours 
+[TimeSpan]$difference = $now - $when
+[double]$duration = $difference.TotalHours 
 
 Write-Host $when
 Write-Host $now
