@@ -13,7 +13,9 @@ function BuildVersion-GetNextPatch {
         throw "Could Not Determine Release (command failed)"
     }
     
-    Write-Information $result
+    foreach($line in $result) {
+        Write-Information $line
+    }
 
     $match = select-string "Version:\s(\d+\.\d+\.\d+)\.\d+\-master" -InputObject $result
     if($match) {
