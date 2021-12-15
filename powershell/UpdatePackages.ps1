@@ -455,56 +455,61 @@ param(
     
     if($branchesCreated -eq 0) {
         # no branches created - check to see if we can create a release
-        Write-Information "Checking if can create release for $repo"
-        
-        if(!$repo.Contains("template")) {
-            Write-Information "Processing Release Notes in $changeLog"
+        if($packagesUpdated -eq 0) {
+            Write-Information "Checking if can create release for $repo"
             
-            [string[]]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
-            Write-Information $releaseNotes
-            [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes
-            
-            Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
-            if( $autoUpdateCount -ge $autoReleasePendingPackages) {
-                # At least $autoReleasePendingPackages auto updates... consider creating a release
+            if(!$repo.Contains("template")) {
+                Write-Information "Processing Release Notes in $changeLog"
                 
-                [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoPath
-                if(!$hasPendingDependencyUpdateBranches) {            
-                    if (ShouldAlwaysCreatePatchRelease -repo $repo) {
-                        Write-Information "**** MAKE RELEASE ****"
-                        Write-Information "Changelog: $changeLog"
-                        Write-Information "Repo: $repoFolder"
-                        Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
-                    }
-                    else {
-                        $allowUpdates = CheckRepoForAllowedAutoUpgrade -repo $repo
-                        if($allowUpdates) {
-                            [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
-                            if (!$publishable) {
-                                Write-Information "**** MAKE RELEASE ****"
-                                Write-Information "Changelog: $changeLog"
-                                Write-Information "Repo: $repoFolder"
-                                Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
-                            }
-                            else {
-                                Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
-                            }
+                [string[]]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
+                Write-Information $releaseNotes
+                [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes
+                
+                Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
+                if( $autoUpdateCount -ge $autoReleasePendingPackages) {
+                    # At least $autoReleasePendingPackages auto updates... consider creating a release
+                    
+                    [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoPath
+                    if(!$hasPendingDependencyUpdateBranches) {            
+                        if (ShouldAlwaysCreatePatchRelease -repo $repo) {
+                            Write-Information "**** MAKE RELEASE ****"
+                            Write-Information "Changelog: $changeLog"
+                            Write-Information "Repo: $repoFolder"
+                            Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                         }
                         else {
-                            Write-Information "SKIPPING RELEASE: $repo is a explicitly prohibited"
+                            $allowUpdates = CheckRepoForAllowedAutoUpgrade -repo $repo
+                            if($allowUpdates) {
+                                [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
+                                if (!$publishable) {
+                                    Write-Information "**** MAKE RELEASE ****"
+                                    Write-Information "Changelog: $changeLog"
+                                    Write-Information "Repo: $repoFolder"
+                                    Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
+                                }
+                                else {
+                                    Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
+                                }
+                            }
+                            else {
+                                Write-Information "SKIPPING RELEASE: $repo is a explicitly prohibited"
+                            }
                         }
+                    } 
+                    else {
+                        Write-Information "SKIPPING RELEASE: Found pending update branches in $repo"
                     }
-                } 
+                }
                 else {
-                    Write-Information "SKIPPING RELEASE: Found pending update branches in $repo"
+                    Write-Information "SKIPPING RELEASE: insufficient pending updates : $autoUpdateCount"
                 }
             }
             else {
-                Write-Information "SKIPPING RELEASE: insufficient pending updates : $autoUpdateCount"
+                Write-Information "SKIPPING RELEASE: $repo is a template"
             }
         }
         else {
-            Write-Information "SKIPPING RELEASE: $repo is a template"
+            Write-Information "SKIPPING RELEASE: Updated $packagesUpdated during this run"
         }
     }
     else {
