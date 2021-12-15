@@ -519,7 +519,8 @@ param(
                                     [DateTime]$now = [DateTime]::UtcNow                                    
                                     $now = [DateTime]::UtcNow
                                     
-                                    $duration = ($now - $when).TotalHours
+                                    [TimeSpan]$durationTimeSpan = ($now - $lastCommitDate)
+                                    $duration = $durationTimeSpan.TotalHours
                                     Write-Information "Duration since last commit $duration"
                                     if($duration -gt $minimumHoursBeforeAutoRelease) {
                                         Write-Information "**** MAKE RELEASE ****"
