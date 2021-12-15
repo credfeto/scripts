@@ -253,6 +253,8 @@ param(
     $packages
     )
 
+    [string]$expr = "(?ms)" + "^\s*\-\s*FF\-1429\s*\-\sUpdated\s+(?<PackageId>.+(\.+)*?)\sto\s+(\d+\..*)$"
+    
     [int]$updateCount = 0
 
     [bool]$hasContent = $false
@@ -265,9 +267,15 @@ param(
         $hasContent = $true
 
         #if($line.StartsWith(" - FF-1429 - ")) {
-        if($line -match "^\s*\-\s*FF\-1429\s*\-\s*") {
+        if($line -match $expr) {            
             # Package Update
-            $updateCount += 1
+            $packageName = $matches.PackageId
+            if(IsPackageConsideredForVersionUpdate -packages $packages -packageName $packageName) {
+                Write-Information "Found Matching Update: $packageName"
+                $updateCount += 1
+            } else {
+                Write-Information "Skipping Ignored Update: $packageName"
+            }
             continue
         }
 
