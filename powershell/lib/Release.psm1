@@ -10,6 +10,11 @@ param(
         throw "No RELEASE version found for $repo"
     }
     
+    if($nextPatch.StartsWitch("0.")) {
+        Write-Information "NOT CREATING RELEASE as version is 0.x.y"
+        return
+    }
+    
     Write-Information "$repo => Create release $nextPatch"
     throw "Not Creating releases"
     
