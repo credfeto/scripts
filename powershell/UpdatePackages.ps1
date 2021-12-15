@@ -226,9 +226,31 @@ param(
     return $false
 }
 
+function IsPackageConsideredForVersionUpdate {
+param (
+    $packages,
+    [string] $packageName
+    )
+    
+    ForEach ($package in $packages)
+    {
+        [string]$packageId = $package.packageId.Trim('.')
+        if($packageName -eq $packageId) {
+            [bool]$ignore = $package.'do-not-count-as-change-referenced'
+            if($ignore) {
+                Write-Information "IGNORING $packageId for update"
+                return false
+            }
+        }
+    }
+
+    return $true    
+}
+
 function IsAllAutoUpdates {
 param(
-    [string[]]$releaseNotes
+    [string[]]$releaseNotes,
+    $packages
     )
 
     [int]$updateCount = 0
@@ -452,7 +474,7 @@ param(
     Write-Information "Updated run updated $packagesUpdated packages"
     
     Git-ResetToMaster -repoPath $repoFolder
-    
+        
     if($branchesCreated -eq 0) {
         # no branches created - check to see if we can create a release
         if($packagesUpdated -eq 0) {
@@ -463,7 +485,7 @@ param(
                 
                 [string[]]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
                 Write-Information $releaseNotes
-                [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes
+                [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes -packages $packages
                 
                 Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
                 if( $autoUpdateCount -ge $autoReleasePendingPackages) {
