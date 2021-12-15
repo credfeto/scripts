@@ -15,7 +15,7 @@ param(
     
     ChangeLog-CreateRelease -fileName $changeLog -release $nextPatch
     Git-Commit -message "Release notes for $nextPatch"
-    Git-Push --repoPath  $repoPath
+    Git-Push -repoPath  $repoPath
     
     [string]$branch = "release/$nextPatch"
     Write-Information "RELEASE: Should have created branch: $branch"
