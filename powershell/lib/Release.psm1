@@ -24,6 +24,8 @@ param(
     if($branched) {
         Git-PushOrigin -branchName $branch -repoPath $repoPath
         Write-Information "*** Created new RELEASE branch $branch in $repo"
+        
+        throw "Abort run as release created - may affect other packages"
     } else {
         throw "Failed to create RELEASE branch $branch in $repo"
     }
