@@ -484,7 +484,9 @@ param(
                 Write-Information "Processing Release Notes in $changeLog"
                 
                 [string[]]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
-                Write-Information $releaseNotes
+                foreach($line in $releaseNotes) {
+                    Write-Information $line
+                }
                 [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes -packages $packages
                 
                 Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
