@@ -39,3 +39,14 @@ foreach($line in $file) {
     }
 }
 
+$unixTime = git log -1 --format=%ct
+
+[DateTime]$when = [DateTimeOffset]::FromUnixTimeSeconds($unixTime).UtcDateTime
+[DateTime]$now = $now = [DateTime]::UtcNow
+
+[double]$duration = ($now - $when).TotalHours 
+
+Write-Host $when
+Write-Host $now
+
+Write-Host $duration

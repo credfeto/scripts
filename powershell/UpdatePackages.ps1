@@ -13,6 +13,7 @@ $ErrorActionPreference = "Stop"
 [string]$packageIdToInstall = "Credfeto.Package.Update"
 [bool]$preRelease = $False
 [int]$autoReleasePendingPackages = 3
+[double]$minimumHoursBeforeAutoRelease = 8
 
 # Ensure $root is set to a valid path
 $workDir = Resolve-Path -path $work
@@ -514,10 +515,21 @@ param(
                             if($allowUpdates) {
                                 [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
                                 if (!$publishable) {
-                                    Write-Information "**** MAKE RELEASE ****"
-                                    Write-Information "Changelog: $changeLog"
-                                    Write-Information "Repo: $repoFolder"
-                                    Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
+                                    [DateTime]$lastCommitDate = Get-GetLastCommitDate -repoPath $repoFolder
+                                    [DateTime]$now = [DateTime]::UtcNow                                    
+                                    $now = [DateTime]::UtcNow
+                                    
+                                    $duration = ($now - $when).TotalHours
+                                    Write-Information "Duration since last commit $duration"
+                                    if($duration -gt $minimumHoursBeforeAutoRelease) {
+                                        Write-Information "**** MAKE RELEASE ****"
+                                        Write-Information "Changelog: $changeLog"
+                                        Write-Information "Repo: $repoFolder"
+                                        Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
+                                    }
+                                    else {
+                                        Write-Information "SKIPPING RELEASE: $repo Not been $minimumHoursBeforeAutoRelease since the last commit"
+                                    }
                                 }
                                 else {
                                     Write-Information "SKIPPING RELEASE: $repo contains publishable executables"

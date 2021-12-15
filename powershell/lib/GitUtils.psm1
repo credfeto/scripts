@@ -368,6 +368,19 @@ param(
     }        
 } 
 
+function Get-GetLastCommitDate {
+param(
+    [string] $repoPath
+    )
+
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
+
+    $unixTime = git -C $repoPath log -1 --format=%ct
+
+    [DateTime]$when = [DateTimeOffset]::FromUnixTimeSeconds($unixTime).UtcDateTime
+
+    return $when
+}
 
 function Git-LoadRepoList {
 param(
@@ -397,3 +410,4 @@ Export-ModuleMember -Function Git-ReNormalise
 Export-ModuleMember -Function Git-HasSubmodules
 Export-ModuleMember -Function Git-GetRemoteBranches
 Export-ModuleMember -Function Git-RemoveBranchesForPrefix
+Export-ModuleMember -Function Get-GetLastCommitDate
