@@ -91,32 +91,22 @@ param(
     $head = Git-Get-HeadRev -repoPath $repoPath
     
     # junk any existing checked out files
-    $result = git -C $repoPath reset HEAD --hard 2>&1
-    Git-Log -result $result
-    $result = git -C $repoPath clean -f -x -d 2>&1
-    Git-Log -result $result
-    $result = git -C $repoPath checkout master 2>&1
-    Git-Log -result $result
-    $result = git -C $repoPath reset HEAD --hard 2>&1
-    Git-Log -result $result
-    $result = git -C $repoPath clean -f -x -d 2>&1
-    Git-Log -result $result
-    $result = git -C $repoPath fetch 2>&1
-    Git-Log -result $result
-
+    & git -C $repoPath reset HEAD --hard | Out-Null
+    & git -C $repoPath clean -f -x -d | Out-Null
+    & git -C $repoPath checkout master | Out-Null
+    & git -C $repoPath reset HEAD --hard | Out-Null
+    & git -C $repoPath clean -f -x -d | Out-Null
+    & git -C $repoPath fetch | Out-Null
+    
     # NOTE Loses all local commits on master
-    $result = git -C $repoPath reset --hard origin/master 2>&1
-    Git-Log -result $result
-    $result = git -C $repoPath remote update origin --prune 2>&1
-    Git-Log -result $result
-    $result = git -C $repoPath prune 2>&1
-    Git-Log -result $result
+    & git -C $repoPath reset --hard origin/master | Out-Null
+    & git -C $repoPath remote update origin --prune | Out-Null
+    & git -C $repoPath prune | Out-Null
     
     $newHead = Git-Get-HeadRev -repoPath $repoPath
     if($head -ne $newHead) {
         # ONLY GC if head is different, i.e. something has changed    
-        $result = git -C $repoPath gc --aggressive --prune 2>&1
-        Git-Log -result $result
+        & git -C $repoPath gc --aggressive --prune | Out-Null
     }
 
     Git-RemoveAllLocalBranches -repoPath $repoPath
@@ -191,10 +181,8 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath add -A 2>&1
-    Git-Log -result $result
-    $result = git -C $repoPath commit -m"$message" 2>&1
-    Git-Log -result $result
+    & git -C $repoPath add -A | Out-Null
+    & git -C $repoPath commit -m"$message" | Out-Null
 }
 
 function Git-Commit-Named {
@@ -209,23 +197,20 @@ param(
     foreach($file in $files) {
         [string]$fileUnix = $file.Replace("\", "/")
         Write-Information "Staging $fileUnix"
-        $result = git -C $repoPath add $fileUnix 2>&1
-        Git-Log -result $result
+        & git -C $repoPath add $fileUnix | Out-Null
     }
 
-    $result = git -C $repoPath commit -m"$message" 2>&1
-    Git-Log -result $result
+    & git -C $repoPath commit -m"$message" | Out-Null
 }
 
-function Git-Push() {
+function Git-Push {
 param(
     [string] $repoPath
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath push 2>&1
-    Git-Log -result $result
+    & git -C $repoPath push | Out-Null
 }
 
 function Git-PushOrigin {
@@ -244,8 +229,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath push --set-upstream origin $branchName -v 2>&1
-    Git-Log -result $result
+    & git -C $repoPath push --set-upstream origin $branchName -v | Out-Null
 }
 
 
@@ -315,12 +299,12 @@ param(
 
     [bool]$branchExists = Git-DoesBranchExist -branchName $branchName -repoPath $repoPath
     if($branchExists) {
-        $deleted = git -C $repoPath branch -D $branchName 2>&1
+        & git -C $repoPath branch -D $branchName | Out-Null
     }
     
     [bool]$branchExists = Git-DoesBranchExist -branchName "origin/$branchName" -repoPath $repoPath
     if($branchExists) {
-        $deleted = git -C $repoPath push origin ":$branchName" 2>&1
+        & git -C $repoPath push origin ":$branchName" | Out-Null
     }
 
     return $true;
@@ -333,14 +317,11 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
-    $result = git -C $repoPath add . --renormalize 2>&1
-    Git-Log -result $result
+    & git -C $repoPath add . --renormalize | Out-Null
     [bool]$hasChanged = Git-HasUnCommittedChanges -repoPath $repoPath
     if($hasChanged -eq $true) {
-        $result = git -C $repoPath commit -m"Renormalised files" 2>&1
-        Git-Log -result $result
-        $result = git -C $repoPath push 2>&1
-        Git-Log -result $result
+        & git -C $repoPath commit -m"Renormalised files" | Out-Null
+        & git -C $repoPath push | Out-Null
     }
 }
 
