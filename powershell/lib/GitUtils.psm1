@@ -1,5 +1,15 @@
 $env:GIT_REDIRECT_STDERR="2>&1"
 
+function Git-Log {
+param(
+    [string[]]$result
+    )
+    
+    foreach($line in $result) {
+        Write-Information $line
+    }
+}
+
 function GetRepoPath{
     param(
         [string] $repoPath
@@ -81,22 +91,32 @@ param(
     $head = Git-Get-HeadRev -repoPath $repoPath
     
     # junk any existing checked out files
-    git -C $repoPath reset HEAD --hard
-    git -C $repoPath clean -f -x -d
-    git -C $repoPath checkout master
-    git -C $repoPath reset HEAD --hard
-    git -C $repoPath clean -f -x -d
-    git -C $repoPath fetch
+    $result = git -C $repoPath reset HEAD --hard
+    Git-Log -result $result
+    $result = git -C $repoPath clean -f -x -d
+    Git-Log -result $result
+    $result = git -C $repoPath checkout master
+    Git-Log -result $result
+    $result = git -C $repoPath reset HEAD --hard
+    Git-Log -result $result
+    $result = git -C $repoPath clean -f -x -d
+    Git-Log -result $result
+    $result = git -C $repoPath fetch
+    Git-Log -result $result
 
     # NOTE Loses all local commits on master
-    git -C $repoPath reset --hard origin/master
-    git -C $repoPath remote update origin --prune
-    git -C $repoPath prune
+    $result = git -C $repoPath reset --hard origin/master
+    Git-Log -result $result
+    $result = git -C $repoPath remote update origin --prune
+    Git-Log -result $result
+    $result = git -C $repoPath prune
+    Git-Log -result $result
     
     $newHead = Git-Get-HeadRev -repoPath $repoPath
     if($head -ne $newHead) {
         # ONLY GC if head is different, i.e. something has changed    
-        git -C $repoPath gc --aggressive --prune
+        $result = git -C $repoPath gc --aggressive --prune
+        Git-Log -result $result
     }
 
     Git-RemoveAllLocalBranches -repoPath $repoPath
@@ -111,11 +131,13 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    git -C $repoPath diff --no-patch --exit-code
+    $result = git -C $repoPath diff --no-patch --exit-code
     if(!$?) {
+        Git-Log -result $result
         return $true
     }
-
+    
+    Git-Log -result $result
     return $false
 }
 
@@ -156,7 +178,8 @@ param(
     else
     {
         Write-Information "Cloning..."
-        git clone $repo --recurse-submodules
+        $result = git clone $repo --recurse-submodules
+        Git-Log -result $result
         Set-Location -Path $repofolder
     }
 }
@@ -168,8 +191,10 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    git -C $repoPath add -A
-    git -C $repoPath commit -m"$message"
+    $result = git -C $repoPath add -A
+    Git-Log -result $result
+    $result = git -C $repoPath commit -m"$message"
+    Git-Log -result $result
 }
 
 function Git-Commit-Named {
@@ -184,10 +209,12 @@ param(
     foreach($file in $files) {
         [string]$fileUnix = $file.Replace("\", "/")
         Write-Information "Staging $fileUnix"
-        git -C $repoPath add $fileUnix
+        $result = git -C $repoPath add $fileUnix
+        Git-Log -result $result
     }
 
-    git -C $repoPath commit -m"$message"
+    $result = git -C $repoPath commit -m"$message"
+    Git-Log -result $result
 }
 
 function Git-Push() {
@@ -197,7 +224,8 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    git -C $repoPath push
+    $result = git -C $repoPath push
+    Git-Log -result $result
 }
 
 function Git-PushOrigin {
@@ -216,7 +244,8 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    git -C $repoPath push --set-upstream origin $branchName -v
+    $result = git -C $repoPath push --set-upstream origin $branchName -v
+    Git-Log -result $result
 }
 
 
@@ -263,12 +292,14 @@ param(
         return $false
     }
 
-    git -C $repoPath checkout -b $branchName
+    $result = git -C $repoPath checkout -b $branchName
     if(!$?) {
+        Git-Log -result $result
         Write-Information "Failed to create branch $branchName - Create branch failed - Call failed."
         return $false
     }
 
+    Git-Log -result $result
     Write-Information "Created branch $branchName"
 
     return $true;
@@ -302,7 +333,8 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
-    git -C $repoPath add . --renormalize
+    $result = git -C $repoPath add . --renormalize
+    Git-Log -result $result
     [bool]$hasChanged = Git-HasUnCommittedChanges -repoPath $repoPath
     if($hasChanged -eq $true) {
         git -C $repoPath commit -m"Renormalised files"
@@ -321,6 +353,7 @@ param(
     $result = git -C $repoPath rev-parse HEAD    
 
     if(!$?) {
+        Git-Log -result $result
         Write-Information "Failed to get head rev"
         return $null
     }
@@ -338,6 +371,7 @@ function Git-HasSubmodules {
     $result = git -C $repoPath submodule
 
     if(!$?) {
+        Git-Log -result $result
         Write-Information "Failed to get submodules."
         return $false
     }
