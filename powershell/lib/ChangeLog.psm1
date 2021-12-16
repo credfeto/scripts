@@ -1,4 +1,14 @@
-﻿<#
+﻿function Changelog-Log {
+param(
+    [string[]]$result
+    )
+    
+    foreach($line in $result) {
+        Write-Information $line
+    }
+}
+
+<#
  .Synopsis
   Adds an entry to the [Unreleased] section of a CHANGELOG.md file.
 
@@ -27,7 +37,8 @@ param(
     
     Write-Information ">>> Updating Changelog <<<"
 
-    dotnet changelog --changelog $fileName --add $entryType --message "$code - $message"
+    [string[]]$result = dotnet changelog --changelog $fileName --add $entryType --message "$code - $message"
+    Changelog-Log -result $result
     if($?) {
         Write-Information "* Changelog Updated"
     }
@@ -45,7 +56,8 @@ function ChangeLog-CreateRelease {
 
     Write-Information ">>> Creating Changelog release notes for $release <<<"
 
-    dotnet changelog --changelog $fileName --create-release $release
+    [string[]]$result = dotnet changelog --changelog $fileName --create-release $release
+    Changelog-Log -result $result
     if($?) {
         Write-Information "* Changelog Updated"
     }
