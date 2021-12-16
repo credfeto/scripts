@@ -1,6 +1,22 @@
 
 $standardSource = 'https://api.nuget.org/v3/index.json'
 
+function DotNetTool-Log {
+param($result)
+
+    foreach($line in $result) {
+        Write-Information $line
+    }
+}
+
+function DotNetTool-Error {
+param($result)
+
+    foreach($line in $result) {
+        Write-Error $line
+    }
+}
+
 function getLatestPreReleasePackage($packageId) {
 
 	try {
@@ -37,7 +53,7 @@ function findPreReleasePackageVersion( $packageId) {
 function isInstalled($packageId) {
     [string]$packageIdRegex = $packageId.Replace(".", "\.").ToLowerInvariant();
 
-    $result = &dotnet tool list --local 2>&1
+    $result = &dotnet tool list --local
     $entry = $result | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
 
 	Write-Information "Found: $entry"
@@ -67,11 +83,12 @@ param(
     if(isInstalled -packageId $packageId) {
 
         Write-Information "Removing currently installed $packageId"
-        $result = dotnet tool uninstall --local $packageId 2>&1
+        $result = dotnet tool uninstall --local $packageId
         if(!$?) {
-            Write-Error $result
+            DotNetTool-Error -result $result
             throw "Failed to uninstall $packageId"
-        }        
+        }
+        DotNetTool-Log -result $result         
     }
 }
 
@@ -98,11 +115,13 @@ param(
     [bool]$manifestExists = Test-Path -path '.config\dotnet-tools.json'
     if ($manifestExists -ne $true)
     {
-        $result = dotnet new tool-manifest 2>&1
+        $result = dotnet new tool-manifest
         if(!$?) {
-            Write-Error $result
+            DotNetTool-Error -result $result
             throw "Failed to uninstall $packageId"
-        }        
+        }
+        
+        DotNetTool-Log -result $result         
     }
 
     # Uninstall if already installed 
@@ -117,11 +136,13 @@ param(
 
         if($version -ne $null) {
             Write-Information "Installing $version of $packageId"
-            $result = dotnet tool install --local $packageId --version $version 2>&1
+            $result = dotnet tool install --local $packageId --version $version
             if(!$?) {
-                Write-Error $result
+                DotNetTool-Error -result $result
                 return $false
             }
+            
+            DotNetTool-Log -result $result
             
             [bool]$installed = isInstalled -packageId $packageId
 			return [bool]$installed
@@ -130,9 +151,9 @@ param(
 
     # Install released version
     Write-Information "Installing latest release version of $packageId"
-    $result = dotnet tool install --local $packageId 2>&1
+    $result = dotnet tool install --local $packageId
     if(!$?) {
-        Write-Error $result
+        DotNetTool-Error -result $result
         return $false
     }
     

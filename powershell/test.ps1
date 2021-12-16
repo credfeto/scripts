@@ -25,27 +25,27 @@ catch {
 }
 
 [bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
-Write-Host $installed
+Write-Host "Installed: $installed"
 
 if($installed -eq $false) {
     Write-Error ""
     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install Credfeto.Changelog.Cmd']"
 }
 
-$changelog = "/data/work/funfair/funfair-server-code-analysis/CHANGELOG.md"
-
-$file = Get-Content -Path $changelog
-
-# Write-Host $file
-
-$expr = "(?ms)" + "^\s*\-\s*FF\-1429\s*\-\sUpdated\s+(?<PackageId>.+(\.+)*?)\sto\s+(\d+\..*)$"
-foreach($line in $file) {
-
-    $m = $line -match $expr
-    if($m) {    
-        Write-Host $matches.PackageId
-    }
-}
+# $changelog = "/data/work/funfair/funfair-server-code-analysis/CHANGELOG.md"
+# 
+# $file = Get-Content -Path $changelog
+# 
+# # Write-Host $file
+# 
+# $expr = "(?ms)" + "^\s*\-\s*FF\-1429\s*\-\sUpdated\s+(?<PackageId>.+(\.+)*?)\sto\s+(\d+\..*)$"
+# foreach($line in $file) {
+# 
+#     $m = $line -match $expr
+#     if($m) {    
+#         Write-Host $matches.PackageId
+#     }
+# }
 
 $unixTime = git log -1 --format=%ct
 
