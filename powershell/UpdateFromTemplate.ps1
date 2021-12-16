@@ -486,6 +486,30 @@ param (
     Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
 }
 
+function commitGlobalJsonVersionUpdateToBranch {
+param (
+    [string]$dotnetVersion,
+    [string]$targetRepo,
+    [string]$branchName,
+    [string]$originalBranchPrefix)
+
+    Write-Information "**** BUILD FAILURE ****"
+    [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
+    if ($branchOk -eq $true) {
+        Write-Information "Create Branch $branchName"
+        Git-Commit -repoPath $targetRepo -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
+        Git-PushOrigin -repoPath $targetRepo -branchName $branchName
+    }
+
+    Git-ResetToMaster -repoPath $targetRepo
+    
+    Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+
+    # Remove any previous template updates that didn't create a version specific branch
+    Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+
+}
+
 function updateGlobalJson{
 param(
     [string]$sourceRepo, 
@@ -532,25 +556,16 @@ param(
             Set-Location -Path $targetRepo
             if ($codeOK -eq $true) {
 
-                commitGlobalJsonVersionUpdateToMaster -dotnetVersion $dotnetVersion -targetRepo $targetRepo -branchName $branchName -originalBranchPrefix $originalBranchPrefix
+                $result = commitGlobalJsonVersionUpdateToMaster -dotnetVersion $dotnetVersion -targetRepo $targetRepo -branchName $branchName -originalBranchPrefix $originalBranchPrefix
+
+                Write-Information "Commit Result: $result"
                 
                 return "VERSION"
             }
             else {
-                Write-Information "**** BUILD FAILURE ****"
-                [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
-                if ($branchOk -eq $true) {
-                    Write-Information "Create Branch $branchName"
-                    Git-Commit -repoPath $targetRepo -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
-                    Git-PushOrigin -repoPath $targetRepo -branchName $branchName
-                }
-    
-                Git-ResetToMaster -repoPath $targetRepo
+                $result = commitGlobalJsonVersionUpdateToBranch -dotnetVersion $dotnetVersion -targetRepo $targetRepo -branchName $branchName -originalBranchPrefix $originalBranchPrefix
                 
-                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
-
-                # Remove any previous template updates that didn't create a version specific branch
-                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+                Write-Information "Commit Result: $result"
                 
                 return "PENDING"
             }
