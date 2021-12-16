@@ -14,7 +14,8 @@ $ErrorActionPreference = "Stop"
 [bool]$preRelease = $False
 [int]$autoReleasePendingPackages = 3
 [double]$minimumHoursBeforeAutoRelease = 8
-
+[double]$inactivityHoursBeforeAutoRelease = 3 * $minimumHoursBeforeAutoRelease
+ 
 # Ensure $root is set to a valid path
 $workDir = Resolve-Path -path $work
 [string]$root = $workDir.Path
@@ -499,7 +500,30 @@ param(
                 [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes -packages $packages
                 
                 Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
-                if( $autoUpdateCount -ge $autoReleasePendingPackages) {
+                [DateTime]$lastCommitDate = Get-GetLastCommitDate -repoPath $repoFolder
+                [DateTime]$now = [DateTime]::UtcNow                                    
+                $now = [DateTime]::UtcNow
+                
+                [TimeSpan]$durationTimeSpan = ($now - $lastCommitDate)
+                $duration = $durationTimeSpan.TotalHours
+                Write-Information "Duration since last commit $duration hours"
+                
+                [bool]$shouldCreateRelease = $false
+                if($autoUpdateCount -ge $autoReleasePendingPackages) {
+                    if($duration -gt $minimumHoursBeforeAutoRelease) {
+                        $shouldCreateRelease = $true
+                    }
+                }
+                
+                if(!$shouldCreateRelease) {
+                    if($autoUpdateCount -ge 1) {
+                        if($duration -gt $inactivityHoursBeforeAutoRelease) {
+                            $shouldCreateRelease = $true
+                        }
+                    }
+                }
+
+                if($shouldCreateRelease ) {
                     # At least $autoReleasePendingPackages auto updates... consider creating a release
                     
                     [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoPath
@@ -515,22 +539,10 @@ param(
                             if($allowUpdates) {
                                 [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
                                 if (!$publishable) {
-                                    [DateTime]$lastCommitDate = Get-GetLastCommitDate -repoPath $repoFolder
-                                    [DateTime]$now = [DateTime]::UtcNow                                    
-                                    $now = [DateTime]::UtcNow
-                                    
-                                    [TimeSpan]$durationTimeSpan = ($now - $lastCommitDate)
-                                    $duration = $durationTimeSpan.TotalHours
-                                    Write-Information "Duration since last commit $duration hours"
-                                    if($duration -gt $minimumHoursBeforeAutoRelease) {
-                                        Write-Information "**** MAKE RELEASE ****"
-                                        Write-Information "Changelog: $changeLog"
-                                        Write-Information "Repo: $repoFolder"
-                                        Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
-                                    }
-                                    else {
-                                        Write-Information "SKIPPING RELEASE: $repo Not been $minimumHoursBeforeAutoRelease since the last commit"
-                                    }
+                                    Write-Information "**** MAKE RELEASE ****"
+                                    Write-Information "Changelog: $changeLog"
+                                    Write-Information "Repo: $repoFolder"
+                                    Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                                 }
                                 else {
                                     Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
