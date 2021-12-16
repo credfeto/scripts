@@ -37,7 +37,7 @@ function findPreReleasePackageVersion( $packageId) {
 function isInstalled($packageId) {
     [string]$packageIdRegex = $packageId.Replace(".", "\.").ToLowerInvariant();
 
-    $result = &dotnet tool list --local
+    $result = &dotnet tool list --local 2>&1
     $entry = $result | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
 
 	Write-Information "Found: $entry"
@@ -67,7 +67,7 @@ param(
     if(isInstalled -packageId $packageId) {
 
         Write-Information "Removing currently installed $packageId"
-        $result = dotnet tool uninstall --local $packageId
+        $result = dotnet tool uninstall --local $packageId 2>&1
         if(!$?) {
             Write-Error $result
             throw "Failed to uninstall $packageId"
@@ -98,7 +98,7 @@ param(
     [bool]$manifestExists = Test-Path -path '.config\dotnet-tools.json'
     if ($manifestExists -ne $true)
     {
-        $result = dotnet new tool-manifest
+        $result = dotnet new tool-manifest 2>&1
         if(!$?) {
             Write-Error $result
             throw "Failed to uninstall $packageId"

@@ -36,7 +36,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    [string[]]$result = git -C $repoPath branch --remote
+    [string[]]$result = git -C $repoPath branch --remote 2>&1
 
     $branches = @()
 
@@ -72,11 +72,11 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    [string[]]$result = git -C $repoPath branch
+    [string[]]$result = git -C $repoPath branch 2>&1
     foreach($item in $result) {
         [string]$branch = $item.Trim()
         if(!$branch.StartsWith("* ")) {
-            $complete = git -C $repoPath branch -d $branch
+            $complete = git -C $repoPath branch -d $branch 2>&1
         }
     }
 }
@@ -91,31 +91,31 @@ param(
     $head = Git-Get-HeadRev -repoPath $repoPath
     
     # junk any existing checked out files
-    $result = git -C $repoPath reset HEAD --hard
+    $result = git -C $repoPath reset HEAD --hard 2>&1
     Git-Log -result $result
-    $result = git -C $repoPath clean -f -x -d
+    $result = git -C $repoPath clean -f -x -d 2>&1
     Git-Log -result $result
-    $result = git -C $repoPath checkout master
+    $result = git -C $repoPath checkout master 2>&1
     Git-Log -result $result
-    $result = git -C $repoPath reset HEAD --hard
+    $result = git -C $repoPath reset HEAD --hard 2>&1
     Git-Log -result $result
-    $result = git -C $repoPath clean -f -x -d
+    $result = git -C $repoPath clean -f -x -d 2>&1
     Git-Log -result $result
-    $result = git -C $repoPath fetch
+    $result = git -C $repoPath fetch 2>&1
     Git-Log -result $result
 
     # NOTE Loses all local commits on master
-    $result = git -C $repoPath reset --hard origin/master
+    $result = git -C $repoPath reset --hard origin/master 2>&1
     Git-Log -result $result
-    $result = git -C $repoPath remote update origin --prune
+    $result = git -C $repoPath remote update origin --prune 2>&1
     Git-Log -result $result
-    $result = git -C $repoPath prune
+    $result = git -C $repoPath prune 2>&1
     Git-Log -result $result
     
     $newHead = Git-Get-HeadRev -repoPath $repoPath
     if($head -ne $newHead) {
         # ONLY GC if head is different, i.e. something has changed    
-        $result = git -C $repoPath gc --aggressive --prune
+        $result = git -C $repoPath gc --aggressive --prune 2>&1
         Git-Log -result $result
     }
 
@@ -131,7 +131,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath diff --no-patch --exit-code
+    $result = git -C $repoPath diff --no-patch --exit-code 2>&1
     if(!$?) {
         Git-Log -result $result
         return $true
@@ -191,9 +191,9 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath add -A
+    $result = git -C $repoPath add -A 2>&1
     Git-Log -result $result
-    $result = git -C $repoPath commit -m"$message"
+    $result = git -C $repoPath commit -m"$message" 2>&1
     Git-Log -result $result
 }
 
@@ -209,11 +209,11 @@ param(
     foreach($file in $files) {
         [string]$fileUnix = $file.Replace("\", "/")
         Write-Information "Staging $fileUnix"
-        $result = git -C $repoPath add $fileUnix
+        $result = git -C $repoPath add $fileUnix 2>&1
         Git-Log -result $result
     }
 
-    $result = git -C $repoPath commit -m"$message"
+    $result = git -C $repoPath commit -m"$message" 2>&1
     Git-Log -result $result
 }
 
@@ -224,7 +224,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath push
+    $result = git -C $repoPath push 2>&1
     Git-Log -result $result
 }
 
@@ -244,7 +244,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath push --set-upstream origin $branchName -v
+    $result = git -C $repoPath push --set-upstream origin $branchName -v 2>&1
     Git-Log -result $result
 }
 
@@ -257,7 +257,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath branch --remote
+    $result = git -C $repoPath branch --remote 2>&1
 
     [string]$regex = $branchName.replace(".", "\.") + "$"
 
@@ -292,7 +292,7 @@ param(
         return $false
     }
 
-    $result = git -C $repoPath checkout -b $branchName
+    $result = git -C $repoPath checkout -b $branchName 2>&1
     if(!$?) {
         Git-Log -result $result
         Write-Information "Failed to create branch $branchName - Create branch failed - Call failed."
@@ -315,12 +315,12 @@ param(
 
     [bool]$branchExists = Git-DoesBranchExist -branchName $branchName -repoPath $repoPath
     if($branchExists) {
-        $deleted = git -C $repoPath branch -D $branchName
+        $deleted = git -C $repoPath branch -D $branchName 2>&1
     }
     
     [bool]$branchExists = Git-DoesBranchExist -branchName "origin/$branchName" -repoPath $repoPath
     if($branchExists) {
-        $deleted = git -C $repoPath push origin ":$branchName"
+        $deleted = git -C $repoPath push origin ":$branchName" 2>&1
     }
 
     return $true;
@@ -333,12 +333,14 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
-    $result = git -C $repoPath add . --renormalize
+    $result = git -C $repoPath add . --renormalize 2>&1
     Git-Log -result $result
     [bool]$hasChanged = Git-HasUnCommittedChanges -repoPath $repoPath
     if($hasChanged -eq $true) {
-        git -C $repoPath commit -m"Renormalised files"
-        git -C $repoPath push
+        $result = git -C $repoPath commit -m"Renormalised files" 2>&1
+        Git-Log -result $result
+        $result = git -C $repoPath push 2>&1
+        Git-Log -result $result
     }
 }
 
@@ -350,7 +352,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
-    $result = git -C $repoPath rev-parse HEAD    
+    $result = git -C $repoPath rev-parse HEAD 2>&1    
 
     if(!$?) {
         Git-Log -result $result
@@ -368,7 +370,7 @@ function Git-HasSubmodules {
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath submodule
+    $result = git -C $repoPath submodule 2>&1
 
     if(!$?) {
         Git-Log -result $result
@@ -418,7 +420,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $unixTime = git -C $repoPath log -1 --format=%ct
+    $unixTime = git -C $repoPath log -1 --format=%ct 2>&1
 
     [DateTime]$when = [DateTimeOffset]::FromUnixTimeSeconds($unixTime).UtcDateTime
 
