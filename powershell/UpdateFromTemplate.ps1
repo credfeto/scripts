@@ -466,8 +466,24 @@ param(
     }
 }
 
-function updateGlobalJsonNewDotNetVersion {
-param ()
+function commitGlobalJsonVersionUpdateToMaster {
+param (
+    [string]$dotnetVersion,
+    [string]$targetRepo,
+    [string]$branchName,
+    [string]$originalBranchPrefix)
+
+    Write-Information "**** BUILD OK ****"
+    
+    Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
+    Git-Commit -repoPath $targetRepo -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
+    Git-Push -repoPath $targetRepo
+    Git-DeleteBranch -repoPath $targetRepo -branchName $branchName
+    
+    Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+    
+    # Remove any previous template updates that didn't create a version specific branch
+    Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
 }
 
 function updateGlobalJson{
@@ -503,8 +519,9 @@ param(
 
         if($updated.UpdatingVersion -eq $true) {
         
-            Write-Information "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
             [string]$dotnetVersion = $updated.NewVersion
+
+            Write-Information "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
             [string]$changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
             ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-3881" -message "Updated DotNet SDK to $dotnetVersion"
 
@@ -514,17 +531,8 @@ param(
             [bool]$codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
             Set-Location -Path $targetRepo
             if ($codeOK -eq $true) {
-                Write-Information "**** BUILD OK ****"
-                
-                Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
-                Git-Commit -repoPath $targetRepo -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
-                Git-Push -repoPath $targetRepo
-                Git-DeleteBranch -repoPath $targetRepo -branchName $branchName
-                
-                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
-                
-                # Remove any previous template updates that didn't create a version specific branch
-                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+
+                commitGlobalJsonVersionUpdateToMaster -dotnetVersion $dotnetVersion -targetRepo $targetRepo -branchName $branchName -originalBranchPrefix $originalBranchPrefix
                 
                 return "VERSION"
             }
