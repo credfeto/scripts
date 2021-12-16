@@ -521,7 +521,7 @@ param(
                                     
                                     [TimeSpan]$durationTimeSpan = ($now - $lastCommitDate)
                                     $duration = $durationTimeSpan.TotalHours
-                                    Write-Information "Duration since last commit $duration"
+                                    Write-Information "Duration since last commit $duration hours"
                                     if($duration -gt $minimumHoursBeforeAutoRelease) {
                                         Write-Information "**** MAKE RELEASE ****"
                                         Write-Information "Changelog: $changeLog"
