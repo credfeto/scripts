@@ -466,6 +466,10 @@ param(
     }
 }
 
+function updateGlobalJsonNewDotNetVersion {
+param ()
+}
+
 function updateGlobalJson{
 param(
     [string]$sourceRepo, 
@@ -513,32 +517,32 @@ param(
                 Write-Information "**** BUILD OK ****"
                 
                 Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
-                Git-Commit -repoPath $repoFolder -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
-                Git-Push -repoPath $repoFolder
-                Git-DeleteBranch -repoPath $repoFolder -branchName $branchName
+                Git-Commit -repoPath $targetRepo -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
+                Git-Push -repoPath $targetRepo
+                Git-DeleteBranch -repoPath $targetRepo -branchName $branchName
                 
-                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
                 
                 # Remove any previous template updates that didn't create a version specific branch
-                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
                 
                 return "VERSION"
             }
             else {
                 Write-Information "**** BUILD FAILURE ****"
-                [bool]$branchOk = Git-CreateBranch -repoPath $repoFolder -branchName $branchName
+                [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
                 if ($branchOk -eq $true) {
                     Write-Information "Create Branch $branchName"
-                    Git-Commit -repoPath $repoFolder -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
-                    Git-PushOrigin -repoPath $repoFolder -branchName $branchName
+                    Git-Commit -repoPath $targetRepo -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
+                    Git-PushOrigin -repoPath $targetRepo -branchName $branchName
                 }
     
-                Git-ResetToMaster -repoPath $repoFolder
+                Git-ResetToMaster -repoPath $targetRepo
                 
-                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
 
                 # Remove any previous template updates that didn't create a version specific branch
-                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
                 
                 return "PENDING"
             }
@@ -551,21 +555,21 @@ param(
             Set-Location -Path $targetRepo
             if ($codeOK -eq $true) {
                 Write-Information "**** BUILD OK ****"
-                doCommit -repoPath $repoFolder -fileName $fileName
+                doCommit -repoPath $targetRepo -fileName $fileName
 
                 # Remove any previous template updates that didn't create a version specific branch
-                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
+                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
             }
             else {
                 Write-Information "**** BUILD FAILURE ****"
-                [bool]$branchOk = Git-CreateBranch -repoPath $repoFolder -branchName $branchName
+                [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
                 if ($branchOk -eq $true) {
                     Write-Information "Create Branch $branchName"
-                    doCommit -repoPath $repoFolder -fileName $fileName
-                    Git-PushOrigin -repoPath $repoFolder -branchName $branchName
+                    doCommit -repoPath $targetRepo -fileName $fileName
+                    Git-PushOrigin -repoPath $targetRepo -branchName $branchName
                 }
     
-                Git-ResetToMaster -repoPath $repoFolder
+                Git-ResetToMaster -repoPath $targetRepo
             }
             
             return "CONTENT"
@@ -574,7 +578,7 @@ param(
     else {
         Write-Information "No GLOBAL.JSON UPDATE"
         Write-Information "Ensuring $branchName no longer exists"
-        Git-DeleteBranch -repoPath $repoFolder -branchName $branchName        
+        Git-DeleteBranch -repoPath $targetRepo -branchName $branchName        
         
         return "NONE"
     }
