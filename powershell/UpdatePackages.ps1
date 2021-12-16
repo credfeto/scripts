@@ -286,6 +286,12 @@ param(
             $updateCount += 1
             continue
         }
+        
+        if($line -eq "- FF-3881 - Updated DotNet SDK to 6.0.101") {
+            # Dotnet version update
+            $updateCount += 1
+            continue
+        }
 
         return 0
     }
