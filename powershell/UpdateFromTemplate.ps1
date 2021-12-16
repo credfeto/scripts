@@ -211,12 +211,13 @@ param (
 
 function doCommit{
 param(
-    [string]$fileName
+    [string]$fileName,
+    [String]$repoPath
 )
 
     Write-Information "Staging $fileName"
     [String[]] $files = $filename.Replace("\", "/")
-    Git-Commit-Named -message "[FF-1429] - Update $fileName to match the template repo" -files $fileName
+    Git-Commit-Named -repoPath $repoFolder -message "[FF-1429] - Update $fileName to match the template repo" -files $fileName
 }
 
 function updateFileAndCommit{
@@ -229,8 +230,8 @@ param (
     $ret = updateFile -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $fileName
 
     if($ret -ne $null) {
-        doCommit -fileName $fileName
-        Git-Push
+        doCommit -repoPath $repoFolder -fileName $fileName
+        Git-Push -repoPath $repoFolder
     }    
 }
 
@@ -278,19 +279,19 @@ param(
         if($ret -eq $true) {
             [bool]$codeOK = DotNet-BuildSolution -repoFolder $repoFolder
             if($codeOK) {
-                doCommit -fileName $fileName
-                Git-Push
+                doCommit -repoPath $repoFolder -fileName $fileName
+                Git-Push -repoPath $repoFolder
             }
             else {
                 [string]$branchName = "template/ff-1429/$fileName".Replace("\", "/")
-                [bool]$branchOk = Git-CreateBranch -branchName $branchName
+                [bool]$branchOk = Git-CreateBranch -repoPath $repoFolder -branchName $branchName
                 if($branchOk) {
                     Write-Information "Create Branch $branchName"
-                    doCommit -fileName $fileName
-                    Git-PushOrigin -branchName $branchName
+                    doCommit -repoPath $repoFolder -fileName $fileName
+                    Git-PushOrigin -repoPath $repoFolder -branchName $branchName
                 }
 
-                Git-ResetToMaster
+                Git-ResetToMaster -repoPath $repoFolder
             }
             
         }
@@ -320,8 +321,8 @@ param (
         Write-Information "Update $targetFileName"
         [bool]$ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
         if($ret -ne $null) {
-            doCommit -fileName $fileNameForCommit
-            Git-Push
+            doCommit -repoPath $repoFolder -fileName $fileNameForCommit
+            Git-Push -repoPath $repoFolder
         }
     }
 }
@@ -351,7 +352,7 @@ param(
         
         if($srcContent -ne $trgContent) {
             Set-Content -Path $targetFileName -Value $srcContent
-            doCommit -fileName $fileName
+            doCommit -repoPath $repoFolder -fileName $fileName
         }
         
     }
@@ -363,7 +364,7 @@ param(
         $srcContent = $srcContent.Replace("runs-on: [self-hosted, linux]", "runs-on: ubuntu-latest")
         
         Set-Content -Path $targetFileName -Value $srcContent
-        doCommit -fileName $fileName
+        doCommit -repoPath $repoFolder -fileName $fileName
     }
 }
 
@@ -402,7 +403,7 @@ param(
         [string]$trgContent = $srcContent + $mergeContent
 
         Set-Content -Path $targetFileName -Value $trgContent
-        doCommit -fileName $fileName
+        doCommit -repoPath $repoFolder -fileName $fileName
 
 
     } else {
@@ -427,8 +428,8 @@ param(
     [bool]$hasSubModules = Git-HasSubModules -repoPath $trgRepo 
     Dependabot-BuildConfig -configFileName $targetFileName -repoRoot trgRepo -updateGitHubActions $updateGitHubActions -hasSubModules $hasSubModules
 
-    doCommit -FileName ".github/dependabot.yml"
-    Git-Push
+    doCommit -repoPath $repoFolder -FileName ".github/dependabot.yml"
+    Git-Push -repoPath $repoFolder
 }
 
 function removeLegacyDependabotConfig{
@@ -444,11 +445,11 @@ param(
         Remove-Item -Path $file.FullName
     }
 
-    [bool]$uncommitted = Git-HasUnCommittedChanges
+    [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $repoFolder
     If ($uncommitted -eq $true)
     {
-        Git-Commit -message "Removed old dependabot config templates"
-        Git-Push
+        Git-Commit -repoPath $repoFolder -message "Removed old dependabot config templates"
+        Git-Push -repoPath $repoFolder
     }
 }
 
@@ -512,9 +513,9 @@ param(
                 Write-Information "**** BUILD OK ****"
                 
                 Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
-                Git-Commit -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
-                Git-Push
-                Git-DeleteBranch -branchName $branchName
+                Git-Commit -repoPath $repoFolder -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
+                Git-Push -repoPath $repoFolder
+                Git-DeleteBranch -repoPath $repoFolder -branchName $branchName
                 
                 Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
                 
@@ -525,14 +526,14 @@ param(
             }
             else {
                 Write-Information "**** BUILD FAILURE ****"
-                [bool]$branchOk = Git-CreateBranch -branchName $branchName
+                [bool]$branchOk = Git-CreateBranch -repoPath $repoFolder -branchName $branchName
                 if ($branchOk -eq $true) {
                     Write-Information "Create Branch $branchName"
-                    Git-Commit -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
-                    Git-PushOrigin -branchName $branchName
+                    Git-Commit -repoPath $repoFolder -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
+                    Git-PushOrigin -repoPath $repoFolder -branchName $branchName
                 }
     
-                Git-ResetToMaster
+                Git-ResetToMaster -repoPath $repoFolder
                 
                 Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
 
@@ -550,21 +551,21 @@ param(
             Set-Location -Path $targetRepo
             if ($codeOK -eq $true) {
                 Write-Information "**** BUILD OK ****"
-                doCommit -fileName $fileName
+                doCommit -repoPath $repoFolder -fileName $fileName
 
                 # Remove any previous template updates that didn't create a version specific branch
                 Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
             }
             else {
                 Write-Information "**** BUILD FAILURE ****"
-                [bool]$branchOk = Git-CreateBranch -branchName $branchName
+                [bool]$branchOk = Git-CreateBranch -repoPath $repoFolder -branchName $branchName
                 if ($branchOk -eq $true) {
                     Write-Information "Create Branch $branchName"
-                    doCommit -fileName $fileName
-                    Git-PushOrigin -branchName $branchName
+                    doCommit -repoPath $repoFolder -fileName $fileName
+                    Git-PushOrigin -repoPath $repoFolder -branchName $branchName
                 }
     
-                Git-ResetToMaster
+                Git-ResetToMaster -repoPath $repoFolder
             }
             
             return "CONTENT"
@@ -573,7 +574,7 @@ param(
     else {
         Write-Information "No GLOBAL.JSON UPDATE"
         Write-Information "Ensuring $branchName no longer exists"
-        Git-DeleteBranch -branchName $branchName        
+        Git-DeleteBranch -repoPath $repoFolder -branchName $branchName        
         
         return "NONE"
     }
@@ -602,9 +603,9 @@ param(
 
     Labels_Update -Prefix $prefix -sourceFilesBase $srcPath -labelerFileName $mappingLabelerFile -labelsFileName $coloursLabelFile
 
-    doCommit -FileName ".github/labeler.yml"
-    doCommit -FileName ".github/labels.yml"
-    Git-Push
+    doCommit -repoPath $repoFolder -FileName ".github/labeler.yml"
+    doCommit -repoPath $repoFolder -FileName ".github/labels.yml"
+    Git-Push -repoPath $repoFolder
 }
 
 function ShouldAlwaysCreatePatchRelease{
@@ -670,7 +671,7 @@ param (
     Set-Location -Path $repoFolder
 
     [string]$lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
-    [string]$currentRevision = Git-Get-HeadRev
+    [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
     $currentRevision = "$scriptsHash/$templateRepoHash/$currentRevision"
 
     Write-Information "Last Revision:    $lastRevision"
@@ -786,11 +787,11 @@ param (
     }
 
 
-    [bool]$uncommitted = Git-HasUnCommittedChanges
+    [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $repoFolder
     If ($uncommitted -eq $true)
     {
-        Git-Commit -message "Removed old workflows"
-        Git-Push
+        Git-Commit -repoPath $repoFolder -message "Removed old workflows"
+        Git-Push -repoPath $repoFolder
     }
 
 
@@ -816,9 +817,9 @@ param (
     buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
     removeLegacyDependabotConfig -trgRepo $repoFolder
     
-    Git-ReNormalise
+    Git-ReNormalise -repoPath $repoFolder
     
-    Git-ResetToMaster
+    Git-ResetToMaster -repoPath $repoFolder
         
     if($dotnetVersionUpdated -eq $true) {
         Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
@@ -847,8 +848,8 @@ param (
         }        
     }
 
-    Git-ResetToMaster
-    Git-ReNormalise
+    Git-ResetToMaster -repoPath $repoFolder
+    Git-ReNormalise -repoPath $repoFolder
 
     Write-Information "Updating Tracking for $repo to $currentRevision"
     Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision

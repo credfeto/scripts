@@ -173,12 +173,12 @@ param(
         Write-Information "Already Cloned"
         Set-Location -Path $repofolder
 
-        Git-ResetToMaster
+        Git-ResetToMaster -repoPath $repoFolder
     }
     else
     {
         Write-Information "Cloning..."
-        $result = git clone $repo --recurse-submodules
+        $result = git clone $repo --recurse-submodules 2>&1 
         Git-Log -result $result
         Set-Location -Path $repofolder
     }
