@@ -513,11 +513,16 @@ param(
                 [TimeSpan]$durationTimeSpan = ($now - $lastCommitDate)
                 $duration = $durationTimeSpan.TotalHours
                 Write-Information "Duration since last commit $duration hours"
-                
+
+                [string]$skippingReason = "INSUFFICIENT UPDATES"                
                 [bool]$shouldCreateRelease = $false
                 if($autoUpdateCount -ge $autoReleasePendingPackages) {
                     if($duration -gt $minimumHoursBeforeAutoRelease) {
                         $shouldCreateRelease = $true
+                        [string]$skippingReason = "RELEASING NORMAL"
+                    }
+                    else {
+                        [string]$skippingReason = "INSUFFICIENT DURATION SINCE LAST UPDATE"
                     }
                 }
                 
@@ -525,6 +530,7 @@ param(
                     if($autoUpdateCount -ge 1) {
                         if($duration -gt $inactivityHoursBeforeAutoRelease) {
                             $shouldCreateRelease = $true
+                            [string]$skippingReason = "RELEASING AFTER INACTIVITY"
                         }
                     }
                 }
@@ -538,6 +544,7 @@ param(
                             Write-Information "**** MAKE RELEASE ****"
                             Write-Information "Changelog: $changeLog"
                             Write-Information "Repo: $repoFolder"
+                            Write-Information "Reason: $skippingReason"
                             Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                         }
                         else {
@@ -548,6 +555,7 @@ param(
                                     Write-Information "**** MAKE RELEASE ****"
                                     Write-Information "Changelog: $changeLog"
                                     Write-Information "Repo: $repoFolder"
+                                    Write-Information "Reason: $skippingReason"
                                     Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                                 }
                                 else {
@@ -564,7 +572,7 @@ param(
                     }
                 }
                 else {
-                    Write-Information "SKIPPING RELEASE: insufficient pending updates : $autoUpdateCount"
+                    Write-Information "SKIPPING RELEASE: $skippingReason : $autoUpdateCount"
                 }
             }
             else {
