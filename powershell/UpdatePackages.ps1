@@ -289,7 +289,7 @@ param(
         
         if($line -eq "- FF-3881 - Updated DotNet SDK to 6.0.101") {
             # Dotnet version update
-            $updateCount += 1
+            $updateCount += 1000
             continue
         }
 
