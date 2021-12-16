@@ -751,7 +751,9 @@ param (
 
     [string]$targetWorkflows = makePath -Path $trgRepo -ChildPath ".github\workflows"
     $files = Get-ChildItem -Path $targetWorkflows -Filter *.yml -File -Attributes Normal, Hidden
-    Write-Information $files
+    foreach($line in $files) {
+        Write-Information "* $line"
+    }
     
     $obsoleteWorkflows = @(
         "cc.yml",
@@ -761,8 +763,7 @@ param (
         "tabtospace.yml",
         "dependabot-auto-merge.yml"
     )
-    ForEach ($file in $files)
-    {
+    ForEach ($file in $files) {
         ForEach ($workflow in $workflows) {
             If ($file.Name -eq $workflow) {
                 Remove-Item -Path $file.FullName
@@ -790,20 +791,16 @@ param (
         }
     }
 
-
     [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $repoFolder
-    If ($uncommitted -eq $true)
-    {
+    If ($uncommitted -eq $true) {
         Git-Commit -repoPath $repoFolder -message "Removed old workflows"
         Git-Push -repoPath $repoFolder
     }
 
-
     [string]$linters = makePath -Path $srcRepo -ChildPath ".github\linters"
     Write-Information "Looking for Lint config in $linters"
     $files = Get-ChildItem -Path $linters -File -Attributes Normal, Hidden
-    ForEach ($file in $files)
-    {
+    ForEach ($file in $files) {
         [string]$srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
         Write-Information " * Found Linter config $srcFileName"

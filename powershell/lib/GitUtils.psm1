@@ -359,8 +359,7 @@ function Git-HasSubmodules {
         return $false
     }
 
-    if($result -eq $null -or $result.Trim() -eq "")
-    {
+    if($result -eq $null -or $result.Trim() -eq "")  {
         return $false
     }
     
