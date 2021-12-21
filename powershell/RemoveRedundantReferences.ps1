@@ -95,14 +95,12 @@ function Get-PackageReferences {
     if($IncludeReferences) {
         $packageReferences = $xml | Select-Xml -XPath "Project/ItemGroup/PackageReference"
 
-        Write-Information "Found Packages:"
         foreach($node in $packageReferences)
         {
             if($node.Node.Include)
             {
                 $packageId = $node.Node.Include
                 $allPackageIds += $packageId
-                Write-Information "* $packageId"
             }
         }
         
@@ -420,15 +418,25 @@ param(
             }                   
         }
     
+        [string[]]$allPackageIds = @()
         $packageReferences = $xml | Select-Xml -XPath "Project/ItemGroup/PackageReference"
         $projectReferences = $xml | Select-Xml -XPath "Project/ItemGroup/ProjectReference"
     
+        foreach($node in $packageReferences)
+        {
+            if($node.Node.Include)
+            {
+                $packageId = $node.Node.Include
+                $allPackageIds += $packageId
+            }
+        }
+        
         $nodes = @($packageReferences) + @($projectReferences)
     
         foreach($node in $nodes) {
             if($node.Node.Include)
             {
-                $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include
+                $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include -allPackageIds $allPackageIds
                 if($doNotRemove)
                 {
                     WriteProgress "= Skipping $( $node.Node.Include ) as it is marked as do not remove"
