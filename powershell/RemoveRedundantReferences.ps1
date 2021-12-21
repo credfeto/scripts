@@ -29,7 +29,9 @@ function ExtractProjectFromReference {
 }
 
 function IsDoNotRemovePackage {
-    param($PackageId)
+    param([string]$PackageId,
+        [string[]]$allPackageIds
+    )
 
     if($PackageId -eq "FunFair.Test.Common") {
         return $true
@@ -65,6 +67,14 @@ function IsDoNotRemovePackage {
         return $true
     }
 
+    if($PackageId -eq "System.IdentityModel.Tokens.Jwt") {         
+        if($allPackageIds -contains "Microsoft.AspNetCore.Authentication.JwtBearer") {
+            return $true
+        }
+        
+        return $false
+    }
+
     if($PackageId.StartsWith("LibSassHost.Native.")) {
         # Referenced but not in an obvious way
         return $true
@@ -79,6 +89,7 @@ function Get-PackageReferences {
 
     $xml = [xml] (Get-Content $FileName)
 
+    [string[]]$allPackageIds = @()
     $references = @()
 
     if($IncludeReferences) {
@@ -88,12 +99,20 @@ function Get-PackageReferences {
         {
             if($node.Node.Include)
             {
+                $allPackageIds += $node.Node.Include
+            }
+        }
+        
+        foreach($node in $packageReferences)
+        {
+            if($node.Node.Include)
+            {
                 if($node.Node.PrivateAssets)
                 {
                     continue
                 }
 
-                $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include
+                $doNotRemove = IsDoNotRemovePackage -PackageId $node.Node.Include -allPackageIds $allPackageIds
                 if($doNotRemove)
                 {
                     continue
