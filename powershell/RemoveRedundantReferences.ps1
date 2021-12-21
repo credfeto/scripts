@@ -95,11 +95,14 @@ function Get-PackageReferences {
     if($IncludeReferences) {
         $packageReferences = $xml | Select-Xml -XPath "Project/ItemGroup/PackageReference"
 
+        Write-Information "Found Packages:"
         foreach($node in $packageReferences)
         {
             if($node.Node.Include)
             {
-                $allPackageIds += $node.Node.Include
+                $packageId = $node.Node.Include
+                $allPackageIds += $packageId
+                Write-Information "* $packageId"
             }
         }
         
