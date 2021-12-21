@@ -426,7 +426,7 @@ param(
     [bool]$updateGitHubActions = $hasNonTemplateWorkFlows -And !$trgRepo.ToLowerInvariant().Contains("fFunfair")
 
     [bool]$hasSubModules = Git-HasSubModules -repoPath $trgRepo 
-    Dependabot-BuildConfig -configFileName $targetFileName -repoRoot trgRepo -updateGitHubActions $updateGitHubActions -hasSubModules $hasSubModules
+    Dependabot-BuildConfig -configFileName $targetFileName -repoRoot $trgRepo -updateGitHubActions $updateGitHubActions -hasSubModules $hasSubModules
 
     doCommit -repoPath $repoFolder -FileName ".github/dependabot.yml"
     Git-Push -repoPath $repoFolder

@@ -71,9 +71,10 @@ function dotNetDependabotTemplate {
 }
 
 function javascriptDependabotTemplate {
+param([string]$path)
     return "
 - package-ecosystem: npm
-  directory: ""/""
+  directory: ""$path""
   schedule:
     interval: daily
     time: ""03:00""
@@ -232,7 +233,7 @@ updates:
         [string]$trgContent = $trgContent + $templateContent
     }
 
-    $files = Get-ChildItem -Path $trgRepo -Filter *.csproj -Recurse
+    $files = Get-ChildItem -Path $repoRoot -Filter *.csproj -Recurse
     if($files -ne $null) {
         Write-Information " --> Adding .NET"
         [string]$templateContent = dotNetDependabotTemplate
@@ -240,15 +241,20 @@ updates:
         [string]$trgContent = $trgContent + $templateContent
     }
     
-    $files = Get-ChildItem -Path $trgRepo -Filter 'package.json' -Recurse
-    if($files -ne $null) {
-        Write-Information " --> Adding Javascript"
-        [string]$templateContent = javascriptDependabotTemplate
-        [string]$trgContent = $trgContent.Trim() + $newline + $newline
-        [string]$trgContent = $trgContent + $templateContent
+    $files = Get-ChildItem -Path $repoRoot -Filter 'package.json' -Recurse
+    if($files -ne $null) {        
+        foreach($file in $files) {
+            [string]$dirName = $file.Directory.FullName
+            [string]$path = $dirName.SubString($repoRoot.length)
+            
+            Write-Information " --> Adding Javascript: $path"            
+            [string]$templateContent = javascriptDependabotTemplate -path $path 
+            [string]$trgContent = $trgContent.Trim() + $newline + $newline
+            [string]$trgContent = $trgContent + $templateContent
+        }
     }
     
-    $files = Get-ChildItem -Path $trgRepo -Filter 'Dockerfile' -Recurse
+    $files = Get-ChildItem -Path $repoRoot -Filter 'Dockerfile' -Recurse
     if($files -ne $null) {
         Write-Information " --> Adding Docker"
         [string]$templateContent = dockerDependabotTemplate
@@ -258,7 +264,7 @@ updates:
     
     if($updateGitHubActions -eq $true)
     {
-        [string]$actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
+        [string]$actionsTargetPath = makePath -Path $repoRoot -ChildPath ".github"
         $files = Get-ChildItem -Path $actionsTargetPath -Filter *.yml -Recurse
         if ($files -ne $null)
         {
@@ -269,7 +275,7 @@ updates:
         }
     }
 
-    [string]$actionsTargetPath = makePath -Path $trgRepo -ChildPath ".github"
+    [string]$actionsTargetPath = makePath -Path $repoRoot -ChildPath ".github"
     $files = Get-ChildItem -Path $actionsTargetPath -Filter requirements.txt -Recurse
     if($files -ne $null) {
         Write-Information " --> Adding Python"
