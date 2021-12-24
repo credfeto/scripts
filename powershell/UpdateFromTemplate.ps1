@@ -130,8 +130,8 @@ catch
 
 function makePath {
 param(
-    [string]$Path, 
-    [string]$ChildPath
+    [string]$Path = $(throw "path not specified"), 
+    [string]$ChildPath = $(throw "childPath not specified")
     )
     
     [string]$ChildPath = convertToOsPath -path $ChildPath
@@ -141,7 +141,7 @@ param(
 
 function convertToOsPath{
 param (
-    [string]$path
+    [string]$path = $(throw "path not specified")
 )
 
     if ($IsLinux -eq $true) {
@@ -154,8 +154,8 @@ param (
 
 function updateOneFile{
 param (
-    [string]$sourceFileName, 
-    [string]$targetFileName
+    [string]$sourceFileName = $(throw "sourceFileName not specified"), 
+    [string]$targetFileName = $(throw "targetFileName not specified")
 )
     [string]$sourceFileName = convertToOsPath -path $sourceFileName
     [string]$targetFileName = convertToOsPath -path $targetFileName
@@ -195,10 +195,14 @@ param (
 
 function updateFile{
 param (
-    [string]$sourceRepo, 
-    [string]$targetRepo, 
-    [string]$fileName
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "targetRepo not specified"), 
+    [string]$fileName = $(throw "fileName not specified")
 )
+    if($sourceRepo -eq $targetRepo) {
+        throw "updateFile: Source Repo and Target Repos are both set to $sourceRepo"
+    }
+    
     [string]$fileName = convertToOsPath -path $fileName
 
     Write-Information "Checking $fileName"
@@ -211,8 +215,8 @@ param (
 
 function doCommit{
 param(
-    [string]$fileName,
-    [String]$repoPath
+    [string]$fileName = $(throw "fileName not specified"),
+    [String]$repoPath = $(throw "repoPath not specified")
 )
 
     Write-Information "Staging $fileName in $repoPath"
@@ -222,10 +226,14 @@ param(
 
 function updateFileAndCommit{
 param (
-    [string]$sourceRepo, 
-    [string]$targetRepo, 
-    [string]$fileName
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "targetRepo not specified"), 
+    [string]$fileName = $(throw "filename not specified")
     )
+
+    if($sourceRepo -eq $targetRepo) {
+        throw "updateFileAndCommit: Source Repo and Target Repos are both set to $sourceRepo"
+    }
 
     $ret = updateFile -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $fileName
 
@@ -238,7 +246,7 @@ param (
 
 function hasCodeToBuild{
 param(
-    [string]$targetRepo
+    [string]$targetRepo = $(throw "targetRepo not specified")
     )
     
     [string]$srcPath = makePath -Path $targetRepo -ChildPath "src"
@@ -261,11 +269,15 @@ param(
 
 function updateFileBuildAndCommit{
 param(
-    [string]$sourceRepo, 
-    [string]$targetRepo, 
-    [string]$fileName
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "targetRepo not specified"), 
+    [string]$fileName = $(throw "targetRepo not specified")
     )
     
+    if($sourceRepo -eq $targetRepo) {
+        throw "updateFileBuildAndCommit: Source Repo and Target Repos are both set to $sourceRepo"
+    }
+
     [string]$fileName = convertToOsPath -path $fileName
 
     [bool]$canBuild = hasCodeToBuild -targetRepo $targetRepo
@@ -304,37 +316,45 @@ param(
 
 function updateResharperSettings{
 param (
-    [string]$srcRepo, 
-    [string]$trgRepo
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "targetRepo not specified")
 )
+    if($sourceRepo -eq $targetRepo) {
+        throw "updateResharperSettings: Source Repo and Target Repos are both set to $sourceRepo"
+    }
 
     [string]$sourceTemplateFile = convertToOsPath -path "src\FunFair.Template.sln.DotSettings"
 
-    [string]$sourceFileName = makePath -Path $srcRepo -ChildPath $sourceTemplateFile
-    $files = Get-ChildItem -Path $repoFolder -Filter *.sln -Recurse
+    [string]$sourceFileName = makePath -Path $sourceRepo -ChildPath $sourceTemplateFile
+    $files = Get-ChildItem -Path $targetRepo -Filter *.sln -Recurse
     ForEach($file in $files) {
         [string]$targetFileName = $file.FullName
         $targetFileName = $targetFileName + ".DotSettings"
 
-        [string]$fileNameForCommit = $targetFileName.SubString($trgRepo.Length + 1)
+        [string]$fileNameForCommit = $targetFileName.SubString($targetRepo.Length + 1)
 
         Write-Information "Update $targetFileName"
         [bool]$ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
         if($ret -ne $null) {
-            doCommit -repoPath $repoFolder -fileName $fileNameForCommit
-            Git-Push -repoPath $repoFolder
+            doCommit -repoPath $targetRepo -fileName $fileNameForCommit
+            Git-Push -repoPath $targetRepo
         }
     }
 }
 
 function updateWorkFlowAndCommit{
 param(
-    [string]$sourceRepo, 
-    [string]$targetRepo, 
-    [string]$fileName)
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "targetRepo not specified"), 
+    [string]$fileName = $(throw "filename not specified")
+    )
     
+    if($sourceRepo -eq $targetRepo) {
+        throw "updateWorkFlowAndCommit: Source Repo and Target Repos are both set to $sourceRepo"
+    }
+
     if($targetRepo.Contains("cs-template") -ne $true) {
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $fileName
+        updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $fileName
         return
     }
     
@@ -370,16 +390,17 @@ param(
 
 function updateAndMergeFileAndCommit{
 param(
-    [string]$srcRepo, 
-    [string]$trgRepo, 
-    [string]$fileName, 
-    [string]$mergeFileName)
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "targetRepo not specified"), 
+    [string]$fileName = $(throw "filename not specified"), 
+    [string]$mergeFileName = $(throw "mergeFileName not specified")
+    )
     
     $fileName = convertToOsPath -path $fileName
     [string]$mergeFileName = convertToOsPath -path $mergeFileName
     
     Write-Information "Merging ? $fileName"
-    [string]$sourceFileName = makePath -Path $srcRepo -ChildPath $fileName
+    [string]$sourceFileName = makePath -Path $sourceRepo -ChildPath $fileName
     Write-Information "Source File: $sourceFileName"
     [bool]$sourceFileNameExists = Test-Path -Path $sourceFileName -PathType Leaf
     if($sourceFileNameExists -eq $false) {
@@ -387,8 +408,8 @@ param(
         return
     }
 
-    [string]$targetFileName = makePath -Path $trgRepo -ChildPath $fileName
-    [string]$targetMergeFileName = makePath -Path $trgRepo -ChildPath $mergeFileName
+    [string]$targetFileName = makePath -Path $targetRepo -ChildPath $fileName
+    [string]$targetMergeFileName = makePath -Path $targetRepo -ChildPath $mergeFileName
 
     [bool]$targetMergeFileNameExists = Test-Path -Path $targetMergeFileName
     if($targetMergeFileNameExists -eq $true) {
@@ -407,26 +428,26 @@ param(
 
 
     } else {
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $fileName
+        updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $fileName
     }
 
 }
 
 function buildDependabotConfig{
 param(
-    [string]$srcRepo, 
-    [string]$trgRepo, 
-    [bool]$hasNonTemplateWorkFlows
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "targetRepo not specified"), 
+    [bool]$hasNonTemplateWorkFlows = $(throw "hasNonTemplateWorkFlows not specified")
     )
 
-    [string]$srcPath = makePath -Path $srcRepo -ChildPath ".github"
-    Write-Information "$srcPath"
-    [string]$targetFileName = makePath -Path $trgRepo -ChildPath ".github/dependabot.yml"
+    [string]$srcPath = makePath -Path $sourceRepo -ChildPath ".github"
+    Write-Information "Config Path: $srcPath"
+    [string]$targetFileName = makePath -Path $targetRepo -ChildPath ".github/dependabot.yml"
 
-    [bool]$updateGitHubActions = $hasNonTemplateWorkFlows -And !$trgRepo.ToLowerInvariant().Contains("fFunfair")
+    [bool]$updateGitHubActions = $hasNonTemplateWorkFlows -And !$targetRepo.ToLowerInvariant().Contains("fFunfair")
 
-    [bool]$hasSubModules = Git-HasSubModules -repoPath $trgRepo 
-    Dependabot-BuildConfig -configFileName $targetFileName -repoRoot $trgRepo -updateGitHubActions $updateGitHubActions -hasSubModules $hasSubModules
+    [bool]$hasSubModules = Git-HasSubModules -repoPath $targetRepo 
+    Dependabot-BuildConfig -configFileName $targetFileName -repoRoot $targetRepo -updateGitHubActions $updateGitHubActions -hasSubModules $hasSubModules
 
     doCommit -repoPath $repoFolder -FileName ".github/dependabot.yml"
     Git-Push -repoPath $repoFolder
@@ -434,10 +455,10 @@ param(
 
 function removeLegacyDependabotConfig{
 param(
-    [string]$trgRepo
+    [string]$targetRepo = $(throw "targetRepo not specified")
     )
     
-    [string]$trgPath = makePath -Path $trgRepo -ChildPath ".github"
+    [string]$trgPath = makePath -Path $targetRepo -ChildPath ".github"
 
     $files = Get-ChildItem -Path $trgPath -filter "dependabot.config.template.*"
     foreach($file in $files)
@@ -456,7 +477,8 @@ param(
 
 function ensureFolderExists{
 param(
-    [string]$baseFolder, [string]$subFolder
+    [string]$baseFolder = $(throw "baseFolder not specified"), 
+    [string]$subFolder = $(throw "subFolder not specified")
     )
     
     [string]$fullPath = makePath -Path $baseFolder -ChildPath $subFolder
@@ -468,10 +490,11 @@ param(
 
 function commitGlobalJsonVersionUpdateToMaster {
 param (
-    [string]$dotnetVersion,
-    [string]$targetRepo,
-    [string]$branchName,
-    [string]$originalBranchPrefix)
+    [string]$dotnetVersion = $(throw "dotnetVersion not specified"),
+    [string]$targetRepo = $(throw "targetRepo not specified"),
+    [string]$branchName = $(throw "branchName not specified"),
+    [string]$originalBranchPrefix = $(throw "originalBranchPrefix not specified")
+    )
 
     Write-Information "**** BUILD OK ****"
     
@@ -488,10 +511,11 @@ param (
 
 function commitGlobalJsonVersionUpdateToBranch {
 param (
-    [string]$dotnetVersion,
-    [string]$targetRepo,
-    [string]$branchName,
-    [string]$originalBranchPrefix)
+    [string]$dotnetVersion = $(throw "dotnetVersion not specified"),
+    [string]$targetRepo = $(throw "targetRepo not specified"),
+    [string]$branchName = $(throw "branchName not specified"),
+    [string]$originalBranchPrefix = $(throw "originalBranchPrefix not specified")
+    )
 
     Write-Information "**** BUILD FAILURE ****"
     [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
@@ -512,9 +536,9 @@ param (
 
 function updateGlobalJson{
 param(
-    [string]$sourceRepo, 
-    [string]$targetRepo, 
-    [string]$fileName
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "targetRepo not specified"), 
+    [string]$fileName = $(throw "fileName not specified")
     )
 
     [string]$localFileName = convertToOsPath -path $fileName
@@ -609,7 +633,7 @@ param(
 
 function updateLabel{
 param(
-    [string]$baseFolder
+    [string]$baseFolder = $(throw "baseFolder not specified")
     )
     
     [string]$srcPath = makePath -Path $baseFolder -ChildPath "src"
@@ -637,7 +661,7 @@ param(
 
 function ShouldAlwaysCreatePatchRelease{
 param(
-    [string]$repo
+    [string]$repo = $(throw "repo not specified")
     )
     
     if($repo.Contains("template")) {
@@ -665,10 +689,10 @@ param(
 
 function processRepo {
 param (
-    [string]$srcRepo, 
-    [string]$repo, 
-    [string]$baseFolder, 
-    [string]$templateRepoHash
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$repo = $(throw "repo (target) not specified"), 
+    [string]$baseFolder = $(throw "baseFolder not specified"), 
+    [string]$templateRepoHash = $(throw "templateRepoHash not specified")
     )
 
     Write-Information ""
@@ -680,25 +704,25 @@ param (
     Write-Information "Base Folder: $baseFolder"
     
     Write-Information "Processing Repo: $repo"
-    Write-Information "Source Repo: $srcRepo"
+    Write-Information "Source Repo: $sourceRepo"
 
     # Extract the folder from the repo name
     [string]$folder = Git-GetFolderForRepo -repo $repo
 
     Write-Information "Folder: $folder"
-    [string]$trgRepo = Join-Path -Path $baseFolder -ChildPath $folder
+    [string]$targetRepo = Join-Path -Path $baseFolder -ChildPath $folder
 
-    if($srcRepo -eq $trgRepo) {
+    if($sourceRepo -eq $targetRepo) {
         Write-Information "Skipping updating $repo as it is the same as the template"
         Return
     }
     
-    Git-EnsureSynchronised -repo $repo -repofolder $trgRepo
+    Git-EnsureSynchronised -repo $repo -repofolder $targetRepo
 
-    Set-Location -Path $trgRepo
+    Set-Location -Path $targetRepo
 
     [string]$lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
-    [string]$currentRevision = Git-Get-HeadRev -repoPath $trgRepo
+    [string]$currentRevision = Git-Get-HeadRev -repoPath $targetRepo
     $currentRevision = "$scriptsHash/$templateRepoHash/$currentRevision"
 
     Write-Information "Last Revision:    $lastRevision"
@@ -709,70 +733,70 @@ param (
         Return
     }
 
-    Set-Location -Path $trgRepo
+    Set-Location -Path $targetRepo
 
     #########################################################
     # CREATE ANY FOLDERS THAT ARE NEEDED
-    ensureFolderExists -baseFolder $trgRepo -subFolder ".github"
-    ensureFolderExists -baseFolder $trgRepo -subFolder ".github\workflows"
-    ensureFolderExists -baseFolder $trgRepo -subFolder ".github\linters"
+    ensureFolderExists -baseFolder $targetRepo -subFolder ".github"
+    ensureFolderExists -baseFolder $targetRepo -subFolder ".github\workflows"
+    ensureFolderExists -baseFolder $targetRepo -subFolder ".github\linters"
 
     ## Ensure Changelog exists
-    [string]$targetChangelogFile = makePath -Path $trgRepo -ChildPath "CHANGELOG.md"
+    [string]$targetChangelogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
     [bool]$targetChangeLogExists = Test-Path -Path $targetChangelogFile
     if($targetChangeLogExists -eq $false) {
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "CHANGELOG.md"
+        updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "CHANGELOG.md"
     }
 
     
     #########################################################
     # C# file updates
     [bool]$dotnetVersionUpdated = $false
-    [string]$srcPath = makePath -Path $trgRepo -ChildPath "src"
+    [string]$srcPath = makePath -Path $targetRepo -ChildPath "src"
     [bool]$srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $true) {
         $files = Get-ChildItem -Path $srcPath -Filter *.sln -Recurse
         if($files.Count -ne 0) {
 
             # Process files in src folder
-            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "src\CodeAnalysis.ruleset"
-            [string]$versionResult = updateGlobalJson -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "src\global.json"
+            updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\CodeAnalysis.ruleset"
+            [string]$versionResult = updateGlobalJson -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\global.json"
             Write-Information ".NET VERSION UPDATED: $versionResult"
             [bool]$dotnetVersionUpdated = $versionResult -eq "VERSION"
             Write-Information ".NET VERSION UPDATED: $dotnetVersionUpdated"
         }
         
-        if($trgRepo.Contains("funfair")) {
+        if($targetRepo.Contains("funfair")) {
             Write-Information "Repo Folder contains 'funfair': $repo"
-            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "src\FunFair.props"
-            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "src\packageicon.png"
+            updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\FunFair.props"
+            updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\packageicon.png"
         }
     }
 
     #########################################################
     # SIMPLE OVERWRITE UPDATES
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".editorconfig"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".gitleaks.toml"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".gitignore"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".gitattributes"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".github\pr-lint.yml"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".github\CODEOWNERS"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".github\PULL_REQUEST_TEMPLATE.md"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".editorconfig"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitleaks.toml"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitignore"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitattributes"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\pr-lint.yml"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\CODEOWNERS"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\PULL_REQUEST_TEMPLATE.md"
 
     
-    [string]$workflows = makePath -Path $srcRepo -ChildPath ".github\workflows"
+    [string]$workflows = makePath -Path $sourceRepo -ChildPath ".github\workflows"
     Write-Information "Looking for Workflows in $workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml -File -Attributes Normal, Hidden
     ForEach ($file in $files)
     {
         [string]$srcFileName = $file.FullName
-        $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
+        $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
         Write-Information " * Found Workflow $srcFileName"
 
-        updateWorkFlowAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $srcFileName
+        updateWorkFlowAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
     }
 
-    [string]$targetWorkflows = makePath -Path $trgRepo -ChildPath ".github\workflows"
+    [string]$targetWorkflows = makePath -Path $targetRepo -ChildPath ".github\workflows"
     $files = Get-ChildItem -Path $targetWorkflows -Filter *.yml -File -Attributes Normal, Hidden
     foreach($line in $files) {
         Write-Information "* $line"
@@ -814,36 +838,36 @@ param (
         }
     }
 
-    [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $trgRepo
+    [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $targetRepo
     If ($uncommitted -eq $true) {
-        Git-Commit -repoPath $trgRepo -message "Removed old workflows"
-        Git-Push -repoPath $trgRepo
+        Git-Commit -repoPath $targetRepo -message "Removed old workflows"
+        Git-Push -repoPath $targetRepo
     }
 
-    [string]$linters = makePath -Path $srcRepo -ChildPath ".github\linters"
+    [string]$linters = makePath -Path $sourceRepo -ChildPath ".github\linters"
     Write-Information "Looking for Lint config in $linters"
     $files = Get-ChildItem -Path $linters -File -Attributes Normal, Hidden
     ForEach ($file in $files) {
         [string]$srcFileName = $file.FullName
-        $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
+        $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
         Write-Information " * Found Linter config $srcFileName"
 
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $srcFileName
+        updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
     }
 
     #########################################################
     # COMPLICATED UPDATES
     
     # Update R# DotSettings
-    updateResharperSettings -srcRepo $srcRepo -trgRepo $trgRepo
-    updateLabel -baseFolder $trgRepo
+    updateResharperSettings -srcRepo $sourceRepo -trgRepo $targetRepo
+    updateLabel -baseFolder $targetRepo
 
-    buildDependabotConfig -srcRepo $srcRepo -trgRepo $trgRepo -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
-    removeLegacyDependabotConfig -trgRepo $trgRepo
+    buildDependabotConfig -srcRepo $sourceRepo -trgRepo $targetRepo -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
+    removeLegacyDependabotConfig -trgRepo $targetRepo
     
-    Git-ReNormalise -repoPath $trgRepo
+    Git-ReNormalise -repoPath $targetRepo
     
-    Git-ResetToMaster -repoPath $trgRepo
+    Git-ResetToMaster -repoPath $targetRepo
         
     if($dotnetVersionUpdated -eq $true) {
         Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
@@ -853,8 +877,8 @@ param (
             if (ShouldAlwaysCreatePatchRelease -repo $repo) {
                 Write-Information "**** MAKE RELEASE ****"
                 Write-Information "Changelog: $targetChangelogFile"
-                Write-Information "Repo: $trgRepo"
-                Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $trgRepo
+                Write-Information "Repo: $targetRepo"
+                Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $targetRepo
             }
             else {
                 if(!$repo.Contains("server-content-package"))
@@ -864,16 +888,16 @@ param (
                     {
                         Write-Information "**** MAKE RELEASE ****"
                         Write-Information "Changelog: $targetChangelogFile"
-                        Write-Information "Repo: $trgRepo"
-                        Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $trgRepo
+                        Write-Information "Repo: $targetRepo"
+                        Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $targetRepo
                     }
                 }
             }
         }        
     }
 
-    Git-ResetToMaster -repoPath $trgRepo
-    Git-ReNormalise -repoPath $trgRepo
+    Git-ResetToMaster -repoPath $targetRepo
+    Git-ReNormalise -repoPath $targetRepo
 
     Write-Information "Updating Tracking for $repo to $currentRevision"
     Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
@@ -881,10 +905,10 @@ param (
 
 function processAll{
 param(
-    [string[]]$repositoryList, 
-    [string]$templateRepositoryFolder, 
-    [string]$baseFolder, 
-    [string]$templateRepoHash
+    [string[]]$repositoryList = $(throw "repositoryList not specified"), 
+    [string]$templateRepositoryFolder = $(throw "templateRepositoryFolder not specified"), 
+    [string]$baseFolder = $(throw "baseFolder not specified"), 
+    [string]$templateRepoHash = $(throw "templateRepoHash not specified")
     )
 
     [int]$repoCount = $repositoryList.Count
