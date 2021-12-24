@@ -87,7 +87,10 @@ catch {
 }
 #endregion
 
-function runCodeCleanup($solutionFile) {
+function runCodeCleanup{
+param(
+    [string]$solutionFile  = $(throw "solutionFile not specified")
+    )
 
     $tempFolder = [System.IO.Path]::GetTempPath()
 
@@ -161,7 +164,11 @@ function runCodeCleanup($solutionFile) {
     return $false
 }
 
-function processRepo($srcRepo, $repo) {
+function processRepo{
+param(
+    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
+    [string]$repo = $(throw "repo not specified")
+    )
     
     Write-Information ""
     Write-Information "***************************************************************"
@@ -178,7 +185,7 @@ function processRepo($srcRepo, $repo) {
     Write-Information "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
 
-    Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
+    Git-EnsureSynchronised -repo $repo -repoFolder $repoFolder
 
     Set-Location -Path $repoFolder
 
@@ -279,7 +286,7 @@ ForEach($repo in $repoList) {
         continue
     }
 
-    processRepo -srcRepo $templateRepoFolder -repo $repo
+    processRepo -sourceRepo $templateRepoFolder -repo $repo
 }
 
 Set-Location -Path $root

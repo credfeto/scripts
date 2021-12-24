@@ -717,7 +717,7 @@ param (
         Return
     }
     
-    Git-EnsureSynchronised -repo $repo -repofolder $targetRepo
+    Git-EnsureSynchronised -repo $repo -repoFolder $targetRepo
 
     Set-Location -Path $targetRepo
 
