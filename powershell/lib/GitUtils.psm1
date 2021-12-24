@@ -32,7 +32,7 @@ function GetRepoPath{
 
 function Git-GetRemoteBranches {
 param(
-        [string] $repoPath,
+        [string] $repoPath = $(throw "repoPath not specified"),
         [string] $upstream = "origin"
     )
 
@@ -69,7 +69,7 @@ param(
 
 function Git-RemoveAllLocalBranches {
 param(
-        [string] $repoPath
+        [string] $repoPath = $(throw "repoPath not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -85,7 +85,7 @@ param(
 
 function Git-ResetToMaster {
 param(
-        [string] $repoPath
+        [string] $repoPath = $(throw "repoPath not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -118,7 +118,7 @@ param(
 
 function Git-HasUnCommittedChanges {
 param(
-    [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -135,7 +135,7 @@ param(
 
 function Git-GetFolderForRepo {
 param(
-    [string] $repo
+    [string] $repo = $(throw "repo not specified")
     )
 
     # Extract the folder from the repo name
@@ -147,12 +147,12 @@ param(
 
 function Git-EnsureSynchronised {
 param(
-    [string] $repo, 
-    [string] $repofolder
+    [string] $repo = $(throw "repo not specified"), 
+    [string] $repoFolder = $(throw "repoFolder not specified")
     )
 
     Write-Information "Repo: $repo"
-    Write-Information "Folder: $repofolder"
+    Write-Information "Folder: $repoFolder"
 
     [string]$gitHead = Join-Path -Path $repoFolder -ChildPath ".git" 
     [string]$gitHead = Join-Path -Path $gitHead -ChildPath "HEAD" 
@@ -163,7 +163,7 @@ param(
 
     if ($gitHeadCloned -eq $True) {
         Write-Information "Already Cloned"
-        Set-Location -Path $repofolder
+        Set-Location -Path $repoFolder
 
         Git-ResetToMaster -repoPath $repoFolder
     }
@@ -172,14 +172,14 @@ param(
         Write-Information "Cloning..."
         $result = git clone $repo --recurse-submodules 2>&1 
         Git-Log -result $result
-        Set-Location -Path $repofolder
+        Set-Location -Path $repoFolder
     }
 }
 
 function Git-Commit {
 param(
-    [string] $repoPath,
-    [string] $message
+    [string] $repoPath = $(throw "repoPath not specified"),
+    [string] $message = $(throw "message not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -190,9 +190,9 @@ param(
 
 function Git-Commit-Named {
 param(
-    [string] $repoPath,
-    [string] $message,
-    [String[]] $files
+    [string] $repoPath = $(throw "repoPath not specified"),
+    [string] $message = $(throw "message not specified"),
+    [String[]] $files = $(throw "files not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -208,7 +208,7 @@ param(
 
 function Git-Push {
 param(
-    [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -218,8 +218,8 @@ param(
 
 function Git-PushOrigin {
 param(
-    [string] $branchName,
-    [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified"),
+    [string] $branchName = $(throw "branchName not specified")
     )
     
     if($branchName -eq $null) {
@@ -238,8 +238,8 @@ param(
 
 function Git-DoesBranchExist {
 param(
-    [string] $branchName,
-    [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified"),
+    [string] $branchName = $(throw "branchName not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -267,8 +267,8 @@ param(
 
 function Git-CreateBranch {
 param(
-    [string] $branchName,
-    [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified"),
+    [string] $branchName = $(throw "branchName not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -294,8 +294,8 @@ param(
 
 function Git-DeleteBranch {
 param(
-    [string] $branchName,
-    [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified"),
+    [string] $branchName = $(throw "branchName not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -315,7 +315,7 @@ param(
 
 function Git-ReNormalise {
 param(
-        [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -331,7 +331,7 @@ param(
 
 function Git-Get-HeadRev {
 param(
-    [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -349,7 +349,7 @@ param(
 
 function Git-HasSubmodules {
     param(
-        [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -374,9 +374,10 @@ function Git-HasSubmodules {
 
 function Git-RemoveBranchesForPrefix{
 param(
-    [string]$repoPath, 
-    [string]$branchForUpdate, 
-    [string]$branchPrefix)
+    [string]$repoPath = $(throw "repoPath not specified"), 
+    [string]$branchForUpdate = $(throw "branchForUpdate not specified"), 
+    [string]$branchPrefix = $(throw "branchPrefix not specified")
+    )
 
     [string[]]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
     
@@ -398,7 +399,7 @@ param(
 
 function Get-GetLastCommitDate {
 param(
-    [string] $repoPath
+    [string] $repoPath = $(throw "repoPath not specified")
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -412,7 +413,7 @@ param(
 
 function Git-LoadRepoList {
 param(
-    [string] $repoFile
+    [string] $repoFile = $(throw "repoPath not specified")
     )
 
     [string[]] $content = Get-Content -Path $repoFile
