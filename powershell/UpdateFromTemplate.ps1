@@ -230,8 +230,8 @@ param (
     $ret = updateFile -sourceRepo $sourceRepo -targetRepo $targetRepo -filename $fileName
 
     if($ret -ne $null) {
-        doCommit -repoPath $repoFolder -fileName $fileName
-        Git-Push -repoPath $repoFolder
+        doCommit -repoPath $targetRepo -fileName $fileName
+        Git-Push -repoPath $targetRepo
     }    
 }
 
