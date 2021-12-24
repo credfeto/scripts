@@ -686,19 +686,19 @@ param (
     [string]$folder = Git-GetFolderForRepo -repo $repo
 
     Write-Information "Folder: $folder"
-    [string]$repoFolder = Join-Path -Path $baseFolder -ChildPath $folder
+    [string]$trgRepo = Join-Path -Path $baseFolder -ChildPath $folder
 
-    if($srcRepo -eq $repoFolder) {
+    if($srcRepo -eq $trgRepo) {
         Write-Information "Skipping updating $repo as it is the same as the template"
         Return
     }
     
-    Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
+    Git-EnsureSynchronised -repo $repo -repofolder $trgRepo
 
-    Set-Location -Path $repoFolder
+    Set-Location -Path $trgRepo
 
     [string]$lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
-    [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
+    [string]$currentRevision = Git-Get-HeadRev -repoPath $trgRepo
     $currentRevision = "$scriptsHash/$templateRepoHash/$currentRevision"
 
     Write-Information "Last Revision:    $lastRevision"
@@ -709,55 +709,55 @@ param (
         Return
     }
 
-    Set-Location -Path $repoFolder
+    Set-Location -Path $trgRepo
 
     #########################################################
     # CREATE ANY FOLDERS THAT ARE NEEDED
-    ensureFolderExists -baseFolder $repoFolder -subFolder ".github"
-    ensureFolderExists -baseFolder $repoFolder -subFolder ".github\workflows"
-    ensureFolderExists -baseFolder $repoFolder -subFolder ".github\linters"
+    ensureFolderExists -baseFolder $trgRepo -subFolder ".github"
+    ensureFolderExists -baseFolder $trgRepo -subFolder ".github\workflows"
+    ensureFolderExists -baseFolder $trgRepo -subFolder ".github\linters"
 
     ## Ensure Changelog exists
-    [string]$targetChangelogFile = makePath -Path $repoFolder -ChildPath "CHANGELOG.md"
+    [string]$targetChangelogFile = makePath -Path $trgRepo -ChildPath "CHANGELOG.md"
     [bool]$targetChangeLogExists = Test-Path -Path $targetChangelogFile
     if($targetChangeLogExists -eq $false) {
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "CHANGELOG.md"
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "CHANGELOG.md"
     }
 
     
     #########################################################
     # C# file updates
     [bool]$dotnetVersionUpdated = $false
-    [string]$srcPath = makePath -Path $repoFolder -ChildPath "src"
+    [string]$srcPath = makePath -Path $trgRepo -ChildPath "src"
     [bool]$srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $true) {
         $files = Get-ChildItem -Path $srcPath -Filter *.sln -Recurse
         if($files.Count -ne 0) {
 
             # Process files in src folder
-            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\CodeAnalysis.ruleset"
-            [string]$versionResult = updateGlobalJson -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\global.json"
+            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "src\CodeAnalysis.ruleset"
+            [string]$versionResult = updateGlobalJson -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "src\global.json"
             Write-Information ".NET VERSION UPDATED: $versionResult"
             [bool]$dotnetVersionUpdated = $versionResult -eq "VERSION"
             Write-Information ".NET VERSION UPDATED: $dotnetVersionUpdated"
         }
         
-        if($repoFolder.Contains("funfair")) {
+        if($trgRepo.Contains("funfair")) {
             Write-Information "Repo Folder contains 'funfair': $repo"
-            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\FunFair.props"
-            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName "src\packageicon.png"
+            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "src\FunFair.props"
+            updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName "src\packageicon.png"
         }
     }
 
     #########################################################
     # SIMPLE OVERWRITE UPDATES
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".editorconfig"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".gitleaks.toml"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".gitignore"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".gitattributes"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\pr-lint.yml"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\CODEOWNERS"
-    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName ".github\PULL_REQUEST_TEMPLATE.md"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".editorconfig"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".gitleaks.toml"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".gitignore"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".gitattributes"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".github\pr-lint.yml"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".github\CODEOWNERS"
+    updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName ".github\PULL_REQUEST_TEMPLATE.md"
 
     
     [string]$workflows = makePath -Path $srcRepo -ChildPath ".github\workflows"
@@ -769,7 +769,7 @@ param (
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
         Write-Information " * Found Workflow $srcFileName"
 
-        updateWorkFlowAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $srcFileName
+        updateWorkFlowAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $srcFileName
     }
 
     [string]$targetWorkflows = makePath -Path $trgRepo -ChildPath ".github\workflows"
@@ -814,10 +814,10 @@ param (
         }
     }
 
-    [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $repoFolder
+    [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $trgRepo
     If ($uncommitted -eq $true) {
-        Git-Commit -repoPath $repoFolder -message "Removed old workflows"
-        Git-Push -repoPath $repoFolder
+        Git-Commit -repoPath $trgRepo -message "Removed old workflows"
+        Git-Push -repoPath $trgRepo
     }
 
     [string]$linters = makePath -Path $srcRepo -ChildPath ".github\linters"
@@ -828,22 +828,22 @@ param (
         $srcFileName = $srcFileName.SubString($srcRepo.Length + 1)
         Write-Information " * Found Linter config $srcFileName"
 
-        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $repoFolder -fileName $srcFileName
+        updateFileAndCommit -sourceRepo $srcRepo -targetRepo $trgRepo -fileName $srcFileName
     }
 
     #########################################################
     # COMPLICATED UPDATES
     
     # Update R# DotSettings
-    updateResharperSettings -srcRepo $srcRepo -trgRepo $repoFolder
-    updateLabel -baseFolder $repoFolder
+    updateResharperSettings -srcRepo $srcRepo -trgRepo $trgRepo
+    updateLabel -baseFolder $trgRepo
 
-    buildDependabotConfig -srcRepo $srcRepo -trgRepo $repoFolder -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
-    removeLegacyDependabotConfig -trgRepo $repoFolder
+    buildDependabotConfig -srcRepo $srcRepo -trgRepo $trgRepo -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
+    removeLegacyDependabotConfig -trgRepo $trgRepo
     
-    Git-ReNormalise -repoPath $repoFolder
+    Git-ReNormalise -repoPath $trgRepo
     
-    Git-ResetToMaster -repoPath $repoFolder
+    Git-ResetToMaster -repoPath $trgRepo
         
     if($dotnetVersionUpdated -eq $true) {
         Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
@@ -853,8 +853,8 @@ param (
             if (ShouldAlwaysCreatePatchRelease -repo $repo) {
                 Write-Information "**** MAKE RELEASE ****"
                 Write-Information "Changelog: $targetChangelogFile"
-                Write-Information "Repo: $repoFolder"
-                Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
+                Write-Information "Repo: $trgRepo"
+                Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $trgRepo
             }
             else {
                 if(!$repo.Contains("server-content-package"))
@@ -864,16 +864,16 @@ param (
                     {
                         Write-Information "**** MAKE RELEASE ****"
                         Write-Information "Changelog: $targetChangelogFile"
-                        Write-Information "Repo: $repoFolder"
-                        Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $repoFolder
+                        Write-Information "Repo: $trgRepo"
+                        Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $trgRepo
                     }
                 }
             }
         }        
     }
 
-    Git-ResetToMaster -repoPath $repoFolder
-    Git-ReNormalise -repoPath $repoFolder
+    Git-ResetToMaster -repoPath $trgRepo
+    Git-ReNormalise -repoPath $trgRepo
 
     Write-Information "Updating Tracking for $repo to $currentRevision"
     Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
