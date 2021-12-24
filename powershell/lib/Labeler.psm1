@@ -40,10 +40,10 @@ param(
 #>
 function Labels_Update {
 param(
-        [String] $prefix, 
-        [String] $sourceFilesBase, 
-        [String] $labelerFileName, 
-        [String] $labelsFileName
+        [String] $prefix = $(throw "prefix not specified"), 
+        [String] $sourceFilesBase = $(throw "sourceFilesBase not specified"), 
+        [String] $labelerFileName = $(throw "labelerFileName not specified"), 
+        [String] $labelsFileName = $(throw "labelsFileName not specified")
 )
 
     $config = @(

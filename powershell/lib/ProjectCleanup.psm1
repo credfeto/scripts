@@ -1,7 +1,7 @@
 
 function Project_ReOrderPropertyGroups {
 param (
-    $project
+    $project = $(throw "project not specified")
 )
     $toRemove = @()
     
@@ -48,7 +48,7 @@ param (
 
 function Project_ReOrderIncludes {
 param (
-    $project
+    $project = $(throw "project not specified")
 )
 
     $itemGroups = $project.SelectNodes("ItemGroup")
@@ -156,7 +156,7 @@ param (
 
 function Project_Cleanup {
 param (
-    [string] $projectFile
+    [string] $projectFile = $(throw "projectFile not specified")
     )
     
     $data = [xml](Get-Content $projectFile)
