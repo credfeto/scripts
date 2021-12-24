@@ -279,19 +279,19 @@ param(
         if($ret -eq $true) {
             [bool]$codeOK = DotNet-BuildSolution -repoFolder $repoFolder
             if($codeOK) {
-                doCommit -repoPath $repoFolder -fileName $fileName
-                Git-Push -repoPath $repoFolder
+                doCommit -repoPath $targetRepo -fileName $fileName
+                Git-Push -repoPath $targetRepo
             }
             else {
                 [string]$branchName = "template/ff-1429/$fileName".Replace("\", "/")
-                [bool]$branchOk = Git-CreateBranch -repoPath $repoFolder -branchName $branchName
+                [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
                 if($branchOk) {
                     Write-Information "Create Branch $branchName"
-                    doCommit -repoPath $repoFolder -fileName $fileName
-                    Git-PushOrigin -repoPath $repoFolder -branchName $branchName
+                    doCommit -repoPath $targetRepo -fileName $fileName
+                    Git-PushOrigin -repoPath $targetRepo -branchName $branchName
                 }
 
-                Git-ResetToMaster -repoPath $repoFolder
+                Git-ResetToMaster -repoPath $targetRepo
             }
             
         }
@@ -941,7 +941,7 @@ Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
 Set-Location -Path $templateRepoFolder
 
-[string]$templateRepoHash = Git-Get-HeadRev
+[string]$templateRepoHash = Git-Get-HeadRev -repoPath $templateRepoFolder
 Write-Information "Template Rev Hash = $templateRepoHash"
 
 Set-Location -Path $root
