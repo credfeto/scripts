@@ -215,7 +215,7 @@ param(
     [String]$repoPath
 )
 
-    Write-Information "Staging $fileName"
+    Write-Information "Staging $fileName in $repoPath"
     [String[]] $files = $filename.Replace("\", "/")
     Git-Commit-Named -repoPath $repoPath -message "[FF-1429] - Update $fileName to match the template repo" -files $fileName
 }
@@ -630,9 +630,9 @@ param(
 
     Labels_Update -Prefix $prefix -sourceFilesBase $srcPath -labelerFileName $mappingLabelerFile -labelsFileName $coloursLabelFile
 
-    doCommit -repoPath $repoFolder -FileName ".github/labeler.yml"
-    doCommit -repoPath $repoFolder -FileName ".github/labels.yml"
-    Git-Push -repoPath $repoFolder
+    doCommit -repoPath $baseFolder -FileName ".github/labeler.yml"
+    doCommit -repoPath $baseFolder -FileName ".github/labels.yml"
+    Git-Push -repoPath $baseFolder
 }
 
 function ShouldAlwaysCreatePatchRelease{
