@@ -24,6 +24,8 @@ function GetRepoPath{
         throw "Could not determine repo path"
     }
     
+    Write-Information "Using Repo: $repoPath"
+    
     return $repoPath
 }
 
@@ -176,6 +178,7 @@ param(
 
 function Git-Commit {
 param(
+    [string] $repoPath,
     [string] $message
     )
 
@@ -187,9 +190,9 @@ param(
 
 function Git-Commit-Named {
 param(
+    [string] $repoPath,
     [string] $message,
-    [String[]] $files,
-    [string] $repoPath
+    [String[]] $files
     )
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
