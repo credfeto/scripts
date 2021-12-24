@@ -212,10 +212,10 @@ function convertToOsPath($path)
 
 function Dependabot-BuildConfig {
 param(
-    [string] $configFileName,
-    [string] $repoRoot,
-    [bool] $updateGitHubActions,
-    [bool] $hasSubModules
+    [string] $configFileName = $(throw "configFileName not specified"),
+    [string] $repoRoot = $(throw "repoRoot not specified"),
+    [bool] $updateGitHubActions = $(throw "updateGitHubActions not specified"),
+    [bool] $hasSubModules = $(throw "hasSubModules not specified")
     )
 
     Write-Information "Building Dependabot Config:"
