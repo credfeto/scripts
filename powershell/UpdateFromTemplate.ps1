@@ -168,8 +168,11 @@ param (
         [bool]$copy = $true
         if($trgExists -eq $true) {
             Write-Information "--- Files exist - checking hash"
-            [string]$srcHash = Get-FileHash -Path $sourceFileName -Algorithm SHA512
-            [string]$trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
+            $srcHash = Get-FileHash -Path $sourceFileName -Algorithm SHA512
+            $trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
+            
+            Write-Information " --- SRC: $( $srcHash.Hash )"
+            Write-Information " --- TRF: $( $trgHash.Hash )"
         
             if($srcHash -eq $trgHash) {
                 $copy = $false;
