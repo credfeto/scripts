@@ -859,11 +859,11 @@ param (
     # COMPLICATED UPDATES
     
     # Update R# DotSettings
-    updateResharperSettings -srcRepo $sourceRepo -trgRepo $targetRepo
+    updateResharperSettings -sourceRepo $sourceRepo -targetRepo $targetRepo
     updateLabel -baseFolder $targetRepo
 
-    buildDependabotConfig -srcRepo $sourceRepo -trgRepo $targetRepo -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
-    removeLegacyDependabotConfig -trgRepo $targetRepo
+    buildDependabotConfig -sourceRepo $sourceRepo -targetRepo $targetRepo -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
+    removeLegacyDependabotConfig -sourceRepo $targetRepo
     
     Git-ReNormalise -repoPath $targetRepo
     
@@ -924,7 +924,7 @@ param(
             continue
         }
 
-        processRepo -srcRepo $templateRepoFolder -repo $gitRepository -baseFolder $baseFolder -templateRepoHash $templateRepoHash
+        processRepo -sourceRepo $templateRepoFolder -repo $gitRepository -baseFolder $baseFolder -templateRepoHash $templateRepoHash
     }
 }
 
