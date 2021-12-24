@@ -217,7 +217,7 @@ param(
 
     Write-Information "Staging $fileName"
     [String[]] $files = $filename.Replace("\", "/")
-    Git-Commit-Named -repoPath $repoFolder -message "[FF-1429] - Update $fileName to match the template repo" -files $fileName
+    Git-Commit-Named -repoPath $repoPath -message "[FF-1429] - Update $fileName to match the template repo" -files $fileName
 }
 
 function updateFileAndCommit{
