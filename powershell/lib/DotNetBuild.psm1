@@ -14,7 +14,7 @@ function DotNet-DumpOutput {
 
 function DotNet-GetPublishableFramework {
 param(
-    [string] $srcFolder
+    [string] $srcFolder = $(throw "srcFolder not specified")
 )
     $targets = @()
 
@@ -69,7 +69,8 @@ param(
 
 function DotNet-BuildClean {
 param(
-    [string] $srcFolder)
+    [string] $srcFolder = $(throw "srcFolder not specified")
+)
      
     Write-Information " * Cleaning"
     try {
@@ -93,7 +94,8 @@ param(
 
 function DotNet-BuildRestore {
 param(
-    [string] $srcFolder)
+    [string] $srcFolder = $(throw "srcFolder not specified")
+    )
      
     Write-Information " * Restoring"
     try {
@@ -116,7 +118,8 @@ param(
 
 function DotNet-Build {
 param(
-    [string] $srcFolder)
+    [string] $srcFolder = $(throw "srcFolder not specified")
+    )
      
     [string]$errorCode = "AD0001"
     [string]$NewLine = [System.Environment]::NewLine
@@ -147,7 +150,8 @@ param(
 
 function DotNet-Pack {
 param(
-    [string] $srcFolder)
+    [string] $srcFolder = $(throw "srcFolder not specified")
+    )
      
     [string]$errorCode = "AD0001"
     [string]$NewLine = [System.Environment]::NewLine
@@ -179,7 +183,8 @@ param(
 
 function DotNet-Publish {
 param(
-    [string] $srcFolder)
+    [string] $srcFolder = $(throw "srcFolder not specified")
+    )
     
     [string]$framework = DotNet-GetPublishableFramework -srcFolder $srcFolder
      
@@ -217,7 +222,8 @@ param(
 
 function DotNet-BuildRunUnitTestsLinux {
 param(
-    [string] $srcFolder)
+    [string] $srcFolder = $(throw "srcFolder not specified")
+    )
      
     [string]$errorCode = "AD0001"
     [string]$NewLine = [System.Environment]::NewLine
@@ -246,7 +252,8 @@ param(
 
 function DotNet-BuildRunUnitTestsWindows {
 param(
-    [string] $srcFolder)
+    [string] $srcFolder = $(throw "srcFolder not specified")
+    )
      
     [string]$errorCode = "AD0001"
     [string]$NewLine = [System.Environment]::NewLine
@@ -275,7 +282,7 @@ param(
 
 function DotNet-BuildRunUnitTests {
 param(
-    [string] $srcFolder
+    [string] $srcFolder = $(throw "srcFolder not specified")
 )
 
     if($IsLinux -eq $true) {
@@ -287,7 +294,7 @@ param(
 
 function DotNet-BuildRunIntegrationTests {
 param(
-    [string] $srcFolder
+    [string] $srcFolder = $(throw "srcFolder not specified")
 )
 
     [string]$errorCode = "AD0001"
@@ -317,7 +324,7 @@ param(
 
 function DotNet-HasPackable {
     param(
-        [string] $srcFolder
+        [string] $srcFolder = $(throw "srcFolder not specified")
     )
 
     $projects = Get-ChildItem -Path $srcFolder -Filter *.csproj -Recurse
@@ -350,7 +357,7 @@ function DotNet-HasPackable {
 
 function DotNet-HasPublishableExe {
 param(
-    [string] $srcFolder
+    [string] $srcFolder = $(throw "srcFolder not specified")
 )
 
     $projects = Get-ChildItem -Path $srcFolder -Filter *.csproj -Recurse
@@ -398,7 +405,7 @@ param(
 #>
 function DotNet-BuildSolution {
 param(
-    [string] $srcFolder, 
+    [string] $srcFolder = $(throw "srcFolder not specified"), 
     [bool] $runTests = $true, 
     [bool] $includeIntegrationTests = $false
     )
