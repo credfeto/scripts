@@ -716,6 +716,9 @@ param (
         Write-Information "Skipping updating $repo as it is the same as the template"
         Return
     }
+    if([string]::IsNullOrEmpty($targetRepo)) {
+        throw "Target Repo did not set up correctly"
+    }
     
     Git-EnsureSynchronised -repo $repo -repoFolder $targetRepo
 
