@@ -1,2 +1,2 @@
 #! /bin/bash
-dotnet pwsh -f /data/work/personal/scripts/powershell/RemoveRedundantReferences.ps1 --solutionDirectory `pwd`
+dotnet pwsh -f ~/work/personal/scripts/powershell/RemoveRedundantReferences.ps1 --solutionDirectory `pwd`
