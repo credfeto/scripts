@@ -79,7 +79,7 @@ param([string]$path)
     interval: daily
     time: ""03:00""
     timezone: ""Europe/London""
-  open-pull-requests-limit: 99
+  open-pull-requests-limit: 2
   reviewers:
   - credfeto
   assignees:
@@ -89,6 +89,7 @@ param([string]$path)
   commit-message:
     prefix: ""[FF-1429]""
   rebase-strategy: ""auto""
+  versioning-strategy: increase-if-necessary
   labels:
   - ""npm""
   - ""dependencies""
