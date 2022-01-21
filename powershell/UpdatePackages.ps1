@@ -105,11 +105,10 @@ catch
 
 function checkForUpdatesExact{
 param(
-    [String]$repoFolder, 
-    [String]$packageId, 
+    [String]$repoFolder = $(throw "checkForUpdatesExact: repoFolder not specified"), 
+    [String]$packageId = $(throw "checkForUpdatesExact: packageId not specified"), 
     [Boolean]$exactMatch
     )
-
 
     Write-Information "Updating Package Exact"
     $results = dotnet updatepackages -folder $repoFolder -packageId $packageId
@@ -137,8 +136,8 @@ param(
 
 function checkForUpdatesPrefix{
 param(
-    [String]$repoFolder,
-    [String]$packageId
+    [String]$repoFolder = $(throw "checkForUpdatesPrefix: repoFolder not specified"),
+    [String]$packageId = $(throw "checkForUpdatesPrefix: packageId not specified")
     )
 
     Write-Information "Updating Package Prefix"
@@ -165,8 +164,8 @@ param(
 
 function checkForUpdates{
 param(
-    [String]$repoFolder,
-    [String]$packageId,
+    [String]$repoFolder = $(throw "checkForUpdates: repoFolder not specified"),
+    [String]$packageId = $(throw "checkForUpdates: packageId not specified"),
     [Boolean]$exactMatch
 )
 
@@ -182,9 +181,9 @@ param(
 
 function BuildSolution{
 param(
-    [String]$srcPath,
-    [String]$baseFolder,
-    [String]$currentVersion
+    [String]$srcPath = $(throw "BuildSolution: srcPath not specified"),
+    [String]$baseFolder = $(throw "BuildSolution: baseFolder not specified"),
+    [String]$currentVersion = $(throw "BuildSolution: currentVersion not specified")
     )
 
     if ($lastRevision -eq $currentRevision)
@@ -202,7 +201,7 @@ param(
 
 function ShouldAlwaysCreatePatchRelease{
 param(
-    [string]$repo
+    [string]$repo = $(throw "ShouldAlwaysCreatePatchRelease: repo not specified")
     )
     
     if($repo.Contains("template")) {
@@ -230,8 +229,8 @@ param(
 
 function IsPackageConsideredForVersionUpdate {
 param (
-    $packages,
-    [string] $packageName
+    $packages = $(throw "IsPackageConsideredForVersionUpdate: packages not specified"),
+    [string] $packageName = $(throw "IsPackageConsideredForVersionUpdate: packageName not specified")
     )
     
     ForEach ($package in $packages)
@@ -251,8 +250,8 @@ param (
 
 function IsAllAutoUpdates {
 param(
-    [string[]]$releaseNotes,
-    $packages
+    [string[]]$releaseNotes = $(throw "IsAllAutoUpdates: releaseNotes not specified"),
+    $packages = $(throw "IsAllAutoUpdates: packages not specified")
     )
 
     [string]$expr = "(?ms)" + "^\s*\-\s*FF\-1429\s*\-\sUpdated\s+(?<PackageId>.+(\.+)*?)\sto\s+(\d+\..*)$"
@@ -306,7 +305,7 @@ param(
 
 function HasPendingDependencyUpdateBranches{
 param(
-    [string]$repoPath
+    [string]$repoPath = $(throw "HasPendingDependencyUpdateBranches: repoPath not specified")
     )
 
     [string[]]$branches = Git-GetRemoteBranches -repoPath $repoPath -upstream "origin"
@@ -327,7 +326,10 @@ param(
 }
 
 function CheckRepoForAllowedAutoUpgrade {
-param ([string]$repo)
+param (
+    [string]$repo = $(throw "CheckRepoForAllowedAutoUpgrade: repo not specified")
+    )
+    
     if($repo.Contains("server-content-package")) {
         return $false
     }
@@ -341,9 +343,9 @@ param ([string]$repo)
 
 function processRepo{
 param(
-    [string]$repo,
-    $packages, 
-    [string]$baseFolder
+    [string]$repo = $(throw "processRepo: repo not specified"),
+    $packages = $(throw "processRepo: packages not specified"), 
+    [string]$baseFolder = $(throw "processRepo: baseFolder not specified")
     )
 
 
