@@ -1,6 +1,6 @@
 function Resharper_ConvertSuppressionCommentToSuppressMessage {  
 param (
-    [string] $sourceFolder = $(throw "sourceFolder not specified")
+    [string] $sourceFolder = $(throw "Resharper_ConvertSuppressionCommentToSuppressMessage: sourceFolder not specified")
     )
     
     Write-Information "* Changing Resharper disable once comments to SuppressMessage"

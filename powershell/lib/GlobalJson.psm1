@@ -1,5 +1,5 @@
 ﻿function ReformatJson {
-param( [string] $source = $(throw "source not specified")
+param( [string] $source = $(throw "ReformatJson: source not specified")
     )
     
     $obj = $source | ConvertFrom-Json
@@ -24,8 +24,8 @@ param( [string] $source = $(throw "source not specified")
 function GlobalJson_Update
 {
     param(
-        [String] $sourceFileName = $(throw "sourceFileName not specified"),
-        [String] $targetFileName = $(throw "targetFileName not specified")
+        [String] $sourceFileName = $(throw "GlobalJson_Update: sourceFileName not specified"),
+        [String] $targetFileName = $(throw "GlobalJson_Update: targetFileName not specified")
     )
     
     [string] $targetFreezeFileName = $targetFileName + ".freeze"

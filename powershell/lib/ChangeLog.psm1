@@ -29,10 +29,10 @@ param(
 #>
 function ChangeLog-AddEntry {
 param(
-    [string] $fileName = $(throw "fileName not specified"), 
-    [string] $entryType = $(throw "entryType not specified"), 
-    [string] $code = $(throw "code not specified"), 
-    [string] $message = $(throw "message not specified")
+    [string] $fileName = $(throw "ChangeLog-AddEntry: fileName not specified"), 
+    [string] $entryType = $(throw "ChangeLog-AddEntry: entryType not specified"), 
+    [string] $code = $(throw "ChangeLog-AddEntry: code not specified"), 
+    [string] $message = $(throw "ChangeLog-AddEntry: message not specified")
     )
     
     Write-Information ">>> Updating Changelog <<<"
@@ -50,8 +50,8 @@ param(
 
 function ChangeLog-CreateRelease {
     param(
-        [string] $fileName = $(throw "fileName not specified"),
-        [string] $release = $(throw "release not specified")
+        [string] $fileName = $(throw "ChangeLog-CreateRelease: fileName not specified"),
+        [string] $release = $(throw "ChangeLog-CreateRelease: release not specified")
     )
 
     Write-Information ">>> Creating Changelog release notes for $release <<<"
@@ -69,7 +69,7 @@ function ChangeLog-CreateRelease {
 
 function ChangeLog-GetUnreleased {
     param(
-        [string] $fileName = $(throw "fileName not specified")
+        [string] $fileName = $(throw "ChangeLog-GetUnreleased: fileName not specified")
     )
 
     Write-Information ">>> Reading Changelog unreleased content <<<"

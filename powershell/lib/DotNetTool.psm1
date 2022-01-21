@@ -77,7 +77,7 @@ function isInstalled($packageId) {
 #>
 function DotNetTool-Uninstall {
 param(
-    [string] $packageId = $(throw "packageId not specified")
+    [string] $packageId = $(throw "DotNetTool-Uninstall: packageId not specified")
     )
 
     if(isInstalled -packageId $packageId) {
@@ -108,7 +108,7 @@ param(
 #>
 function DotNetTool-Install {
 param(
-    [string] $packageId = $(throw "packageId not specified"),
+    [string] $packageId = $(throw "DotNetTool-Install: packageId not specified"),
     [bool] $preReleaseVersion = $false
     )
 

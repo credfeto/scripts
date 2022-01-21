@@ -1,6 +1,6 @@
 function Tracking_Read {
 param (
-    [string] $fileName = $(throw "fileName not specified")
+    [string] $fileName = $(throw "Tracking_Read: fileName not specified")
     )
 
     $content = @{}
@@ -30,8 +30,8 @@ param (
 #>
 function Tracking_Get {
 param(
-    [string] $basePath = $(throw "basePath not specified"), 
-    [string] $repo = $(throw "repo not specified")
+    [string] $basePath = $(throw "Tracking_Get: basePath not specified"), 
+    [string] $repo = $(throw "Tracking_Get: repo not specified")
     )
 
     [string]$srcPath = Join-Path -Path $basePath -ChildPath "tracking.json"
@@ -62,9 +62,9 @@ param(
 
 function Tracking_Set {
 param(
-    [string] $basePath = $(throw "basePath not specified"), 
-    [string] $repo = $(throw "repo not specified"),
-    [string] $value = $(throw "value not specified")
+    [string] $basePath = $(throw "Tracking_Set: basePath not specified"), 
+    [string] $repo = $(throw "Tracking_Set: repo not specified"),
+    [string] $value = $(throw "Tracking_Set: value not specified")
     )
 
     [string]$srcPath = Join-Path -Path $basePath -ChildPath "tracking.json"

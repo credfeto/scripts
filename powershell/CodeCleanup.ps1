@@ -87,9 +87,9 @@ catch {
 }
 #endregion
 
-function runCodeCleanup{
+function runCodeCleanup {
 param(
-    [string]$solutionFile  = $(throw "solutionFile not specified")
+    [string]$solutionFile  = $(throw "runCodeCleanup: solutionFile not specified")
     )
 
     $tempFolder = [System.IO.Path]::GetTempPath()
@@ -164,10 +164,10 @@ param(
     return $false
 }
 
-function processRepo{
+function processRepo {
 param(
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$repo = $(throw "repo not specified")
+    [string]$sourceRepo = $(throw "processRepo: sourceRepo not specified"), 
+    [string]$repo = $(throw "processRepo: repo not specified")
     )
     
     Write-Information ""

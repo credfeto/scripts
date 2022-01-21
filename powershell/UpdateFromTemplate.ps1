@@ -130,8 +130,8 @@ catch
 
 function makePath {
 param(
-    [string]$Path = $(throw "path not specified"), 
-    [string]$ChildPath = $(throw "childPath not specified")
+    [string]$Path = $(throw "makePath: path not specified"), 
+    [string]$ChildPath = $(throw "makePath: childPath not specified")
     )
     
     [string]$ChildPath = convertToOsPath -path $ChildPath
@@ -141,7 +141,7 @@ param(
 
 function convertToOsPath{
 param (
-    [string]$path = $(throw "path not specified")
+    [string]$path = $(throw "convertToOsPath: path not specified")
 )
 
     if ($IsLinux -eq $true) {
@@ -152,10 +152,10 @@ param (
 }
 
 
-function updateOneFile{
+function updateOneFile {
 param (
-    [string]$sourceFileName = $(throw "sourceFileName not specified"), 
-    [string]$targetFileName = $(throw "targetFileName not specified")
+    [string]$sourceFileName = $(throw "updateOneFile: sourceFileName not specified"), 
+    [string]$targetFileName = $(throw "updateOneFile: targetFileName not specified")
 )
     [string]$sourceFileName = convertToOsPath -path $sourceFileName
     [string]$targetFileName = convertToOsPath -path $targetFileName
@@ -196,11 +196,11 @@ param (
     return $false;
 }
 
-function updateFile{
+function updateFile {
 param (
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "targetRepo not specified"), 
-    [string]$fileName = $(throw "fileName not specified")
+    [string]$sourceRepo = $(throw "updateFile: sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "updateFile: targetRepo not specified"), 
+    [string]$fileName = $(throw "updateFile: fileName not specified")
 )
     if($sourceRepo -eq $targetRepo) {
         throw "updateFile: Source Repo and Target Repos are both set to $sourceRepo"
@@ -216,10 +216,10 @@ param (
     return updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
 }
 
-function doCommit{
+function doCommit {
 param(
-    [string]$fileName = $(throw "fileName not specified"),
-    [String]$repoPath = $(throw "repoPath not specified")
+    [string]$fileName = $(throw "doCommit: fileName not specified"),
+    [String]$repoPath = $(throw "doCommit: repoPath not specified")
 )
 
     Write-Information "Staging $fileName in $repoPath"
@@ -227,11 +227,11 @@ param(
     Git-Commit-Named -repoPath $repoPath -message "[FF-1429] - Update $fileName to match the template repo" -files $fileName
 }
 
-function updateFileAndCommit{
+function updateFileAndCommit {
 param (
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "targetRepo not specified"), 
-    [string]$fileName = $(throw "filename not specified")
+    [string]$sourceRepo = $(throw "updateFileAndCommit: sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "updateFileAndCommit: targetRepo not specified"), 
+    [string]$fileName = $(throw "updateFileAndCommit: filename not specified")
     )
 
     if($sourceRepo -eq $targetRepo) {
@@ -247,9 +247,9 @@ param (
 }
 
 
-function hasCodeToBuild{
+function hasCodeToBuild {
 param(
-    [string]$targetRepo = $(throw "targetRepo not specified")
+    [string]$targetRepo = $(throw "hasCodeToBuild: targetRepo not specified")
     )
     
     [string]$srcPath = makePath -Path $targetRepo -ChildPath "src"
@@ -270,11 +270,11 @@ param(
     return $true
 }
 
-function updateFileBuildAndCommit{
+function updateFileBuildAndCommit {
 param(
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "targetRepo not specified"), 
-    [string]$fileName = $(throw "targetRepo not specified")
+    [string]$sourceRepo = $(throw "updateFileBuildAndCommit: sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "updateFileBuildAndCommit: targetRepo not specified"), 
+    [string]$fileName = $(throw "updateFileBuildAndCommit: targetRepo not specified")
     )
     
     if($sourceRepo -eq $targetRepo) {
@@ -317,10 +317,10 @@ param(
     return $false;
 }
 
-function updateResharperSettings{
+function updateResharperSettings {
 param (
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "targetRepo not specified")
+    [string]$sourceRepo = $(throw "updateResharperSettings: sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "updateResharperSettings: targetRepo not specified")
 )
     if($sourceRepo -eq $targetRepo) {
         throw "updateResharperSettings: Source Repo and Target Repos are both set to $sourceRepo"
@@ -345,11 +345,11 @@ param (
     }
 }
 
-function updateWorkFlowAndCommit{
+function updateWorkFlowAndCommit {
 param(
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "targetRepo not specified"), 
-    [string]$fileName = $(throw "filename not specified")
+    [string]$sourceRepo = $(throw "updateWorkFlowAndCommit: sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "updateWorkFlowAndCommit: targetRepo not specified"), 
+    [string]$fileName = $(throw "updateWorkFlowAndCommit: filename not specified")
     )
     
     if($sourceRepo -eq $targetRepo) {
@@ -391,12 +391,12 @@ param(
     }
 }
 
-function updateAndMergeFileAndCommit{
+function updateAndMergeFileAndCommit {
 param(
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "targetRepo not specified"), 
-    [string]$fileName = $(throw "filename not specified"), 
-    [string]$mergeFileName = $(throw "mergeFileName not specified")
+    [string]$sourceRepo = $(throw "updateAndMergeFileAndCommit: sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "updateAndMergeFileAndCommit: targetRepo not specified"), 
+    [string]$fileName = $(throw "updateAndMergeFileAndCommit: filename not specified"), 
+    [string]$mergeFileName = $(throw "updateAndMergeFileAndCommit: mergeFileName not specified")
     )
     
     $fileName = convertToOsPath -path $fileName
@@ -436,11 +436,11 @@ param(
 
 }
 
-function buildDependabotConfig{
+function buildDependabotConfig {
 param(
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "targetRepo not specified"), 
-    [bool]$hasNonTemplateWorkFlows = $(throw "hasNonTemplateWorkFlows not specified")
+    [string]$sourceRepo = $(throw "buildDependabotConfig: sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "buildDependabotConfig: targetRepo not specified"), 
+    [bool]$hasNonTemplateWorkFlows = $(throw "buildDependabotConfig: hasNonTemplateWorkFlows not specified")
     )
 
     [string]$srcPath = makePath -Path $sourceRepo -ChildPath ".github"
@@ -456,9 +456,9 @@ param(
     Git-Push -repoPath $repoFolder
 }
 
-function removeLegacyDependabotConfig{
+function removeLegacyDependabotConfig {
 param(
-    [string]$targetRepo = $(throw "targetRepo not specified")
+    [string]$targetRepo = $(throw "removeLegacyDependabotConfig: targetRepo not specified")
     )
     
     [string]$trgPath = makePath -Path $targetRepo -ChildPath ".github"
@@ -480,8 +480,8 @@ param(
 
 function ensureFolderExists{
 param(
-    [string]$baseFolder = $(throw "baseFolder not specified"), 
-    [string]$subFolder = $(throw "subFolder not specified")
+    [string]$baseFolder = $(throw "ensureFolderExists: baseFolder not specified"), 
+    [string]$subFolder = $(throw "ensureFolderExists: subFolder not specified")
     )
     
     [string]$fullPath = makePath -Path $baseFolder -ChildPath $subFolder
@@ -493,10 +493,10 @@ param(
 
 function commitGlobalJsonVersionUpdateToMaster {
 param (
-    [string]$dotnetVersion = $(throw "dotnetVersion not specified"),
-    [string]$targetRepo = $(throw "targetRepo not specified"),
-    [string]$branchName = $(throw "branchName not specified"),
-    [string]$originalBranchPrefix = $(throw "originalBranchPrefix not specified")
+    [string]$dotnetVersion = $(throw "commitGlobalJsonVersionUpdateToMaster: dotnetVersion not specified"),
+    [string]$targetRepo = $(throw "commitGlobalJsonVersionUpdateToMaster: targetRepo not specified"),
+    [string]$branchName = $(throw "commitGlobalJsonVersionUpdateToMaster: branchName not specified"),
+    [string]$originalBranchPrefix = $(throw "commitGlobalJsonVersionUpdateToMaster: originalBranchPrefix not specified")
     )
 
     Write-Information "**** BUILD OK ****"
@@ -514,10 +514,10 @@ param (
 
 function commitGlobalJsonVersionUpdateToBranch {
 param (
-    [string]$dotnetVersion = $(throw "dotnetVersion not specified"),
-    [string]$targetRepo = $(throw "targetRepo not specified"),
-    [string]$branchName = $(throw "branchName not specified"),
-    [string]$originalBranchPrefix = $(throw "originalBranchPrefix not specified")
+    [string]$dotnetVersion = $(throw "commitGlobalJsonVersionUpdateToBranch: dotnetVersion not specified"),
+    [string]$targetRepo = $(throw "commitGlobalJsonVersionUpdateToBranch: targetRepo not specified"),
+    [string]$branchName = $(throw "commitGlobalJsonVersionUpdateToBranch: branchName not specified"),
+    [string]$originalBranchPrefix = $(throw "commitGlobalJsonVersionUpdateToBranch: originalBranchPrefix not specified")
     )
 
     Write-Information "**** BUILD FAILURE ****"
@@ -539,9 +539,9 @@ param (
 
 function updateGlobalJson{
 param(
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "targetRepo not specified"), 
-    [string]$fileName = $(throw "fileName not specified")
+    [string]$sourceRepo = $(throw "updateGlobalJson: sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "updateGlobalJson: targetRepo not specified"), 
+    [string]$fileName = $(throw "updateGlobalJson: fileName not specified")
     )
 
     [string]$localFileName = convertToOsPath -path $fileName
@@ -636,7 +636,7 @@ param(
 
 function updateLabel{
 param(
-    [string]$baseFolder = $(throw "baseFolder not specified")
+    [string]$baseFolder = $(throw "updateLabel: baseFolder not specified")
     )
     
     [string]$srcPath = makePath -Path $baseFolder -ChildPath "src"
@@ -664,7 +664,7 @@ param(
 
 function ShouldAlwaysCreatePatchRelease{
 param(
-    [string]$repo = $(throw "repo not specified")
+    [string]$repo = $(throw "ShouldAlwaysCreatePatchRelease: repo not specified")
     )
     
     if($repo.Contains("template")) {
@@ -692,10 +692,10 @@ param(
 
 function processRepo {
 param (
-    [string]$sourceRepo = $(throw "sourceRepo not specified"), 
-    [string]$repo = $(throw "repo (target) not specified"), 
-    [string]$baseFolder = $(throw "baseFolder not specified"), 
-    [string]$templateRepoHash = $(throw "templateRepoHash not specified")
+    [string]$sourceRepo = $(throw "processRepo: sourceRepo not specified"), 
+    [string]$repo = $(throw "processRepo: repo (target) not specified"), 
+    [string]$baseFolder = $(throw "processRepo: baseFolder not specified"), 
+    [string]$templateRepoHash = $(throw "processRepo: templateRepoHash not specified")
     )
 
     Write-Information ""
@@ -909,12 +909,12 @@ param (
     Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
 }
 
-function processAll{
+function processAll {
 param(
-    [string[]]$repositoryList = $(throw "repositoryList not specified"), 
-    [string]$templateRepositoryFolder = $(throw "templateRepositoryFolder not specified"), 
-    [string]$baseFolder = $(throw "baseFolder not specified"), 
-    [string]$templateRepoHash = $(throw "templateRepoHash not specified")
+    [string[]]$repositoryList = $(throw "processAll: repositoryList not specified"), 
+    [string]$templateRepositoryFolder = $(throw "processAll: templateRepositoryFolder not specified"), 
+    [string]$baseFolder = $(throw "processAll: baseFolder not specified"), 
+    [string]$templateRepoHash = $(throw "processAll: templateRepoHash not specified")
     )
 
     [int]$repoCount = $repositoryList.Count

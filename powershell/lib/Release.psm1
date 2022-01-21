@@ -1,8 +1,8 @@
 ﻿function Release-Create {
 param(
-    [string]$repo = $(throw "repo not specified"), 
-    [string]$changeLog = $(throw "changeLog not specified"), 
-    [string]$repoPath = $(throw "repoPath not specified")
+    [string]$repo = $(throw "Release-Create: repo not specified"), 
+    [string]$changeLog = $(throw "Release-Create: changeLog not specified"), 
+    [string]$repoPath = $(throw "Release-Create: repoPath not specified")
 )
     Write-Information "Looking for next RELEASE version"
     [string]$nextPatch = BuildVersion-GetNextPatch
