@@ -445,7 +445,7 @@ param(
         Write-Information "***** $repo FOUND UPDATE TO $packageId for $update ******"
         
         $packagesUpdated += 1
-        [string]$branchName = "$branchPrefix/$update"
+        [string]$branchName = "$branchPrefix$update"
         [bool]$branchExists = Git-DoesBranchExist -branchName $branchName  -repoPath $repoFolder
         if(!$branchExists) {
 
