@@ -98,7 +98,7 @@ param(
     & git -C $repoPath checkout master | Out-Null
     & git -C $repoPath reset HEAD --hard | Out-Null
     & git -C $repoPath clean -f -x -d | Out-Null
-    & git -C $repoPath fetch | Out-Null
+    & git -C $repoPath fetch --recurse-submodules | Out-Null
     
     # NOTE Loses all local commits on master
     & git -C $repoPath reset --hard origin/master | Out-Null
