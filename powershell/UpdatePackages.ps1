@@ -101,6 +101,14 @@ catch
     Write-Error $Error[0]
     Throw "Error while loading supporting PowerShell Scripts: Release"
 }
+
+try {
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetPackages.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error $Error[0]
+    Throw "Error while loading supporting PowerShell Scripts: DotNetPackages"
+}
 #endregion
 
 function checkForUpdatesExact{
@@ -341,6 +349,30 @@ param (
     return $true
 }
 
+function ShouldUpdatePackage{
+param (
+    $installed = $(throw "ShouldUpdatePackage: installed not specified"),
+    [string]$packageId = $(throw "ShouldUpdatePackage: packageId not specified"),
+    [bool]$exactMatch
+)
+    foreach($candidate in $installed) {
+        if($packageId -eq $candidate) {
+            return $true
+        }
+
+        if(!$exactMatch) {
+            $test = "$packageId.".ToLower()
+            
+            if($candidate.ToLower().StartsWith($test)) {
+                return $true
+            }
+        }
+    }
+    
+    return $false
+}
+
+
 function processRepo{
 param(
     [string]$repo = $(throw "processRepo: repo not specified"),
@@ -376,12 +408,18 @@ param(
     }
 
     $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
-    if ($projects.Length -eq 0)
-    {
+    if ($projects.Length -eq 0) {
         # no source to update
         Write-Information "* No C# projects in repo"
         return;
     }
+    
+    $currentlyInstalledPackages = DotNetPackages-Get -srcFolder $srcFolder
+    if($currentlyInstalledPackages.Length -eq 0) {
+        # no source to update
+        Write-Information "* No C# packages to update in repo"
+        return;
+    }    
 
     [string]$lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
     [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
@@ -424,11 +462,22 @@ param(
         [string]$packageId = $package.packageId.Trim('.')
         [string]$type = $package.type
         [bool]$exactMatch = $package.'exact-match'
+        
+        [bool]$shouldUpdatePackages = ShouldUpdatePackage -installed $currentlyInstalledPackages -packageId $packageId -exactMatch $exactMatch
 
         Write-Information ""
         Write-Information "------------------------------------------------"
         Write-Information "Looking for updates of $packageId"
         Write-Information "Exact Match: $exactMatch"
+        Write-Information "Should update Test: $shouldUpdatePackages"
+        
+        if(!$shouldUpdatePackages) {
+            Write-Information "Found Packages"
+            foreach($candidate in $currentlyInstalledPackages) {
+                Write-Information "* $candidate"
+            }
+            continue
+        }
         
         [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
         [string]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
