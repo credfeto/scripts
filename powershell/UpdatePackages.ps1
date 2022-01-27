@@ -469,13 +469,10 @@ param(
         Write-Information "------------------------------------------------"
         Write-Information "Looking for updates of $packageId"
         Write-Information "Exact Match: $exactMatch"
-        Write-Information "Should update Test: $shouldUpdatePackages"
+        Write-Information "Package installed in solution: $shouldUpdatePackages"
         
         if(!$shouldUpdatePackages) {
-            Write-Information "Found Packages"
-            foreach($candidate in $currentlyInstalledPackages) {
-                Write-Information "* $candidate"
-            }
+            Write-Information "Skipping $packageId as not installed"
             continue
         }
         
