@@ -72,7 +72,35 @@ function IsDoNotRemovePackage {
         if($allPackageIds -contains "Microsoft.AspNetCore.Authentication.JwtBearer") {
             return $true
         }
-        
+
+        if($allPackageIds -contains "Microsoft.IdentityModel.Tokens") {
+            return $true
+        }
+
+        return $false
+    }
+
+    if($PackageId -eq "Microsoft.AspNetCore.Authentication.JwtBearer") {         
+        if($allPackageIds -contains "Microsoft.IdentityModel.Tokens") {
+            return $true
+        }
+
+        if($allPackageIds -contains "Microsoft.AspNetCore.Authentication.JwtBearer") {
+            return $true
+        }
+
+        return $false
+    }
+
+    if($PackageId -eq "Microsoft.IdentityModel.Tokens") {         
+        if($allPackageIds -contains "System.IdentityModel.Tokens.Jwt") {
+            return $true
+        }
+
+        if($allPackageIds -contains "Microsoft.AspNetCore.Authentication.JwtBearer") {
+            return $true
+        }
+
         return $false
     }
 
