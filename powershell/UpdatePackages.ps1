@@ -510,28 +510,32 @@ param(
 
                 Write-Information "Last Revision:    $lastRevision"
                 Write-Information "Current Revision: $currentRevision"
+
+                Write-Information "WARNING: Removing other branches similar to $branchPrefix as committed to master for $update"
+                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
             }
             else {
                 Write-Information "Create Branch $branchName"
-                [bool]$branchOk = Git-CreateBranch -branchName $branchName  -repoPath $repoFolder
+                [bool]$branchOk = Git-CreateBranch -branchName $branchName -repoPath $repoFolder
                 if($branchOk) {
                     ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
                     Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"  -repoPath $repoFolder
                     Git-PushOrigin -branchName $branchName  -repoPath $repoFolder
 
                     $branchesCreated += 1
+
+                    Write-Information "WARNING: Removing other branches similar to $branchPrefix as new branch created for $update ($branchName)"
+                    Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
                 } else {
                     Write-Information ">>> ERROR: FAILED TO CREATE BRANCH <<<"
                 }
             }
         }
         else {
-                Write-Information "Branch $branchName already exists - skipping"
+            Write-Information "Branch $branchName already exists - skipping"
         }
  
         Git-ResetToMaster -repoPath $repoFolder
-        
-        #Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
     }
     
     Write-Information "Updated run created $branchesCreated branches"

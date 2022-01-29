@@ -10,7 +10,27 @@ param(
     }
 }
 
-function GetRepoPath{
+function Git-ValidateBranchName {
+param (
+    [string] $branchName = $(throw "Git-ValidateBranchName: branchName not specified"),
+    [string] $method = $(throw "Git-ValidateBranchName: method not specified")
+    
+)
+
+    if($branchName -eq $null) {
+        throw "$method: Invalid branch (null)"
+    }
+
+    if($branchName -eq "") {
+        throw "$method: Invalid branch: [$branchName]"
+    }
+
+    if($branchName.Contains("//") {
+        throw "$method: Invalid branch: [$branchName]"
+    }
+}
+
+function GetRepoPath {
     param(
         [string] $repoPath
     )
@@ -216,19 +236,14 @@ param(
     & git -C $repoPath push | Out-Null
 }
 
+
 function Git-PushOrigin {
 param(
     [string] $repoPath = $(throw "Git-PushOrigin: repoPath not specified"),
     [string] $branchName = $(throw "Git-PushOrigin: branchName not specified")
     )
     
-    if($branchName -eq $null) {
-        throw "Invalid branch (null)"
-    }
-
-    if($branchName -eq "") {
-        throw "Invalid branch: [$branchName]"
-    }
+    Git-ValidateBranchName -branchName $branchName -method "Git-PushOrigin"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -241,6 +256,8 @@ param(
     [string] $repoPath = $(throw "Git-DoesBranchExist: repoPath not specified"),
     [string] $branchName = $(throw "Git-DoesBranchExist: branchName not specified")
     )
+
+    Git-ValidateBranchName -branchName $branchName -method "Git-DoesBranchExist"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -270,6 +287,8 @@ param(
     [string] $repoPath = $(throw "Git-CreateBranch: repoPath not specified"),
     [string] $branchName = $(throw "Git-CreateBranch: branchName not specified")
     )
+    
+    Git-ValidateBranchName -branchName $branchName -method "Git-CreateBranch"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -297,6 +316,8 @@ param(
     [string] $repoPath = $(throw "Git-DeleteBranch: repoPath not specified"),
     [string] $branchName = $(throw "Git-DeleteBranch: branchName not specified")
     )
+
+    Git-ValidateBranchName -branchName $branchName -method "Git-DeleteBranch"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -378,6 +399,8 @@ param(
     [string]$branchForUpdate = $(throw "Git-RemoveBranchesForPrefix: branchForUpdate not specified"), 
     [string]$branchPrefix = $(throw "Git-RemoveBranchesForPrefix: branchPrefix not specified")
     )
+
+    Git-ValidateBranchName -branchName $branchPrefix -method "Git-RemoveBranchesForPrefix"
 
     [string[]]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
     
