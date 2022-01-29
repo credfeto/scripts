@@ -483,7 +483,7 @@ param(
             Write-Information "***** $repo NO UPDATES TO $packageId ******"
             Git-ResetToMaster -repoPath $repoFolder
             
-            Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
+            # Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
             
             Continue
         }
@@ -531,7 +531,7 @@ param(
  
         Git-ResetToMaster -repoPath $repoFolder
         
-        Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
+        #Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
     }
     
     Write-Information "Updated run created $branchesCreated branches"
