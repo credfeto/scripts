@@ -272,6 +272,10 @@ param(
         if($line.StartsWith("#")) {
             continue
         }
+        
+        if([string]::IsNullOrWhiteSpace($line)) {
+            continue
+        }
 
         $hasContent = $true
 
