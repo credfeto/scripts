@@ -245,7 +245,7 @@ param (
     {
         [string]$packageId = $package.packageId.Trim('.')
         if($packageName -eq $packageId) {
-            [bool]$ignore = $package.'do-not-count-as-change-referenced'
+            [bool]$ignore = $package.'prohibit-version-bump-when-referenced'
             if($ignore) {
                 Write-Information "IGNORING $packageId for update"
                 return false
