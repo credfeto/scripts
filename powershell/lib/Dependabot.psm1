@@ -233,24 +233,30 @@ updates:
     
     [string]$newline = "`r`n"
 
-    if($hasSubModules -eq $true)
+    if($hasSubModules)
     {
         Write-Information " --> Adding Git Submodules"
         [string]$templateContent = githubSubmodulesDependabotTemplate
         [string]$trgContent = $trgContent.Trim() + $newline + $newline
         [string]$trgContent = $trgContent + $templateContent
     }
+    else {
+        Write-Information " --> Adding Git Submodules"
+    }
 
     $files = Get-ChildItem -Path $repoRoot -Filter *.csproj -Recurse
-    if($files -ne $null) {
+    if($files) {
         Write-Information " --> Adding .NET"
         [string]$templateContent = dotNetDependabotTemplate
         [string]$trgContent = $trgContent.Trim() + $newline + $newline
         [string]$trgContent = $trgContent + $templateContent
     }
+    else {
+        Write-Information " --> NO .NET"
+    }
     
     $files = Get-ChildItem -Path $repoRoot -Filter 'package.json' -Recurse
-    if($files -ne $null) {        
+    if($files) {        
         foreach($file in $files) {
             [string]$dirName = $file.Directory.FullName
             [string]$path = $dirName.SubString($repoRoot.length)
@@ -261,35 +267,45 @@ updates:
             [string]$trgContent = $trgContent + $templateContent
         }
     }
+    else {
+        Write-Information " --> NO Javascript"
+    }
     
     $files = Get-ChildItem -Path $repoRoot -Filter 'Dockerfile' -Recurse
-    if($files -ne $null) {
+    if($files) {
         Write-Information " --> Adding Docker"
         [string]$templateContent = dockerDependabotTemplate
         [string]$trgContent = $trgContent.Trim() + $newline + $newline
         [string]$trgContent = $trgContent + $templateContent
     }
+    else {
+        Write-Information " --> NO Docker"
+    }
     
-    if($updateGitHubActions -eq $true)
+    if($updateGitHubActions)
     {
         [string]$actionsTargetPath = makePath -Path $repoRoot -ChildPath ".github"
         $files = Get-ChildItem -Path $actionsTargetPath -Filter *.yml -Recurse
-        if ($files -ne $null)
-        {
+        if ($files) {
             Write-Information " --> Adding Github Actions"
             [string]$templateContent = githubActionsDependabotTemplate
             [string]$trgContent = $trgContent.Trim() + $newline + $newline
             [string]$trgContent = $trgContent + $templateContent
         }
+        else {
+            Write-Information " --> NO Github Actions"
+        }
     }
 
-    [string]$actionsTargetPath = makePath -Path $repoRoot -ChildPath ".github"
-    $files = Get-ChildItem -Path $actionsTargetPath -Filter requirements.txt -Recurse
-    if($files -ne $null) {
+    $files = Get-ChildItem -Path $repoRoot -Filter requirements.txt -Recurse
+    if($files) {
         Write-Information " --> Adding Python"
         [string]$templateContent = pythonDependabotTemplate
         [string]$trgContent = $trgContent.Trim() + $newline + $newline
         [string]$trgContent = $trgContent +  $templateContent
+    }
+    else {
+        Write-Information " --> NO Python"
     }
     
     [string]$trgContent = $trgContent.Trim() + $newline
