@@ -241,7 +241,7 @@ updates:
         [string]$trgContent = $trgContent + $templateContent
     }
     else {
-        Write-Information " --> Adding Git Submodules"
+        Write-Information " --> NO Git Submodules"
     }
 
     $files = Get-ChildItem -Path $repoRoot -Filter *.csproj -Recurse
