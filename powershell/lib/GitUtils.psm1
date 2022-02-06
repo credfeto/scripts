@@ -18,15 +18,15 @@ param (
 )
 
     if($branchName -eq $null) {
-        throw "$method: Invalid branch (null)"
+        throw "$($method) : Invalid branch (null)"
     }
 
     if($branchName -eq "") {
-        throw "$method: Invalid branch: [$branchName]"
+        throw "$($method) : Invalid branch: [$branchName]"
     }
 
     if($branchName.Contains("//") {
-        throw "$method: Invalid branch: [$branchName]"
+        throw "$($method) : Invalid branch: [$branchName]"
     }
 }
 
