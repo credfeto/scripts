@@ -37,7 +37,7 @@ try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: DotNetTool"
 }
 
@@ -46,7 +46,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: GitUtils" 
 }
 
@@ -55,7 +55,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: DotNetBuild" 
 }
 
@@ -64,7 +64,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "ChangeLog.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: ChangeLog" 
 }
 
@@ -73,7 +73,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "BuildVersion.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: BuildVersion"
 }
 
@@ -82,7 +82,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Tracking.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: Tracking" 
 }
 
@@ -92,7 +92,7 @@ try
 }
 catch
 {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: Labeler"
 }
 
@@ -102,7 +102,7 @@ try
 }
 catch
 {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: GlobalJson"
 }
 
@@ -112,7 +112,7 @@ try
 }
 catch
 {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: Dependabot"
 }
 
@@ -122,7 +122,7 @@ try
 }
 catch
 {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: Release"
 }
 #endregion

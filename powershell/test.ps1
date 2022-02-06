@@ -14,7 +14,7 @@ try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: DotNetTool"
 }
 
@@ -22,7 +22,7 @@ try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: GitUtils"
 }
 
@@ -30,7 +30,7 @@ try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetPackages.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $Error[0]
+    Write-Error $_
     Throw "Error while loading supporting PowerShell Scripts: DotNetPackages"
 }
 
