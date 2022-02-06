@@ -38,7 +38,7 @@ try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: DotNetTool" 
 }
 
@@ -47,7 +47,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: GitUtils" 
 }
 
@@ -56,7 +56,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: DotNetBuild" 
 }
 
@@ -65,7 +65,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Tracking.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: Tracking" 
 }
 
@@ -74,7 +74,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Resharper.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: Resharper" 
 }
 
@@ -83,7 +83,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "ProjectCleanup.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: ProjectCleanup" 
 }
 #endregion

@@ -42,7 +42,7 @@ try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: DotNetTool" 
 }
 
@@ -51,7 +51,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GitUtils.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: GitUtils" 
 }
 
@@ -60,7 +60,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetBuild.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: DotNetBuild" 
 }
 
@@ -70,7 +70,7 @@ try
 }
 catch
 {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: Changelog"
 }
 
@@ -80,7 +80,7 @@ try
 }
 catch
 {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: Tracking"
 }
 
@@ -89,7 +89,7 @@ try
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "BuildVersion.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: BuildVersion"
 }
 
@@ -99,7 +99,7 @@ try
 }
 catch
 {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: Release"
 }
 
@@ -107,7 +107,7 @@ try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetPackages.psm1") -Force -DisableNameChecking
 }
 catch {
-    Write-Error $_
+    Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: DotNetPackages"
 }
 #endregion
