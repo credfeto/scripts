@@ -419,7 +419,7 @@ param(
         return;
     }
     
-    $currentlyInstalledPackages = DotNetPackages-Get -srcFolder $srcFolder
+    $currentlyInstalledPackages = DotNetPackages-Get -srcFolder $srcPath
     if($currentlyInstalledPackages.Length -eq 0) {
         # no source to update
         Write-Information "* No C# packages to update in repo"
