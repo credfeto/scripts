@@ -388,7 +388,7 @@ param(
         $srcContent = $srcContent.Replace("runs-on: [self-hosted, linux]", "runs-on: ubuntu-latest")
         
         Set-Content -Path $targetFileName -Value $srcContent
-        doCommit -repoPath $repoFolder -fileName $fileName
+        doCommit -repoPath $targetRepo -fileName $fileName
     }
 }
 
