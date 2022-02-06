@@ -448,7 +448,7 @@ param(
     Write-Information "Config Path: $srcPath"
     [string]$targetFileName = makePath -Path $targetRepo -ChildPath ".github/dependabot.yml"
 
-    [bool]$updateGitHubActions = $hasNonTemplateWorkFlows -And !$targetRepo.ToLowerInvariant().Contains("f333unfair")
+    [bool]$updateGitHubActions = $hasNonTemplateWorkFlows -And !$targetRepo.ToLowerInvariant().Contains("funfair")
 
     [bool]$hasSubModules = Git-HasSubModules -repoPath $targetRepo 
     Dependabot-BuildConfig -configFileName $targetFileName -repoRoot $targetRepo -updateGitHubActions $updateGitHubActions -hasSubModules $hasSubModules
