@@ -1,4 +1,4 @@
-Set-StrictMode -Version 1
+# Set-StrictMode -Version 1
 
 Remove-Module *
 
