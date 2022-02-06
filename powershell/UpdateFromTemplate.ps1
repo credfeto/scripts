@@ -376,7 +376,7 @@ param(
         
         if($srcContent -ne $trgContent) {
             Set-Content -Path $targetFileName -Value $srcContent
-            doCommit -repoPath $repoFolder -fileName $fileName
+            doCommit -repoPath $targetRepo -fileName $fileName
         }
         
     }
