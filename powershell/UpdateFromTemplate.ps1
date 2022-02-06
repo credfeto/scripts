@@ -7,7 +7,7 @@ param(
 )
 
 Remove-Module *
-# Set-StrictMode -Version 1
+Set-StrictMode -Version 1
 
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"

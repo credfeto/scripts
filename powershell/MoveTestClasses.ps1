@@ -1,4 +1,4 @@
-﻿# Set-StrictMode -Version 1
+﻿Set-StrictMode -Version 1
 
 $base = "D:\work\funfair-wallet-server\src\FunFair.FunWallet.Data.SqlServer"
 $testBase = "D:\work\funfair-wallet-server\src\FunFair.FunWallet.Data.SqlServer.Tests.Integration"
