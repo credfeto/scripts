@@ -8,6 +8,7 @@ param(
     [string] $solutionDirectory = $(throw "Directory containing projects")
 )
 
+Set-StrictMode -Version 1
 $InformationPreference = "Continue"
 
 function ExtractProjectFromReference {

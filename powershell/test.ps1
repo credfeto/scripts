@@ -1,3 +1,5 @@
+Set-StrictMode -Version 1
+
 Remove-Module *
 
 $InformationPreference = "Continue"
