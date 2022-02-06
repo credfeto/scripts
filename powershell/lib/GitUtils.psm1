@@ -25,7 +25,7 @@ param (
         throw "$($method) : Invalid branch: [$branchName]"
     }
 
-    if($branchName.Contains("//") {
+    if($branchName.Contains("//")) {
         throw "$($method) : Invalid branch: [$branchName]"
     }
 }
