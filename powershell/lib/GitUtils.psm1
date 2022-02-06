@@ -407,7 +407,7 @@ param(
     Write-Information "Looking for branches to remove based on prefix: $branchPrefix"        
     foreach($branch in $remoteBranches) {
         if($branchForUpdate) {
-            if($branch -eq $branchName) {
+            if($branch -eq $branchForUpdate) {
                 Write-Information "- Skipping branch just pushed to: $branch"
                 continue
             }
