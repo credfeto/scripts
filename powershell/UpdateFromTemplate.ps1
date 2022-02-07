@@ -173,7 +173,7 @@ param (
             $trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
             
             Write-Information " --- SRC: $( $srcHash.Hash )"
-            Write-Information " --- TRF: $( $trgHash.Hash )"
+            Write-Information " --- TRG: $( $trgHash.Hash )"
         
             if($srcHash -eq $trgHash) {
                 $copy = $false;
