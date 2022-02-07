@@ -595,7 +595,7 @@ param(
                 if($shouldCreateRelease ) {
                     # At least $autoReleasePendingPackages auto updates... consider creating a release
                     
-                    [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoPath
+                    [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoFolder
                     if(!$hasPendingDependencyUpdateBranches) {            
                         if (ShouldAlwaysCreatePatchRelease -repo $repo) {
                             Write-Information "**** MAKE RELEASE ****"
