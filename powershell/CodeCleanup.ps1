@@ -190,7 +190,7 @@ param(
     Set-Location -Path $repoFolder
 
     $lastRevision = Tracking_Get -basePath $root -repo $repo
-    $currentRevision = Git-Get-HeadRev
+    $currentRevision = Git-Get-HeadRev -repoFolder $repoFolder 
 
     Write-Information "Last Revision:    $lastRevision"
     Write-Information "Current Revision: $currentRevision"
