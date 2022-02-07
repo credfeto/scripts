@@ -218,7 +218,7 @@ param(
 
                 $cleaned = runCodeCleanup -solutionFile $solution.FullName
                 if($cleaned -eq $null) {
-                    Git-ResetToMaster
+                    Git-ResetToMaster -repoPath $repoFolder
                     continue
                 }
 
@@ -227,31 +227,31 @@ param(
 
                     Set-Location -Path $repoFolder
 
-                    $hasChanges = Git-HasUnCommittedChanges
+                    $hasChanges = Git-HasUnCommittedChanges -repoPath $repoFolder
                     if($hasChanges -eq $true) {
-                        Git-CreateBranch -branchName $branchName
-                        Git-Commit -message "[FF-2244] - Code cleanup on $solutionName"
-                        Git-PushOrigin -branchName $branchName
+                        Git-CreateBranch  -repoPath $repoFolder -branchName $branchName
+                        Git-Commit -repoPath $repoFolder -message "[FF-2244] - Code cleanup on $solutionName"
+                        Git-PushOrigin -repoPath $repoFolder -branchName $branchName
                         
-                        Git-ReNormalise
+                        Git-ReNormalise -repoPath $repoFolder
                     }
                 }
                 else {
                     $branchName = "broken/$currentRevision/cleanup/ff-2244/$solutionName"
                     $branchExists = Git-DoesBranchExist -repoPath $repoFolder -branchName $branchName
                     if($branchExists -ne $true) {
-                        $hasChanges = Git-HasUnCommittedChanges
+                        $hasChanges = Git-HasUnCommittedChanges -repoPath $repoFolder
                         if($hasChanges -eq $true) {
-                            Git-CreateBranch -branchName $branchName
-                            Git-Commit -message "[FF-2244] - Code cleanup on $solutionName [BROKEN - NEEDS INVESTIGATION - DO NOT MERGE]"
-                            Git-PushOrigin -branchName $branchName
+                            Git-CreateBranch -repoPath $repoFolder -branchName $branchName
+                            Git-Commit  -repoPath $repoFolder -message "[FF-2244] - Code cleanup on $solutionName [BROKEN - NEEDS INVESTIGATION - DO NOT MERGE]"
+                            Git-PushOrigin  -repoPath $repoFolder -branchName $branchName
                             
-                            Git-ReNormalise
+                            Git-ReNormalise -repoPath $repoFolder
                         }
                     }
                 }
 
-                Git-ResetToMaster
+                Git-ResetToMaster -repoPath $repoFolder
             }
         }    
     }
