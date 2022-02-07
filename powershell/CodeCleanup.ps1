@@ -167,7 +167,6 @@ param(
 
 function processRepo {
 param(
-    [string]$sourceRepo = $(throw "processRepo: sourceRepo not specified"), 
     [string]$repo = $(throw "processRepo: repo not specified")
     )
     
@@ -287,7 +286,7 @@ ForEach($repo in $repoList) {
         continue
     }
 
-    processRepo -sourceRepo $templateRepoFolder -repo $repo
+    processRepo -repo $repo
 }
 
 Set-Location -Path $root
