@@ -213,7 +213,7 @@ param(
             $solutionFile = $solution.FullName
             $solutionName = $solution.Name
             $branchName = "cleanup/ff-2244/$solutionName"
-            $branchExists = Git-DoesBranchExist -branchName $branchName
+            $branchExists = Git-DoesBranchExist -repoPath $repoFolder -branchName $branchName
             if($branchExists -ne $true) {
 
                 $cleaned = runCodeCleanup -solutionFile $solution.FullName
@@ -238,7 +238,7 @@ param(
                 }
                 else {
                     $branchName = "broken/$currentRevision/cleanup/ff-2244/$solutionName"
-                    $branchExists = Git-DoesBranchExist -branchName $branchName
+                    $branchExists = Git-DoesBranchExist -repoPath $repoFolder -branchName $branchName
                     if($branchExists -ne $true) {
                         $hasChanges = Git-HasUnCommittedChanges
                         if($hasChanges -eq $true) {
