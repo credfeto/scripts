@@ -471,11 +471,11 @@ param(
         Remove-Item -Path $file.FullName
     }
 
-    [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $repoFolder
+    [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $targetRepo
     If ($uncommitted -eq $true)
     {
-        Git-Commit -repoPath $repoFolder -message "Removed old dependabot config templates"
-        Git-Push -repoPath $repoFolder
+        Git-Commit -repoPath $targetRepo -message "Removed old dependabot config templates"
+        Git-Push -repoPath $targetRepo
     }
 }
 
