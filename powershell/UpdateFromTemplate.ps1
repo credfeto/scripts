@@ -454,8 +454,8 @@ param(
     [bool]$hasSubModules = Git-HasSubModules -repoPath $targetRepo 
     Dependabot-BuildConfig -configFileName $targetFileName -repoRoot $targetRepo -updateGitHubActions $updateGitHubActions -hasSubModules $hasSubModules
 
-    doCommit -repoPath $repoFolder -FileName ".github/dependabot.yml"
-    Git-Push -repoPath $repoFolder
+    doCommit -repoPath $targetRepo -FileName ".github/dependabot.yml"
+    Git-Push -repoPath $targetRepo
 }
 
 function removeLegacyDependabotConfig {
