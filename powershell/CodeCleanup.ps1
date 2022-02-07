@@ -184,6 +184,7 @@ param(
 
     Write-Information "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
+    Write-Information "Repo Folder: $repoFolder"
 
     Git-EnsureSynchronised -repo $repo -repoFolder $repoFolder
 
@@ -278,6 +279,7 @@ Write-Information ""
 Write-Information "***************************************************************"
 Write-Information "***************************************************************"
 Write-Information ""
+Write-Information "Root: $root"
 
 Set-Location -Path $root   
 
