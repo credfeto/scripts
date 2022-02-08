@@ -108,6 +108,7 @@ param (
         $includes = $itemGroup.SelectNodes("Folder")
         if($includes.Count -ne 0) {
             foreach($include in $includes) {
+                Write-Information "* Found Folder to remove $( $include.Include )"
                 $toRemove += $include
             }
         }
@@ -165,7 +166,7 @@ param (
 
     Project_ReOrderPropertyGroups -project $project
     Project_ReOrderIncludes -project $project
-  
+    
     $xws = new-object System.Xml.XmlWriterSettings
     $xws.Indent = $true
     $xws.IndentChars = "  "
