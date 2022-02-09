@@ -9,6 +9,17 @@ param( [string] $source = $(throw "ReformatJson: source not specified")
     return $reformatted
 }
 
+function ReformatJsonForSaving {
+param( [string] $source = $(throw "ReformatJson: source not specified")
+    )
+    
+    $obj = $source | ConvertFrom-Json
+    
+    [string] $reformatted = $obj | ConvertTo-Json
+    
+    return $reformatted
+}
+
 <#
  .Synopsis
   Updates the global.json file
@@ -52,14 +63,15 @@ function GlobalJson_Update
         }
     }
 
-    [string]$srcContent = Get-Content -Path $sourceFileName -Raw
+    [string]$srcContent = Get-Content -Path $sourceFileName -Raw        
     $srcGlobal = $srcContent | ConvertFrom-Json
 
     [bool]$trgExists = Test-Path -Path $targetFileName
     if ($trgExists -ne $true) {
         Write-Information "Target global.json does not exist: creating"
 
-        Set-Content -Path $targetFileName -Value $srcContent
+        $reformatted = ReformatJsonForSaving -source $srcContent 
+        Set-Content -Path $targetFileName -Value $reformatted 
     
         return [pscustomobject]@{
             Update = $true
@@ -104,7 +116,8 @@ function GlobalJson_Update
     if ($targetVersion -lt $sourceVersion) {
         Write-Information "* Target global.json specifies a older version of .net ($targetVersion) < $sourceVersion)"
 
-        Set-Content -Path $targetFileName -Value $srcContent
+        $reformatted = ReformatJsonForSaving -source $srcContent 
+        Set-Content -Path $targetFileName -Value $reformatted 
 
         return [pscustomobject]@{
             Update = $true
@@ -114,7 +127,8 @@ function GlobalJson_Update
     }
     
     Write-Information "* Target global.json different but not by version"
-    Set-Content -Path $targetFileName -Value $srcContent
+    $reformatted = ReformatJsonForSaving -source $srcContent 
+    Set-Content -Path $targetFileName -Value $reformatted 
 
     return [pscustomobject]@{
         Update = $true
