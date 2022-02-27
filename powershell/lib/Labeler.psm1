@@ -281,6 +281,7 @@ param(
                     PathsExclude = @()
                 }
         
+                Write-Information "+++ Adding Label $labelName"
                 $config += $newLabel
             }
         }
@@ -294,30 +295,32 @@ param(
 
     ForEach($group in $config) {
 
-        if ($group.Paths -and $group.PathsExclude)
+        $groupName = $group.Name
+        Write-Information "Adding group $groupName"
+        
+        if ($group.Paths)
         {
+            Write-Information " - With Paths..."
             [bool]$first = $true
             [string]$all = ' - any: [ '
-            if ($group.Paths)
+            
+            $sortedPaths = $group.Paths
+            $sortedPaths = $sortedPaths | sort
+
+            Foreach ($mask in $sortedPaths)
             {
-                $sortedPaths = $group.Paths
-                $sortedPaths = $sortedPaths | sort
-
-                Foreach ($mask in $sortedPaths)
+                if ($first -ne $true)
                 {
-                    if ($first -ne $true)
-                    {
-                        $all += ", "
-                    }
-
-                    $first = $false
-                    $all += "'$mask'"
+                    $all += ", "
                 }
+
+                $first = $false
+                $all += "'$mask'"
             }
 
             if ($group.PathsExclude)
             {
-
+                Write-Information " - With Excluded Paths..."
                 $sortedPaths = $group.PathsExclude
                 $sortedPaths = $sortedPaths | sort
 
@@ -337,11 +340,13 @@ param(
             $all += ' ]'
 
             if($first -ne $true) {
+                Write-Information " - Adding Group with file match"
                 $labeller += '"' + $group.Name + '":'
                 $labeller += $all
             }
         }
 
+        Write-Information " - Adding Colour Group"
         $labelsWithColour += ' - name: "' + $group.Name + '"'
         $labelsWithColour += '   color: "' + $group.Colour + '"'
         if($group.Description -ne $null) {

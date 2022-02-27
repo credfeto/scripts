@@ -34,6 +34,15 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: DotNetPackages"
 }
 
+try {
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Labeler.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error "$_"
+    Throw "Error while loading supporting PowerShell Scripts: Labeler"
+}
+
+
 #[bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
 #Write-Host "Installed: $installed"
 
@@ -117,3 +126,6 @@ $packageId = "Microsoft.NET"
 $exactMatch = $false
 $update = ShouldUpdatePackage -installed $result -packageId $packageId -exactMatch $exactMatch
 Write-Host "Update $packageId (exact: $exactMatch) = $update"
+
+
+Labels_Update -prefix "Credfeto.Notification.Bot" -sourceFilesBase "/home/markr/work/personal/notification-bot/src" -labelerFileName "/home/markr/work/personal/notification-bot/.github/labeler.yml" -labelsFileName "/home/markr/work/personal/notification-bot/.github/labels.yml"
