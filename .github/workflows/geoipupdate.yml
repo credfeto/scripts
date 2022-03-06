@@ -16,7 +16,7 @@ jobs:
         ref: ${{ github.head_ref }}
         token: ${{ secrets.SOURCE_PUSH_TOKEN }}
     - uses: credfeto/action-dotnet-version-detect@v1.1.1
-    - uses: actions/setup-dotnet@v1
+    - uses: actions/setup-dotnet@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
