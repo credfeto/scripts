@@ -164,6 +164,18 @@ param(
     Write-Information ">>>>> Build Failed! [From Cleanup]"
     return $false
 }
+function ShouldPushToBranch {
+    param(
+    [string]$repoPath
+    )
+    
+    if(repoPath.EndsWith(-"server")) {
+        # Never auto cleanup servers
+        return $true
+    }
+    
+    return $false
+}
 
 function processRepo {
 param(
@@ -229,11 +241,19 @@ param(
 
                     $hasChanges = Git-HasUnCommittedChanges -repoPath $repoFolder
                     if($hasChanges -eq $true) {
-                        Git-CreateBranch  -repoPath $repoFolder -branchName $branchName
-                        Git-Commit -repoPath $repoFolder -message "[FF-2244] - Code cleanup on $solutionName"
-                        Git-PushOrigin -repoPath $repoFolder -branchName $branchName
-                        
-                        Git-ReNormalise -repoPath $repoFolder
+                        [bool]$pushToBranch = ShouldPushToBranch -repoPath $repoFolder 
+                        if($pushToBranch) {                         
+                            Git-CreateBranch  -repoPath $repoFolder -branchName $branchName
+                            Git-Commit -repoPath $repoFolder -message "[FF-2244] - Code cleanup on $solutionName"
+                            Git-PushOrigin -repoPath $repoFolder -branchName $branchName
+                            
+                            Git-ReNormalise -repoPath $repoFolder
+                        }
+                        else {
+                            Git-Commit -repoPath $repoFolder -message "[FF-2244] - Code cleanup on $solutionName"
+                            Git-Push -repoPath $repoFolder
+                            Git-ReNormalise -repoPath $repoFolder
+                        }
                     }
                 }
                 else {
