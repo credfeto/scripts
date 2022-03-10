@@ -169,7 +169,7 @@ function ShouldPushToBranch {
     [string]$repoPath
     )
     
-    if($repoPath.EndsWith(-"server")) {
+    if($repoPath.EndsWith("-server")) {
         # Never auto cleanup servers
         return $true
     }
