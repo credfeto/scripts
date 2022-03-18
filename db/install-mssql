@@ -1,6 +1,29 @@
-#! /bin/sh
+#! /bin/bash
+
+PROG=$0
+
+function error_exit {
+    echo
+    echo "$@"
+    exit 1
+}
+#Trap the killer signals so that we can exit with a good message.
+trap "error_exit 'Received signal SIGHUP'" SIGHUP
+trap "error_exit 'Received signal SIGINT'" SIGINT
+trap "error_exit 'Received signal SIGTERM'" SIGTERM
+
+shopt -s expand_aliases
+alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
+
+source dbenv
+
+[ -z "$PASSWORD" ] && die "--password not specified"
+
+echo "Ensuring network installed"
 docker network create multi-host-network
+
+echo "Getting container from registry"
 docker pull mcr.microsoft.com/mssql/server:2019-latest
 
-PASSWORD=LocalDb1234$
+echo "Installing container"
 docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=$PASSWORD" -e "MSSQL_PID=Developer"  -p 1433:1433  --name mssql --hostname sql -v/home:/home --network multi-host-network -d mcr.microsoft.com/mssql/server:2019-latest
