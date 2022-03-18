@@ -21,33 +21,43 @@ USER=
 PASSWORD=
 SCHEMA=
 
-source dbenv 
+DB_SETTINGS_FILE=~/.database
+[[ -f "$DB_SETTINGS_FILE" ]]; echo "Using $DB_SETTINGS_FILE"
+[[ -f "$DB_SETTINGS_FILE" ]]; source $DB_SETTINGS_FILE
 
 while [[ $# -gt 0 ]]; do
   key="$1"
 
   case $key in
+    -U|--user)
+      USER="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -P|--password)
+      PASSWORD="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -s|--server)
+      SERVER="$2"
+      shift # past argument
+      shift # past value
+      ;;
     -d|--database)
       DB="$2"
       shift # past argument
       shift # past value
       ;;
-    -f|--file)
-      SCHEMA="$2"
-      shift # past argument
-      shift # past value
-      ;;
-    *)    # unknown option
+    *)    # unknown option - skip here      
       shift # past argument
       ;;
   esac
 done
 
 [ -z "$SERVER" ] && die "--server not specified"
-[ -z "$DB" ] && die "--database not specified"
 [ -z "$USER" ] && die "--user not specified"
 [ -z "$PASSWORD" ] && die "--password not specified"
 
-sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "CREATE DATABASE $DB"
-
-[ -n "$SCHEMA" ] && sqlcmd -S "$SERVER" -U "$USER" -P "$PASSWORD" -d "$DB" -b -e -i "$SCHEMA"
+echo "Server: $SERVER"
+echo "User: $USER"
