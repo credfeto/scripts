@@ -16,7 +16,7 @@ function upsearch () {
  for (( n=${#slashes}; n>0; --n ))
  do
    if test -e "$directory/$1"; then
-     echo "$directory/$1"
+     echo $directory
      return
    fi
   
@@ -43,10 +43,21 @@ DB_SETTINGS_FILE=~/.database
 [[ -f "$DB_SETTINGS_FILE" ]]; echo "Using $DB_SETTINGS_FILE"
 [[ -f "$DB_SETTINGS_FILE" ]]; source $DB_SETTINGS_FILE
 
-LOCAL_DB_SETTINGS_FILE=$(upsearch ".database")
-if [ ! -z "$LOCAL_DB_SETTINGS_FILE" ]; then
-  echo "Using $LOCAL_DB_SETTINGS_FILE"
-  source $LOCAL_DB_SETTINGS_FILE
+LOCAL_DB_SETTINGS_FOLDER=$(upsearch ".database")
+if [ ! -z "$LOCAL_DB_SETTINGS_FOLDER" ]; then
+  LOCAL_DB_SETTINGS_FOLDER=$(readlink -f "$LOCAL_DB_SETTINGS_FOLDER")
+  echo "Using settings from $LOCAL_DB_SETTINGS_FOLDER"
+  LOCAL_DB_SETTINGS_FILE="$LOCAL_DB_SETTINGS_FOLDER/.database"
+  if [ "$LOCAL_DB_SETTINGS_FILE" != "$DB_SETTINGS_FILE" ]; then
+    source $LOCAL_DB_SETTINGS_FILE
+    
+    if [ ! -z "$DB" ]; then
+      [ -z "$SOURCE" ] && SOURCE="$LOCAL_DB_SETTINGS_FOLDER/db"
+      REDGATE=~/.redgate
+      [ !-d "$REDGATE" ] && mkdir $REDGATE
+      [ -z "$OUTPUT" ] && OUTPUT=~/.redgate/$DB.sql
+    fi
+  fi
 fi
 
 while [[ $# -gt 0 ]]; do
@@ -86,3 +97,5 @@ done
 echo "Server: $SERVER"
 echo "User: $USER"
 [ ! -z "$DB" ] && echo "DB: $DB"
+[ ! -z "$SOURCE" ] && echo "Source: $SOURCE"
+[ ! -z "$OUTPUT" ] && echo "Output: $OUTPUT"

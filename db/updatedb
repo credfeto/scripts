@@ -61,7 +61,9 @@ FILTER=$SOURCE/Filter.scpf
 LOG=$OUTPUT.log
 REPORT=$OUTPUT.xml
 
-sqlcompare \
+SQLCOMARE_SERVER=$(sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mssql)
+echo "Running sqlcompare to produce $OUTPUT"
+sudo sqlcompare \
   /filter:"$FILTER" \
   /options:ConsiderNextFilegroupInPartitionSchemes,DecryptPost2kEncryptedObjects,DoNotOutputCommentHeader,ForceColumnOrder,IgnoreCertificatesAndCryptoKeys,IgnoreDatabaseAndServerName,IgnoreUserProperties,IgnoreUsersPermissionsAndRoleMemberships,IgnoreWhiteSpace,IgnoreWithElementOrder,IncludeDependencies,NoDeploymentLogging,ThrowOnFileParseFailed,UseCompatibilityLevel \
   /transactionIsolationLevel:SERIALIZABLE \
@@ -75,7 +77,7 @@ sqlcompare \
   /force \
   /OutputWidth:1024 \
   /out:"$LOG" \
-  /server2:"$SERVER" \
+  /server2:"$SQLCOMARE_SERVER" \
   /database2:"$DB" \
   /username2:"$USER" \
   /password2:"$PASSWORD" \
@@ -83,6 +85,9 @@ sqlcompare \
 
 #  /scriptFile:"$OUTPUT" \
 
+[ ! -f "$OUTPUT" ] && die "No output generated at $OUTPUT"
+
+echo "Running sqlcmd to import $OUTPUT"
 sqlcmd \
   -S "$SERVER" \
   -U "$USER" \
