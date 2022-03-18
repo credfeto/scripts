@@ -81,20 +81,21 @@ sqlcompare \
   /transactionIsolationLevel:SERIALIZABLE \
   /include:staticData \
   /scriptFile:"$OUTPUT" \
+  /scripts1:"$SOURCE" \
   /showWarnings \
   /include:Identical \
   /report:"$REPORT" \
   /reportType:Xml \
   /force \
   /OutputWidth:1024 \
-  /scriptfile:"$OUTPUT" \
   /out:"$LOG" \
-  /scriptfile:"$SCHEMA" \
   /server2:"$SERVER" \
   /database2:"$DB" \
   /username2:"$USER" \
   /password2:"$PASSWORD" \
   /assertidentical
+
+#  /scriptFile:"$OUTPUT" \
 
 sqlcmd \
   -S "$SERVER" \
