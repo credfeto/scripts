@@ -54,7 +54,7 @@ if [ ! -z "$LOCAL_DB_SETTINGS_FOLDER" ]; then
     if [ ! -z "$DB" ]; then
       [ -z "$SOURCE" ] && SOURCE="$LOCAL_DB_SETTINGS_FOLDER/db"
       REDGATE=~/.redgate
-      [ !-d "$REDGATE" ] && mkdir $REDGATE
+      [ ! -d "$REDGATE" ] && mkdir $REDGATE
       [ -z "$OUTPUT" ] && OUTPUT=~/.redgate/$DB.sql
     fi
   fi
