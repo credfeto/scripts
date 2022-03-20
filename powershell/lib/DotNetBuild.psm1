@@ -12,6 +12,20 @@ function DotNet-DumpOutput {
     }
 }
 
+function DotNet-IsCodeAnalysisCrash {
+param(
+    $result
+    )
+
+    [string]$errorCode = "AD0001"
+    [string]$NewLine = [System.Environment]::NewLine
+
+    [string]$resultsAsText = $result -join $NewLine
+    [bool]$retry = $resultsAsText.Contains($errorCode)
+    
+    return $retry
+}
+
 function DotNet-GetPublishableFramework {
 param(
     [string] $srcFolder = $(throw "DotNet-GetPublishableFramework: srcFolder not specified")
@@ -121,8 +135,6 @@ param(
     [string] $srcFolder = $(throw "DotNet-Build: srcFolder not specified")
     )
      
-    [string]$errorCode = "AD0001"
-    [string]$NewLine = [System.Environment]::NewLine
     [string]$version = BuildVersion
 
     Write-Information " * Building"
@@ -131,8 +143,7 @@ param(
 
         $result = dotnet build --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version 2>&1
         if(!$?) {
-            [string]$resultsAsText = $results -join $NewLine
-            [bool]$retry = $resultsAsText.Contains($errorCode)
+            [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Build Failed"
                 DotNet-DumpOutput -result $result
@@ -153,8 +164,6 @@ param(
     [string] $srcFolder = $(throw "DotNet-Pack: srcFolder not specified")
     )
      
-    [string]$errorCode = "AD0001"
-    [string]$NewLine = [System.Environment]::NewLine
     [string]$version = BuildVersion
     
     Write-Information " * Packing"
@@ -163,8 +172,7 @@ param(
 
         $result = dotnet pack --no-restore -nodeReuse:False --configuration=Release -p:Version=$version 2>&1
         if(!$?) {
-            [string]$resultsAsText = $results -join $NewLine
-            [bool]$retry = $resultsAsText.Contains($errorCode)
+            [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Packing Failed"
                 DotNet-DumpOutput -result $result
@@ -188,8 +196,6 @@ param(
     
     [string]$framework = DotNet-GetPublishableFramework -srcFolder $srcFolder
      
-    [string]$errorCode = "AD0001"
-    [string]$NewLine = [System.Environment]::NewLine
     [string]$version = BuildVersion
 
     Write-Information " * Publishing"
@@ -202,8 +208,7 @@ param(
             $result = dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False 2>&1
         }
         if (!$?) {
-            [string]$resultsAsText = $results -join $NewLine
-            [bool]$retry = $resultsAsText.Contains($errorCode)
+            [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry)
             {
                 Write-Information ">>> Publishing Failed"
@@ -225,17 +230,13 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildRunUnitTestsLinux: srcFolder not specified")
     )
      
-    [string]$errorCode = "AD0001"
-    [string]$NewLine = [System.Environment]::NewLine
-
     Write-Information " * Unit Tests"
     do {
         Set-Location -Path $srcFolder
 
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration 2>&1
         if (!$?) {
-            [string]$resultsAsText = $results -join $NewLine
-            [bool]$retry = $resultsAsText.Contains($errorCode)
+            [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
@@ -255,17 +256,13 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildRunUnitTestsWindows: srcFolder not specified")
     )
      
-    [string]$errorCode = "AD0001"
-    [string]$NewLine = [System.Environment]::NewLine
-
     Write-Information " * Unit Tests"
     do {
         Set-Location -Path $srcFolder
 
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration 2>&1
         if (!$?) {
-            [string]$resultsAsText = $results -join $NewLine
-            [bool]$retry = $resultsAsText.Contains($errorCode)
+            [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
@@ -297,17 +294,13 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildRunIntegrationTests: srcFolder not specified")
 )
 
-    [string]$errorCode = "AD0001"
-    [string]$NewLine = [System.Environment]::NewLine
-
     Write-Information " * Unit Tests and Integration Tests"
     do {
         Set-Location -Path $srcFolder
 
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False 2>&1
         if (!$?) {
-            [string]$resultsAsText = $results -join $NewLine
-            [bool]$retry = $resultsAsText.Contains($errorCode)
+            [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
