@@ -17,39 +17,20 @@ alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
 
 SERVER=
 DB=
-AUTH=
+
+source dbenv 
 
 while [[ $# -gt 0 ]]; do
   key="$1"
 
   case $key in
-    -U|--user)
-      USER="$2"
-      shift # past argument
-      shift # past value
-      ;;
-    -P|--password)
-      PASSWORD="$2"
-      shift # past argument
-      shift # past value
-      ;;
-    -s|--server)
-      SERVER="$2"
-      shift # past argument
-      shift # past value
-      ;;
-    -d|--database)
-      DB="$2"
-      shift # past argument
-      shift # past value
-      ;;
     -o|--output)
       OUTPUT="$2"
       shift # past argument
       shift # past value
       ;;
     *)    # unknown option
-      die "unknown argument $1"
+      shift # past argument
       ;;
   esac
 done
