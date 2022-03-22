@@ -774,7 +774,7 @@ param (
             Write-Information ".NET VERSION UPDATED: $dotnetVersionUpdated"
         }
         
-        if($targetRepo.Contains("funfair")) {
+        if($repo.Contains("funfair")) {
             Write-Information "Repo Folder contains 'funfair': $repo"
             updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\FunFair.props"
             updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\packageicon.png"
