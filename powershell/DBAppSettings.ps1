@@ -44,6 +44,5 @@ ForEach($file in $files) {
     Write-Information "  - Setting DatabaseConfiguration:ConnectionString"
     $properties.DatabaseConfiguration.ConnectionString = "Database=$database;Server=$server;User ID=$user;Password=$password;Application Name=$database;Connection Timeout=60"
 
-    $properties | ConvertTo-Json -Compress | Out-File -encoding ASCII $fileToUpdate
-
+    $properties | ConvertTo-Json | Out-File -encoding ASCII $fileToUpdate
 }
