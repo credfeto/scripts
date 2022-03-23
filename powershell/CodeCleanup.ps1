@@ -164,15 +164,16 @@ param(
     Write-Information ">>>>> Build Failed! [From Cleanup]"
     return $false
 }
+
 function ShouldPushToBranch {
     param(
     [string]$repoPath
     )
     
-    if($repoPath.EndsWith("-server")) {
-        # Never auto cleanup servers
-        return $true
-    }
+#    if($repoPath.EndsWith("-server")) {
+#        # Never auto cleanup servers
+#        return $true
+#    }
     
     return $false
 }
