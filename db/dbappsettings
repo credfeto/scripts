@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PROG=$0
+BASEDIR=$(dirname "$(readlink -f "$0")")
 
 function error_exit {
     echo
@@ -25,5 +26,5 @@ source dbenv
 [ -z "$USER" ] && die "--user not specified"
 [ -z "$PASSWORD" ] && die "--password not specified"
 
-dotnet pwsh -f ~/work/personal/scripts/powershell/DBAppSettings.ps1 --server "$SERVER" --user "$USER" --password "$PASSWORD" --database "$DB"
+dotnet pwsh -f "$BASEDIR/../powershell/DBAppSettings.ps1" --server "$SERVER" --user "$USER" --password "$PASSWORD" --database "$DB"
 
