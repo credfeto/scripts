@@ -12,6 +12,9 @@ name: PSScriptAnalyzer
 on:
   push:
     branches: [ master, hotfix/*, release/* ]
+    paths:
+    - '**.ps1'
+    - '**.psm1'
   pull_request:
     branches: [ master ]
   schedule:
