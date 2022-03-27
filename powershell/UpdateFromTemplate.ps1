@@ -819,7 +819,7 @@ param (
         "dependabot-auto-merge.yml"
     )
     ForEach ($file in $files) {
-        ForEach ($workflow in $workflows) {
+        ForEach ($workflow in $targetWorkflows) {
             If ($file.Name -eq $workflow) {
                 Remove-Item -Path $file.FullName
                 break 
