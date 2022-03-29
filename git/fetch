@@ -1,8 +1,11 @@
 #! /bin/bash
 
-for d in */; do
 
-  CURRENTDIR=${d::-1}
+for line in $(find  $(pwd)/* -name '*.git' -printf '%h\n' | sort -u)
+do 
+    echo $line
+    CURRENTDIR=$line  
+
   echo ""
   echo "Retrieving $CURRENTDIR..."
   git -C "$CURRENTDIR" remote get-url origin
