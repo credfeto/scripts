@@ -79,53 +79,57 @@ catch {
 
 #Write-Host $duration
 
-function ShouldUpdatePackage{
-param (
-    $installed,
-    [string]$packageId,
-    [bool]$exactMatch
-)
+#function ShouldUpdatePackage{
+#param (
+#    $installed,
+#    [string]$packageId,
+#    [bool]$exactMatch
+#)
+#
+#    foreach($candidate in $installed) {
+#        if($packageId -eq $candidate) {
+#            return $true
+#        }
+#
+#        if(!$exactMatch) {
+#            $test = "$packageId.".ToLower()
+#            
+#            if($candidate.ToLower().StartsWith($test)) {
+#                return $true
+#            }
+#        }
+#    }
+#    
+#    return $false
+#}
+#
+#Write-Host "Hello"
+#$result = DotNetPackages-Get -srcFolder "/home/markr/work/personal/changelog-manager/src"
+#Write-Host $result 
+#
+#$packageId = "CommandLineParser"
+#$exactMatch = $true
+#$update = ShouldUpdatePackage -installed $result -packageId $packageId -exactMatch $exactMatch
+#Write-Host "Update $packageId (exact: $exactMatch) = $update"
+#
+#$packageId = "commandlineparser"
+#$exactMatch = $true
+#$update = ShouldUpdatePackage -installed $result -packageId $packageId -exactMatch $exactMatch
+#Write-Host "Update $packageId (exact: $exactMatch) = $update"
+#
+#$packageId = "Microsoft.NET"
+#$exactMatch = $true
+#$update = ShouldUpdatePackage -installed $result -packageId $packageId -exactMatch $exactMatch
+#Write-Host "Update $packageId (exact: $exactMatch) = $update"
+#
+#$packageId = "Microsoft.NET"
+#$exactMatch = $false
+#$update = ShouldUpdatePackage -installed $result -packageId $packageId -exactMatch $exactMatch
+#Write-Host "Update $packageId (exact: $exactMatch) = $update"
+#
+#
+#Labels_Update -prefix "Credfeto.Notification.Bot" -sourceFilesBase "/home/markr/work/personal/notification-bot/src" -labelerFileName "/home/markr/work/personal/notification-bot/.github/labeler.yml" -labelsFileName "/home/markr/work/personal/notification-bot/.github/labels.yml"
 
-    foreach($candidate in $installed) {
-        if($packageId -eq $candidate) {
-            return $true
-        }
 
-        if(!$exactMatch) {
-            $test = "$packageId.".ToLower()
-            
-            if($candidate.ToLower().StartsWith($test)) {
-                return $true
-            }
-        }
-    }
-    
-    return $false
-}
-
-Write-Host "Hello"
-$result = DotNetPackages-Get -srcFolder "/home/markr/work/personal/changelog-manager/src"
-Write-Host $result 
-
-$packageId = "CommandLineParser"
-$exactMatch = $true
-$update = ShouldUpdatePackage -installed $result -packageId $packageId -exactMatch $exactMatch
-Write-Host "Update $packageId (exact: $exactMatch) = $update"
-
-$packageId = "commandlineparser"
-$exactMatch = $true
-$update = ShouldUpdatePackage -installed $result -packageId $packageId -exactMatch $exactMatch
-Write-Host "Update $packageId (exact: $exactMatch) = $update"
-
-$packageId = "Microsoft.NET"
-$exactMatch = $true
-$update = ShouldUpdatePackage -installed $result -packageId $packageId -exactMatch $exactMatch
-Write-Host "Update $packageId (exact: $exactMatch) = $update"
-
-$packageId = "Microsoft.NET"
-$exactMatch = $false
-$update = ShouldUpdatePackage -installed $result -packageId $packageId -exactMatch $exactMatch
-Write-Host "Update $packageId (exact: $exactMatch) = $update"
-
-
-Labels_Update -prefix "Credfeto.Notification.Bot" -sourceFilesBase "/home/markr/work/personal/notification-bot/src" -labelerFileName "/home/markr/work/personal/notification-bot/.github/labeler.yml" -labelsFileName "/home/markr/work/personal/notification-bot/.github/labels.yml"
+$branch = Git-GetDefaultBranch -repoPath '~/work/funfair/funfair-ethereum-proxy-server'
+Write-Host "Default Branch: $branch"

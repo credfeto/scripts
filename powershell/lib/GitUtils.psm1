@@ -50,6 +50,21 @@ function GetRepoPath {
 }
 
 
+function Git-GetDefaultBranch {
+param(
+    [string] $repoPath = $(throw "Get-GetDefaultBranch: repoPath not specified"),
+    [string] $upstream = "origin"
+    )
+
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
+
+    [string[]]$result = git -C $repoPath remote show $upstream
+    
+    [string] $branch =  $result | Select-String -Pattern 'HEAD branch: (.*)' -CaseSensitive | %{$_.Matches.Groups[1].value}
+    
+    return $branch.Trim()
+}
+
 function Git-GetRemoteBranches {
 param(
         [string] $repoPath = $(throw "Git-GetRemoteBranches: repoPath not specified"),
@@ -108,21 +123,25 @@ param(
         [string] $repoPath = $(throw "Git-ResetToMaster: repoPath not specified")
     )
 
+    [string]$upstream = "origin";
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     $head = Git-Get-HeadRev -repoPath $repoPath
     
+    [string]$defaultBranch = Git-GetDefaultBranch -repoPath $repoPath -upstream $upstream
+    [string]$upstreamBranch = "$upstream/$defaultBranch"
+    
     # junk any existing checked out files
     & git -C $repoPath reset HEAD --hard | Out-Null
     & git -C $repoPath clean -f -x -d | Out-Null
-    & git -C $repoPath checkout master | Out-Null
+    & git -C $repoPath checkout $defaultBranch | Out-Null
     & git -C $repoPath reset HEAD --hard | Out-Null
     & git -C $repoPath clean -f -x -d | Out-Null
     & git -C $repoPath fetch --recurse-submodules | Out-Null
     
     # NOTE Loses all local commits on master
-    & git -C $repoPath reset --hard origin/master | Out-Null
-    & git -C $repoPath remote update origin --prune | Out-Null
+    & git -C $repoPath reset --hard $upstreamBranch | Out-Null
+    & git -C $repoPath remote update $upstream --prune | Out-Null
     & git -C $repoPath prune | Out-Null
     
     $newHead = Git-Get-HeadRev -repoPath $repoPath
@@ -243,11 +262,13 @@ param(
     [string] $branchName = $(throw "Git-PushOrigin: branchName not specified")
     )
     
+    [string]$upstream = "origin";
+
     Git-ValidateBranchName -branchName $branchName -method "Git-PushOrigin"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    & git -C $repoPath push --set-upstream origin $branchName -v | Out-Null
+    & git -C $repoPath push --set-upstream $upstream $branchName -v | Out-Null
 }
 
 
@@ -256,10 +277,14 @@ param(
     [string] $repoPath = $(throw "Git-DoesBranchExist: repoPath not specified"),
     [string] $branchName = $(throw "Git-DoesBranchExist: branchName not specified")
     )
+    
+    [string]$upstream = "origin";
+    [string]$repoPath = GetRepoPath -repoPath $repoPath
+
+    [string]$defaultBranch = Git-GetDefaultBranch -repoPath $repoPath -upstream $upstream
+    [string]$upstreamBranch = "$upstream/$defaultBranch"
 
     Git-ValidateBranchName -branchName $branchName -method "Git-DoesBranchExist"
-
-    [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     $result = git -C $repoPath branch --remote 2>&1
 
@@ -275,7 +300,8 @@ param(
         return $true
     }
 
-    if($result -eq "origin/$branchName") {
+    [string]$upstreamBranch = "$upstream/$branchName"
+    if($result -eq $upstreamBranch) {
         return $true
     }
 
@@ -317,6 +343,8 @@ param(
     [string] $branchName = $(throw "Git-DeleteBranch: branchName not specified")
     )
 
+    [string]$upstream = "origin"
+
     Git-ValidateBranchName -branchName $branchName -method "Git-DeleteBranch"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -326,9 +354,10 @@ param(
         & git -C $repoPath branch -D $branchName | Out-Null
     }
     
-    [bool]$branchExists = Git-DoesBranchExist -branchName "origin/$branchName" -repoPath $repoPath
+    [string]$upstreamBranch = "$upstream/$branchName"
+    [bool]$branchExists = Git-DoesBranchExist -branchName $upstreamBranch -repoPath $repoPath
     if($branchExists) {
-        & git -C $repoPath push origin ":$branchName" | Out-Null
+        & git -C $repoPath push $upstream ":$branchName" | Out-Null
     }
 
     return $true;
@@ -400,9 +429,11 @@ param(
     [string]$branchPrefix = $(throw "Git-RemoveBranchesForPrefix: branchPrefix not specified")
     )
 
+    [string]$upstream = "origin"
+    
     Git-ValidateBranchName -branchName $branchPrefix -method "Git-RemoveBranchesForPrefix"
 
-    [string[]]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream "origin"
+    [string[]]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream $upstream
     
     Write-Information "Looking for branches to remove based on prefix: $branchPrefix"        
     foreach($branch in $remoteBranches) {
@@ -444,6 +475,7 @@ param(
     return $content
 }
 
+Export-ModuleMember -Function Git-GetDefaultBranch
 Export-ModuleMember -Function Git-RemoveAllLocalBranches
 Export-ModuleMember -Function Git-ResetToMaster
 Export-ModuleMember -Function Git-EnsureSynchronised
