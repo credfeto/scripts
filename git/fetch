@@ -1,23 +1,23 @@
 #! /bin/bash
 
 
-for line in $(find  $(pwd)/* -name '*.git' -printf '%h\n' | sort -u)
+for line in $(find  $(pwd)/* -name '*.git' -printf '%h\n' | sort -u | grep -v .cache)
 do 
-    echo $line
-    CURRENTDIR=$line  
+  echo "$line"
+  CURRENT_DIR=$line  
 
   echo ""
-  echo "Retrieving $CURRENTDIR..."
-  git -C "$CURRENTDIR" remote get-url origin
-  git -C "$CURRENTDIR" fetch 
-  git -C "$CURRENTDIR" remote update origin --prune
+  echo "Retrieving $CURRENT_DIR..."
+  git -C "$CURRENT_DIR" remote get-url origin
+  git -C "$CURRENT_DIR" fetch 
+  git -C "$CURRENT_DIR" remote update origin --prune
   
-  git -C "$CURRENTDIR" status
+  git -C "$CURRENT_DIR" status
   if [ $? -eq 0 ]
   then
     echo " + No pending changes in working folder. Rebasing..."
-    git -C "$CURRENTDIR" rebase
-    git -C "$CURRENTDIR" rebase --abort 2> /dev/null
+    git -C "$CURRENT_DIR" rebase
+    git -C "$CURRENT_DIR" rebase --abort 2> /dev/null
   fi 
 
   echo " * done"
