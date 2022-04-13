@@ -10,10 +10,9 @@ do
   echo ""
   echo "Retrieving $CURRENT_DIR..."
   git -C "$CURRENT_DIR" remote get-url origin
-  git -C "$CURRENT_DIR" branch -m master main
   git -C "$CURRENT_DIR" fetch origin
-  git -C "$CURRENT_DIR" branch -u origin/main main
-  git -C "$CURRENT_DIR" remote set-head origin -a
+  git -C "$CURRENT_DIR" checkout main
+  git -C "$CURRENT_DIR" fetch origin
   
   echo " * done"
 done
