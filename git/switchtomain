@@ -10,16 +10,10 @@ do
   echo ""
   echo "Retrieving $CURRENT_DIR..."
   git -C "$CURRENT_DIR" remote get-url origin
-  git -C "$CURRENT_DIR" fetch 
-  git -C "$CURRENT_DIR" remote update origin --prune
+  git -C "$CURRENT_DIR" branch -m master main
+  git -C "$CURRENT_DIR" fetch origin
+  git -C "$CURRENT_DIR" branch -u origin/main main
+  git -C "$CURRENT_DIR" remote set-head origin -a
   
-  git -C "$CURRENT_DIR" status
-  if [ $? -eq 0 ]
-  then
-    echo " + No pending changes in working folder. Rebasing..."
-    git -C "$CURRENT_DIR" rebase
-    git -C "$CURRENT_DIR" rebase --abort 2> /dev/null
-  fi 
-
   echo " * done"
 done
