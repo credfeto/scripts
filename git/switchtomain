@@ -1,0 +1,25 @@
+#! /bin/bash
+
+
+for line in $(find  $(pwd)/* -name '*.git' -printf '%h\n' | sort -u | grep -v .cache)
+do 
+  echo "$line"
+  CURRENT_DIR=$line  
+
+
+  echo ""
+  echo "Retrieving $CURRENT_DIR..."
+  git -C "$CURRENT_DIR" remote get-url origin
+  git -C "$CURRENT_DIR" fetch 
+  git -C "$CURRENT_DIR" remote update origin --prune
+  
+  git -C "$CURRENT_DIR" status
+  if [ $? -eq 0 ]
+  then
+    echo " + No pending changes in working folder. Rebasing..."
+    git -C "$CURRENT_DIR" rebase
+    git -C "$CURRENT_DIR" rebase --abort 2> /dev/null
+  fi 
+
+  echo " * done"
+done
