@@ -814,6 +814,7 @@ param (
         "cc.yml",
         "codacy-analysis.yml",
         "linter.yml",
+        "rebase.yml",
         "sqlcheck.yml",
         "tabtospace.yml",
         "dependabot-auto-merge.yml"
