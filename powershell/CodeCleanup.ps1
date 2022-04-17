@@ -2,7 +2,7 @@
 
 param(
     [string] $repos = $(throw "repos.lst file containing list of repositories"),
-    [string] $work = $(throw "folder where to clone repositories")
+    [string] $work = $(throw "folder where to clone repositories"),
     [string] $tempFolder = $(throw "folder where to write temp and caches")
 )
 
