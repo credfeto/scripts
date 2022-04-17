@@ -2,7 +2,8 @@
 
 param(
     [string] $repos = $(throw "repos.lst file containing list of repositories"),
-    [string] $work = $(throw "folder where to clone repositories")        
+    [string] $work = $(throw "folder where to clone repositories")
+    [string] $tempFolder = [System.IO.Path]::GetTempPath()        
 )
 
 Remove-Module *
@@ -90,10 +91,9 @@ catch {
 
 function runCodeCleanup {
 param(
-    [string]$solutionFile  = $(throw "runCodeCleanup: solutionFile not specified")
+    [string]$solutionFile = $(throw "runCodeCleanup: solutionFile not specified")
+    [string]$workspaceCache = $(throw "runCodeCleanup: workspaceCache not specified")
     )
-
-    $tempFolder = [System.IO.Path]::GetTempPath()
 
     $sourceFolder = Split-Path -Path $solutionFile -Parent
     $sourceFolderWithoutDrive = $sourceFolder
@@ -101,7 +101,7 @@ param(
         $sourceFolderWithoutDrive = $sourceFolder.Substring(3)
     }    
 
-    $cachesFolder = Join-Path -Path $tempFolder -ChildPath $sourceFolderWithoutDrive
+    $cachesFolder = Join-Path -Path $workspaceCache -ChildPath $sourceFolderWithoutDrive
     $settingsFile = $solutionFile + ".DotSettings"
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
@@ -181,6 +181,7 @@ function ShouldPushToBranch {
 function processRepo {
 param(
     [string]$repo = $(throw "processRepo: repo not specified")
+    [string]$workspaceCache = $(throw "processRepo: workspaceCache not specified")
     )
     
     Write-Information ""
@@ -229,7 +230,7 @@ param(
             $branchExists = Git-DoesBranchExist -repoPath $repoFolder -branchName $branchName
             if($branchExists -ne $true) {
 
-                $cleaned = runCodeCleanup -solutionFile $solution.FullName
+                $cleaned = runCodeCleanup -solutionFile $solution.FullName -workspaceCache $workspaceCache
                 if($cleaned -eq $null) {
                     Git-ResetToMaster -repoPath $repoFolder
                     continue
@@ -309,7 +310,7 @@ ForEach($repo in $repoList) {
         continue
     }
 
-    processRepo -repo $repo
+    processRepo -repo $repo -workspaceCache $tempFolder
 }
 
 Set-Location -Path $root
