@@ -91,7 +91,7 @@ catch {
 
 function runCodeCleanup {
 param(
-    [string]$solutionFile = $(throw "runCodeCleanup: solutionFile not specified")
+    [string]$solutionFile = $(throw "runCodeCleanup: solutionFile not specified"),
     [string]$workspaceCache = $(throw "runCodeCleanup: workspaceCache not specified")
     )
 
