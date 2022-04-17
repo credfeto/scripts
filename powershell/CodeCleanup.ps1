@@ -118,8 +118,10 @@ param(
             Write-Information ">>>>> Build Failed! [From simple cleanup]"
             return $false
         }
+        
+        # TODO: Consider commiting at this point.
     }
-
+    
     Write-Information "* Running Code Cleanup"
     Write-Information "  - Solution: $Solution"
     Write-Information "  - Cache Folder: $cachesFolder"
@@ -135,6 +137,15 @@ param(
         Write-Information        "    - Reorder CSPROJ"
         Project_Cleanup -projectFile $projectFile
 
+        Write-Information "* Building after simple cleanup"
+        $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
+        if(!$buildOk) {
+            Write-Information ">>>>> Build Failed! [From simple project cleanup]"
+            return $false
+        }
+        
+        # TODO: Consider commiting at this point.
+
         Write-Information "    - JB Code Cleanup"
         dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
          # --no-buildin-settings
@@ -144,15 +155,16 @@ param(
             return $false
         }
         
-        $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
         Write-Information "* Building after simple cleanup"
         $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
         if(!$buildOk) {
             Write-Information ">>>>> Build Failed! [From project cleanup]"
             return $false
         }
-    }
 
+        # TODO: Consider commiting at this point.
+    }
+    
     # Cleanup the solution
     Write-Information "  * Cleaning Whole Solution"
     dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
