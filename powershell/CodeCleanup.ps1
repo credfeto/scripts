@@ -329,9 +329,6 @@ Write-Information "*************************************************************
 Write-Information ""
 Write-Information "Root: $root"
 Write-Information "Workspace Cache: $tempFolder"
-if($tempFolder.StartsWith('/tmp/')) {
-    throw "Temp folder is not in the correct location"
-}
 
 Set-Location -Path $root   
 
