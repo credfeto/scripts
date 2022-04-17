@@ -201,7 +201,7 @@ function ShouldPushToBranch {
 
 function processRepo {
 param(
-    [string]$repo = $(throw "processRepo: repo not specified")
+    [string]$repo = $(throw "processRepo: repo not specified"),
     [string]$workspaceCache = $(throw "processRepo: workspaceCache not specified")
     )
     
