@@ -124,6 +124,7 @@ param(
     
     Write-Information "* Running Code Cleanup"
     Write-Information "  - Solution: $Solution"
+    Write-Information "  - Workspace Cache Folder: $workspaceCache"
     Write-Information "  - Cache Folder: $cachesFolder"
     Write-Information "  - Settings File: $settingsFile"
 
@@ -327,6 +328,7 @@ Write-Information "*************************************************************
 Write-Information "***************************************************************"
 Write-Information ""
 Write-Information "Root: $root"
+Write-Information "Workspace Cache: $tempFolder"
 
 Set-Location -Path $root   
 
