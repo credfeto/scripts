@@ -143,6 +143,14 @@ param(
             throw "Code Cleanup for project failed"
             return $false
         }
+        
+        $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
+        Write-Information "* Building after simple cleanup"
+        $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
+        if(!$buildOk) {
+            Write-Information ">>>>> Build Failed! [From project cleanup]"
+            return $false
+        }
     }
 
     # Cleanup the solution
@@ -161,7 +169,7 @@ param(
         return $true
     }
 
-    Write-Information ">>>>> Build Failed! [From Cleanup]"
+    Write-Information ">>>>> Build Failed! [From Solution Cleanup]"
     return $false
 }
 
@@ -223,6 +231,8 @@ param(
         
         $solutions = Get-ChildItem -Path $srcPath -Filter "*.sln" 
         foreach($solution in $solutions) {
+        
+            Git-ResetToMaster -repoPath $repoFolder
 
             $solutionFile = $solution.FullName
             $solutionName = $solution.Name
@@ -282,6 +292,9 @@ param(
         Write-Information "Updating Tracking for $repo to $currentRevision"
         Tracking_Set -basePath $root -repo $repo -value $currentRevision
     }
+
+    # Always reset to master after running the cleanup
+    Git-ResetToMaster -repoPath $repoFolder
 }
 
 
