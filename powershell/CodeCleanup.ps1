@@ -3,7 +3,7 @@
 param(
     [string] $repos = $(throw "repos.lst file containing list of repositories"),
     [string] $work = $(throw "folder where to clone repositories")
-    [string] $tempFolder = [System.IO.Path]::GetTempPath()        
+    [string] $tempFolder = $(throw "folder where to write temp and caches")
 )
 
 Remove-Module *
