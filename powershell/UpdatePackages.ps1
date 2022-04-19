@@ -565,7 +565,6 @@ param(
                 Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
                 [DateTime]$lastCommitDate = Get-GetLastCommitDate -repoPath $repoFolder
                 [DateTime]$now = [DateTime]::UtcNow                                    
-                $now = [DateTime]::UtcNow
                 
                 [TimeSpan]$durationTimeSpan = ($now - $lastCommitDate)
                 $duration = $durationTimeSpan.TotalHours
