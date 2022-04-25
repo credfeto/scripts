@@ -11,12 +11,12 @@ function error_exit {
 
 while [[ $# -gt 0 ]]; do
   SOURCE="$1"
-  OUTPUT="$SOURCE.avi"
+  OUTPUT="$SOURCE.mov"
 
   shift # past argument
   
   # -qscale 1    - is ambiguous
-  ffmpeg -i "$SOURCE" -vcodec mjpeg -acodec aac -f avi "$OUTPUT"
+  ffmpeg -i "$SOURCE" -vcodec mjpeg -acodec pcm_s16le -f mov "$OUTPUT"
 
 done
 
