@@ -119,6 +119,8 @@ param(
     [Boolean]$exactMatch
     )
 
+    dotnet tool restore
+
     Write-Information "Updating Package Exact"
     $results = dotnet updatepackages -folder $repoFolder -packageId $packageId
     if ($?)
@@ -148,6 +150,8 @@ param(
     [String]$repoFolder = $(throw "checkForUpdatesPrefix: repoFolder not specified"),
     [String]$packageId = $(throw "checkForUpdatesPrefix: packageId not specified")
     )
+
+    dotnet tool restore
 
     Write-Information "Updating Package Prefix"
     $results = dotnet updatepackages -folder $repoFolder -packageprefix $packageId 
