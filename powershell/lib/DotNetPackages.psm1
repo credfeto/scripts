@@ -19,7 +19,6 @@ function DotNetPackages-Get {
 param (
     [string]$srcFolder
 )
-    Write-Host "World"
     $packages = @()
 
     $projects = Get-ChildItem -Path $srcFolder -Filter *.csproj -Recurse
