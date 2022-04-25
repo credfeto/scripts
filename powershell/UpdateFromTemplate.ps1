@@ -939,6 +939,9 @@ param(
 
 #########################################################################
 
+Set-Location -Path $root
+Write-Information "Root Folder: $root"
+
 [bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
 
 if($installed -eq $false) {

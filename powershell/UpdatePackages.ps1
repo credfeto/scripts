@@ -656,6 +656,13 @@ param(
 
 #########################################################################
 
+Write-Information ""
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information ""
+
+Set-Location -Path $root
+Write-Information "Root Folder: $root"
 
 [bool]$installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
 
@@ -700,8 +707,6 @@ ForEach($repo in $repoList) {
 
     processRepo -repo $repo -packages $packages -baseFolder $root
 }
-
-Set-Location -Path $root
 
 Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
 

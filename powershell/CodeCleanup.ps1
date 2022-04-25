@@ -314,6 +314,9 @@ param(
 
 #########################################################################
 
+Set-Location -Path $root
+Write-Information "Root Folder: $root"
+
 $installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
 
 if($installed -eq $false) {
@@ -336,8 +339,6 @@ Write-Information "*************************************************************
 Write-Information ""
 Write-Information "Root: $root"
 Write-Information "Workspace Cache: $tempFolder"
-
-Set-Location -Path $root   
 
 ForEach($repo in $repoList) {
     if($repo.Trim() -eq "") {
