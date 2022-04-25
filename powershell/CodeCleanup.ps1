@@ -321,6 +321,13 @@ if($installed -eq $false) {
 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
 }
 
+Write-Information ""
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information ""
+
+dotnet tool restore
+
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
 
 Write-Information ""
