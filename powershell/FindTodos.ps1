@@ -22,7 +22,8 @@ function WriteProgress {
 param([string]$message)
     $tc = InTeamCity 
     if($tc) {
-        Write-Information "##teamcity[progressMessage '$message']"
+        $cleanMessage = $message.Replace("[", "|[").Replace("]", "|]").Replace("'", "|'").Trim()
+        Write-Information "##teamcity[progressMessage '$cleanMessage']"
     }
     else {
         Write-Information $message
