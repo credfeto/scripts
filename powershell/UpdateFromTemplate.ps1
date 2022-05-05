@@ -813,14 +813,14 @@ param (
     $obsoleteWorkflows = @(
         "cc.yml",
         "codacy-analysis.yml",
+        "dependabot-auto-merge.yml",
         "linter.yml",
         "rebase.yml",
         "sqlcheck.yml",
-        "tabtospace.yml",
-        "dependabot-auto-merge.yml"
+        "tabtospace.yml"                
     )
     ForEach ($file in $files) {
-        ForEach ($workflow in $targetWorkflows) {
+        ForEach ($workflow in $obsoleteWorkflows) {
             If ($file.Name -eq $workflow) {
                 Remove-Item -Path $file.FullName
                 break 
