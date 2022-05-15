@@ -326,10 +326,24 @@ param (
     if($sourceRepo -eq $targetRepo) {
         throw "updateResharperSettings: Source Repo and Target Repos are both set to $sourceRepo"
     }
-
-    [string]$sourceTemplateFile = convertToOsPath -path "src\FunFair.Template.sln.DotSettings"
-
-    [string]$sourceFileName = makePath -Path $sourceRepo -ChildPath $sourceTemplateFile
+    
+    [string]$srcFolder = makePath -Path $sourceRepo -ChildPath "src"
+    
+    $search = Get-ChildItem -Path $srcFolder -Filter *.sln
+    if(!$search) {
+        # no solutions
+        return;
+    } 
+    
+    [string]$solution = $search[0].FullName
+    
+    [string]$sourceFileName = "$solution.DotSettings"
+    $sourceTemplateExists = Test-Path -Path $sourceFileName
+    if(!$sourceTemplateExists) {
+        Write-Information "ERROR: $sourceFileName does not exist"
+        return
+    }  
+    
     $files = Get-ChildItem -Path $targetRepo -Filter *.sln -Recurse
     ForEach($file in $files) {
         [string]$targetFileName = $file.FullName
