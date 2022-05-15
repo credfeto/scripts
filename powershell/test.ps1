@@ -143,3 +143,4 @@ $branch = Git-GetDefaultBranch -repoPath '~/work/funfair/funfair-ethereum-proxy-
 Write-Host "Default Branch: $branch"
 
 XmlDoc_RemoveComments -sourceFolder "~/work/personal/notification-bot/src"
+XmlDoc_DisableDocComment -sourceFolder "~/work/personal/notification-bot/src"

@@ -3,7 +3,7 @@ param (
     [string] $sourceFolder = $(throw "XmlDoc_RemoveComments: sourceFolder not specified")
     )
     
-    Write-Information "* Changing Removing XmlDoc Comments"
+    Write-Information "* Removing XmlDoc Comments from C# files"
     Write-Information "  - Folder: $sourceFolder"
 
     [bool]$changed = $false
@@ -48,5 +48,93 @@ param (
     return $changed
 }
 
+function XmlDoc_DisableDocCommentForProject {
+    param (
+        [string] $projectPath = $(throw "XmlDoc_DisableDocCommentForProject: projectPath not specified")
+        )
+        
+    [string[]]$warningsToRemove = @("1591", "CS1591")
+        
+    Write-Information "* $fileName"
+    $data = [xml](Get-Content $projectPath)
+          
+    [bool]$projectChanged = $false
+    $propertyGroups = $data.SelectNodes("/Project/PropertyGroup")
+    ForEach($propertyGroup in $propertyGroups) {
+        $docNode = $propertyGroup.SelectSingleNode("DocumentationFile")
+        if($docNode) {
+            $propertyGroup.RemoveChild($docNode)
+            $projectChanged = $true
+            Write-information "   - Removed DocumentationFile"
+        }
+    }
+  
+    if($projectChanged) { 
+        ForEach($propertyGroup in $propertyGroups) {
+            $noWarning = $propertyGroup.SelectSingleNode("NoWarn")
+            if($noWarning) {
+                [string]$noWarnText = $noWarning.InnerText
+                if($noWarnText) {
+                    [string[]]$warnings = $noWarnText.Split(",")
+                    [string[]]$filteredWarnings = $warnings | where { $_ -notin $warningsToRemove }
+                    [string]$noWarnTextUpdated = $filteredWarnings -Join ","
+                    
+                    if($noWarnText -ne $noWarnTextUpdated) {
+                        if($noWarnTextUpdated.length -eq 0) {
+                            $noWarningParent = $noWarning.ParentNode
+                            [void]$noWarningParent.RemoveChild($noWarning)
+                            $newNoWarning = $data.CreateNode("element", "NoWarn", "")
+                            [void]$noWarningParent.AppendChild($newNoWarning) 
+                            
+                        } else {
+                            $noWarning.InnerText = $noWarnTextUpdated
+                        }                        
+                        $projectChanged = $true
+                        Write-Information "   - Updated NoWarn"
+                        [bool]$projectChanged = $true
+                    }
+                }
+            }   
+        }
+    }
+  
+    if($projectChanged) {
+        $xws = new-object System.Xml.XmlWriterSettings
+        $xws.Indent = $true
+        $xws.IndentChars = "  "
+        $xws.NewLineOnAttributes = $false
+        $xws.OmitXmlDeclaration = $true
+        $xws.Encoding = new-object System.Text.UTF8Encoding($false)
+      
+        $data.Save([Xml.XmlWriter]::Create($projectPath, $xws))
+    }
+  
+    return $projectChanged      
+}  
+
+function XmlDoc_DisableDocComment {
+param (
+        [string] $sourceFolder = $(throw "XmlDoc_DisableDocComment: sourceFolder not specified")
+    )
+    
+    Write-Information "* Removing XmlDoc Comments from C# projects"
+    Write-Information "  - Folder: $sourceFolder"
+
+    [bool]$changed = $false
+    $files = Get-ChildItem -Path $sourceFolder -Filter "*.csproj" -Recurse
+    ForEach($file in $files) {
+        [string]$fileName = $file.FullName
+
+        
+        $projectChanged = XmlDoc_DisableDocCommentForProject -projectPath $fileName
+        if($projectChanged) {
+            $changed = $true
+        }
+    }
+    
+    return $changed
+}
+
 
 Export-ModuleMember -Function XmlDoc_RemoveComments
+Export-ModuleMember -Function XmlDoc_DisableDocComment
