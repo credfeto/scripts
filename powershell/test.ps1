@@ -42,6 +42,14 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: Labeler"
 }
 
+try {
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "XmlDoc.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error "$_"
+    Throw "Error while loading supporting PowerShell Scripts: XmlDoc"
+}
+
 
 #[bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
 #Write-Host "Installed: $installed"
@@ -133,3 +141,5 @@ catch {
 
 $branch = Git-GetDefaultBranch -repoPath '~/work/funfair/funfair-ethereum-proxy-server'
 Write-Host "Default Branch: $branch"
+
+XmlDoc_RemoveComments -sourceFolder "~/work/personal/notification-bot/src"
