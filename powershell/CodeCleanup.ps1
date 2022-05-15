@@ -87,12 +87,22 @@ catch {
     Write-Error "$_"
     Throw "Error while loading supporting PowerShell Scripts: ProjectCleanup" 
 }
+
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "XmlDoc.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error "$_"
+    Throw "Error while loading supporting PowerShell Scripts: XmlDoc" 
+}
 #endregion
 
 function runCodeCleanup {
 param(
     [string]$solutionFile = $(throw "runCodeCleanup: solutionFile not specified"),
-    [string]$workspaceCache = $(throw "runCodeCleanup: workspaceCache not specified")
+    [string]$workspaceCache = $(throw "runCodeCleanup: workspaceCache not specified"),
+    [bool]$removeXmlDoc
     )
 
     $sourceFolder = Split-Path -Path $solutionFile -Parent
@@ -108,6 +118,19 @@ param(
     if(!$buildOk) {
         Write-Information ">>>>> Build Failed! [From clean checkin]"
         return $null
+    }
+    
+    if($removeXmlDoc) {
+        $xmlDocCommentsRemoved = XmlDoc_RemoveComments -sourceFolder $sourceFolder
+        $xmlDocCommentsSettingsChanged = XmlDoc_DisableDocComment -sourceFolder $sourceFolder
+        if($xmlDocCommentsRemoved -Or $xmlDocCommentsSettingsChanged) {
+            Write-Information "* Building after removing xml doc comments"
+            $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
+            if(!$buildOk) {
+                Write-Information ">>>>> Build Failed! [From xmldoc removal]"
+                return $false
+            }            
+        }
     }
 
     $changed = Resharper_ConvertSuppressionCommentToSuppressMessage -sourceFolder $sourceFolder
@@ -213,6 +236,8 @@ param(
     Set-Location -Path $root
     
     Write-Information "Processing Repo: $repo"
+    
+    $removeXmlDoc = !$repo.Contains("funfair")
 
     # Extract the folder from the repo name
     $folder = Git-GetFolderForRepo -repo $repo
@@ -253,7 +278,7 @@ param(
             $branchExists = Git-DoesBranchExist -repoPath $repoFolder -branchName $branchName
             if($branchExists -ne $true) {
 
-                $cleaned = runCodeCleanup -solutionFile $solution.FullName -workspaceCache $workspaceCache
+                $cleaned = runCodeCleanup -solutionFile $solution.FullName -workspaceCache $workspaceCache -removeXmlDoc $removeXmlDoc
                 if($cleaned -eq $null) {
                     Git-ResetToMaster -repoPath $repoFolder
                     continue
