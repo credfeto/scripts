@@ -164,10 +164,10 @@ param (
     [bool]$srcExists = Test-Path -Path $sourceFileName
     [bool]$trgExists = Test-Path -Path $targetFileName
 
-    if($srcExists -eq $true) {
+    if($srcExists) {
         
-        [bool]$copy = $true
-        if($trgExists -eq $true) {
+        [bool]$update = $false
+        if($trgExists) {
             Write-Information "--- Files exist - checking hash"
             $srcHash = Get-FileHash -Path $sourceFileName -Algorithm SHA512
             $trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
@@ -176,18 +176,26 @@ param (
             Write-Information " --- TRG: $( $trgHash.Hash )"
         
             if($srcHash -eq $trgHash) {
-                $copy = $false;
+                $update = $false
                 Write-Information "--- Identical $sourceFileName to $targetFileName"
             }
+            else {
+                Write-Information "--- Different $sourceFileName to $targetFileName"
+                $update = $true
+            }
+        }
+        else {
+            Write-Information "--- Target file does not exist - copying $sourceFileName to $targetFileName"
+            $update = $true
         }
                       
-        if($copy -eq $true) {
+        if($update) {
             Write-Information "--- Copy $sourceFileName to $targetFileName"
             Copy-Item $sourceFileName -Destination $targetFileName -Force
             return $true
         }
     }
-    elseif($trgExists -eq $true) {
+    elseif($trgExists) {
         Write-Information "--- Delete"
         #Remove-Item -Path $targetFileName
 
