@@ -361,7 +361,7 @@ param (
 
         Write-Information "Update $targetFileName"
         [bool]$ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
-        if($ret -ne $null) {
+        if($ret) {
             doCommit -repoPath $targetRepo -fileName $fileNameForCommit
             Git-Push -repoPath $targetRepo
         }
