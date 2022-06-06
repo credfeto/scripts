@@ -79,8 +79,6 @@ function CheckTodos {
     [string]$regexResharper = "//\s+ReSharper\s+disable\s+once\s+"
     [string]$regexTodo = "(?i://\s+TODO\s+)"
     [string]$regexSuppressTodo = "\[SuppressMessage\((category:)?\s+""(.*)?"",\s+(checkId:\s+)?""(.*)?"",\s+Justification\s+=\s+""TODO:(.*)?""\)\]"
-    Write-Information $regexSuppressTodo
-
     
     ForEach($file in $files) {
         [string]$fileName = $file.FullName
