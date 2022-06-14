@@ -17,7 +17,7 @@ function BuildVersion-GetNextPatch {
         Write-Information $line
     }
 
-    $match = select-string "Version:\s(\d+\.\d+\.\d+)\.\d+\-master" -InputObject $result
+    $match = select-string "Version:\s(\d+\.\d+\.\d+)\.\d+\-[master|main]" -InputObject $result
     if($match) {
         [string]$version = $match.Matches.Groups[1].Value
         Write-Information "Found Release Branch ($version)"
