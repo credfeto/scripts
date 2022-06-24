@@ -46,6 +46,7 @@ function dotNetDependabotTemplate {
   - dependency-name: ""Microsoft.VisualStudio.Threading.Analyzers""
   - dependency-name: ""NBitcoin""
   - dependency-name: ""Newtonsoft.Json""
+  - dependency-name: ""Npgsql""
   - dependency-name: ""NSubstitute""
   - dependency-name: ""NSubstitute.Analyzers.CSharp""
   - dependency-name: ""Nullable.Extended.Analyzer""
