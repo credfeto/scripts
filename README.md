@@ -10,5 +10,5 @@ Helper/Setup/Template scripts for working with git.
 
 # Ethereum
 
-Helper/Setup/Template scrips for working with Ethereum/Ethereum clients
+Helper/Setup/Template scripts for working with Ethereum/Ethereum clients
 
