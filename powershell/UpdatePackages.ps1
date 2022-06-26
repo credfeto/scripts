@@ -14,8 +14,8 @@ $ErrorActionPreference = "Stop"
 [string]$packageIdToInstall = "Credfeto.Package.Update"
 [bool]$preRelease = $False
 [int]$autoReleasePendingPackages = 3
-[double]$minimumHoursBeforeAutoRelease = 8
-[double]$inactivityHoursBeforeAutoRelease = 3 * $minimumHoursBeforeAutoRelease
+[double]$minimumHoursBeforeAutoRelease = 4
+[double]$inactivityHoursBeforeAutoRelease = 2 * $minimumHoursBeforeAutoRelease
  
 # Ensure $root is set to a valid path
 $workDir = Resolve-Path -path $work
