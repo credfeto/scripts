@@ -4,7 +4,7 @@
 
 
 * ``install-mssql`` -> installs latest MSSQL as a docker instance
-* ``createdb`` -> creates a named database
+* ``createmssqldb`` -> creates a named database
 * ``updatedb`` -> runs Redgate sqlcompare in docker and populates the database [1]
 * ``extractdb`` -> runs Redgate sqlcompare in docker extracts the database to files [1]
 * ``dbappsettings`` -> creates\updates appsettings-local.json in each project with the connection string to the DB
