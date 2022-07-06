@@ -14,8 +14,10 @@
 These scripts use the following files:
 * ``~/.database`` - file containing properties for talking to mssql
 
+```
 SERVER=localhost
 USER=sa
 PASSWORD=NotTellingYou!
+```
 
 ``Repo/.database`` => file containing the DatabaseName for synchronising
