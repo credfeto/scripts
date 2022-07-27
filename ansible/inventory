@@ -13,20 +13,20 @@ novichok-miner1.funfair.io
 novichok-miner2.funfair.io
 
 [DevEthereum]
-ec2-34-245-164-118.eu-west-1.compute.amazonaws.com
-ec2-3-250-163-6.eu-west-1.compute.amazonaws.com
+1.ethereum.dev.vpc.funfair.io
+2.ethereum.dev.vpc.funfair.io
 
 [DevWeb]
-ec2-54-170-99-138.eu-west-1.compute.amazonaws.com
-ec2-3-250-100-167.eu-west-1.compute.amazonaws.com
+1.web.dev.vpc.funfair.io
+1.web.dev.vpc.funfair.io
 
 [StagingEthereum]
-ec2-63-33-201-105.eu-west-1.compute.amazonaws.com
-ec2-34-242-4-50.eu-west-1.compute.amazonaws.com
+1.ethereum.staging.vpc.funfair.io
+2.ethereum.staging.vpc.funfair.io
 
 [StagingWeb]
-ec2-54-170-51-196.eu-west-1.compute.amazonaws.com
-ec2-54-78-145-73.eu-west-1.compute.amazonaws.com
+1.web.staging.vpc.funfair.io
+1.web.staging.vpc.funfair.io
 
 [build:vars]
 ansible_user=markr
@@ -42,25 +42,25 @@ ansible_become=yes
 #ansible_become_method=sudo
 ansible_ssh_pipelining=True
 
-[dev-ethereum:vars]
+[DevEthereum:vars]
 ansible_user=ubuntu
 ansible_become=yes
 #ansible_become_method=sudo
 ansible_ssh_pipelining=True
 
-[dev-web:vars]
+[DevWeb:vars]
 ansible_user=ubuntu
 ansible_become=yes
 #ansible_become_method=sudo
 ansible_ssh_pipelining=True
 
-[staging-ethereum:vars]
+[StagingEthereum:vars]
 ansible_user=ubuntu
 ansible_become=yes
 #ansible_become_method=sudo
 ansible_ssh_pipelining=True
 
-[staging-web:vars]
+[StagingWeb:vars]
 ansible_user=ubuntu
 ansible_become=yes
 #ansible_become_method=sudo
