@@ -1,30 +1,30 @@
 [build]
 arch-ryzen9.lan
 
-[deploy]
-ansible_user=ubuntu
-ansible_become=yes
+#[deploy]
+#ansible_user=ubuntu
+#ansible_become=yes
 #ansible_become_method=sudo
-ansible_ssh_pipelining=True
+#ansible_ssh_pipelining=True
 
 [ethereum]
 novichok-rpc.funfair.io
 novichok-miner1.funfair.io
 novichok-miner2.funfair.io
 
-[dev-ethereum]
+[DevEthereum]
 ec2-34-245-164-118.eu-west-1.compute.amazonaws.com
 ec2-3-250-163-6.eu-west-1.compute.amazonaws.com
 
-[dev-web]
+[DevWeb]
 ec2-54-170-99-138.eu-west-1.compute.amazonaws.com
 ec2-3-250-100-167.eu-west-1.compute.amazonaws.com
 
-[staging-ethereum]
+[StagingEthereum]
 ec2-63-33-201-105.eu-west-1.compute.amazonaws.com
 ec2-34-242-4-50.eu-west-1.compute.amazonaws.com
 
-[staging-web]
+[StagingWeb]
 ec2-54-170-51-196.eu-west-1.compute.amazonaws.com
 ec2-54-78-145-73.eu-west-1.compute.amazonaws.com
 
