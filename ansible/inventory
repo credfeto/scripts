@@ -18,7 +18,7 @@ novichok-miner2.funfair.io
 
 [DevWeb]
 1.web.dev.vpc.funfair.io
-1.web.dev.vpc.funfair.io
+2.web.dev.vpc.funfair.io
 
 [StagingEthereum]
 1.ethereum.staging.vpc.funfair.io
@@ -26,7 +26,7 @@ novichok-miner2.funfair.io
 
 [StagingWeb]
 1.web.staging.vpc.funfair.io
-1.web.staging.vpc.funfair.io
+2.web.staging.vpc.funfair.io
 
 [build:vars]
 ansible_user=markr
