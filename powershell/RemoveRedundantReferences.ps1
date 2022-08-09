@@ -67,6 +67,20 @@ function IsDoNotRemovePackage {
         # Has bug fix
         return $true
     }
+    
+    if($PackageId -eq "AutoBogus.NSubstitute") {
+        return $true
+    }
+
+    if($PackageId -eq "Bogus") {
+        # Has bug fix
+        return $true
+    }
+
+    if($PackageId -eq "CountryData.Bogus") {
+        # Has bug fix
+        return $true
+    }
 
     if($PackageId -eq "System.IdentityModel.Tokens.Jwt") {         
         if($allPackageIds -contains "Microsoft.AspNetCore.Authentication.JwtBearer") {
