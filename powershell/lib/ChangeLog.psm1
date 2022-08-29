@@ -69,10 +69,10 @@ param(
 #>
 function ChangeLog-RemoveEntry {
 param(
-    [string] $fileName = $(throw "ChangeLog-AddEntry: fileName not specified"), 
-    [string] $entryType = $(throw "ChangeLog-AddEntry: entryType not specified"), 
-    [string] $code = $(throw "ChangeLog-AddEntry: code not specified"), 
-    [string] $message = $(throw "ChangeLog-AddEntry: message not specified")
+    [string] $fileName = $(throw "ChangeLog-RemoveEntry: fileName not specified"), 
+    [string] $entryType = $(throw "ChangeLog-RemoveEntry: entryType not specified"), 
+    [string] $code = $(throw "ChangeLog-RemoveEntry: code not specified"), 
+    [string] $message = $(throw "ChangeLog-RemoveEntry: message not specified")
     )
     
     Write-Information ">>> Updating Changelog <<<"
