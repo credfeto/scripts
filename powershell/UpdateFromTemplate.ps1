@@ -598,6 +598,7 @@ param(
 
             Write-Information "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
             [string]$changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
+            ChangeLog-RemoveEntry -fileName $changeLogFile -entryType Changed -code "FF-3881" -message "Updated DotNet SDK to "
             ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-3881" -message "Updated DotNet SDK to $dotnetVersion"
 
             # Change branch name so its obvious its a dotnet update rather than just a change to the file
