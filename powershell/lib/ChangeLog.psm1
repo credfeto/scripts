@@ -48,6 +48,46 @@ param(
     }
 }
 
+<#
+ .Synopsis
+  Removes an entry from the [Unreleased] section of a CHANGELOG.md file.
+
+ .Description
+  Removes an entry from the [Unreleased] section of a CHANGELOG.md file
+
+ .Parameter fileName
+  The CHANGELOG.md file to update (if it doesn't exist a new one is created
+
+ .Parameter entryType
+  The type of entry to add (Added, Fixed, Changed, Removed, Deployment Changes)
+
+  .Parameter code
+  The code for the change e.g XX-1234
+
+  .Parameter message
+  The prefix for the message/description of the change to remove 
+#>
+function ChangeLog-RemoveEntry {
+param(
+    [string] $fileName = $(throw "ChangeLog-AddEntry: fileName not specified"), 
+    [string] $entryType = $(throw "ChangeLog-AddEntry: entryType not specified"), 
+    [string] $code = $(throw "ChangeLog-AddEntry: code not specified"), 
+    [string] $message = $(throw "ChangeLog-AddEntry: message not specified")
+    )
+    
+    Write-Information ">>> Updating Changelog <<<"
+
+    [string[]]$result = dotnet changelog --changelog $fileName --remove $entryType --message "$code - $message"
+    Changelog-Log -result $result
+    if($?) {
+        Write-Information "* Changelog Updated"
+    }
+    else {
+        Write-Information "* Changelog NOT Updated"
+        throw "Failed to update changelog"
+    }
+}
+
 function ChangeLog-CreateRelease {
     param(
         [string] $fileName = $(throw "ChangeLog-CreateRelease: fileName not specified"),
@@ -97,5 +137,6 @@ function ChangeLog-GetUnreleased {
 
 
 Export-ModuleMember -Function ChangeLog-AddEntry
+Export-ModuleMember -Function ChangeLog-RemoveEntry
 Export-ModuleMember -Function ChangeLog-CreateRelease
 Export-ModuleMember -Function ChangeLog-GetUnreleased
