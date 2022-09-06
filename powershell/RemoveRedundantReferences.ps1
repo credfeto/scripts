@@ -123,6 +123,17 @@ function IsDoNotRemovePackage {
         return $true
     }
 
+    if($PackageId -eq "Serilog") {
+        # Referenced but not in an obvious way
+        foreach($id in $allPackageIds) {
+            if($id.StartsWith("Serilog.")) {
+                return $true
+            }
+        }
+        
+        return $false
+    }
+    
     return $false
 }
 
