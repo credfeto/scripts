@@ -35,7 +35,7 @@ jobs:
         with:
           fetch-depth: 0
       - if: ${{ !endsWith(github.repository , '-template') && !startsWith(github.head_ref, 'release/') && !startsWith(github.head_ref, 'hotfix/') }}
-        uses: seferov/pr-lint-action@v1.1.2
+        uses: seferov/pr-lint-action@v1.2.0
         with:
           title-regex: '^\[FF\-\d*?\](:)?(\ )'
           error-message: 'Add Jira Ticket ID to your title'
