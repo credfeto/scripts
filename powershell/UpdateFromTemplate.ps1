@@ -810,6 +810,7 @@ param (
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitleaks.toml"
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitignore"
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitattributes"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".tsqllintrc"
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\pr-lint.yml"
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\CODEOWNERS"
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\PULL_REQUEST_TEMPLATE.md"
