@@ -1,6 +1,10 @@
 [build]
 arch-ryzen9.lan
 
+[ffBuild]
+buildagent-01.funfair.io
+buildagent-02.funfair.io
+
 #[deploy]
 #ansible_user=ubuntu
 #ansible_become=yes
@@ -35,6 +39,12 @@ ansible_become=yes
 ansible_ssh_pipelining=False
 #ansible_python_interpreter=/usr/bin/python3
 ansible_python_interpreter=auto_silent
+
+[ffBuild:vars]
+ansible_user=markr
+ansible_become=yes
+#ansible_become_method=sudo
+ansible_ssh_pipelining=True
 
 [ethereum:vars]
 ansible_user=ubuntu
