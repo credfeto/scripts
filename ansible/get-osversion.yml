@@ -1,0 +1,17 @@
+---
+  - hosts:
+      ethereum
+      build
+      DevEthereum
+      DevWeb
+      StagingEthereum
+      StagingWeb
+      ffBuild
+    remote_user: root
+
+    tasks:
+    - debug:
+        msg:
+        - "ansible_distribution {{ hostvars[inventory_hostname].ansible_distribution }}"
+        - "major version {{ hostvars[inventory_hostname].ansible_distribution_major_version }}"
+        - "version {{ hostvars[inventory_hostname].ansible_distribution_version }}"

@@ -1,0 +1,2 @@
+#! /bin/sh
+ansible-playbook get-osversion.yml -f 10 -i inventory -b
