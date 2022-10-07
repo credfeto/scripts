@@ -32,6 +32,18 @@ novichok-miner2.funfair.io
 1.web.staging.vpc.funfair.io
 2.web.staging.vpc.funfair.io
 
+[LiveEthereum]
+1.ethereum.live.vpc.funfair.io
+2.ethereum.live.vpc.funfair.io
+
+[LiveWeb]
+1.web.live.vpc.funfair.io
+2.web.live.vpc.funfair.io
+
+[LiveWallet]
+1.wallet.live.vpc.funfair.io
+2.wallet.live.vpc.funfair.io
+
 [build:vars]
 ansible_user=markr
 ansible_become=yes
@@ -71,6 +83,25 @@ ansible_become=yes
 ansible_ssh_pipelining=True
 
 [StagingWeb:vars]
+ansible_user=ubuntu
+ansible_become=yes
+#ansible_become_method=sudo
+ansible_ssh_pipelining=True
+
+
+[LiveEthereum:vars]
+ansible_user=ubuntu
+ansible_become=yes
+#ansible_become_method=sudo
+ansible_ssh_pipelining=True
+
+[LiveWeb:vars]
+ansible_user=ubuntu
+ansible_become=yes
+#ansible_become_method=sudo
+ansible_ssh_pipelining=True
+
+[LiveWallet:vars]
 ansible_user=ubuntu
 ansible_become=yes
 #ansible_become_method=sudo
