@@ -26,7 +26,7 @@ jobs:
         sudo chown -R $USER:$USER $GITHUB_WORKSPACE
         rm -fr $GITHUB_WORKSPACE/*
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v3.1.0
       with:
         fetch-depth: 1
         # token: ${{ secrets.SOURCE_PUSH_TOKEN }}
