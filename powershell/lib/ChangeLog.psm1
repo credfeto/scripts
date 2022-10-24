@@ -114,18 +114,19 @@ function ChangeLog-GetUnreleased {
 
     Write-Information ">>> Reading Changelog unreleased content <<<"
 
+    
     [string[]]$releaseNotes = dotnet changelog --changelog $fileName --un-released $release
     if($?) {
-
-        [int]$skip = 0
-        while($skip -lt $releaseNotes.Length -and !$releaseNotes[$skip].StartsWith("#"))
-        {
-            ++$skip
+        $i = 0;
+        [string[]]$rn = @()
+        foreach($line in $releaseNotes) {
+            if($i -ge 4 -and !$line.StartsWith("#")) {
+                $rn += $line
+            }
+            $i++
         }
-
-        [string[]]$releaseNotes = $releaseNotes | Select-Object -Skip $skip
-
-        return $releaseNotes
+        
+        return $rn
 
     }
     else {
