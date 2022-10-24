@@ -120,7 +120,7 @@ function ChangeLog-GetUnreleased {
         $i = 0;
         [string[]]$rn = @()
         foreach($line in $releaseNotes) {
-            if($i -ge 4 -and !$line.StartsWith("#")) {
+            if($i -ge 4) {
                 $rn += $line
             }
             $i++

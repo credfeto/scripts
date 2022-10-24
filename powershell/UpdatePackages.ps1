@@ -289,8 +289,7 @@ param(
         }
 
         $hasContent = $true
-
-        #if($line.StartsWith(" - FF-1429 - ")) {
+        
         if($line -match $expr) {            
             # Package Update
             $packageName = $matches.PackageId
@@ -309,13 +308,11 @@ param(
             continue
         }
         
-        if($line -eq "- FF-3881 - Updated DotNet SDK to 6.0.101") {
+        if($line.StartsWith("- FF-3881 - Updated DotNet SDK to ")) {
             # Dotnet version update
             $updateCount += 1000
             continue
         }
-
-        return 0
     }
 
     if($hasContent) {
