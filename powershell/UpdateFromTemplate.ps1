@@ -836,6 +836,7 @@ param (
     
     $obsoleteWorkflows = @(
         "cc.yml",
+        "check-case.yml",
         "codacy-analysis.yml",
         "dependabot-auto-merge.yml",
         "linter.yml",
