@@ -248,11 +248,11 @@ param(
 
     if ($exactMatch -eq $true)
     {
-        return checkForUpdatesExact -repoFolder $repoFolder -packageId $packageId
+        return checkForUpdatesExact -repoFolder $repoFolder -packageId $packageId -exclude $exclude
     }
     else
     {
-        return checkForUpdatesPrefix -repoFolder $repoFolder -packageId $packageId
+        return checkForUpdatesPrefix -repoFolder $repoFolder -packageId $packageId -exclude $exclude
     }
 }
 
