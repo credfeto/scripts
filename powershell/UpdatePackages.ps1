@@ -188,6 +188,10 @@ param(
             return $version
         }
     }
+    else
+    {
+        Write-Information $results
+    }
     
 
     Write-Information " * No Changes"    
@@ -232,6 +236,10 @@ param(
             Write-Information "Found: $version"
             return $version
         }
+    }
+    else
+    {
+        Write-Information $results
     }
     
     Write-Information " * No Changes"    
