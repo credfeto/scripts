@@ -112,6 +112,19 @@ catch {
 }
 #endregion
 
+function buildPackageSearch{
+    param(
+        [string]$packageId,
+        [bool]$exactMatch
+    )
+    
+    if($exactMatch) {
+        return $packageId
+    }
+    
+    return "$($packageId):prefix"
+}
+
 function buildExcludes{
 param(
     $exclude
@@ -120,12 +133,10 @@ param(
     $excludes =@()
     foreach($item in $exclude)
     {
-        if($item.'exact-match') {
-            $excludes += $item.packageId
-        }
-        else {
-            $excludes += "$($item.packageId):prefix"            
-        }        
+        [string]$packageId = $item.packageId
+        [boolean]$exactMatch = $item.'exact-match'
+        $search = buildPackageSearch -packageId $packageId -exactMatch $exactMatch         
+        $excludes += $search
     }
     
     if($excludes.Count -gt 0) {
@@ -138,6 +149,7 @@ param(
         return $null        
     }
 }
+
 
 function checkForUpdatesExact{
 param(
@@ -152,12 +164,13 @@ param(
     }
 
     Write-Information "Updating Package Exact"
+    $search = buildPackageSearch -packageId $packageId -exactMatch $True
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
-        $results = dotnet updatepackages --folder $repoFolder --package-id $packageId --exclude $excludes
+        $results = dotnet updatepackages --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
-        $results = dotnet updatepackages --folder $repoFolder --package-id $packageId
+        $results = dotnet updatepackages --folder $repoFolder --package-id $search
     }    
     if ($?)
     {
@@ -195,14 +208,14 @@ param(
     }
 
     Write-Information "Updating Package Prefix"
+    $search = buildPackageSearch -packageId $packageId -exactMatch $False
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
-        $results = dotnet updatepackages --folder $repoFolder --package-id $packageId --exclude $excludes
+        $results = dotnet updatepackages --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
-        $results = dotnet updatepackages --folder $repoFolder --package-id $packageId
+        $results = dotnet updatepackages --folder $repoFolder --package-id $search
     }
-    $results = dotnet updatepackages --folder $repoFolder --package-id "$($packageId):prefix" 
 
     if($?) {
         
