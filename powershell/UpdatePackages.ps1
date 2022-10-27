@@ -112,11 +112,38 @@ catch {
 }
 #endregion
 
+function buildExcludes{
+param(
+    $exclude
+    )
+    
+    $excludes =@()
+    foreach($item in $exclude)
+    {
+        if($item.'exact-match') {
+            $excludes += $item.packageId
+        }
+        else {
+            $excludes += "$($item.packageId):prefix"            
+        }        
+    }
+    
+    if($excludes.Count -gt 0) {
+        $excluded = $excludes -join " "
+        Write-Information "Excluding: $excluded"
+        return $excluded
+    }
+    else {
+        Write-Information "Excluding: <<None>>"
+        return $null        
+    }
+}
+
 function checkForUpdatesExact{
 param(
     [String]$repoFolder = $(throw "checkForUpdatesExact: repoFolder not specified"), 
-    [String]$packageId = $(throw "checkForUpdatesExact: packageId not specified"), 
-    [Boolean]$exactMatch
+    [String]$packageId = $(throw "checkForUpdatesExact: packageId not specified"),
+    $exclude    
     )
 
     $restore = dotnet tool restore
@@ -125,7 +152,13 @@ param(
     }
 
     Write-Information "Updating Package Exact"
-    $results = dotnet updatepackages -folder $repoFolder -packageId $packageId
+    $excludes = buildExcludes -exclude $exclude
+    if($excludes) {
+        $results = dotnet updatepackages --folder $repoFolder --package-id $packageId --exclude $excludes
+    }
+    else {
+        $results = dotnet updatepackages --folder $repoFolder --package-id $packageId
+    }    
     if ($?)
     {
 
@@ -151,7 +184,8 @@ param(
 function checkForUpdatesPrefix{
 param(
     [String]$repoFolder = $(throw "checkForUpdatesPrefix: repoFolder not specified"),
-    [String]$packageId = $(throw "checkForUpdatesPrefix: packageId not specified")
+    [String]$packageId = $(throw "checkForUpdatesPrefix: packageId not specified"),
+    $exclude
     )
 
     $restore = dotnet tool restore
@@ -160,7 +194,14 @@ param(
     }
 
     Write-Information "Updating Package Prefix"
-    $results = dotnet updatepackages -folder $repoFolder -packageprefix $packageId 
+    $excludes = buildExcludes -exclude $exclude
+    if($excludes) {
+        $results = dotnet updatepackages --folder $repoFolder --package-id $packageId --exclude $excludes
+    }
+    else {
+        $results = dotnet updatepackages --folder $repoFolder --package-id $packageId
+    }
+    $results = dotnet updatepackages --folder $repoFolder --package-id "$($packageId):prefix" 
 
     if($?) {
         
@@ -185,7 +226,8 @@ function checkForUpdates{
 param(
     [String]$repoFolder = $(throw "checkForUpdates: repoFolder not specified"),
     [String]$packageId = $(throw "checkForUpdates: packageId not specified"),
-    [Boolean]$exactMatch
+    [Boolean]$exactMatch,
+    $exclude
 )
 
     if ($exactMatch -eq $true)
@@ -361,30 +403,6 @@ param (
     return $true
 }
 
-function ShouldUpdatePackage{
-param (
-    $installed = $(throw "ShouldUpdatePackage: installed not specified"),
-    [string]$packageId = $(throw "ShouldUpdatePackage: packageId not specified"),
-    [bool]$exactMatch
-)
-    foreach($candidate in $installed) {
-        if($packageId -eq $candidate) {
-            return $true
-        }
-
-        if(!$exactMatch) {
-            $test = "$packageId.".ToLower()
-            
-            if($candidate.ToLower().StartsWith($test)) {
-                return $true
-            }
-        }
-    }
-    
-    return $false
-}
-
-
 function processRepo{
 param(
     [string]$repo = $(throw "processRepo: repo not specified"),
@@ -475,21 +493,14 @@ param(
         [string]$type = $package.type
         [bool]$exactMatch = $package.'exact-match'
         
-        [bool]$shouldUpdatePackages = ShouldUpdatePackage -installed $currentlyInstalledPackages -packageId $packageId -exactMatch $exactMatch
-
         Write-Information ""
         Write-Information "------------------------------------------------"
         Write-Information "Looking for updates of $packageId"
         Write-Information "Exact Match: $exactMatch"
         Write-Information "Package installed in solution: $shouldUpdatePackages"
         
-        if(!$shouldUpdatePackages) {
-            Write-Information "Skipping $packageId as not installed"
-            continue
-        }
-        
         [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
-        [string]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch
+        [string]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
         
         if([string]::IsNullOrEmpty($update)) {
             Write-Information "***** $repo NO UPDATES TO $packageId ******"
