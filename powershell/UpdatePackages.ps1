@@ -114,7 +114,7 @@ catch {
 
 function WriteLogs {
     param(
-    [string[]$logs
+    [string[]]$logs
     )
     
     foreach($message in $logs)
