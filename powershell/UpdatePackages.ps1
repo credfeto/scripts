@@ -112,6 +112,17 @@ catch {
 }
 #endregion
 
+function WriteLogs {
+    param(
+    [string[]$logs
+    )
+    
+    foreach($message in $logs)
+    {
+        Write-Information $message
+    }
+}
+
 function buildPackageSearch{
     param(
         [string]$packageId,
@@ -174,7 +185,7 @@ param(
     }    
     if ($?)
     {
-        Write-Information $results
+        WriteLogs -logs $results
         
         # has updates
         [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
@@ -190,9 +201,8 @@ param(
     }
     else
     {
-        Write-Information $results
+        WriteLogs -logs $results
     }
-    
 
     Write-Information " * No Changes"    
     return $null
@@ -223,7 +233,7 @@ param(
 
     if($?) {
         
-        Write-Information $results
+        WriteLogs -logs $results
         
         # has updates
         [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
@@ -239,7 +249,7 @@ param(
     }
     else
     {
-        Write-Information $results
+        WriteLogs -logs $results
     }
     
     Write-Information " * No Changes"    
