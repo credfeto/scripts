@@ -161,7 +161,8 @@ param(
     }    
     if ($?)
     {
-
+        Write-Information $results
+        
         # has updates
         [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
         [string]$regexPattern = "::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
@@ -204,6 +205,8 @@ param(
     $results = dotnet updatepackages --folder $repoFolder --package-id "$($packageId):prefix" 
 
     if($?) {
+        
+        Write-Information $results
         
         # has updates
         [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
