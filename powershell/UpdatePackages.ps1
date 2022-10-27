@@ -500,7 +500,6 @@ param(
         Write-Information "------------------------------------------------"
         Write-Information "Looking for updates of $packageId"
         Write-Information "Exact Match: $exactMatch"
-        Write-Information "Package installed in solution: $shouldUpdatePackages"
         
         [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
         [string]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
