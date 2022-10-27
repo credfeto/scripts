@@ -175,8 +175,8 @@ param(
     
     if($excludes.Count -gt 0) {
         $excluded = $excludes -join " "
-        Write-Information "Excluding: $excluded"
-        return $excluded
+        Write-Information "Excluding: $excluded"        
+        return $excludes
     }
     else {
         Write-Information "Excluding: <<None>>"
