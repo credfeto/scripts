@@ -1,5 +1,19 @@
 $env:GIT_REDIRECT_STDERR="2>&1"
 
+function IsOnRamDisk {
+    param(
+        [string]$Path
+    )
+    
+    if($IsLinux -eq $true) {
+        if($Path.StartsWith("/zram/")) {
+            return $true
+        }
+    }
+
+    return $false
+}
+
 function Git-Log {
 param(
     [string[]]$result
@@ -122,6 +136,8 @@ function Git-ResetToMaster {
 param(
         [string] $repoPath = $(throw "Git-ResetToMaster: repoPath not specified")
     )
+    
+    $repack = IsOnRamDisk -Path $repoPath
 
     [string]$upstream = "origin";
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -146,10 +162,12 @@ param(
     
     $newHead = Git-Get-HeadRev -repoPath $repoPath
     if($head -ne $newHead) {
-        # ONLY GC if head is different, i.e. something has changed    
-        & git -C $repoPath gc --aggressive --prune | Out-Null
+        if(!$repack) {
+            # ONLY GC if head is different, i.e. something has changed    
+            & git -C $repoPath gc --aggressive --prune | Out-Null
+        }
     }
-
+    
     Git-RemoveAllLocalBranches -repoPath $repoPath
     
     return $newHead
