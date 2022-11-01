@@ -3,6 +3,7 @@
 param(
     [string] $repos = $(throw "repos.lst file containing list of repositories"),
     [string] $work = $(throw "folder where to clone repositories"),
+    [string] $trackingFolder = $(throw "folder where to write tracking.json file"),
     [string] $packagesToUpdate = $(throw "Packages.json file to load")
 )
 
@@ -291,7 +292,7 @@ param(
     [bool]$codeOK = DotNet-BuildSolution -srcFolder $srcPath
     if ($codeOK -eq $true)
     {
-        Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
+        Tracking_Set -basePath $trackingFolder -repo $repo -value $currentRevision
     }
 }
 
@@ -486,7 +487,7 @@ param(
         return;
     }    
 
-    [string]$lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
+    [string]$lastRevision = Tracking_Get -basePath $trackingFolder -repo $repo
     [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
 
     Write-Information "Last Revision:    $lastRevision"
@@ -507,7 +508,7 @@ param(
         {
             # Update last successful revision
             [string]$lastRevision = $currentRevision
-            Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
+            Tracking_Set -basePath $trackingFolder -repo $repo -value $currentRevision
         }
     }
 
@@ -564,7 +565,7 @@ param(
                 # Just built, committed and pushed so get the the revisions 
                 [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
                 [string]$lastRevision = $currentRevision
-                Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
+                Tracking_Set -basePath $trackingFolder -repo $repo -value $currentRevision
 
                 Write-Information "Last Revision:    $lastRevision"
                 Write-Information "Current Revision: $currentRevision"

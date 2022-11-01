@@ -3,6 +3,7 @@
 param(
     [string] $repos = $(throw "repos.lst file containing list of repositories"),
     [string] $work = $(throw "folder where to clone repositories"),
+    [string] $trackingFolder = $(throw "folder where to write tracking.json file"),
     [string] $tempFolder = $(throw "folder where to write temp and caches")
 )
 
@@ -250,7 +251,7 @@ param(
 
     Set-Location -Path $repoFolder
 
-    $lastRevision = Tracking_Get -basePath $root -repo $repo
+    $lastRevision = Tracking_Get -basePath $trackingFolder -repo $repo
     $currentRevision = Git-Get-HeadRev -repoPath $repoFolder 
 
     Write-Information "Last Revision:    $lastRevision"
@@ -328,7 +329,7 @@ param(
 
     if($hasCleanedSuccessFully -eq $true) {
         Write-Information "Updating Tracking for $repo to $currentRevision"
-        Tracking_Set -basePath $root -repo $repo -value $currentRevision
+        Tracking_Set -basePath $root -repo $trackingFolder -value $currentRevision
     }
 
     # Always reset to master after running the cleanup

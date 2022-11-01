@@ -3,6 +3,7 @@
 param(
     [string] $repos = $(throw "repos.lst file containing list of repositories"),
     [string] $work = $(throw "folder where to clone repositories"),
+    [string] $trackingFolder = $(throw "folder where to write tracking.json file"),
     [string] $templateRepo = $(throw "Template repo")
 )
 
@@ -752,7 +753,7 @@ param (
 
     Set-Location -Path $targetRepo
 
-    [string]$lastRevision = Tracking_Get -basePath $baseFolder -repo $repo
+    [string]$lastRevision = Tracking_Get -basePath $trackingFolder -repo $repo
     [string]$currentRevision = Git-Get-HeadRev -repoPath $targetRepo
     $currentRevision = "$scriptsHash/$templateRepoHash/$currentRevision"
 
@@ -934,7 +935,7 @@ param (
     Git-ReNormalise -repoPath $targetRepo
 
     Write-Information "Updating Tracking for $repo to $currentRevision"
-    Tracking_Set -basePath $baseFolder -repo $repo -value $currentRevision
+    Tracking_Set -basePath $trackingFolder -repo $repo -value $currentRevision
 }
 
 function processAll {
