@@ -4,6 +4,7 @@ param(
     [string] $repos = $(throw "repos.lst file containing list of repositories"),
     [string] $work = $(throw "folder where to clone repositories"),
     [string] $trackingFolder = $(throw "folder where to write tracking.json file"),
+    [string] $packageCache = $(throw "package cache file"),
     [string] $packagesToUpdate = $(throw "Packages.json file to load")
 )
 
@@ -180,10 +181,10 @@ param(
     $search = buildPackageSearch -packageId $packageId -exactMatch $True
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
-        $results = dotnet updatepackages --folder $repoFolder --package-id $search --exclude $excludes
+        $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
-        $results = dotnet updatepackages --folder $repoFolder --package-id $search
+        $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
     }    
     if ($?)
     {
@@ -227,10 +228,10 @@ param(
     $search = buildPackageSearch -packageId $packageId -exactMatch $False
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
-        $results = dotnet updatepackages --folder $repoFolder --package-id $search --exclude $excludes
+        $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
-        $results = dotnet updatepackages --folder $repoFolder --package-id $search
+        $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
     }
 
     if($?) {
