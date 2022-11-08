@@ -81,6 +81,41 @@ param(
     return [string]$null
 }
 
+function DotNet-CheckSolution {
+param(
+    [string] $srcFolder = $(throw "DotNet-CheckSolution: srcFolder not specified")
+)
+     
+    Write-Information " * Checking Solution"
+    try {
+        Set-Location -Path $srcFolder
+        
+        $solutions = Get-ChildItem -Path $srcFolder -Filter *.sln
+        if($solutions.Count -ne 1) {
+            Write-Information " * No Solution Found"
+            return $false
+        }
+        
+        $solution = $solutions[0]
+        Write-Information " * Solution Found: $($solution.FullName)"
+        
+        $result = dotnet buildcheck -Solution $solution -WarningAsErrors True
+        if(!$?) {
+            Write-Information ">>> Solution Check Failed"
+            DotNet-DumpOutput -result $result
+            return $false
+        }
+        
+        Write-Information "   - Solution Check Succeeded"
+
+        return $true
+    } catch  {
+        Write-Information ">>> Solution Check Failed"
+        return $false
+    }
+}
+
+
 function DotNet-BuildClean {
 param(
     [string] $srcFolder = $(throw "DotNet-BuildClean: srcFolder not specified")
@@ -411,6 +446,12 @@ param(
     try
     {
         Write-Information "Building Source in $srcFolder"
+        
+        [bool]$buildOk = DotNet-CheckSolution -srcFolder $srcFolder
+        Write-Information "Result $buildOk" 
+        if(!$buildOk) {
+            return $false
+        }
 
         [bool]$buildOk = DotNet-BuildClean -srcFolder $srcFolder
         Write-Information "Result $buildOk" 
