@@ -17,6 +17,33 @@ param($result)
     }
 }
 
+function getLatestReleasePackage($packageId) {
+
+	try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        Write-Information "Looking for $packageId in $standardSource"
+        $packages = Find-Package -Name $packageId -Source $standardSource -AllVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
+        if($packages) {
+        
+            foreach($package in $packages) {
+                Write-Information "* Found $packageId version $($package.Version)"
+            }
+            
+			[string]$foundVersion = $packages[0].Version
+			Write-Information "* Found $foundVersion"
+            return $foundVersion
+        }
+
+		Write-Information "- Not Found"
+        return $null
+	}
+	catch {
+		Write-Information "# Not Found - Error"
+		return $null
+	}
+}
+
+
 function getLatestPreReleasePackage($packageId) {
 
 	try {
@@ -24,6 +51,15 @@ function getLatestPreReleasePackage($packageId) {
         Write-Information "Looking for $packageId in $standardSource"
         $packages = Find-Package -Name $packageId -Source $standardSource -AllowPrereleaseVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
         if($packages) {
+            foreach($package in $packages) {
+                $version = $package.Version
+                Write-Information "* Found $packageId version $version"
+                if $version -lt "100.0.0.0" {
+                    Write-Information "* Found $packageId version $version"
+                    return $version
+                }
+            }
+                    
 			[string]$foundVersion = $packages[0].Version
 			Write-Information "* Found $foundVersion"
             return $foundVersion
@@ -148,7 +184,21 @@ param(
 			return [bool]$installed
         }
     }
+    
+    if($packageId -eq "funfair.buildcheck") {
+        Write-Information "Installing latest version of $packageId"
+        $latestReleaseVersion = getLatestReleasePackage -packageId $packageId
 
+        $result = dotnet tool install --local $packageId --version $latestReleaseVersion
+        if(!$?) {
+            DotNetTool-Error -result $result
+            return $false
+        }
+        
+        [bool]$installed = isInstalled -packageId $packageId
+        return [bool]$installed
+    }
+        
     # Install released version
     Write-Information "Installing latest release version of $packageId"
     $result = dotnet tool install --local $packageId

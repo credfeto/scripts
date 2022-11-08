@@ -60,9 +60,12 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: XmlDoc"
 }
 
-$ret = GlobalJson_Update -sourceFileName '/home/markr/work/funfair/funfair-build-check/src/global.json' -targetFileName '/home/markr/work/funfair/BuildBot/src/global.json'
+#$ret = GlobalJson_Update -sourceFileName '/home/markr/work/funfair/funfair-build-check/src/global.json' -targetFileName '/home/markr/work/funfair/BuildBot/src/global.json'
+#Write-Host $ret
 
-Write-Host $ret
+DotNetTool-Install -packageId 'FunFair.BuildCheck' -preReleaseVersion $false
+
+
 
 #[bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
 #Write-Host "Installed: $installed"
