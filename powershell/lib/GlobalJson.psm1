@@ -103,20 +103,17 @@ function GlobalJson_Update
     Write-Information "Source Version: $sourceVersion"
     Write-Information "Target Version: $targetVersion"
     
-    if($targetVersion.Contains("-")) {
-        if(!$sourceVersion.Contains("-")) {
-            # target is a preview version, but source is release
-            if($sourceVersion.StartsWith($targetVersion)) {
-                Write-Information "* target global.json is a pre-release version of the GA release in source ($targetVersion ==> $sourceVersion)"
-                
-                return [pscustomobject]@{
-                    Update = $true
-                    UpdatingVersion = $true
-                    NewVersion = $sourceVersion
-                }
-            }
+    if($targetVersion.Contains("-") -and !$sourceVersion.Contains("-") -and $targetVersion.StartsWith($sourceVersion)) {
+        # target is a preview version, but source is release
+        
+        Write-Information "* target global.json is a pre-release version of the GA release in source ($targetVersion ==> $sourceVersion)"       
+        return [pscustomobject]@{
+            Update = $true
+            UpdatingVersion = $true
+            NewVersion = $sourceVersion
         }
     }
+    
     
     if ($targetVersion -gt $sourceVersion) {
         Write-Information "* Target global.json specifies a newer version of .net ($targetVersion > $sourceVersion)"

@@ -42,6 +42,16 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: Labeler"
 }
 
+try
+{
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GlobalJson.psm1") -Force -DisableNameChecking
+}
+catch
+{
+    Write-Error "$_"
+    Throw "Error while loading supporting PowerShell Scripts: GlobalJson"
+}
+
 try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "XmlDoc.psm1") -Force -DisableNameChecking
 }
@@ -50,6 +60,9 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: XmlDoc"
 }
 
+$ret = GlobalJson_Update -sourceFileName '/home/markr/work/funfair/funfair-build-check/src/global.json' -targetFileName '/home/markr/work/funfair/BuildBot/src/global.json'
+
+Write-Host $ret
 
 #[bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
 #Write-Host "Installed: $installed"
@@ -145,63 +158,63 @@ catch {
 # XmlDoc_RemoveComments -sourceFolder "~/work/personal/notification-bot/src"
 # XmlDoc_DisableDocComment -sourceFolder "~/work/personal/notification-bot/src"
 
-function buildPackageSearch{
-    param(
-        [string]$packageId,
-        [bool]$exactMatch
-    )
-    
-    if($exactMatch) {
-        return $packageId
-    }
-    
-    return "$($packageId):prefix"
-}
-
-function buildExcludes{
-param(
-    $exclude
-    )
-    
-    $excludes =@()
-    foreach($item in $exclude)
-    {
-        [string]$packageId = $item.packageId
-        [boolean]$exactMatch = $item.'exact-match'
-        $search = buildPackageSearch -packageId $packageId -exactMatch $exactMatch         
-        $excludes += $search
-                
-    }
-    
-    if($excludes.Count -gt 0) {
-        $excluded = $excludes -join " "
-        Write-Information "Excluding: $excluded"        
-        return $excludes
-    }
-    else {
-        Write-Information "Excluding: <<None>>"
-        return $null        
-    }
-}
-
-
-$packages = Get-Content -Path "~/work/personal/auto-update-config/packages.json" -Raw | ConvertFrom-Json
-Write-Host $packages 
-
-foreach($package in $packages) {
-    
-    if($package.packageId -eq "FunFair.Ethereum") {
-        Write-Host "* $($package.packageId)"
-        Write-Host "  --> Found"
-        
-        foreach($exclusion in $package.exclude) {
-            Write-Host "  --> Exclusion: $($exclusion.packageId)"
-        }
-        
-        $excluded = buildExcludes -exclude $package.exclude
-        Write-Host "  *--> Exclusion: $excluded"
-        
-        $search = buildPackageSearch -packageId $package.packageId -exactMatch $package.'exact-match'
-        dotnet updatepackages --package-id $search --folder /home/markr/work/funfair/funfair-ethereum-gas-server/src --source https://funfair.myget.org/F/internal/auth/071ea13d-90dd-4b3d-a2be-6133beba5d05/api/v3/index.json --exclude $excluded
-    }
-}
+# function buildPackageSearch{
+#     param(
+#         [string]$packageId,
+#         [bool]$exactMatch
+#     )
+#     
+#     if($exactMatch) {
+#         return $packageId
+#     }
+#     
+#     return "$($packageId):prefix"
+# }
+# 
+# function buildExcludes{
+# param(
+#     $exclude
+#     )
+#     
+#     $excludes =@()
+#     foreach($item in $exclude)
+#     {
+#         [string]$packageId = $item.packageId
+#         [boolean]$exactMatch = $item.'exact-match'
+#         $search = buildPackageSearch -packageId $packageId -exactMatch $exactMatch         
+#         $excludes += $search
+#                 
+#     }
+#     
+#     if($excludes.Count -gt 0) {
+#         $excluded = $excludes -join " "
+#         Write-Information "Excluding: $excluded"        
+#         return $excludes
+#     }
+#     else {
+#         Write-Information "Excluding: <<None>>"
+#         return $null        
+#     }
+# }
+# 
+# 
+# $packages = Get-Content -Path "~/work/personal/auto-update-config/packages.json" -Raw | ConvertFrom-Json
+# Write-Host $packages 
+# 
+# foreach($package in $packages) {
+#     
+#     if($package.packageId -eq "FunFair.Ethereum") {
+#         Write-Host "* $($package.packageId)"
+#         Write-Host "  --> Found"
+#         
+#         foreach($exclusion in $package.exclude) {
+#             Write-Host "  --> Exclusion: $($exclusion.packageId)"
+#         }
+#         
+#         $excluded = buildExcludes -exclude $package.exclude
+#         Write-Host "  *--> Exclusion: $excluded"
+#         
+#         $search = buildPackageSearch -packageId $package.packageId -exactMatch $package.'exact-match'
+#         dotnet updatepackages --package-id $search --folder /home/markr/work/funfair/funfair-ethereum-gas-server/src --source https://funfair.myget.org/F/internal/auth/071ea13d-90dd-4b3d-a2be-6133beba5d05/api/v3/index.json --exclude $excluded
+#     }
+# }
