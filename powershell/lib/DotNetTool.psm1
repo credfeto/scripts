@@ -26,7 +26,12 @@ function getLatestReleasePackage($packageId) {
         if($packages) {
         
             foreach($package in $packages) {
-                Write-Information "* Found $packageId version $($package.Version)"
+                $version = $package.Version
+                Write-Information "* Found $packageId version $version"
+                if($version -lt "100.0.0.0") {
+                    Write-Information "* Found $packageId version $version"
+                    return $version
+                }
             }
             
 			[string]$foundVersion = $packages[0].Version
@@ -54,7 +59,7 @@ function getLatestPreReleasePackage($packageId) {
             foreach($package in $packages) {
                 $version = $package.Version
                 Write-Information "* Found $packageId version $version"
-                if $version -lt "100.0.0.0" {
+                if($version -lt "100.0.0.0") {
                     Write-Information "* Found $packageId version $version"
                     return $version
                 }
