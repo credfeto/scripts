@@ -19,6 +19,7 @@ function dotNetDependabotTemplate {
   - dependency-name: ""AWSSDK.*""
   - dependency-name: ""codecracker.CSharp""
   - dependency-name: ""Coverlet.*""
+  - dependency-name: ""Credfeto.*""
   - dependency-name: ""FunFair.*""
   - dependency-name: ""Microsoft.AspNetCore.*""
   - dependency-name: ""Microsoft.CodeAnalysis.*""
