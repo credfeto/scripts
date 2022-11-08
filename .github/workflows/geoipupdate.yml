@@ -36,7 +36,7 @@ jobs:
     - run: geoipupdate --config-file GeoIP.conf --database-directory geoip
     - name: Update changelog if changes occured
       run: git diff -s --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
-    - uses: stefanzweifel/git-auto-commit-action@v4
+    - uses: stefanzweifel/git-auto-commit-action@v4.15.4
       with:
         commit_message: "[FF-368] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
         file_pattern: "*.mmdb CHANGELOG.md"
