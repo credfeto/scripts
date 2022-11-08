@@ -96,8 +96,8 @@ param(
             return $false
         }
         
-        $solution = $solutions[0]
-        Write-Information " * Solution Found: $($solution.FullName)"
+        $solution = $solutions[0].FullName
+        Write-Information " * Solution Found: $solution"
         
         $result = dotnet buildcheck -Solution $solution -WarningAsErrors True
         if(!$?) {
