@@ -107,6 +107,10 @@ function GlobalJson_Update
         # target is a preview version, but source is release
         
         Write-Information "* target global.json is a pre-release version of the GA release in source ($targetVersion ==> $sourceVersion)"       
+
+        $reformatted = ReformatJsonForSaving -source $srcContent 
+        Set-Content -Path $targetFileName -Value $reformatted 
+
         return [pscustomobject]@{
             Update = $true
             UpdatingVersion = $true
