@@ -567,6 +567,12 @@ param(
             continue
         }
         
+        [boolean]$okBefore = DotNet-CheckSolution -srcFolder $srcPath
+        if(!$okBefore) {
+            Write-Information "Skipping $packageId as solution is not in a good state"
+            continue
+        }
+        
         [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
         [string]$update = checkForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
         
@@ -581,6 +587,12 @@ param(
 
         Write-Information "***** $repo FOUND UPDATE TO $packageId for $update ******"
         
+        [boolean]$okAfter = DotNet-CheckSolution -srcFolder $srcPath
+        if(!$okAfter) {
+            Write-Information "Skipping $packageId as solution is not in a good state after update attempt (probable mismatch of packages)"
+            continue
+        }
+                
         $packagesUpdated += 1
         [string]$branchName = "$branchPrefix$update"
         [bool]$branchExists = Git-DoesBranchExist -branchName $branchName  -repoPath $repoFolder

@@ -521,6 +521,7 @@ param(
     
 }
 
+Export-ModuleMember -Function DotNet-CheckSolution
 Export-ModuleMember -Function DotNet-BuildSolution
 Export-ModuleMember -Function DotNet-HasPackable
 Export-ModuleMember -Function DotNet-HasPublishableExe
