@@ -99,7 +99,7 @@ param(
         $solution = $solutions[0].FullName
         Write-Information " * Solution Found: $solution"
         
-        $result = dotnet buildcheck -Solution $solution -WarningAsErrors True
+        $result = dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild
         if(!$?) {
             Write-Information ">>> Solution Check Failed"
             DotNet-DumpOutput -result $result
