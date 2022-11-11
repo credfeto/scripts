@@ -16,10 +16,12 @@ trap "error_exit 'Received signal SIGTERM'" SIGTERM
 shopt -s expand_aliases
 alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
 
+BASEDIR=$(dirname "$(readlink -f "$0")")
+echo "Script Dir: $BASEDIR"
 SERVER=
 DB=
 
-source dbenv 
+source $BASEDIR/dbenv 
 
 [ -z "$SERVER" ] && die "--server not specified"
 [ -z "$DB" ] && die "--database not specified"

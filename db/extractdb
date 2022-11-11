@@ -21,7 +21,7 @@ SERVER=
 DB=
 AUTH=
 
-source dbenv 
+source $BASEDIR/dbenv 
 
 while [[ $# -gt 0 ]]; do
   key="$1"
@@ -113,7 +113,7 @@ sudo $BASEDIR/sqlcompare /filter:"$FILTER" \
   /makescripts:"$OUTPUT" \
   /force \
   /OutputWidth:1024 \
-  /server1:"$SERVER" \
+  /server1:"$SQLCOMPARE_SERVER" \
   /database1:"$DB" \
   /username1:"$USER" \
   /password1:"$PASSWORD"

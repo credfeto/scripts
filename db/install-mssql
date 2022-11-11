@@ -15,7 +15,10 @@ trap "error_exit 'Received signal SIGTERM'" SIGTERM
 shopt -s expand_aliases
 alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
 
-source dbenv
+BASEDIR=$(dirname "$(readlink -f "$0")")
+echo "Script Dir: $BASEDIR"
+
+source $BASEDIR/dbenv
 
 SHARED_DATA=
 while [[ $# -gt 0 ]]; do
