@@ -268,6 +268,7 @@ param(
 function BuildProject {
     param([string]$FileName, [bool]$FullError)
 
+    dotnet build-server shutdown
     $errorCode = "AD0001"
     $NewLine = [System.Environment]::NewLine
     do
@@ -283,10 +284,12 @@ function BuildProject {
                 {
                     Write-Error $resultsAsText
                 }
+                dotnet build-server shutdown
                 return $false
             }
         }
         else {
+            dotnet build-server shutdown
             #WriteProgress "**** SUCCESS ****" 
             return $true
         }
