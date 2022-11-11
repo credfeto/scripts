@@ -36,12 +36,14 @@ Note: if SERVER is set as localhost then the local docker instance will be used
 ```
 DB=MyDatabaseName
 ```
-Common Command line Parmeters
+### Common Command line parameters
 
 * ``--server servername`` - overrides the server name in ~/.database
 * ``--database database`` - overrides the database name in repo/.database
 * ``--user username`` - overrides the username name in ~/.database
 * ``--password password`` - overrides the username name in ~/.database
+
+## Commands
 
 ### ``install-mssql``
 
@@ -64,7 +66,6 @@ Usage:
 
 Note:
 * this does not update the content of static data tables
-
 
 ### ``dbappsettings``
 * Creates\updates appsettings-local.json in each project with the connection string to the DB
