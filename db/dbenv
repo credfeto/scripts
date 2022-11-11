@@ -94,11 +94,11 @@ done
 [ -z "$USER" ] && die "--user not specified"
 [ -z "$PASSWORD" ] && die "--password not specified"
 
+SQLCOMPARE_SERVER=$SERVER
 if [ "$SERVER" = "localhost" ]; then
   SQLCOMPARE_SERVER=$(sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mssql)
   if [ ! -z "SQLCOMPARE_SERVER" ]; then
-    echo "Overriding localhost with Docker Server"
-    SERVER=$SQLCOMPARE_SERVER
+    echo "Overriding localhost with Docker Server"    
   fi  
 fi
 
