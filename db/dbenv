@@ -98,7 +98,7 @@ SQLCOMPARE_SERVER=$SERVER
 if [ "$SERVER" = "localhost" ]; then
   SQLCOMPARE_SERVER=$(sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mssql)
   if [ ! -z "SQLCOMPARE_SERVER" ]; then
-    echo "Overriding localhost with Docker Server"    
+    echo "Overriding localhost with Docker Server for compare at $SQLCOMPARE_SERVER"    
   fi  
 fi
 
