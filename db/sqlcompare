@@ -1,5 +1,6 @@
 #!/bin/bash
-USER_HOME=$(getent passwd $SUDO_USER | cut -d: -f6)
+USER_HOME=$1
+shift # past argument
 MAP=$USER_HOME:$USER_HOME
 echo "MAP: $MAP"
 docker pull redgate/sqlcompare:latest

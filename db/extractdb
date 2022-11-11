@@ -107,7 +107,9 @@ echo "  <HooksConfigFile>$HOOKSXML</HooksConfigFile>" >> $DBXML
 echo "  <HooksFileInRepositoryFolder>False</HooksFileInRepositoryFolder>" >> $DBXML
 echo "</ISOCCompareLocation>" >> $DBXML
 
-sudo $BASEDIR/sqlcompare /filter:"$FILTER" \
+sudo $BASEDIR/sqlcompare \
+  $HOME \
+  /filter:"$FILTER" \
   /options:ConsiderNextFilegroupInPartitionSchemes,DecryptPost2kEncryptedObjects,DoNotOutputCommentHeader,ForceColumnOrder,IgnoreCertificatesAndCryptoKeys,IgnoreDatabaseAndServerName,IgnoreUserProperties,IgnoreUsersPermissionsAndRoleMemberships,IgnoreWhiteSpace,IgnoreWithElementOrder,IncludeDependencies,NoDeploymentLogging,ThrowOnFileParseFailed,UseCompatibilityLevel \
   /transactionIsolationLevel:SERIALIZABLE \
   /makescripts:"$OUTPUT" \
