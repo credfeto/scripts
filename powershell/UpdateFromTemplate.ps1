@@ -867,8 +867,9 @@ param (
             }
         }
 
-        if($match -eq $false) {
-            $hasNonTemplateWorkFlows = true
+        if(!$match) {
+            Write-Information "Non-Template Workflow found: $targetFileName"
+            $hasNonTemplateWorkFlows = $true
             break
         }
     }
