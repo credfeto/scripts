@@ -17,7 +17,24 @@ alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
 
 source dbenv
 
+SHARED_DATA=
+while [[ $# -gt 0 ]]; do
+  key="$1"
+
+  case $key in
+    -X|--data)
+      SHARED_DATA="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    *)    # unknown option - skip here      
+      shift # past argument
+      ;;
+  esac
+done
+
 [ -z "$PASSWORD" ] && die "--password not specified"
+[ -z "$SHARED_DATA"] && die "--data not specified"
 
 echo "Ensuring network installed"
 docker network create multi-host-network
@@ -25,15 +42,17 @@ docker network create multi-host-network
 echo "Getting container from registry"
 docker pull mcr.microsoft.com/mssql/server:2019-latest
 
-
 echo "Ensuring Data exists"
-mkdir -p /home/mssql/.db/data
-mkdir -p /home/mssql/.db/logs
-mkdir -p /home/mssql/.db/secrets
-chown -R 10001.docker /home/mssql
-chmod -R 700 /home/mssql
+mkdir -p $SHARED_DATA/.db/data
+mkdir -p $SHARED_DATA/.db/logs
+mkdir -p $SHARED_DATA/.db/secrets
+
+echo "Ensuring docker has permission to access $SHARED_DATA"
+chown -R 10001.docker $SHARED_DATA
+chmod -R 700 $SHARED_DATA
  
 echo "Installing container"
 docker container stop mssql
 docker container rm mssql
-docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=$PASSWORD" -e "MSSQL_PID=Developer" -p 1433:1433  --name mssql --hostname sql -v /home/mssql/.db/data:/var/opt/mssql/data -v /home/mssql/.db/logs:/var/opt/mssql/logs -v /home/mssql/.db/secrets:/var/opt/mssql/secrets -v/home:/home --network multi-host-network --restart always -d mcr.microsoft.com/mssql/server:2019-latest
+
+docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=$PASSWORD" -e "MSSQL_PID=Developer" -p 1433:1433  --name mssql --hostname sql -v $SHARED_DATA/.db/data:/var/opt/mssql/data -v $SHARED_DATA/.db/logs:/var/opt/mssql/logs -v $SHARED_DATA/.db/secrets:/var/opt/mssql/secrets -v/home:/home --network multi-host-network --restart always -d mcr.microsoft.com/mssql/server:2019-latest
