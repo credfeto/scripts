@@ -1,16 +1,9 @@
 #!/bin/bash
 USER_HOME=$1
 shift # past argument
-MAP=$USER_HOME:$USER_HOME
-echo "MAP: $MAP"
+
+
 docker pull redgate/sqlcompare:latest
-#docker run --rm --network multi-host-network -v$MAP redgate/sqlcompare:latest /IAgreeToTheEULA "$@"
-
-#docker run --rm --interactive --tty \
-#    --mount type=bind,src=/Users/peter/dev/funfair-treasury-reporting/db,dst=/scriptsfolder \
-#    redgate/sqlcompare:14 /IAgreeToTheEULA /synchronise /include:staticData \
-#    /s2:192.168.1.159 /db2:Treasury-Dev /u2:sa /p2:Wordpass1 /scripts1:"/scriptsfolder" /scriptfile:"script.sql" /out:log.txt
-
 echo "docker run --rm --interactive --tty --mount type=bind,src=$USER_HOME,dst=$USER_HOME --network multi-host-network redgate/sqlcompare:latest /IAgreeToTheEULA ""$@""" 
 docker run --rm --interactive --tty --mount type=bind,src=$USER_HOME,dst=$USER_HOME --network multi-host-network redgate/sqlcompare:latest /IAgreeToTheEULA "$@" 
     
