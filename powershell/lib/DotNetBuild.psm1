@@ -173,11 +173,13 @@ param(
      
     [string]$version = BuildVersion
 
+    $noWarn = "-p:NoWarn=MSB3243"
+
     Write-Information " * Building"
     do {
         Set-Location -Path $srcFolder
 
-        $result = dotnet build --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version 2>&1
+        $result = dotnet build --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version $noWarn  2>&1
         if(!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
@@ -202,11 +204,12 @@ param(
      
     [string]$version = BuildVersion
     
+    $noWarn = "-p:NoWarn=MSB3243"
     Write-Information " * Packing"
     do {
         Set-Location -Path $srcFolder
 
-        $result = dotnet pack --no-restore -nodeReuse:False --configuration=Release -p:Version=$version 2>&1
+        $result = dotnet pack --no-restore -nodeReuse:False --configuration=Release -p:Version=$version $noWarn 2>&1
         if(!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
@@ -234,16 +237,18 @@ param(
      
     [string]$version = BuildVersion
 
+    $noWarn = "-p:NoWarn=MSB3243" 
     Write-Information " * Publishing"
     do {
         Set-Location -Path $srcFolder
 #       run: dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:NoWarn=NETSDK1179 -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=${{ env.BUILD_VERSION }} -p:IncludeNativeLibrariesForSelfExtract=false -p:SolutionDir=..\\ --output ../server-dist
 #       -p:NoWarn=NETSDK1179 
-#       --no-restore 
+#       --no-restore
+
         if($framework) {
-            $result = dotnet publish -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False 2>&1
+            $result = dotnet publish -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false $noWarn -nodeReuse:False 2>&1
         } else {
-            $result = dotnet publish -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false -nodeReuse:False 2>&1
+            $result = dotnet publish -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false $noWarn -nodeReuse:False 2>&1
         }
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
