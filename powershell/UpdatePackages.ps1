@@ -201,13 +201,16 @@ param(
             Write-Information "Found: $version"
             return $version
         }
+        
+        Write-Information " * No Changes"    
     }
     else
     {
+        Write-Information " * ERROR: Failed to update $packageId"    
         WriteLogs -logs $results
     }
 
-    Write-Information " * No Changes"    
+    
     return $null
 }
 
