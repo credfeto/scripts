@@ -45,6 +45,7 @@ function dotNetDependabotTemplate {
   - dependency-name: ""Microsoft.ApplicationInsights.AspNetCore""
   - dependency-name: ""Microsoft.NET.Test.Sdk""
   - dependency-name: ""Microsoft.VisualStudio.Threading.Analyzers""
+  - dependency-name: ""MSBuild.Sdk.SqlProj""
   - dependency-name: ""NBitcoin""
   - dependency-name: ""Newtonsoft.Json""
   - dependency-name: ""NonBlocking""
