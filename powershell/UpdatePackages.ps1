@@ -441,10 +441,10 @@ param(
             return $true
         }
 
-        if($branch.StartsWith("dependabot/")) {
-            Write-Information "Found dependency update branch: $branch"
-            return $true
-        }
+#         if($branch.StartsWith("dependabot/")) {
+#             Write-Information "Found dependency update branch: $branch"
+#             return $true
+#         }
     }
     
     return $false
