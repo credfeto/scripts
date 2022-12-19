@@ -275,24 +275,28 @@ param(
    }
 }
 
+function ShutdownBuildServer {
+    $results = dotnet build-server shutdown 2>1 > $null
+    if(!$?) {        
+        WriteProgress "$results"
+        throw "Failed to shutdown build server"
+    }
+}
+
 function BuildProject {
     param([string]$FileName, [bool]$FullError)
 
-    dotnet build-server shutdown
-    dotnet clean -nodeReuse:False /p:SolutionDir=$solutionDirectory
-    if(!$?) {
-        throw "Failed to clean $FileName"
-    }
-    dotnet build-server shutdown
+    ShutdownBuildServer
 
     $errorCode = "AD0001"
     $NewLine = [System.Environment]::NewLine
+    try {
     do
     {
         $results = dotnet build $FileName -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
         if(!$?) {
             $resultsAsText = $results -join $NewLine
-            #WriteProgress "**** FAILED ****"
+#             WriteProgress "**** FAILED ****"
             $retry = $resultsAsText.Contains($errorCode) 
             if(!$retry)
             {
@@ -300,17 +304,19 @@ function BuildProject {
                 {
                     Write-Error $resultsAsText
                 }
-                dotnet build-server shutdown
                 return $false
             }
         }
         else {
-            dotnet build-server shutdown
-            #WriteProgress "**** SUCCESS ****" 
+#             WriteProgress "**** SUCCESS ****" 
             return $true
         }
     }
     while($true)
+    }
+    finally {
+        ShutdownBuildServer
+    }
 }
 
 function Get-ProjectReferences {
@@ -459,6 +465,7 @@ param(
         $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
     
         $buildOk = BuildProject -FileName $file.FullName -FullError $true
+        Write-Host "Build OK: $buildOk"
         if(!$buildOk) {
             WriteProgress "* Does not build without changes"
             throw "Failed to build a project"
@@ -482,6 +489,7 @@ param(
                 
                 WriteProgress "* Building $( $file.Name ) using $minimalSdk instead of $sdk..."
                 $buildOk = BuildProject -FileName $file.FullName -FullError $false
+                Write-Host "Build OK: $buildOk"
                 if($buildOk) {
                     WriteProgress "  - Building succeeded."
                     WriteProgress "$( $file.Name ) references SDK $sdk that could be reduced to $minimalSdk."
