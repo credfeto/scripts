@@ -279,11 +279,17 @@ function BuildProject {
     param([string]$FileName, [bool]$FullError)
 
     dotnet build-server shutdown
+    dotnet clean -nodeReuse:False /p:SolutionDir=$solutionDirectory
+    if(!$?) {
+        throw "Failed to clean $FileName"
+    }
+    dotnet build-server shutdown
+
     $errorCode = "AD0001"
     $NewLine = [System.Environment]::NewLine
     do
     {
-        $results = dotnet build $file.FullName -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
+        $results = dotnet build $FileName -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
         if(!$?) {
             $resultsAsText = $results -join $NewLine
             #WriteProgress "**** FAILED ****"
