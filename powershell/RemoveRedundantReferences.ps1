@@ -276,7 +276,7 @@ param(
 }
 
 function ShutdownBuildServer {
-    $results = dotnet build-server shutdown 2>1 > $null
+    $results = dotnet build-server shutdown 2>$null > $null
     if(!$?) {        
         WriteProgress "$results"
         throw "Failed to shutdown build server"
