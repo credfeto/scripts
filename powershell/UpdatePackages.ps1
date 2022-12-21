@@ -327,7 +327,7 @@ param(
     if($branchesCreated -eq 0) {
         # no branches created - check to see if we can create a release
         if($packagesUpdated -eq 0) {
-            Release-TryCreateNextPatch -repo $repo -repoPath $repoPath -changeLog $changeLog
+            Release-TryCreateNextPatch -repo $repo -repoPath $repoFolder -changeLog $changeLog
         }
         else {
             Write-Information "SKIPPING RELEASE: Updated $packagesUpdated during this run"
