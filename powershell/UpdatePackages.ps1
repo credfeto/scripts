@@ -41,6 +41,14 @@ $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "lib" 
 Write-Information "Loading Modules from $ScriptDirectory"
 try {
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "CheckForPackages.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error "$_"
+    Throw "Error while loading supporting PowerShell Scripts: CheckForPackages" 
+}
+
+try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
 }
 catch {
@@ -797,7 +805,7 @@ Write-Information "*************************************************************
 Write-Information "***************************************************************"
 Write-Information ""
 
-$packages = Get-Content -Path $packagesToUpdate -Raw | ConvertFrom-Json
+$packages = Packages_Get -fileName $packagesToUpdate
 
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
 ForEach($repo in $repoList) {
