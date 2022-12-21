@@ -250,7 +250,7 @@ param(
         }
         
         [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
-        [string]$update = Packages_CheckForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
+        [string]$update = Packages_CheckForUpdates -repoFolder $repoFolder -packageCache $packageCache -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
         
         if([string]::IsNullOrEmpty($update)) {
             Write-Information "***** $repo NO UPDATES TO $packageId ******"
@@ -375,13 +375,6 @@ if($installed -eq $false) {
     Write-Error ""
     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildCheck']"
 }
-
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
-
-dotnet tool restore
 
 Write-Information ""
 Write-Information "***************************************************************"

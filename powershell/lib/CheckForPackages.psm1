@@ -84,15 +84,11 @@ param(
 
 function Packages_CheckForUpdatesExact{
 param(
-    [String]$repoFolder = $(throw "Packages_CheckForUpdatesExact: repoFolder not specified"), 
+    [String]$repoFolder = $(throw "Packages_CheckForUpdatesExact: repoFolder not specified"),
+    [string]$packageCache = $(throw "Packages_CheckForUpdatesExact: packageCache not specified"),
     [String]$packageId = $(throw "Packages_CheckForUpdatesExact: packageId not specified"),
     $exclude    
     )
-
-    $restore = dotnet tool restore
-    if (!$?) {
-       throw $restore
-    }
 
     Write-Information "Updating Package Exact"
     $search = buildPackageSearch -packageId $packageId -exactMatch $True
@@ -135,14 +131,10 @@ param(
 function Packages_CheckForUpdatesPrefix{
 param(
     [String]$repoFolder = $(throw "checkForUpdatesPrefix: repoFolder not specified"),
+    [string]$packageCache = $(throw "Packages_CheckForUpdates: packageCache not specified"),
     [String]$packageId = $(throw "checkForUpdatesPrefix: packageId not specified"),
     $exclude
     )
-
-    $restore = dotnet tool restore
-    if (!$?) {
-       throw $restore
-    }
 
     Write-Information "Updating Package Prefix"
     $search = buildPackageSearch -packageId $packageId -exactMatch $False
@@ -182,6 +174,7 @@ param(
 function Packages_CheckForUpdates{
 param(
     [String]$repoFolder = $(throw "Packages_CheckForUpdates: repoFolder not specified"),
+    [string]$packageCache = $(throw "Packages_CheckForUpdates: packageCache not specified"),
     [String]$packageId = $(throw "Packages_CheckForUpdates: packageId not specified"),
     [Boolean]$exactMatch,
     $exclude
@@ -189,11 +182,11 @@ param(
 
     if ($exactMatch -eq $true)
     {
-        return Packages_CheckForUpdatesExact -repoFolder $repoFolder -packageId $packageId -exclude $exclude
+        return Packages_CheckForUpdatesExact -repoFolder $repoFolder -packageCache $packageCache -packageId $packageId -exclude $exclude
     }
     else
     {
-        return Packages_CheckForUpdatesPrefix -repoFolder $repoFolder -packageId $packageId -exclude $exclude
+        return Packages_CheckForUpdatesPrefix -repoFolder $repoFolder -packageCache $packageCache -packageId $packageId -exclude $exclude
     }
 }
 

@@ -369,8 +369,6 @@ Write-Information "*************************************************************
 Write-Information "***************************************************************"
 Write-Information ""
 
-dotnet tool restore
-
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
 
 Write-Information ""

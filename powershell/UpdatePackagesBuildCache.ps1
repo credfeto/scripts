@@ -2,7 +2,8 @@
 
 param(
     [string] $work = $(throw "folder where to clone repositories"),
-    [string] $packageCache = $(throw "package cache file"),
+    [string] $packageCacheToRead = $(throw "package cache file to read"),
+    [string] $packageCacheToWrite = $(throw "package cache file to write"),
     [string] $packagesToUpdate = $(throw "Packages.json file to load")
 )
 
@@ -137,15 +138,15 @@ param(
     }
 }
 
-function processRepo{
+function ProcessFolder{
 param(
-    [string]$repo = $(throw "processRepo: repo not specified"),
-    $packages = $(throw "processRepo: packages not specified"), 
-    [string]$baseFolder = $(throw "processRepo: baseFolder not specified")
+    [string]$folder = $(throw "ProcessFolder: repo not specified"),
+    $packages = $(throw "ProcessFolder: packages not specified"),
+    [string]$packageCache= $(throw "ProcessFolder: packageCache not specified")
     )
 
 
-    Set-Location -Path $root
+    Set-Location -Path $folder
 
     Write-Information ""
     Write-Information "***********************************************************************************"
@@ -153,74 +154,16 @@ param(
     Write-Information "***********************************************************************************"
     Write-Information "***********************************************************************************"
     Write-Information ""
-    Write-Information "Processing Repo: $repo"
+    Write-Information "Processing Cache folder: $folder"
 
-    # Extract the folder from the repo name
-    [string]$folder = Git-GetFolderForRepo -repo $repo
-
-    Write-Information "Folder: $folder"
-    [string]$repoFolder = Join-Path -Path $root -ChildPath $folder
-
-    Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
-
-    [string]$srcPath = Join-Path -Path $repoFolder -ChildPath "src"
-    [bool]$srcExists = Test-Path -Path $srcPath
-    if($srcExists -eq $false) {
-        # no source to update
-        Write-Information "* No src folder in repo"
-        return;
-    }
-
-    $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
-    if ($projects.Length -eq 0) {
-        # no source to update
-        Write-Information "* No C# projects in repo"
-        return;
-    }
-    
-    $currentlyInstalledPackages = DotNetPackages-Get -srcFolder $srcPath
+    $currentlyInstalledPackages = DotNetPackages-Get -srcFolder $folder
     if($currentlyInstalledPackages.Length -eq 0) {
         # no source to update
-        Write-Information "* No C# packages to update in repo"
+        Write-Information "* No C# packages to update"
         return;
     }    
 
-    [string]$lastRevision = Tracking_Get -basePath $trackingFolder -repo $repo
-    [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
-
-    Write-Information "Last Revision:    $lastRevision"
-    Write-Information "Current Revision: $currentRevision"
-
-    [string]$changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
-
-    [bool]$codeOK = $false
-    if ($lastRevision -eq $currentRevision)
-    {
-        # no need to build - it last built successfully with this code revision
-        $codeOK = $true
-    }
-    else
-    {
-        $codeOK = DotNet-BuildSolution -srcFolder $srcPath
-        if ($codeOk -eq $true)
-        {
-            # Update last successful revision
-            [string]$lastRevision = $currentRevision
-            Tracking_Set -basePath $trackingFolder -repo $repo -value $currentRevision
-        }
-    }
-
-    Set-Location -Path $repoFolder
-    if ($codeOk -eq $false)
-    {
-        # no point updating
-        Write-Information "* WARNING: Solution doesn't build without any changes - no point in trying to update packages"
-        return;
-    }
-    
-    [int]$branchesCreated = 0
     [int]$packagesUpdated = 0
-
     ForEach ($package in $packages)
     {
         [string]$packageId = $package.packageId.Trim('.')
@@ -240,18 +183,10 @@ param(
             continue
         }
         
-        [boolean]$okBefore = DotNet-CheckSolution -srcFolder $srcPath
-        if(!$okBefore) {
-            Write-Information "Skipping $packageId as solution is not in a good state"
-            continue
-        }
-        
-        [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
-        [string]$update = Packages_CheckForUpdates -repoFolder $repoFolder -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
+        [string]$update = Packages_CheckForUpdates -repoFolder $folder -packageCache $packageCache -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
         
         if([string]::IsNullOrEmpty($update)) {
             Write-Information "***** $repo NO UPDATES TO $packageId ******"
-            Git-ResetToMaster -repoPath $repoFolder
             
             # Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
             
@@ -260,79 +195,35 @@ param(
 
         Write-Information "***** $repo FOUND UPDATE TO $packageId for $update ******"
         
-        [boolean]$okAfter = DotNet-CheckSolution -srcFolder $srcPath
-        if(!$okAfter) {
-            Write-Information "Skipping $packageId as solution is not in a good state after update attempt (probable mismatch of packages)"
-            continue
-        }
-                
         $packagesUpdated += 1
-        [string]$branchName = "$branchPrefix$update"
-        [bool]$branchExists = Git-DoesBranchExist -branchName $branchName  -repoPath $repoFolder
-        if(!$branchExists) {
-
-            Write-Information ">>>> Checking to see if code builds against $packageId $update <<<<"
-            $codeOK = DotNet-BuildSolution -srcFolder $srcPath
-            Set-Location -Path $repoFolder
-            if($codeOK) {
-                ChangeLog-RemoveEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to "
-                ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-                Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"  -repoPath $repoFolder
-                Git-Push -repoPath $repoFolder
-
-                # Just built, committed and pushed so get the the revisions 
-                [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
-                [string]$lastRevision = $currentRevision
-                Tracking_Set -basePath $trackingFolder -repo $repo -value $currentRevision
-
-                Write-Information "Last Revision:    $lastRevision"
-                Write-Information "Current Revision: $currentRevision"
-
-                Write-Information "WARNING: Removing other branches similar to $branchPrefix as committed to master for $update"
-                Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
-            }
-            else {
-                Write-Information "Create Branch $branchName"
-                [bool]$branchOk = Git-CreateBranch -branchName $branchName -repoPath $repoFolder
-                if($branchOk) {
-                    ChangeLog-RemoveEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to "
-                    ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-                    Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"  -repoPath $repoFolder
-                    Git-PushOrigin -branchName $branchName  -repoPath $repoFolder
-
-                    $branchesCreated += 1
-
-                    Write-Information "WARNING: Removing other branches similar to $branchPrefix as new branch created for $update ($branchName)"
-                    Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
-                } else {
-                    Write-Information ">>> ERROR: FAILED TO CREATE BRANCH <<<"
-                }
-            }
-        }
-        else {
-            Write-Information "Branch $branchName already exists - skipping"
-        }
- 
-        Git-ResetToMaster -repoPath $repoFolder
     }
     
-    Write-Information "Updated run created $branchesCreated branches"
-    Write-Information "Updated run updated $packagesUpdated packages"
+    Write-Information "Cache update run updated $packagesUpdated packages"
+}
+
+function CreateProject {
+param(
+ $packageCache = $(throw "CreateProject: packageCache not specified"),
+ $workFolder = $(throw "CreateProject: workFolder not specified")
+)
+
+    $packageCacheContent = Get-Content -Path $packageCache -Raw | ConvertFrom-Json
     
-    Git-ResetToMaster -repoPath $repoFolder
-        
-    if($branchesCreated -eq 0) {
-        # no branches created - check to see if we can create a release
-        if($packagesUpdated -eq 0) {
-            Release-TryCreateNextPatch -repo $repo -repoPath $repoPath -changeLog $changeLog
-        }
-        else {
-            Write-Information "SKIPPING RELEASE: Updated $packagesUpdated during this run"
-        }
+    $project = Join-Path -Path $workFolder -ChildPath "Package.Cache.Update.Temp.csproj"
+    Write-Information "Creating project $project..."
+    
+    $projectContent = "<Project Sdk=`"Microsoft.NET.Sdk`">" + "`r`n"
+    $projectContent += "  <ItemGroup>" + "`r`n"
+    foreach($package in $packageCacheContent.PSObject.Properties) {
+        $packageId = $package.Name
+        $version = $package.Value
+        Write-Information "* Package: $packageId - $version"
+        $projectContent += "    <PackageReference Include=`"$packageId`" Version=`"$version`" />"
     }
-    else {
-        Write-Information "SKIPPING RELEASE: Created $branchesCreated during this run"
-    }
+    $projectContent += "  </ItemGroup>" + "`r`n"
+    $projectContent += "</Project>" + "`r`n"
+    Set-Content -Path $project -Value $projectContent
+    Write-Information "Done $project..."
 }
 
 #########################################################################
@@ -352,34 +243,6 @@ if($installed -eq $false) {
 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
 }
 
-[bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
-}
-
-[bool]$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
-}
-
-[bool]$installed = DotNetTool-Install -packageId "FunFair.BuildCheck" -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildCheck']"
-}
-
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
-
-dotnet tool restore
-
 Write-Information ""
 Write-Information "***************************************************************"
 Write-Information "***************************************************************"
@@ -387,7 +250,22 @@ Write-Information ""
 
 $packages = Packages_Get -fileName $packagesToUpdate
 
+
+$packageWorkFolder = Join-Path -Path $root -ChildPath "Package.Cache.Update.Temp"
+$packageWorkFolderExists = Test-Path -Path $packageWorkFolder
+if(!$packageWorkFolderExists) {
+    New-Item -ItemType Directory -Path $packageWorkFolder
+}
+
+CreateProject -packageCache $packageCacheToRead -workFolder $packageWorkFolder
+
+$packageCacheToWriteExists = Test-Path -Path $packageCacheToWrite
+if($packageCacheToWriteExists) {
+    Remove-Item -Path $packageCacheToWrite -Recurse -Force
+}
+
+ProcessFolder -folder $packageWorkFolder -packages $packages -packageCache $packageCacheToWrite
 ###############
 
-Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
+Write-Information ">>>>>>>>>>>> COMPLETE <<<<<<<<<<<<"
 
