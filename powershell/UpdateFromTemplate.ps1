@@ -910,25 +910,7 @@ param (
         
         if(!$repo.Contains("template"))
         {
-            if (ShouldAlwaysCreatePatchRelease -repo $repo) {
-                Write-Information "**** MAKE RELEASE ****"
-                Write-Information "Changelog: $targetChangelogFile"
-                Write-Information "Repo: $targetRepo"
-                Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $targetRepo
-            }
-            else {
-                if(!$repo.Contains("server-content-package"))
-                {
-                    $publishable = DotNet-HasPublishableExe -srcFolder $srcPath
-                    if (!$publishable -and !$repo.Contains("template"))
-                    {
-                        Write-Information "**** MAKE RELEASE ****"
-                        Write-Information "Changelog: $targetChangelogFile"
-                        Write-Information "Repo: $targetRepo"
-                        Release-Create -repo $repo -changelog $targetChangelogFile -repoPath $targetRepo
-                    }
-                }
-            }
+            Release-TryCreateNextPatch -repo $repo -repoPath $targetRepo -changelog $targetChangelogFile 
         }        
     }
 
