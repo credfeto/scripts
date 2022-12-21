@@ -357,29 +357,6 @@ param (
     return $true    
 }
 
-function ShouldUpdatePackage{
-param (
-    $installed = $(throw "ShouldUpdatePackage: installed not specified"),
-    [string]$packageId = $(throw "ShouldUpdatePackage: packageId not specified"),
-    [bool]$exactMatch
-)
-    foreach($candidate in $installed) {
-        if($packageId -eq $candidate) {
-            return $true
-        }
-
-        if(!$exactMatch) {
-            $test = "$packageId.".ToLower()
-            
-            if($candidate.ToLower().StartsWith($test)) {
-                return $true
-            }
-        }
-    }
-    
-    return $false
-}
-
 function IsAllAutoUpdates {
 param(
     [string[]]$releaseNotes = $(throw "IsAllAutoUpdates: releaseNotes not specified"),
@@ -564,8 +541,7 @@ param(
         [string]$type = $package.type
         [bool]$exactMatch = $package.'exact-match'
         
-        [bool]$shouldUpdatePackages = ShouldUpdatePackage -installed $currentlyInstalledPackages -packageId $packageId -exactMatch $exactMatch
-
+        [bool]$shouldUpdatePackages = Packages_ShouldUpdate -installed $currentlyInstalledPackages -packageId $packageId -exactMatch $exactMatch
         
         Write-Information ""
         Write-Information "------------------------------------------------"
