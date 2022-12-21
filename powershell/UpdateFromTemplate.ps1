@@ -688,34 +688,6 @@ param(
     Git-Push -repoPath $baseFolder
 }
 
-function ShouldAlwaysCreatePatchRelease{
-param(
-    [string]$repo = $(throw "ShouldAlwaysCreatePatchRelease: repo not specified")
-    )
-    
-    if($repo.Contains("template")) {
-        return $false
-    }
-        
-    if($repo.Contains("credfeto")) {
-        return $true
-    }
-
-    if($repo.Contains("BuildBot")) {
-        return $true
-    }
-
-    if($repo.Contains("CoinBot")) {
-        return $true
-    }
-
-    if($repo.Contains("funfair-server-balance-bot")) {
-        return $true
-    }
-
-    return $false
-}
-
 function processRepo {
 param (
     [string]$sourceRepo = $(throw "processRepo: sourceRepo not specified"), 

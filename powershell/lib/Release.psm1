@@ -36,6 +36,34 @@ param(
     }
 }
 
+function ShouldAlwaysCreatePatchRelease{
+param(
+    [string]$repo = $(throw "ShouldAlwaysCreatePatchRelease: repo not specified")
+    )
+    
+    if($repo.Contains("template")) {
+        return $false
+    }
+
+    if($repo.Contains("credfeto")) {
+        return $true
+    }
+
+    if($repo.Contains("BuildBot")) {
+        return $true
+    }
+
+    if($repo.Contains("CoinBot")) {
+        return $true
+    }
+
+    if($repo.Contains("funfair-server-balance-bot")) {
+        return $true
+    }
+
+    return $false
+}
+
 function IsPackageConsideredForVersionUpdate {
 param (
     $packages = $(throw "IsPackageConsideredForVersionUpdate: packages not specified"),
