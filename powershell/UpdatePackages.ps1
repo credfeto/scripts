@@ -15,9 +15,6 @@ $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
 [string]$packageIdToInstall = "Credfeto.Package.Update"
 [bool]$preRelease = $False
-[int]$autoReleasePendingPackages = 3
-[double]$minimumHoursBeforeAutoRelease = 4
-[double]$inactivityHoursBeforeAutoRelease = 2 * $minimumHoursBeforeAutoRelease
  
 # Ensure $root is set to a valid path
 $workDir = Resolve-Path -path $work
@@ -183,120 +180,11 @@ param(
     return $false
 }
 
-function IsPackageConsideredForVersionUpdate {
-param (
-    $packages = $(throw "IsPackageConsideredForVersionUpdate: packages not specified"),
-    [string] $packageName = $(throw "IsPackageConsideredForVersionUpdate: packageName not specified")
-    )
-    
-    ForEach ($package in $packages)
-    {
-        [string]$packageId = $package.packageId.Trim('.')
-        if($packageName -eq $packageId) {
-            [bool]$ignore = $package.'prohibit-version-bump-when-referenced'
-            if($ignore) {
-                Write-Information "IGNORING $packageId for update"
-                return false
-            }
-        }
-    }
-
-    return $true    
-}
-
-function IsAllAutoUpdates {
-param(
-    [string[]]$releaseNotes = $(throw "IsAllAutoUpdates: releaseNotes not specified"),
-    $packages = $(throw "IsAllAutoUpdates: packages not specified")
-    )
-
-    [string]$expr = "(?ms)" + "^\s*\-\s*FF\-1429\s*\-\sUpdated\s+(?<PackageId>.+(\.+)*?)\sto\s+(\d+\..*)$"
-    
-    [int]$updateCount = 0
-
-    [bool]$hasContent = $false
-    foreach($line in $releaseNotes) {
-
-        if($line.StartsWith("#")) {
-            continue
-        }
-        
-        if([string]::IsNullOrWhiteSpace($line)) {
-            continue
-        }
-
-        $hasContent = $true
-        
-        if($line -match $expr) {            
-            # Package Update
-            $packageName = $matches.PackageId
-            if(IsPackageConsideredForVersionUpdate -packages $packages -packageName $packageName) {
-                Write-Information "Found Matching Update: $packageName"
-                $updateCount += 1
-            } else {
-                Write-Information "Skipping Ignored Update: $packageName"
-            }
-            continue
-        }
-
-        if($line -match "^\s*\-\s*FF\-368\s*\-\s*") {
-            # GEO-IP update
-            $updateCount += 1
-            continue
-        }
-        
-        if($line.StartsWith("- FF-3881 - Updated DotNet SDK to ")) {
-            # Dotnet version update
-            $updateCount += 1000
-            continue
-        }
-    }
-
-    if($hasContent) {
-        return $updateCount
-    }
-
-    return 0
-}
 
 
-function HasPendingDependencyUpdateBranches{
-param(
-    [string]$repoPath = $(throw "HasPendingDependencyUpdateBranches: repoPath not specified")
-    )
 
-    [string[]]$branches = Git-GetRemoteBranches -repoPath $repoPath -upstream "origin"
-    
-    foreach($branch in $branches) {
-        if($branch.StartsWith("depends/")) {
-            Write-Information "Found dependency update branch: $branch"
-            return $true
-        }
 
-#         if($branch.StartsWith("dependabot/")) {
-#             Write-Information "Found dependency update branch: $branch"
-#             return $true
-#         }
-    }
-    
-    return $false
-}
 
-function CheckRepoForAllowedAutoUpgrade {
-param (
-    [string]$repo = $(throw "CheckRepoForAllowedAutoUpgrade: repo not specified")
-    )
-    
-    if($repo.Contains("server-content-package")) {
-        return $false
-    }
-    
-    if($repo.Contains("code-analysis")) {
-        return $false
-    }
-
-    return $true
-}
 
 function processRepo{
 param(
@@ -485,89 +373,7 @@ param(
     if($branchesCreated -eq 0) {
         # no branches created - check to see if we can create a release
         if($packagesUpdated -eq 0) {
-            Write-Information "Checking if can create release for $repo"
-            
-            if(!$repo.Contains("template")) {
-                Write-Information "Processing Release Notes in $changeLog"
-                
-                [string[]]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
-                foreach($line in $releaseNotes) {
-                    Write-Information $line
-                }
-                [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes -packages $packages
-                
-                Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
-                [DateTime]$lastCommitDate = Get-GetLastCommitDate -repoPath $repoFolder
-                [DateTime]$now = [DateTime]::UtcNow                                    
-                
-                [TimeSpan]$durationTimeSpan = ($now - $lastCommitDate)
-                $duration = $durationTimeSpan.TotalHours
-                Write-Information "Duration since last commit $duration hours"
-
-                [string]$skippingReason = "INSUFFICIENT UPDATES"                
-                [bool]$shouldCreateRelease = $false
-                if($autoUpdateCount -ge $autoReleasePendingPackages) {
-                    if($duration -gt $minimumHoursBeforeAutoRelease) {
-                        $shouldCreateRelease = $true
-                        [string]$skippingReason = "RELEASING NORMAL"
-                    }
-                    else {
-                        [string]$skippingReason = "INSUFFICIENT DURATION SINCE LAST UPDATE"
-                    }
-                }
-                
-                if(!$shouldCreateRelease) {
-                    if($autoUpdateCount -ge 1) {
-                        if($duration -gt $inactivityHoursBeforeAutoRelease) {
-                            $shouldCreateRelease = $true
-                            [string]$skippingReason = "RELEASING AFTER INACTIVITY"
-                        }
-                    }
-                }
-
-                if($shouldCreateRelease ) {
-                    # At least $autoReleasePendingPackages auto updates... consider creating a release
-                    
-                    [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoFolder
-                    if(!$hasPendingDependencyUpdateBranches) {            
-                        if (ShouldAlwaysCreatePatchRelease -repo $repo) {
-                            Write-Information "**** MAKE RELEASE ****"
-                            Write-Information "Changelog: $changeLog"
-                            Write-Information "Repo: $repoFolder"
-                            Write-Information "Reason: $skippingReason"
-                            Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
-                        }
-                        else {
-                            $allowUpdates = CheckRepoForAllowedAutoUpgrade -repo $repo
-                            if($allowUpdates) {
-                                [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
-                                if (!$publishable) {
-                                    Write-Information "**** MAKE RELEASE ****"
-                                    Write-Information "Changelog: $changeLog"
-                                    Write-Information "Repo: $repoFolder"
-                                    Write-Information "Reason: $skippingReason"
-                                    Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
-                                }
-                                else {
-                                    Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
-                                }
-                            }
-                            else {
-                                Write-Information "SKIPPING RELEASE: $repo is a explicitly prohibited"
-                            }
-                        }
-                    } 
-                    else {
-                        Write-Information "SKIPPING RELEASE: Found pending update branches in $repo"
-                    }
-                }
-                else {
-                    Write-Information "SKIPPING RELEASE: $skippingReason : $autoUpdateCount"
-                }
-            }
-            else {
-                Write-Information "SKIPPING RELEASE: $repo is a template"
-            }
+            Release-TryCreateNextPatch -repo $repo -repoPath $repoPath -changeLog $changeLog
         }
         else {
             Write-Information "SKIPPING RELEASE: Updated $packagesUpdated during this run"
