@@ -279,3 +279,4 @@ function Release-TryCreateNextPatch {
 
 
 Export-ModuleMember -Function Release-Create
+Export-ModuleMember -Function Release-TryCreateNextPatch
