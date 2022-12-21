@@ -31,6 +31,16 @@ param (
     return $false
 }
 
+function WriteLogs {
+    param(
+    [string[]]$logs
+    )
+    
+    foreach($message in $logs)
+    {
+        Write-Information $message
+    }
+}
 
 function buildPackageSearch{
     param(

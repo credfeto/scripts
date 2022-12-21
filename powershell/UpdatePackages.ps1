@@ -119,19 +119,6 @@ catch {
 }
 #endregion
 
-function WriteLogs {
-    param(
-    [string[]]$logs
-    )
-    
-    foreach($message in $logs)
-    {
-        Write-Information $message
-    }
-}
-
-
-
 function BuildSolution{
 param(
     [String]$srcPath = $(throw "BuildSolution: srcPath not specified"),
@@ -179,12 +166,6 @@ param(
 
     return $false
 }
-
-
-
-
-
-
 
 function processRepo{
 param(
