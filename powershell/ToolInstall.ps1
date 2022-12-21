@@ -1,7 +1,7 @@
 #########################################################################
 
 param(
-    [string] $packageId = $(throw "the packageId to install"),
+    [string] $packageId = $(throw "the packageId to install")
 )
 
 Remove-Module *
@@ -10,19 +10,6 @@ Set-StrictMode -Version 1
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
 [bool]$preRelease = $False
-
-# Ensure $root is set to a valid path
-$workDir = Resolve-Path -path $work
-[string]$root = $workDir.Path
-if($root.Contains("/../")){
-    Write-Error "Work folder: $work"
-    Write-Error "Base folder: $root"
-    throw "Invalid Base Folder: $root"
-}
-
-Write-Information $root
-Write-Information "Base folder: $root"
-Set-Location -Path $root
 
 
 #########################################################################
