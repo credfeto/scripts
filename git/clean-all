@@ -1,0 +1,16 @@
+#! /bin/bash
+
+
+for line in $(find  $(pwd)/* -name '*.git' -printf '%h\n' | sort -u | grep -v .cache)
+do 
+  echo "$line"
+  CURRENT_DIR=$line  
+
+  echo ""
+  echo "Retrieving $CURRENT_DIR..."
+  git -C "$CURRENT_DIR" remote get-url origin
+  git -C "$CURRENT_DIR" clean -f -d -x 
+  git -C "$CURRENT_DIR" remote update origin --prune
+  
+  echo " * done"
+done
