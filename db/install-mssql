@@ -43,7 +43,7 @@ echo "Ensuring network installed"
 docker network create multi-host-network
 
 echo "Getting container from registry"
-docker pull mcr.microsoft.com/mssql/server:2019-latest
+docker pull mcr.microsoft.com/mssql/server:2022-latest
 
 echo "Ensuring Data exists"
 mkdir -p $SHARED_DATA/.db/data
