@@ -3,8 +3,7 @@ function BuildVersion {
 }
 
 function GetNoWarn {
-    # return "-p:NoWarn=MSB3243"
-    return ""
+    return "-p:NoWarn=MSB3243"
 }
 
 function DotNet-DumpOutput {
