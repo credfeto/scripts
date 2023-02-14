@@ -2,6 +2,11 @@ function BuildVersion {
     return "0.0.0.1-do-not-distribute"
 }
 
+function GetNoWarn {
+    # return "-p:NoWarn=MSB3243"
+    return ""
+}
+
 function DotNet-DumpOutput {
     param(
          $result
@@ -172,8 +177,7 @@ param(
     )
      
     [string]$version = BuildVersion
-
-    $noWarn = "-p:NoWarn=MSB3243"
+    [string]$noWarn = GetNoWarn
 
     Write-Information " * Building"
     do {
@@ -202,9 +206,9 @@ param(
     [string] $srcFolder = $(throw "DotNet-Pack: srcFolder not specified")
     )
      
-    [string]$version = BuildVersion
+    [string]$version = BuildVersion    
+    [string]$noWarn = GetNoWarn
     
-    $noWarn = "-p:NoWarn=MSB3243"
     Write-Information " * Packing"
     do {
         Set-Location -Path $srcFolder
@@ -237,7 +241,8 @@ param(
      
     [string]$version = BuildVersion
 
-    $noWarn = "-p:NoWarn=MSB3243" 
+    [string]$noWarn = GetNoWarn 
+    
     Write-Information " * Publishing"
     do {
         Set-Location -Path $srcFolder
