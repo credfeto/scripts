@@ -130,7 +130,7 @@ function GlobalJson_Update
     }
 
     if ($targetVersion -lt $sourceVersion) {
-        Write-Information "* Target global.json specifies a older version of .net ($targetVersion) < $sourceVersion)"
+        Write-Information "* Target global.json specifies a older version of .net ($targetVersion < $sourceVersion)"
 
         $reformatted = ReformatJsonForSaving -source $srcContent 
         Set-Content -Path $targetFileName -Value $reformatted 
