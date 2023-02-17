@@ -812,6 +812,7 @@ param (
         "check-case.yml",
         "codacy-analysis.yml",
         "dependabot-auto-merge.yml",
+        "dependabot-rebase.yml",
         "linter.yml",
         "rebase.yml",
         "sqlcheck.yml",
