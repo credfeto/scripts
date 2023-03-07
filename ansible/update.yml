@@ -20,12 +20,6 @@
         path: /var/run/reboot-required
         get_md5: no
 
-    - name: Restart novicok
-      ansible.builtin.service:
-        name: novichok
-        state: restarted
-      when: reboot_required_file.stat.exists == False
-
     - name: Reboot the box if kernel updated
       reboot:
         msg: "Reboot initiated by Ansible for kernel updates"
