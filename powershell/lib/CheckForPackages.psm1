@@ -98,8 +98,18 @@ param(
     }
     else {
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
+    }
+    
+    $exitCode = $?
+    Write-Information "Result: $exitCode"
+    
+    if ($exitCode -lt 0) {
+        Write-Information " * ERROR: Failed to update $packageId"    
+        WriteLogs -logs $results
+        throw "Failed to update $packageId"
     }    
-    if ($?)
+    
+    if ($exitCode -gt 0)
     {
         WriteLogs -logs $results
         
