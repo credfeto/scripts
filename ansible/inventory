@@ -6,12 +6,6 @@ arch-i7.lan
 buildagent-01.funfair.io
 buildagent-02.funfair.io
 
-#[deploy]
-#ansible_user=ubuntu
-#ansible_become=yes
-#ansible_become_method=sudo
-#ansible_ssh_pipelining=True
-
 [ethereum]
 novichok-rpc.funfair.io
 novichok-miner1.funfair.io
@@ -21,25 +15,13 @@ novichok-miner2.funfair.io
 1.ethereum.dev.vpc.funfair.io
 2.ethereum.dev.vpc.funfair.io
 
-[DevWeb]
-1.web.dev.vpc.funfair.io
-2.web.dev.vpc.funfair.io
-
 [StagingEthereum]
 1.ethereum.staging.vpc.funfair.io
 2.ethereum.staging.vpc.funfair.io
 
-[StagingWeb]
-1.web.staging.vpc.funfair.io
-2.web.staging.vpc.funfair.io
-
 [LiveEthereum]
 1.ethereum.live.vpc.funfair.io
 2.ethereum.live.vpc.funfair.io
-
-[LiveWeb]
-1.web.live.vpc.funfair.io
-2.web.live.vpc.funfair.io
 
 [LiveWallet]
 1.wallet.live.vpc.funfair.io
@@ -71,32 +53,13 @@ ansible_become=yes
 #ansible_become_method=sudo
 ansible_ssh_pipelining=True
 
-[DevWeb:vars]
-ansible_user=ubuntu
-ansible_become=yes
-#ansible_become_method=sudo
-ansible_ssh_pipelining=True
-
 [StagingEthereum:vars]
 ansible_user=ubuntu
 ansible_become=yes
 #ansible_become_method=sudo
 ansible_ssh_pipelining=True
 
-[StagingWeb:vars]
-ansible_user=ubuntu
-ansible_become=yes
-#ansible_become_method=sudo
-ansible_ssh_pipelining=True
-
-
 [LiveEthereum:vars]
-ansible_user=ubuntu
-ansible_become=yes
-#ansible_become_method=sudo
-ansible_ssh_pipelining=True
-
-[LiveWeb:vars]
 ansible_user=ubuntu
 ansible_become=yes
 #ansible_become_method=sudo

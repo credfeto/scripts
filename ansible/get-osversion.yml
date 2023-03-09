@@ -1,13 +1,9 @@
 ---
   - hosts:
-      ethereum
       build
       DevEthereum
-      DevWeb
       StagingEthereum
-      StagingWeb
       LiveEthereum
-      LiveWeb
       LiveWallet
       ffBuild
     remote_user: root
