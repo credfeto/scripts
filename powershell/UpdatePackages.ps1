@@ -249,7 +249,7 @@ param(
             continue
         }
         
-        [string]$branchPrefix = "depends/ff-1429/update-$packageId/"
+        [string]$branchPrefix = "depends/update-$packageId/"
         [string]$update = Packages_CheckForUpdates -repoFolder $repoFolder -packageCache $packageCache -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
         
         if([string]::IsNullOrEmpty($update)) {
@@ -278,9 +278,9 @@ param(
             $codeOK = DotNet-BuildSolution -srcFolder $srcPath
             Set-Location -Path $repoFolder
             if($codeOK) {
-                ChangeLog-RemoveEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to "
-                ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-                Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"  -repoPath $repoFolder
+                ChangeLog-RemoveEntry -fileName $changeLog -entryType "Changed" -code "Dependencies" -message "Updated $packageId to "
+                ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "Dependencies" -message "Updated $packageId to $update"
+                Git-Commit -message "[Dependencies] Updating $packageId ($type) to $update"  -repoPath $repoFolder
                 Git-Push -repoPath $repoFolder
 
                 # Just built, committed and pushed so get the the revisions 
@@ -298,9 +298,9 @@ param(
                 Write-Information "Create Branch $branchName"
                 [bool]$branchOk = Git-CreateBranch -branchName $branchName -repoPath $repoFolder
                 if($branchOk) {
-                    ChangeLog-RemoveEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to "
-                    ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "FF-1429" -message "Updated $packageId to $update"
-                    Git-Commit -message "[FF-1429] Updating $packageId ($type) to $update"  -repoPath $repoFolder
+                    ChangeLog-RemoveEntry -fileName $changeLog -entryType "Changed" -code "Dependencies" -message "Updated $packageId to "
+                    ChangeLog-AddEntry -fileName $changeLog -entryType "Changed" -code "Dependencies" -message "Updated $packageId to $update"
+                    Git-Commit -message "[Dependencies] Updating $packageId ($type) to $update"  -repoPath $repoFolder
                     Git-PushOrigin -branchName $branchName  -repoPath $repoFolder
 
                     $branchesCreated += 1

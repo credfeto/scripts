@@ -234,7 +234,7 @@ param(
 
     Write-Information "Staging $fileName in $repoPath"
     [String[]] $files = $filename.Replace("\", "/")
-    Git-Commit-Named -repoPath $repoPath -message "[FF-1429] - Update $fileName to match the template repo" -files $fileName
+    Git-Commit-Named -repoPath $repoPath -message "[Dependencies] - Update $fileName to match the template repo" -files $fileName
 }
 
 function updateFileAndCommit {
@@ -308,7 +308,7 @@ param(
                 Git-Push -repoPath $targetRepo
             }
             else {
-                [string]$branchName = "template/ff-1429/$fileName".Replace("\", "/")
+                [string]$branchName = "template/$fileName".Replace("\", "/")
                 [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
                 if($branchOk) {
                     Write-Information "Create Branch $branchName"

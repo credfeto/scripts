@@ -74,7 +74,7 @@ function dotNetDependabotTemplate {
   - dependency-name: ""xunit.runner.visualstudio""
   - dependency-name: ""Yoti""
   commit-message:
-    prefix: ""[FF-1429]""
+    prefix: ""[Dependencies]""
   rebase-strategy: ""auto""
   labels:
   - ""dotnet""
@@ -100,7 +100,7 @@ param([string]$path)
   allow:
   - dependency-type: all
   commit-message:
-    prefix: ""[FF-1429]""
+    prefix: ""[Dependencies]""
   rebase-strategy: ""auto""
   versioning-strategy: increase-if-necessary
   labels:
@@ -126,7 +126,7 @@ function dockerDependabotTemplate {
   allow:
   - dependency-type: all
   commit-message:
-    prefix: ""[FF-1429]""
+    prefix: ""[Dependencies]""
   rebase-strategy: ""auto""
   labels:
   - ""docker""
@@ -151,7 +151,7 @@ function githubActionsDependabotTemplate {
   allow:
   - dependency-type: all
   commit-message:
-    prefix: ""[FF-1429]""
+    prefix: ""[Dependencies]""
   rebase-strategy: ""auto""
   labels:
   - ""github-actions""
@@ -176,7 +176,7 @@ function pythonDependabotTemplate {
   allow:
   - dependency-type: all
   commit-message:
-    prefix: ""[FF-1429]""
+    prefix: ""[Dependencies]""
   rebase-strategy: ""auto""
   labels:
   - ""python""
@@ -197,7 +197,7 @@ function githubSubmodulesDependabotTemplate {
   assignees:
   - credfeto
   commit-message:
-    prefix: ""[FF-1429]""
+    prefix: ""[Dependencies]""
   rebase-strategy: ""auto""
   labels:
   - ""submodule""
