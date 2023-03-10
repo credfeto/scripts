@@ -527,11 +527,11 @@ param (
     Write-Information "**** BUILD OK ****"
     
     Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
-    Git-Commit -repoPath $targetRepo -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
+    Git-Commit -repoPath $targetRepo -message "[SDK] - Updated DotNet SDK to $dotnetVersion"
     Git-Push -repoPath $targetRepo
     Git-DeleteBranch -repoPath $targetRepo -branchName $branchName
     
-    Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+    Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/update-dotnet/"
     
     # Remove any previous template updates that didn't create a version specific branch
     Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
@@ -549,13 +549,13 @@ param (
     [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
     if ($branchOk -eq $true) {
         Write-Information "Create Branch $branchName"
-        Git-Commit -repoPath $targetRepo -message "[FF-3881] - Updated DotNet SDK to $dotnetVersion"
+        Git-Commit -repoPath $targetRepo -message "[SDK] - Updated DotNet SDK to $dotnetVersion"
         Git-PushOrigin -repoPath $targetRepo -branchName $branchName
     }
 
     Git-ResetToMaster -repoPath $targetRepo
     
-    Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/ff-3881/update-dotnet/"
+    Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix "depends/update-dotnet/"
 
     # Remove any previous template updates that didn't create a version specific branch
     Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
@@ -576,7 +576,7 @@ param(
     [string]$sourceFileName = makePath -Path $sourceRepo -ChildPath $localFileName
     [string]$targetFileName = makePath -Path $targetRepo -ChildPath $localFileName
 
-    [string]$originalBranchPrefix = "template/ff-3881/$fileName".Replace("\", "/")
+    [string]$originalBranchPrefix = "template/$fileName".Replace("\", "/")
     [string]$branchName = $originalBranchPrefix
 
     Write-Information "*****************"
@@ -599,11 +599,11 @@ param(
 
             Write-Information "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
             [string]$changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
-            ChangeLog-RemoveEntry -fileName $changeLogFile -entryType Changed -code "FF-3881" -message "Updated DotNet SDK to "
-            ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "FF-3881" -message "Updated DotNet SDK to $dotnetVersion"
+            ChangeLog-RemoveEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to "
+            ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to $dotnetVersion"
 
             # Change branch name so its obvious its a dotnet update rather than just a change to the file
-            [string]$branchName = "depends/ff-3881/update-dotnet/$dotnetVersion/$fileName".Replace("\", "/")
+            [string]$branchName = "depends/update-dotnet/$dotnetVersion/$fileName".Replace("\", "/")
 
             [bool]$codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
             Set-Location -Path $targetRepo

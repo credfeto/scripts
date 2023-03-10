@@ -121,13 +121,13 @@ param(
             continue
         }
 
-        if($line -match "^\s*\-\s*FF\-368\s*\-\s*") {
+        if($line -match "^\s*\-\s*GEOIP\s*\-\s*") {
             # GEO-IP update
             $updateCount += 1
             continue
         }
         
-        if($line.StartsWith("- FF-3881 - Updated DotNet SDK to ")) {
+        if($line.StartsWith("- SDK - Updated DotNet SDK to ")) {
             # Dotnet version update
             $updateCount += 1000
             continue
