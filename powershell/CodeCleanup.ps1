@@ -275,7 +275,7 @@ param(
 
             $solutionFile = $solution.FullName
             $solutionName = $solution.Name
-            $branchName = "cleanup/ff-2244/$solutionName"
+            $branchName = "cleanup/$solutionName"
             $branchExists = Git-DoesBranchExist -repoPath $repoFolder -branchName $branchName
             if($branchExists -ne $true) {
 
@@ -295,26 +295,26 @@ param(
                         [bool]$pushToBranch = ShouldPushToBranch -repoPath $repoFolder 
                         if($pushToBranch) {                         
                             Git-CreateBranch  -repoPath $repoFolder -branchName $branchName
-                            Git-Commit -repoPath $repoFolder -message "[FF-2244] - Code cleanup on $solutionName"
+                            Git-Commit -repoPath $repoFolder -message "[Cleanup] - Code cleanup on $solutionName"
                             Git-PushOrigin -repoPath $repoFolder -branchName $branchName
                             
                             Git-ReNormalise -repoPath $repoFolder
                         }
                         else {
-                            Git-Commit -repoPath $repoFolder -message "[FF-2244] - Code cleanup on $solutionName"
+                            Git-Commit -repoPath $repoFolder -message "[Cleanup] - Code cleanup on $solutionName"
                             Git-Push -repoPath $repoFolder
                             Git-ReNormalise -repoPath $repoFolder
                         }
                     }
                 }
                 else {
-                    $branchName = "broken/$currentRevision/cleanup/ff-2244/$solutionName"
+                    $branchName = "broken/$currentRevision/cleanup/$solutionName"
                     $branchExists = Git-DoesBranchExist -repoPath $repoFolder -branchName $branchName
                     if($branchExists -ne $true) {
                         $hasChanges = Git-HasUnCommittedChanges -repoPath $repoFolder
                         if($hasChanges -eq $true) {
                             Git-CreateBranch -repoPath $repoFolder -branchName $branchName
-                            Git-Commit  -repoPath $repoFolder -message "[FF-2244] - Code cleanup on $solutionName [BROKEN - NEEDS INVESTIGATION - DO NOT MERGE]"
+                            Git-Commit  -repoPath $repoFolder -message "[Cleanup] - Code cleanup on $solutionName [BROKEN - NEEDS INVESTIGATION - DO NOT MERGE]"
                             Git-PushOrigin  -repoPath $repoFolder -branchName $branchName
                             
                             Git-ReNormalise -repoPath $repoFolder
