@@ -163,8 +163,13 @@ param (
     [string]$targetFileName = convertToOsPath -path $targetFileName
 
     [string]$targetFolder = $targetFileName.Substring(0, $targetFileName.LastIndexOf("/"))
+    
     Write-Information "--- Ensure folder exists: $targetFolder for $targetFileName"
-    ensureFolderExists -path $targetFolder
+    [bool]$targetFolderExists = Test-Path -Path $targetFolder -PathType Container
+    if($targetFolderExists -eq $false) {
+        Write-Information "--- Creating folder: $targetFolder"
+        New-Item -ItemType Directory -Path $targetFolder
+    }    
     
     [bool]$srcExists = Test-Path -Path $sourceFileName
     [bool]$trgExists = Test-Path -Path $targetFileName
