@@ -162,6 +162,10 @@ param (
     [string]$sourceFileName = convertToOsPath -path $sourceFileName
     [string]$targetFileName = convertToOsPath -path $targetFileName
 
+    [string]$targetFolder = $targetFileName.Substring(0, $targetFileName.LastIndexOf("\"))
+    Write-Information "--- Ensure folder exists: $targetFolder for $targetFileName"
+    ensureFolderExists -path $targetFolder
+    
     [bool]$srcExists = Test-Path -Path $sourceFileName
     [bool]$trgExists = Test-Path -Path $targetFileName
 
@@ -367,6 +371,20 @@ param (
             Git-Push -repoPath $targetRepo
         }
     }
+}
+
+function updateActionAndCommit {
+param(
+    [string]$sourceRepo = $(throw "updateActionAndCommit: sourceRepo not specified"), 
+    [string]$targetRepo = $(throw "updateActionAndCommit: targetRepo not specified"), 
+    [string]$fileName = $(throw "updateActionAndCommit: filename not specified")
+    )
+    
+    if($sourceRepo -eq $targetRepo) {
+        throw "updateActionAndCommit: Source Repo and Target Repos are both set to $sourceRepo"
+    }
+
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $fileName
 }
 
 function updateWorkFlowAndCommit {
@@ -790,6 +808,18 @@ param (
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\PULL_REQUEST_TEMPLATE.md"
 
     
+    [string]$actions = makePath -Path $sourceRepo -ChildPath ".github\actions"
+    Write-Information "Looking for action in $actions"
+    $files = Get-ChildItem -Path $actions -Filter *.yml -File -Attributes Normal, Hidden -Recurse
+    ForEach ($file in $files)
+    {
+        [string]$srcFileName = $file.FullName
+        $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
+        Write-Information " * Found action $srcFileName"
+
+        updateActionAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
+    }
+
     [string]$workflows = makePath -Path $sourceRepo -ChildPath ".github\workflows"
     Write-Information "Looking for Workflows in $workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml -File -Attributes Normal, Hidden
