@@ -162,7 +162,7 @@ param (
     [string]$sourceFileName = convertToOsPath -path $sourceFileName
     [string]$targetFileName = convertToOsPath -path $targetFileName
 
-    [string]$targetFolder = $targetFileName.Substring(0, $targetFileName.LastIndexOf("\"))
+    [string]$targetFolder = $targetFileName.Substring(0, $targetFileName.LastIndexOf("/"))
     Write-Information "--- Ensure folder exists: $targetFolder for $targetFileName"
     ensureFolderExists -path $targetFolder
     
