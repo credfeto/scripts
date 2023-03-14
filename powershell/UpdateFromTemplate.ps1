@@ -743,6 +743,7 @@ param (
     # CREATE ANY FOLDERS THAT ARE NEEDED
     ensureFolderExists -baseFolder $targetRepo -subFolder ".github"
     ensureFolderExists -baseFolder $targetRepo -subFolder ".github\workflows"
+    ensureFolderExists -baseFolder $targetRepo -subFolder ".github\actions"
     ensureFolderExists -baseFolder $targetRepo -subFolder ".github\linters"
 
     ## Ensure Changelog exists
