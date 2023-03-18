@@ -28,10 +28,7 @@ function getLatestReleasePackage($packageId) {
             foreach($package in $packages) {
                 $version = $package.Version
                 Write-Information "* Found $packageId version $version"
-                if($version -ne "473.0.0") {
-                    Write-Information "* Found $packageId version $version"
-                    return $version
-                }
+                return $version
             }
             
 			[string]$foundVersion = $packages[0].Version
