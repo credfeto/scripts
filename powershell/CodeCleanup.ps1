@@ -238,7 +238,8 @@ param(
     
     Write-Information "Processing Repo: $repo"
     
-    $removeXmlDoc = !$repo.Contains("funfair")
+    [bool]$removeXmlDoc = !$repo.Contains("funfair")
+    [bool]$removeXmlDoc = $true
 
     # Extract the folder from the repo name
     $folder = Git-GetFolderForRepo -repo $repo
