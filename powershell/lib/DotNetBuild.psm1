@@ -6,6 +6,14 @@ function GetNoWarn {
     return "-p:NoWarn=MSB3243"
 }
 
+function DotNet-ShutdownBuildServer {
+    $results = dotnet build-server shutdown 2>$null > $null
+    if(!$?) {        
+        WriteProgress "$results"
+        #throw "Failed to shutdown build server"
+    }
+}
+
 function DotNet-DumpOutput {
     param(
          $result
@@ -21,13 +29,26 @@ param(
     $result
     )
 
-    [string]$errorCode = "AD0001"
+    [string]$errorCode = 
     [string]$NewLine = [System.Environment]::NewLine
 
     [string]$resultsAsText = $result -join $NewLine
-    [bool]$retry = $resultsAsText.Contains($errorCode)
     
-    return $retry
+    # AD0001: Analyzer 'X' threw an exception of type 'Y'
+    [bool]$retry = $resultsAsText.Contains("AD0001")    
+    if($retry) {
+        Write-Information ">>>>>> Code Analysis Crashed"
+        return $true
+    }
+    
+    # CS8034 - Unable to load Analyzer assembly X : Could not load file or assembly 'Y'. Access is denied.
+    [bool]$retry = $resultsAsText.Contains("CS8034")    
+    if($retry) {
+        Write-Information ">>>>>> Code Analysis could not load assembly"
+        return $true
+    }
+    
+    return $false
 }
 
 function DotNet-GetPublishableFramework {
@@ -130,6 +151,7 @@ param(
     try {
         Set-Location -Path $srcFolder
 
+        DotNet-ShutdownBuildServer
         $result = dotnet clean --configuration=Release -nodeReuse:False 2>&1
         if(!$?) {
             Write-Information ">>> Clean Failed"
@@ -138,11 +160,13 @@ param(
         }
         
         Write-Information "   - Clean Succeeded"
-
         return $true
     } catch  {
         Write-Information ">>> Clean Failed"
         return $false
+    }
+    finally {
+        DotNet-ShutdownBuildServer
     }
 }
 
@@ -155,6 +179,7 @@ param(
     try {
         Set-Location -Path $srcFolder
 
+        DotNet-ShutdownBuildServer
         $result = dotnet restore -nodeReuse:False -r:linux-x64 2>&1
         if(!$?) {
             Write-Information ">>> Restore Failed"
@@ -167,6 +192,9 @@ param(
     } catch  {
         Write-Information ">>> Restore Failed"
         return $false
+    }
+    finally {
+        DotNet-ShutdownBuildServer
     }
 }
 
@@ -182,18 +210,20 @@ param(
     do {
         Set-Location -Path $srcFolder
 
+        DotNet-ShutdownBuildServer
         $result = dotnet build --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version $noWarn  2>&1
         if(!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Build Failed"
                 DotNet-DumpOutput -result $result
+                DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
             Write-Information "   - Build Succeeded"
-
+            DotNet-ShutdownBuildServer
             return $true
         }
     }
@@ -212,19 +242,20 @@ param(
     do {
         Set-Location -Path $srcFolder
 
+        DotNet-ShutdownBuildServer
         $result = dotnet pack --no-restore -nodeReuse:False --configuration=Release -p:Version=$version $noWarn 2>&1
         if(!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Packing Failed"
                 DotNet-DumpOutput -result $result
-
+                DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
             Write-Information "   - Packing Succeeded"
-
+            DotNet-ShutdownBuildServer
             return $true
         }
     }
@@ -249,6 +280,7 @@ param(
 #       -p:NoWarn=NETSDK1179 
 #       --no-restore
 
+        DotNet-ShutdownBuildServer
         if($framework) {
             $result = dotnet publish -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false $noWarn -nodeReuse:False 2>&1
         } else {
@@ -260,12 +292,13 @@ param(
             {
                 Write-Information ">>> Publishing Failed"
                 DotNet-DumpOutput -result $result
-
+                DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
             Write-Information "   - Publishing Succeeded"
+            DotNet-ShutdownBuildServer
             return $true
         }
     }
@@ -281,17 +314,20 @@ param(
     do {
         Set-Location -Path $srcFolder
 
+        DotNet-ShutdownBuildServer
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration 2>&1
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
+                DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
             Write-Information "   - Tests Succeeded"
+            DotNet-ShutdownBuildServer
             return $true
         }            
     }
@@ -307,17 +343,20 @@ param(
     do {
         Set-Location -Path $srcFolder
 
+        DotNet-ShutdownBuildServer
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration 2>&1
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
+                DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
             Write-Information "   - Tests Succeeded"
+            DotNet-ShutdownBuildServer
             return $true
         }
     }
@@ -345,17 +384,20 @@ param(
     do {
         Set-Location -Path $srcFolder
 
+        DotNet-ShutdownBuildServer
         $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False 2>&1
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
                 Write-Information ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
+                DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
             Write-Information "   - Tests Succeeded"
+            DotNet-ShutdownBuildServer
             return $true
         }
     }
@@ -525,6 +567,7 @@ param(
         return $false
     }
     finally {
+        DotNet-ShutdownBuildServer
         # Restore the original path after any build.
         Set-Location -Path $originalPath
     }
