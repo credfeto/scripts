@@ -92,7 +92,7 @@ param(
     $packages = $(throw "IsAllAutoUpdates: packages not specified")
     )
 
-    [string]$expr = "(?ms)" + "^\s*\-\s*FF\-1429\s*\-\sUpdated\s+(?<PackageId>.+(\.+)*?)\sto\s+(\d+\..*)$"
+    [string]$expr = "(?ms)" + "^\s*\-\s*Dependencies\s*\-\sUpdated\s+(?<PackageId>.+(\.+)*?)\sto\s+(\d+\..*)$"
     
     [int]$updateCount = 0
 
