@@ -21,6 +21,10 @@ param (
             
             if($orderedChildren.Contains($name)) {
                 $replace = $false;
+                if($name -eq "DEFINECONSTANTS") {
+                    # Skip DefineConstants as they can be added many times
+                    Break
+                }
                 Write-Information "$filename SKIPPING GROUP AS Found Duplicate item $name"
                 Break
             }
