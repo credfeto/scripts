@@ -1,7 +1,7 @@
 
 function Project_ReOrderPropertyGroups {
 param (
-    [string]filename,
+    [string]$filename,
     $project = $(throw "Project_ReOrderPropertyGroups: project not specified")
 )
     $toRemove = @()
