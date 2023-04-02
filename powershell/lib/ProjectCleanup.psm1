@@ -1,6 +1,7 @@
 
 function Project_ReOrderPropertyGroups {
 param (
+    [string]filename,
     $project = $(throw "Project_ReOrderPropertyGroups: project not specified")
 )
     $toRemove = @()
@@ -14,13 +15,13 @@ param (
             [string]$name = ($child.Name).ToString().ToUpper()
             if($name -eq "#COMMENT") {
                 $replace = $false;
-                Write-Information "SKIPPING GROUP AS Found Comment"
+                Write-Information "$filename SKIPPING GROUP AS Found Comment"
                 Break
             }
             
             if($orderedChildren.Contains($name)) {
                 $replace = $false;
-                Write-Information "SKIPPING GROUP AS Found Duplicate item $name"
+                Write-Information "$filename SKIPPING GROUP AS Found Duplicate item $name"
                 Break
             }
             $orderedChildren.Add($name, $child)
@@ -164,7 +165,7 @@ param (
     
     $project = $data.SelectSingleNode("/Project")
 
-    Project_ReOrderPropertyGroups -project $project
+    Project_ReOrderPropertyGroups -project $project -filename $projectFile
     Project_ReOrderIncludes -project $project
     
     $xws = new-object System.Xml.XmlWriterSettings
