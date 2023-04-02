@@ -6,14 +6,6 @@ function GetNoWarn {
     return "-p:NoWarn=MSB3243"
 }
 
-function DotNet-ShutdownBuildServer {
-    $results = dotnet build-server shutdown 2>$null > $null
-    if(!$?) {        
-        WriteProgress "$results"
-        #throw "Failed to shutdown build server"
-    }
-}
-
 function DotNet-DumpOutput {
     param(
          $result
@@ -21,6 +13,14 @@ function DotNet-DumpOutput {
 
     foreach ($item in $result) {
         Write-Information ">>>>>> $item"
+    }
+}
+
+function DotNet-ShutdownBuildServer {
+    $results = dotnet build-server shutdown 2>$null > $null
+    if(!$?) {        
+        DotNet-DumpOutput -result $results
+        throw "Failed to shutdown build server"
     }
 }
 
