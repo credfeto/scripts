@@ -20,7 +20,7 @@ function DotNet-ShutdownBuildServer {
     $results = dotnet build-server shutdown 2>$null > $null
     if(!$?) {        
         DotNet-DumpOutput -result $results
-        throw "Failed to shutdown build server"
+        #throw "Failed to shutdown build server"
     }
 }
 
