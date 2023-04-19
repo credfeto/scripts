@@ -24,7 +24,6 @@ source $BASEDIR/dbenv
 SHARED_DATA=
 while [[ $# -gt 0 ]]; do
   key="$1"
-  echo "Key: $key"
 
   case $key in
     -X|--data)
