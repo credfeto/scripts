@@ -60,6 +60,8 @@ if [ ! -z "$LOCAL_DB_SETTINGS_FOLDER" ]; then
   fi
 fi
 
+function parse_cmdline {
+
 while [[ $# -gt 0 ]]; do
   key="$1"
 
@@ -89,6 +91,9 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+}
+
+parse_cmdline $@
 
 [ -z "$SERVER" ] && die "--server not specified"
 [ -z "$USER" ] && die "--user not specified"

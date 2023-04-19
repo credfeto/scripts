@@ -18,11 +18,13 @@ alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
 BASEDIR=$(dirname "$(readlink -f "$0")")
 echo "Script Dir: $BASEDIR"
 
+
 source $BASEDIR/dbenv
 
 SHARED_DATA=
 while [[ $# -gt 0 ]]; do
   key="$1"
+  echo "Key: $key"
 
   case $key in
     -X|--data)
@@ -37,7 +39,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 [ -z "$PASSWORD" ] && die "--password not specified"
-[ -z "$SHARED_DATA"] && die "--data not specified"
+[ -z "$SHARED_DATA" ] && die "--data not specified"
 
 echo "Ensuring network installed"
 docker network create multi-host-network
@@ -51,7 +53,7 @@ mkdir -p $SHARED_DATA/.db/logs
 mkdir -p $SHARED_DATA/.db/secrets
 
 echo "Ensuring docker has permission to access $SHARED_DATA"
-chown -R 10001.docker $SHARED_DATA
+chown -R 10001:docker $SHARED_DATA
 chmod -R 700 $SHARED_DATA
  
 echo "Installing container"
