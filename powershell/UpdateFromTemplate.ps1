@@ -799,6 +799,8 @@ param (
             updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\FunFair.props"
             updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\packageicon.png"
         }
+        
+        updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\Directory.Build.props"
     }
 
     #########################################################
