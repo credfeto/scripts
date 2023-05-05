@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 USER_HOME=$1
 shift # past argument
 
