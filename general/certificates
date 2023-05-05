@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 CERTIFICATE=~/work/funfair/funfair-ethereum-proxy-server-monitor/proxy-server-monitor/ssl/server.crt
 HOSTNAME=localhost

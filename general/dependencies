@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
 dotnet pwsh -f "$BASEDIR/../powershell/RemoveRedundantReferences.ps1" --solutionDirectory $(pwd)
