@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 
 
 for line in $(find  $(pwd)/* -name '*.git' -printf '%h\n' | sort -u | grep -v .cache)
