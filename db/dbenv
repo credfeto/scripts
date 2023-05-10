@@ -16,7 +16,7 @@ upsearch () {
  for (( n=${#slashes}; n>0; --n ))
  do
    if test -e "$directory/$1"; then
-     echo $directory
+     echo "$directory"
      return
    fi
   
