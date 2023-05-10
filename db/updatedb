@@ -2,7 +2,7 @@
 
 PROG=$0
 
-function error_exit {
+error_exit() {
     echo
     echo "$@"
     exit 1
@@ -27,7 +27,7 @@ LOG=
 
 source $BASEDIR/dbenv
 
-while [[ $# -gt 0 ]]; do
+while [ $# -gt 0 ]; do
   key="$1"
 
   case $key in

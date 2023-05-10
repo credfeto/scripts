@@ -4,13 +4,13 @@ PROG=$0
 CURRENTDIR=$PWD
 echo "Current Dir: $CURRENTDIR"
 
-function error_exit {
+error_exit() {
     echo
     echo "$@"
     exit 1
 }
 
-function upsearch () {
+upsearch () {
  local slashes=${PWD//[^\/]/}
  local directory="$PWD"
  for (( n=${#slashes}; n>0; --n ))
@@ -40,8 +40,8 @@ PASSWORD=
 SCHEMA=
 
 DB_SETTINGS_FILE=~/.database
-[[ -f "$DB_SETTINGS_FILE" ]]; echo "Using $DB_SETTINGS_FILE"
-[[ -f "$DB_SETTINGS_FILE" ]]; source $DB_SETTINGS_FILE
+[ -f "$DB_SETTINGS_FILE" ]; echo "Using $DB_SETTINGS_FILE"
+[ -f "$DB_SETTINGS_FILE" ]; source $DB_SETTINGS_FILE
 
 LOCAL_DB_SETTINGS_FOLDER=$(upsearch ".database")
 if [ ! -z "$LOCAL_DB_SETTINGS_FOLDER" ]; then
@@ -60,9 +60,9 @@ if [ ! -z "$LOCAL_DB_SETTINGS_FOLDER" ]; then
   fi
 fi
 
-function parse_cmdline {
+parse_cmdline() {
 
-while [[ $# -gt 0 ]]; do
+while [ $# -gt 0 ]; do
   key="$1"
 
   case $key in
@@ -102,7 +102,7 @@ parse_cmdline $@
 SQLCOMPARE_SERVER=$SERVER
 if [ "$SERVER" = "localhost" ]; then
   SQLCOMPARE_SERVER=$(sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mssql)
-  if [ ! -z "SQLCOMPARE_SERVER" ]; then
+  if [ ! -z "$SQLCOMPARE_SERVER" ]; then
     echo "Overriding localhost with Docker Server for compare at $SQLCOMPARE_SERVER"    
   fi  
 fi
