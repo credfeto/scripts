@@ -31,7 +31,7 @@ trap "error_exit 'Received signal SIGINT'" SIGINT
 trap "error_exit 'Received signal SIGTERM'" SIGTERM
 
 shopt -s expand_aliases
-alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
+alias die='error_exit "Error $PROG (@$(( $LINENO - 1 )):"'
 
 SERVER=
 DB=
