@@ -20,7 +20,7 @@ DB_SETTINGS_FILE=~/.database
 [ -f "$DB_SETTINGS_FILE" ]; echo "Using $DB_SETTINGS_FILE"
 [ -f "$DB_SETTINGS_FILE" ]; . "${DB_SETTINGS_FILE}"
 
-LOCAL_DB_SETTINGS_FILE=$(find $(CP="${PWD}"; while [ -n "$CP" ] ; do echo "$CP"; CP="${CP%/*}"; done; echo "/") -mindepth 1 -maxdepth 1 -type f -name ".database" | head -n 1)
+LOCAL_DB_SETTINGS_FILE=$(find $(CP="${PWD}"; while [ -n "$CP" ] ; do echo "$CP"; CP="${CP%/*}"; done;) -mindepth 1 -maxdepth 1 -type f -name ".database" | head -n 1)
 if [ ! -z "$LOCAL_DB_SETTINGS_FILE" ]; then
   LOCAL_DB_SETTINGS_FILE=$(readlink -f "$LOCAL_DB_SETTINGS_FILE")
   LOCAL_DB_SETTINGS_FOLDER=$(dirname "$LOCAL_DB_SETTINGS_FILE")
