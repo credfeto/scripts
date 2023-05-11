@@ -4,34 +4,27 @@ PROG=$0
 CURRENTDIR=$PWD
 echo "Current Dir: $CURRENTDIR"
 
-error_exit() {
+die() {
     echo
     echo "$@"
     exit 1
 }
 
 upsearch () {
- local slashes=${PWD//[^\/]/}
- local directory="$PWD"
- for (( n=${#slashes}; n>0; --n ))
- do
-   if test -e "$directory/$1"; then
-     echo "$directory"
-     return
-   fi
-  
-   test -e "$directory/.git" && return
-   directory="$directory/.."
- done
+ slashes=${PWD//[^\/]/}
+ directory="$PWD"
+ n=${#slashes}
+ while ( n gt 0); do
+    if test -e "$directory/$1"; then
+        echo "$directory"
+        return
+      fi
+     
+      test -e "$directory/.git" && return
+      directory="$directory/.."
+      n=${n - 1}
+ done; 
 }
-
-#Trap the killer signals so that we can exit with a good message.
-trap "error_exit 'Received signal SIGHUP'" SIGHUP
-trap "error_exit 'Received signal SIGINT'" SIGINT
-trap "error_exit 'Received signal SIGTERM'" SIGTERM
-
-shopt -s expand_aliases
-alias die='error_exit "Error $PROG (@$(( $LINENO - 1 )):"'
 
 SERVER=
 DB=
@@ -41,7 +34,7 @@ SCHEMA=
 
 DB_SETTINGS_FILE=~/.database
 [ -f "$DB_SETTINGS_FILE" ]; echo "Using $DB_SETTINGS_FILE"
-[ -f "$DB_SETTINGS_FILE" ]; source $DB_SETTINGS_FILE
+[ -f "$DB_SETTINGS_FILE" ]; . "${DB_SETTINGS_FILE}"
 
 LOCAL_DB_SETTINGS_FOLDER=$(upsearch ".database")
 if [ ! -z "$LOCAL_DB_SETTINGS_FOLDER" ]; then
@@ -49,7 +42,7 @@ if [ ! -z "$LOCAL_DB_SETTINGS_FOLDER" ]; then
   echo "Using settings from $LOCAL_DB_SETTINGS_FOLDER"
   LOCAL_DB_SETTINGS_FILE="$LOCAL_DB_SETTINGS_FOLDER/.database"
   if [ "$LOCAL_DB_SETTINGS_FILE" != "$DB_SETTINGS_FILE" ]; then
-    source $LOCAL_DB_SETTINGS_FILE
+    . "${LOCAL_DB_SETTINGS_FILE}"
     
     if [ ! -z "$DB" ]; then
       [ -z "$SOURCE" ] && SOURCE="$LOCAL_DB_SETTINGS_FOLDER/db"
