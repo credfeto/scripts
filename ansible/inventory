@@ -1,6 +1,8 @@
 [build]
 arch-ryzen9.lan
 arch-i7.lan
+arch-atom.lan
+juno-ryzen7.lan
 
 [ffBuild]
 buildagent-01.funfair.io
