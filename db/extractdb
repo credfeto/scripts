@@ -2,28 +2,21 @@
 
 PROG=$0
 
-error_exit() {
+die() {
     echo
     echo "$@"
     exit 1
 }
-#Trap the killer signals so that we can exit with a good message.
-trap "error_exit 'Received signal SIGHUP'" SIGHUP
-trap "error_exit 'Received signal SIGINT'" SIGINT
-trap "error_exit 'Received signal SIGTERM'" SIGTERM
 
-shopt -s expand_aliases
-alias die='error_exit "Error $PROG (@`echo $(( $LINENO - 1 ))`):"'
-
-BASEDIR=$(dirname "$(readlink -f "$0")")
+BASEDIR="$(dirname "$(readlink -f "$0")")"
 echo "Script Dir: $BASEDIR"
 SERVER=
 DB=
 AUTH=
 
-source $BASEDIR/dbenv 
+. "$BASEDIR/dbenv" 
 
-while [[ $# -gt 0 ]]; do
+while [ $# -gt 0 ]; do
   key="$1"
 
   case $key in
@@ -44,10 +37,10 @@ done
 [ -z "$PASSWORD" ] && die "--password not specified"
 [ -z "$OUTPUT" ] && die "--output not specified"
 
-FILTER=$OUTPUT/Filter.scpf
+FILTER="$OUTPUT/Filter.scpf"
 
-DBXML=$TMP/db.xml
-HOOKSXML=$TMP/hooks.xml
+DBXML="$TMP/db.xml"
+HOOKSXML="$TMP/hooks.xml"
 
 echo "<?xml version=\"1.0\" encoding=\"utf-16\" standalone=\"yes\"?>" > $HOOKSXML
 echo "<HooksConfig version=\"1\" type=\"HooksConfig\">" >> $HOOKSXML
@@ -108,7 +101,7 @@ echo "  <HooksFileInRepositoryFolder>False</HooksFileInRepositoryFolder>" >> $DB
 echo "</ISOCCompareLocation>" >> $DBXML
 
 sudo $BASEDIR/sqlcompare \
-  $HOME \
+  "$HOME" \
   /filter:"$FILTER" \
   /options:ConsiderNextFilegroupInPartitionSchemes,DecryptPost2kEncryptedObjects,DoNotOutputCommentHeader,ForceColumnOrder,IgnoreCertificatesAndCryptoKeys,IgnoreDatabaseAndServerName,IgnoreUserProperties,IgnoreUsersPermissionsAndRoleMemberships,IgnoreWhiteSpace,IgnoreWithElementOrder,IncludeDependencies,NoDeploymentLogging,ThrowOnFileParseFailed,UseCompatibilityLevel \
   /transactionIsolationLevel:SERIALIZABLE \
