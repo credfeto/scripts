@@ -856,6 +856,7 @@ param (
         "linter.yml",
         "rebase.yml",
         "sqlcheck.yml",
+        "stale.yml",
         "tabtospace.yml"                
     )
     ForEach ($file in $files) {
