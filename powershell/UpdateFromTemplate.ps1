@@ -768,6 +768,7 @@ param (
     ensureFolderExists -baseFolder $targetRepo -subFolder ".github\workflows"
     ensureFolderExists -baseFolder $targetRepo -subFolder ".github\actions"
     ensureFolderExists -baseFolder $targetRepo -subFolder ".github\linters"
+    ensureFolderExists -baseFolder $targetRepo -subFolder ".github\ISSUE_TEMPLATE"
 
     ## Ensure Changelog exists
     [string]$targetChangelogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
@@ -817,6 +818,18 @@ param (
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "SECURITY.md"
 
     
+    [string]$issueTemplates = makePath -Path $sourceRepo -ChildPath ".github\ISSUE_TEMPLATE"
+    Write-Information "Looking for issue templates in $issueTemplates"
+    $files = Get-ChildItem -Path $issueTemplates -Filter *.md -File -Attributes Normal, Hidden -Recurse
+    ForEach ($file in $files)
+    {
+        [string]$srcFileName = $file.FullName
+        $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
+        Write-Information " * Found issue template: $srcFileName"
+
+        updateActionAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
+    }
+        
     [string]$actions = makePath -Path $sourceRepo -ChildPath ".github\actions"
     Write-Information "Looking for action in $actions"
     $files = Get-ChildItem -Path $actions -Filter *.yml -File -Attributes Normal, Hidden -Recurse
