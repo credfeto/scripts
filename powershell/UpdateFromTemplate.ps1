@@ -813,8 +813,8 @@ param (
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\pr-lint.yml"
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\CODEOWNERS"
     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\PULL_REQUEST_TEMPLATE.md"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".CONTRIBUTING.md"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".SECURITY.md"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "CONTRIBUTING.md"
+    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "SECURITY.md"
 
     
     [string]$actions = makePath -Path $sourceRepo -ChildPath ".github\actions"
