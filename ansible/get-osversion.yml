@@ -5,6 +5,7 @@
       StagingEthereum
       LiveEthereum
       LiveWallet
+      Clients
       ffBuild
     remote_user: root
 

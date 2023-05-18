@@ -29,6 +29,14 @@ novichok-miner2.funfair.io
 1.wallet.live.vpc.funfair.io
 2.wallet.live.vpc.funfair.io
 
+[Clients]
+1.clients.funfair.io
+2.clients.funfair.io
+3.clients.funfair.io
+4.clients.funfair.io
+5.clients.funfair.io
+6.clients.funfair.io
+
 [build:vars]
 ansible_user=markr
 ansible_become=yes
@@ -69,6 +77,12 @@ ansible_ssh_pipelining=True
 
 [LiveWallet:vars]
 ansible_user=ubuntu
+ansible_become=yes
+#ansible_become_method=sudo
+ansible_ssh_pipelining=True
+
+[Clients:vars]
+ansible_user=markr
 ansible_become=yes
 #ansible_become_method=sudo
 ansible_ssh_pipelining=True
