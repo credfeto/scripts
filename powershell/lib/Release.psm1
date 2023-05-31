@@ -61,6 +61,14 @@ param(
         return $true
     }
 
+    if($repo.Contains("funfair-build-check")) {
+        return $true
+    }
+
+    if($repo.Contains("funfair-build-version")) {
+        return $true
+    }
+
     return $false
 }
 
@@ -258,7 +266,16 @@ function Release-TryCreateNextPatch {
                             Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                         }
                         else {
-                            Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
+                            if (ShouldAlwaysCreatePatchRelease -repo $repo) {
+                                Write-Information "**** MAKE RELEASE ****"
+                                Write-Information "Changelog: $changeLog"
+                                Write-Information "Repo: $repoFolder"
+                                Write-Information "Reason: $skippingReason"
+                                Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
+                            }
+                            else {
+                                Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
+                            }
                         }
                     }
                     else {
@@ -267,11 +284,11 @@ function Release-TryCreateNextPatch {
                 }
             } 
             else {
-                Write-Information "SKIPPING RELEASE: Found pending update branches in $repo"
+                Write-Information "SKIPPING RELEASE: $repo Found pending update branches"
             }
         }
         else {
-            Write-Information "SKIPPING RELEASE: $skippingReason : $autoUpdateCount"
+            Write-Information "SKIPPING RELEASE: $repo - $skippingReason : $autoUpdateCount"
         }
     }
     else {
