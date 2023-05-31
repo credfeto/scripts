@@ -150,8 +150,10 @@ param(
     
     foreach($branch in $branches) {
         if($branch.StartsWith("depends/")) {
-            Write-Information "Found dependency update branch: $branch"
-            return $true
+            if(!$branch.EndsWith("/preview")) {
+                Write-Information "Found dependency branch: $branch"
+                return $true
+            }
         }
 
 #         if($branch.StartsWith("dependabot/")) {
