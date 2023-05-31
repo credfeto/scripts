@@ -188,7 +188,7 @@ function Release-TryCreateNextPatch {
     )
 
 # Settings for auto-release - could be passed in as parameters    
-[int]$autoReleasePendingPackages = 3
+[int]$autoReleasePendingPackages = 2
 [double]$minimumHoursBeforeAutoRelease = 4
 [double]$inactivityHoursBeforeAutoRelease = 2 * $minimumHoursBeforeAutoRelease
     
