@@ -319,8 +319,8 @@ param(
         Git-ResetToMaster -repoPath $repoFolder
     }
     
-    Write-Information "Updated run created $branchesCreated branches"
-    Write-Information "Updated run updated $packagesUpdated packages"
+    Write-Information "$repo Updated run created $branchesCreated branches"
+    Write-Information "$repo Updated run updated $packagesUpdated packages"
     
     Git-ResetToMaster -repoPath $repoFolder
         
@@ -330,11 +330,11 @@ param(
             Release-TryCreateNextPatch -repo $repo -repoPath $repoFolder -changeLog $changeLog
         }
         else {
-            Write-Information "SKIPPING RELEASE: Updated $packagesUpdated during this run"
+            Write-Information "SKIPPING RELEASE: $repo Updated $packagesUpdated during this run"
         }
     }
     else {
-        Write-Information "SKIPPING RELEASE: Created $branchesCreated during this run"
+        Write-Information "SKIPPING RELEASE: $repo Created $branchesCreated during this run"
     }
 }
 
