@@ -44,6 +44,7 @@ param(
     }
     else {
         Write-Information "* Changelog NOT Updated"
+        dotnet tool list
         throw "Failed to update changelog"
     }
 }
@@ -84,6 +85,7 @@ param(
     }
     else {
         Write-Information "* Changelog NOT Updated"
+        dotnet tool list
         throw "Failed to update changelog"
     }
 }
@@ -103,6 +105,7 @@ function ChangeLog-CreateRelease {
     }
     else {
         Write-Information "* Changelog NOT Updated"
+        dotnet tool list
         throw "Failed to update changelog"
     }
 }
@@ -131,6 +134,7 @@ function ChangeLog-GetUnreleased {
     }
     else {
         Write-Information "* Changelog NOT extracted"
+        dotnet tool list
         throw "Failed to extract changelog"
     }
 }
