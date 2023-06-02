@@ -1004,6 +1004,14 @@ Write-Information "*************************************************************
 Write-Information "***************************************************************"
 Write-Information ""
 
+dotnet tool list
+
+Write-Information ""
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information ""
+
+
 Write-Information "Repository List: $repos"
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
 

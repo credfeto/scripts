@@ -381,6 +381,13 @@ Write-Information "*************************************************************
 Write-Information "***************************************************************"
 Write-Information ""
 
+dotnet tool list
+
+Write-Information ""
+Write-Information "***************************************************************"
+Write-Information "***************************************************************"
+Write-Information ""
+
 $packages = Packages_Get -fileName $packagesToUpdate
 
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
