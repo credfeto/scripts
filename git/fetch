@@ -9,7 +9,7 @@ do
   echo ""
   echo "Retrieving $CURRENT_DIR..."
   git -C "$CURRENT_DIR" remote get-url origin
-  git -C "$CURRENT_DIR" fetch 
+  git -C "$CURRENT_DIR" fetch --prune --prune-tags
   git -C "$CURRENT_DIR" remote update origin --prune
   
   git -C "$CURRENT_DIR" status
