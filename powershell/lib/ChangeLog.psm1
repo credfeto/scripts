@@ -117,6 +117,7 @@ function ChangeLog-GetUnreleased {
 
     Write-Information ">>> Reading Changelog unreleased content <<<"
 
+    dotnet changelog --changelog $fileName --un-released $release
     
     [string[]]$releaseNotes = dotnet changelog --changelog $fileName --un-released $release
     if($?) {
