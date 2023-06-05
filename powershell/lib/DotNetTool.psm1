@@ -133,7 +133,7 @@ param(
 function DotNetTool-InstallVersion {
 param(
     [string] $packageId = $(throw "DotNetTool-InstallVersion: packageId not specified"),
-    [string] $version = $(throw "DotNetTool-InstallVersion: Version not specified"),
+    [string] $version = $(throw "DotNetTool-InstallVersion: Version not specified")
     )
 
     Write-Information "Installing $version of $packageId"
