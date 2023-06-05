@@ -130,6 +130,24 @@ param(
     }
 }
 
+function DotNetTool-InstallVersion {
+param(
+    [string] $packageId = $(throw "DotNetTool-InstallVersion: packageId not specified"),
+    [string] $version = $(throw "DotNetTool-InstallVersion: Version not specified"),
+    )
+
+    Write-Information "Installing $version of $packageId"
+    $result = dotnet tool install --local $packageId --version $version
+    if(!$?) {
+        DotNetTool-Error -result $result
+        return $false
+    }
+    
+    DotNetTool-Log -result $result
+    
+    [bool]$installed = isInstalled -packageId $packageId
+    return [bool]$installed    
+}
 
 <#
  .Synopsis
@@ -166,6 +184,18 @@ param(
     [bool]$installed = isInstalled -packageId $packageId
     if($installed) {
         DotNetTool-Uninstall -packageId $packageId
+    }
+    
+    if($packageId -eq "Funfair.Changelog.Cmd") {
+        return DotNetTool-InstallVersion -packageId $packageId -version "1.10.6.22"
+    }
+    
+    if($packageId -eq "Funfair.BuildVersion") {
+        return DotNetTool-InstallVersion -packageId $packageId -version "6.2.0.963"
+    }
+    
+    if($packageId -eq "FunFair.BuildCheck") {
+        return DotNetTool-InstallVersion -packageId $packageId -version "474.0.2.31"
     }
 
     # Install pre-release if requested
