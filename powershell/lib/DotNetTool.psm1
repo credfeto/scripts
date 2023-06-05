@@ -195,7 +195,7 @@ param(
     }
     
     if($packageId -eq "FunFair.BuildCheck") {
-        return DotNetTool-InstallVersion -packageId $packageId -version "474.0.2.31"
+        return DotNetTool-InstallVersion -packageId $packageId -version "6.3.5.1415"
     }
 
     # Install pre-release if requested
