@@ -1,0 +1,2 @@
+#! /bin/sh
+git checkout main && git pull && git checkout depends/dotnet/8/preview && git pull && rebase
