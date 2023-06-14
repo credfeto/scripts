@@ -56,6 +56,7 @@ function dotNetDependabotTemplate {
   - dependency-name: ""Octopus.Client""
   - dependency-name: ""Philips.CodeAnalysis.DuplicateCodeAnalyzer""
   - dependency-name: ""Philips.CodeAnalysis.MaintainabilityAnalyzers""
+  - dependency-name: ""Polly""
   - dependency-name: ""Portable.BouncyCastle""
   - dependency-name: ""Profanity.Detector""
   - dependency-name: ""Roslynator.Analyzers""
