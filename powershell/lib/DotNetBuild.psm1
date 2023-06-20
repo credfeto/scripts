@@ -22,7 +22,7 @@ param(
     )
     
     foreach($line in $result) {
-        if($line.Contains("dotnet tool restore") {
+        if($line.Contains("dotnet tool restore")) {
             dotnet tool list
             throw "Missing dotnet tool"
         }
