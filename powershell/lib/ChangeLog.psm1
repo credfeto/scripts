@@ -8,6 +8,19 @@ param(
     }
 }
 
+function Changelog-IsMissingTool {
+param(
+    [string[]]$result
+    )
+    
+    foreach($line in $result) {
+        if($line -eq "Run ""dotnet tool restore"" to make the ""changelog"" command available.") {
+            dotnet tool list
+            throw "Missing dotnet tool"
+        }
+    }
+}
+
 <#
  .Synopsis
   Adds an entry to the [Unreleased] section of a CHANGELOG.md file.
@@ -44,10 +57,7 @@ param(
     }
     else {
         Write-Information "* Changelog NOT Updated"
-         if($result.Contains("Run ""dotnet tool restore"" to make the ""changelog"" command available.")) {
-            dotnet tool list
-            throw "Build configuration error. dotnet cannot find the changelog tool."
-        }
+        Changelog-IsMissingTool -result $result
         throw "Failed to update changelog"
     }
 }
@@ -88,10 +98,7 @@ param(
     }
     else {
         Write-Information "* Changelog NOT Updated"
-         if($result.Contains("Run ""dotnet tool restore"" to make the ""changelog"" command available.")) {
-            dotnet tool list
-            throw "Build configuration error. dotnet cannot find the changelog tool."
-        }
+        Changelog-IsMissingTool -result $result
         throw "Failed to update changelog"
     }
 }
@@ -111,10 +118,7 @@ function ChangeLog-CreateRelease {
     }
     else {
         Write-Information "* Changelog NOT Updated"
-         if($result.Contains("Run ""dotnet tool restore"" to make the ""changelog"" command available.")) {
-            dotnet tool list
-            throw "Build configuration error. dotnet cannot find the changelog tool."
-        }
+        Changelog-IsMissingTool -result $result
         throw "Failed to update changelog"
     }
 }
@@ -142,10 +146,7 @@ function ChangeLog-GetUnreleased {
     }
     else {
         Write-Information "* Changelog NOT extracted"
-        if($result.Contains("Run ""dotnet tool restore"" to make the ""changelog"" command available.")) {
-            dotnet tool list
-            throw "Build configuration error. dotnet cannot find the changelog tool."
-        }
+        Changelog-IsMissingTool -result $releaseNotes        
         throw "Failed to extract changelog"
     }
 }

@@ -1,4 +1,17 @@
-﻿<#
+﻿function BuildVersion-IsMissingTool {
+param(
+    [string[]]$result
+    )
+    
+    foreach($line in $result) {
+        if($line -eq "Run ""dotnet tool restore"" to make the ""buildversion"" command available.") {
+            dotnet tool list
+            throw "Missing dotnet tool"
+        }
+    }
+}
+
+<#
  .Synopsis
   Gets the next patch release version
 
@@ -9,7 +22,10 @@ function BuildVersion-GetNextPatch {
     $result = dotnet buildversion --BuildNumber 9999 --WarningsAsErrors
 
     if(!$?) {
-        Write-Error $result
+        foreach($line in $result) {
+            Write-Information $line
+        }
+        BuildVersion-IsMissingTool -result $result
         throw "Could Not Determine Release (command failed)"
     }
     

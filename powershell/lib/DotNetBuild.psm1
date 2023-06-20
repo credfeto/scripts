@@ -16,6 +16,19 @@ function DotNet-DumpOutput {
     }
 }
 
+function DotNet-IsMissingTool {
+param(
+    [string[]]$result
+    )
+    
+    foreach($line in $result) {
+        if($line -eq "Run ""dotnet tool restore"" to make the ""buildcheck"" command available.") {
+            dotnet tool list
+            throw "Missing dotnet tool"
+        }
+    }
+}
+
 function DotNet-ShutdownBuildServer {
     $results = dotnet build-server shutdown 2>$null > $null
     if(!$?) {        
@@ -129,10 +142,7 @@ param(
         if(!$?) {
             Write-Information ">>> Solution Check Failed"
             DotNet-DumpOutput -result $result
-            if($result.Contains("Run ""dotnet tool restore"" to make the ""buildcheck"" command available.")) {
-                dotnet tool list
-                throw "Build configuration error. dotnet cannot find the buildcheck tool."
-            }
+            DotNet-IsMissingTool -result $result            
             
             return $false
         }
