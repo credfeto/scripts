@@ -344,26 +344,26 @@ param(
 Set-Location -Path $root
 Write-Information "Root Folder: $root"
 
-$installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
-}
-
-[bool]$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
-}
-
-[bool]$installed = DotNetTool-Install -packageId "FunFair.BuildCheck" -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildCheck']"
-}
+# $installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
+# 
+# if($installed -eq $false) {
+#     Write-Error ""
+# 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
+# }
+# 
+# [bool]$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
+# 
+# if($installed -eq $false) {
+#     Write-Error ""
+#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
+# }
+# 
+# [bool]$installed = DotNetTool-Install -packageId "FunFair.BuildCheck" -preReleaseVersion $preRelease
+# 
+# if($installed -eq $false) {
+#     Write-Error ""
+#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildCheck']"
+# }
 
 Write-Information ""
 Write-Information "***************************************************************"

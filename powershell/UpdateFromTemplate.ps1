@@ -978,26 +978,26 @@ param(
 Set-Location -Path $root
 Write-Information "Root Folder: $root"
 
-[bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install Credfeto.Changelog.Cmd']"
-}
-
-[bool]$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
-}
-
-[bool]$installed = DotNetTool-Install -packageId "FunFair.BuildCheck" -preReleaseVersion $preRelease
-
-if($installed -eq $false) {
-    Write-Error ""
-    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildCheck']"
-}
+# [bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
+# 
+# if($installed -eq $false) {
+#     Write-Error ""
+#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install Credfeto.Changelog.Cmd']"
+# }
+# 
+# [bool]$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
+# 
+# if($installed -eq $false) {
+#     Write-Error ""
+#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
+# }
+# 
+# [bool]$installed = DotNetTool-Install -packageId "FunFair.BuildCheck" -preReleaseVersion $preRelease
+# 
+# if($installed -eq $false) {
+#     Write-Error ""
+#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildCheck']"
+# }
 
 Write-Information ""
 Write-Information "***************************************************************"
