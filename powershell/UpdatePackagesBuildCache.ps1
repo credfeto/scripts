@@ -240,11 +240,6 @@ DotNetTool-Require -packageId "Credfeto.Changelog.Cmd"
 DotNetTool-Require -packageId "FunFair.BuildVersion"
 DotNetTool-Require -packageId "FunFair.BuildCheck"
 
-if($installed -eq $false) {
-    Write-Error ""
-	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
-}
-
 Write-Information ""
 Write-Information "***************************************************************"
 Write-Information "***************************************************************"
