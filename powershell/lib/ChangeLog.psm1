@@ -14,7 +14,7 @@ param(
     )
     
     foreach($line in $result) {
-        if($line -eq "Run ""dotnet tool restore"" to make the ""changelog"" command available.") {
+        if($line.Contains("dotnet tool restore") {
             dotnet tool list
             throw "Missing dotnet tool"
         }
