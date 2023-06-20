@@ -272,13 +272,14 @@ function DotNetTool-Require{
 param(
     [string] $packageId = $(throw "DotNetTool-Install: packageId not specified")
 )
+    Write-information "Checking that $packageId is installed..."
     $installed = DotNetTool-IsInstalled -packageId $packageId
     
     if(!$installed) {
         throw "Package $packageId is not installed"
     }
     
-    
+    Write-information "$packageId found"
 }
 
 Export-ModuleMember -Function DotNetTool-Install
