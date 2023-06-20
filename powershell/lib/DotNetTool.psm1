@@ -186,17 +186,17 @@ param(
         DotNetTool-Uninstall -packageId $packageId
     }
     
-    if($packageId -eq "Funfair.Changelog.Cmd") {
-        return DotNetTool-InstallVersion -packageId $packageId -version "1.10.6.22"
-    }
-    
-    if($packageId -eq "Funfair.BuildVersion") {
-        return DotNetTool-InstallVersion -packageId $packageId -version "6.2.0.963"
-    }
-    
-    if($packageId -eq "FunFair.BuildCheck") {
-        return DotNetTool-InstallVersion -packageId $packageId -version "6.3.5.1415"
-    }
+#     if($packageId -eq "Funfair.Changelog.Cmd") {
+#         return DotNetTool-InstallVersion -packageId $packageId -version "1.10.6.22"
+#     }
+#     
+#     if($packageId -eq "Funfair.BuildVersion") {
+#         return DotNetTool-InstallVersion -packageId $packageId -version "6.2.0.963"
+#     }
+#     
+#     if($packageId -eq "FunFair.BuildCheck") {
+#         return DotNetTool-InstallVersion -packageId $packageId -version "6.3.5.1415"
+#     }
 
     # Install pre-release if requested
     if($preReleaseVersion -eq $true) {
