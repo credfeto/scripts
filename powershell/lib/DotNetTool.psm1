@@ -254,6 +254,8 @@ param(
         throw "Failed to list installed packages $packageId"
     }
     
+    DotnetTool-Log -result $result
+    
     $lowerPackageId = $packageId.ToLower() + " "
     
     foreach($line in $result) {
