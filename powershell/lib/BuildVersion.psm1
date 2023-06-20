@@ -20,6 +20,8 @@ param(
   Gets the next patch release version
 #>
 function BuildVersion-GetNextPatch {
+    DotNetTool-Require -packageId "FunFair.BuildVersion"
+    
     $result = dotnet buildversion --BuildNumber 9999 --WarningsAsErrors
 
     if(!$?) {

@@ -138,6 +138,7 @@ param(
         $solution = $solutions[0].FullName
         Write-Information " * Solution Found: $solution"
         
+        DotNetTool-Require -packageId "FunFair.BuildCheck"
         Write-Information "dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild True"
         $result = dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild True
         if(!$?) {

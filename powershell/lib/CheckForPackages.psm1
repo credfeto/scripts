@@ -94,9 +94,11 @@ param(
     $search = buildPackageSearch -packageId $packageId -exactMatch $True
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
+        DotNetTool-Require -packageId "Credfeto.Package.Update"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
+        DotNetTool-Require -packageId "Credfeto.Package.Update"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
     }
     
@@ -150,9 +152,11 @@ param(
     $search = buildPackageSearch -packageId $packageId -exactMatch $False
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
+        DotNetTool-Require -packageId "Credfeto.Package.Update"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
+        DotNetTool-Require -packageId "Credfeto.Package.Update"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
     }
 
