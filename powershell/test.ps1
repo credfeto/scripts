@@ -230,94 +230,95 @@ if($installed -eq $false) {
 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
 }
 
-
-
-function buildPackageSearch{
-    param(
-        [string]$packageId,
-        [bool]$exactMatch
-    )
-    
-    if($exactMatch) {
-        return $packageId
-    }
-    
-    return "$($packageId):prefix"
-}
-
-function buildExcludes{
-param(
-    $exclude
-    )
-    
-    $excludes =@()
-    foreach($item in $exclude)
-    {
-        [string]$packageId = $item.packageId
-        [boolean]$exactMatch = $item.'exact-match'
-        $search = buildPackageSearch -packageId $packageId -exactMatch $exactMatch         
-        $excludes += $search
-    }
-    
-    if($excludes.Count -gt 0) {
-        $excluded = $excludes -join " "
-        Write-Information "Excluding: $excluded"
-       
-        return $excludes
-    }
-    else {
-        Write-Information "Excluding: <<None>>"
-        return $null        
-    }
-}
-
-function WriteLogs {
-    param(
-    [string[]]$logs
-    )
-    
-    foreach($message in $logs)
-    {
-        Write-Information $message
-    }
-}
-
-$packageCache = "/home/markr/packageCache.json"
-$packageId = "MSBuild.Sdk.SqlProj"
-$exactMatch = $true
-$repoFolder = "/home/markr/work/funfair/funfair-ethereum-gas-server/src"
-$exclude = @()
- 
-Write-Information "Updating Package Prefix"
-$search = buildPackageSearch -packageId $packageId -exactMatch $False
-$excludes = buildExcludes -exclude $exclude
-if($excludes) {
-    $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
-}
-else {
-    $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
-}    
-if ($?)
-{
-    WriteLogs -logs $results
-    
-    # has updates
-    [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
-    [string]$regexPattern = "::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
-
-    $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
-    $regexMatches = $regex.Matches($results.ToLower());
-    if($regexMatches.Count -gt 0) {
-        [string]$version = $regexMatches[0].Groups["Version"].Value
-        Write-Information "Found: $version"
-        return $version
-    }
-
-    Write-Information " * No Changes"
-}
-else
-{
-    Write-Information " * ERROR: Failed to update $packageId"
-    WriteLogs -logs $results
-}
-
+DotNetTool-Require -packageId $packageIdToInstall
+# 
+# 
+# function buildPackageSearch{
+#     param(
+#         [string]$packageId,
+#         [bool]$exactMatch
+#     )
+#     
+#     if($exactMatch) {
+#         return $packageId
+#     }
+#     
+#     return "$($packageId):prefix"
+# }
+# 
+# function buildExcludes{
+# param(
+#     $exclude
+#     )
+#     
+#     $excludes =@()
+#     foreach($item in $exclude)
+#     {
+#         [string]$packageId = $item.packageId
+#         [boolean]$exactMatch = $item.'exact-match'
+#         $search = buildPackageSearch -packageId $packageId -exactMatch $exactMatch         
+#         $excludes += $search
+#     }
+#     
+#     if($excludes.Count -gt 0) {
+#         $excluded = $excludes -join " "
+#         Write-Information "Excluding: $excluded"
+#        
+#         return $excludes
+#     }
+#     else {
+#         Write-Information "Excluding: <<None>>"
+#         return $null        
+#     }
+# }
+# 
+# function WriteLogs {
+#     param(
+#     [string[]]$logs
+#     )
+#     
+#     foreach($message in $logs)
+#     {
+#         Write-Information $message
+#     }
+# }
+# 
+# $packageCache = "/home/markr/packageCache.json"
+# $packageId = "MSBuild.Sdk.SqlProj"
+# $exactMatch = $true
+# $repoFolder = "/home/markr/work/funfair/funfair-ethereum-gas-server/src"
+# $exclude = @()
+#  
+# Write-Information "Updating Package Prefix"
+# $search = buildPackageSearch -packageId $packageId -exactMatch $False
+# $excludes = buildExcludes -exclude $exclude
+# if($excludes) {
+#     $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
+# }
+# else {
+#     $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
+# }    
+# if ($?)
+# {
+#     WriteLogs -logs $results
+#     
+#     # has updates
+#     [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
+#     [string]$regexPattern = "::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
+# 
+#     $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
+#     $regexMatches = $regex.Matches($results.ToLower());
+#     if($regexMatches.Count -gt 0) {
+#         [string]$version = $regexMatches[0].Groups["Version"].Value
+#         Write-Information "Found: $version"
+#         return $version
+#     }
+# 
+#     Write-Information " * No Changes"
+# }
+# else
+# {
+#     Write-Information " * ERROR: Failed to update $packageId"
+#     WriteLogs -logs $results
+# }
+# 

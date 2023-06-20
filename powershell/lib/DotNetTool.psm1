@@ -243,5 +243,43 @@ param(
 	return [bool]$installed
 }
 
+function DotNetTool-IsInstalled{
+param(
+    [string] $packageId = $(throw "DotNetTool-Install: packageId not specified")
+)
+    
+    [string[]] $result = dotnet tool list
+    if(!$?) {
+        DotNetTool-Error -result $result
+        throw "Failed to list installed packages $packageId"
+    }
+    
+    $lowerPackageId = $packageId.ToLower() + " "
+    
+    foreach($line in $result) {
+        $lowerLine = $line.ToLower()
+        if($line.StartsWith($lowerPackageId)) {
+            return $true
+        }
+    }
+    
+    return $false
+}
+
+function DotNetTool-Require{
+param(
+    [string] $packageId = $(throw "DotNetTool-Install: packageId not specified")
+)
+    $installed = DotNetTool-IsInstalled -packageId $packageId
+    
+    if(!$installed) {
+        throw "Package $packageId is not installed"
+    }
+    
+    
+}
+
 Export-ModuleMember -Function DotNetTool-Install
 Export-ModuleMember -Function DotNetTool-Uninstall
+Export-ModuleMember -Function DotNetTool-IsInstalled
+Export-ModuleMember -Function DotNetTool-Require
