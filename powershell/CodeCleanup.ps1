@@ -170,6 +170,7 @@ param(
         # TODO: Consider commiting at this point.
 
         Write-Information "    - JB Code Cleanup"
+        DotNetTool-Require -packageId "JetBrains.ReSharper.GlobalTools"
         dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
          # --no-buildin-settings
         if(!$?) {
@@ -190,6 +191,7 @@ param(
     
     # Cleanup the solution
     Write-Information "  * Cleaning Whole Solution"
+    DotNetTool-Require -packageId "JetBrains.ReSharper.GlobalTools"
     dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
      
      # --no-buildin-settings
