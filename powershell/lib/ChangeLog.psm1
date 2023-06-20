@@ -44,7 +44,10 @@ param(
     }
     else {
         Write-Information "* Changelog NOT Updated"
-        dotnet tool list
+         if($result.Contains("Run ""dotnet tool restore"" to make the ""changelog"" command available.")) {
+            dotnet tool list
+            throw "Build configuration error. dotnet cannot find the changelog tool."
+        }
         throw "Failed to update changelog"
     }
 }
@@ -85,7 +88,10 @@ param(
     }
     else {
         Write-Information "* Changelog NOT Updated"
-        dotnet tool list
+         if($result.Contains("Run ""dotnet tool restore"" to make the ""changelog"" command available.")) {
+            dotnet tool list
+            throw "Build configuration error. dotnet cannot find the changelog tool."
+        }
         throw "Failed to update changelog"
     }
 }
@@ -105,7 +111,10 @@ function ChangeLog-CreateRelease {
     }
     else {
         Write-Information "* Changelog NOT Updated"
-        dotnet tool list
+         if($result.Contains("Run ""dotnet tool restore"" to make the ""changelog"" command available.")) {
+            dotnet tool list
+            throw "Build configuration error. dotnet cannot find the changelog tool."
+        }
         throw "Failed to update changelog"
     }
 }
@@ -117,8 +126,6 @@ function ChangeLog-GetUnreleased {
 
     Write-Information ">>> Reading Changelog unreleased content <<<"
 
-    dotnet changelog --changelog $fileName --un-released $release
-    
     [string[]]$releaseNotes = dotnet changelog --changelog $fileName --un-released $release
     if($?) {
         $i = 0;
@@ -135,7 +142,10 @@ function ChangeLog-GetUnreleased {
     }
     else {
         Write-Information "* Changelog NOT extracted"
-        dotnet tool list
+        if($result.Contains("Run ""dotnet tool restore"" to make the ""changelog"" command available.")) {
+            dotnet tool list
+            throw "Build configuration error. dotnet cannot find the changelog tool."
+        }
         throw "Failed to extract changelog"
     }
 }
