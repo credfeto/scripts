@@ -280,7 +280,8 @@ param(
     }
     
     Write-information "$packageId found"
-    dotnet tool restore
+    $restored = dotnet tool restore
+    DotNetTool-Log -result $restored    
 }
 
 Export-ModuleMember -Function DotNetTool-Install
