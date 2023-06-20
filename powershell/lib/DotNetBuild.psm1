@@ -129,7 +129,7 @@ param(
         if(!$?) {
             Write-Information ">>> Solution Check Failed"
             DotNet-DumpOutput -result $result
-            if($result.Contains("Run ""dotnet tool restore"" to make the ""buildcheck"" command available.") {
+            if($result.Contains("Run ""dotnet tool restore"" to make the ""buildcheck"" command available.")) {
                 dotnet tool list
                 throw "Build configuration error. dotnet cannot find the buildcheck tool."
             }
