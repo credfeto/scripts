@@ -4,6 +4,7 @@ param(
     )
     
     foreach($line in $result) {
+        Write-Information $line
         if($line.Contains("dotnet tool restore")) {
             dotnet tool list
             throw "Missing dotnet tool"
