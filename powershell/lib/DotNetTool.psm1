@@ -186,7 +186,7 @@ param(
         DotNetTool-Uninstall -packageId $packageId
     }
     
-#     if($packageId -eq "Funfair.Changelog.Cmd") {
+#     if($packageId -eq "Credfeto.ChangeLog.Cmd") {
 #         return DotNetTool-InstallVersion -packageId $packageId -version "1.10.6.22"
 #     }
 #     

@@ -51,7 +51,7 @@ param(
     
     Write-Information ">>> Updating Changelog <<<"
 
-    DotNetTool-Require -packageId "FunFair.ChangeLog.Cmd"
+    DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$result = dotnet changelog --changelog $fileName --add $entryType --message "$code - $message"
     Changelog-Log -result $result
     if($?) {
@@ -93,7 +93,7 @@ param(
     
     Write-Information ">>> Updating Changelog <<<"
 
-    DotNetTool-Require -packageId "FunFair.ChangeLog.Cmd"
+    DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$result = dotnet changelog --changelog $fileName --remove $entryType --message "$code - $message"
     Changelog-Log -result $result
     if($?) {
@@ -114,7 +114,7 @@ function ChangeLog-CreateRelease {
 
     Write-Information ">>> Creating Changelog release notes for $release <<<"
 
-    DotNetTool-Require -packageId "FunFair.ChangeLog.Cmd"
+    DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$result = dotnet changelog --changelog $fileName --create-release $release
     Changelog-Log -result $result
     if($?) {
@@ -134,7 +134,7 @@ function ChangeLog-GetUnreleased {
 
     Write-Information ">>> Reading Changelog unreleased content <<<"
 
-    DotNetTool-Require -packageId "FunFair.ChangeLog.Cmd"
+    DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$releaseNotes = dotnet changelog --changelog $fileName --un-released $release
     if($?) {
         $i = 0;
