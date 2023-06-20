@@ -12,7 +12,6 @@ Set-StrictMode -Version 1
 
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop"
-[bool]$preRelease = $False
 
 # Ensure $root is set to a valid path
 $workDir = Resolve-Path -path $work
@@ -978,26 +977,9 @@ param(
 Set-Location -Path $root
 Write-Information "Root Folder: $root"
 
-# [bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease
-# 
-# if($installed -eq $false) {
-#     Write-Error ""
-#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install Credfeto.Changelog.Cmd']"
-# }
-# 
-# [bool]$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
-# 
-# if($installed -eq $false) {
-#     Write-Error ""
-#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
-# }
-# 
-# [bool]$installed = DotNetTool-Install -packageId "FunFair.BuildCheck" -preReleaseVersion $preRelease
-# 
-# if($installed -eq $false) {
-#     Write-Error ""
-#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildCheck']"
-# }
+DotNetTool-Require -packageId "Credfeto.Changelog.Cmd"
+DotNetTool-Require -packageId "FunFair.BuildVersion"
+DotNetTool-Require -packageId "FunFair.BuildCheck"
 
 Write-Information ""
 Write-Information "***************************************************************"

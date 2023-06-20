@@ -12,8 +12,6 @@ Set-StrictMode -Version 1
 
 $InformationPreference = "Continue"
 $ErrorActionPreference = "Stop" 
-$packageIdToInstall = "JetBrains.ReSharper.GlobalTools"
-$preRelease = $False
 
 # Ensure $root is set to a valid path
 $workDir = Resolve-Path -path $work
@@ -344,26 +342,9 @@ param(
 Set-Location -Path $root
 Write-Information "Root Folder: $root"
 
-# $installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
-# 
-# if($installed -eq $false) {
-#     Write-Error ""
-# 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
-# }
-# 
-# [bool]$installed = DotNetTool-Install -packageId "FunFair.BuildVersion" -preReleaseVersion $preRelease
-# 
-# if($installed -eq $false) {
-#     Write-Error ""
-#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildVersion']"
-# }
-# 
-# [bool]$installed = DotNetTool-Install -packageId "FunFair.BuildCheck" -preReleaseVersion $preRelease
-# 
-# if($installed -eq $false) {
-#     Write-Error ""
-#     Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install FunFair.BuildCheck']"
-# }
+DotNetTool-Require -packageId "JetBrains.ReSharper.GlobalTools"
+DotNetTool-Require -packageId "FunFair.BuildVersion"
+DotNetTool-Require -packageId "FunFair.BuildCheck"
 
 Write-Information ""
 Write-Information "***************************************************************"
