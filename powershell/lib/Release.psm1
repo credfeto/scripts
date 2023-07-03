@@ -178,6 +178,7 @@ param (
     [string]$repo = $(throw "CheckRepoForAllowedAutoUpgrade: repo not specified")
     )
     
+    Write-Information "Checking if can auto-upgrade $repo..."
     if($repo -eq "git@github.com:funfair-tech/funfair-server-content-package.git") {
         return $false
     }
