@@ -178,7 +178,7 @@ param (
     [string]$repo = $(throw "CheckRepoForAllowedAutoUpgrade: repo not specified")
     )
     
-    if($repo -eq "git@github.com:funfair-tech/funfair-server-content-package.git")) {
+    if($repo -eq "git@github.com:funfair-tech/funfair-server-content-package.git") {
         return $false
     }
     
