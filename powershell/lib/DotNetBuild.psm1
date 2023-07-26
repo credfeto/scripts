@@ -167,11 +167,13 @@ param(
 )
      
     Write-Information " * Cleaning"
+    [string]$noWarn = GetNoWarn
+    
     try {
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet clean --configuration=Release -nodeReuse:False  2>&1
+        $result = dotnet clean --configuration=Release -nodeReuse:False $noWarn 2>&1
         if(!$?) {
             Write-Information ">>> Clean Failed"
             DotNet-DumpOutput -result $result
