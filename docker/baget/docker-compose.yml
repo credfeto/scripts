@@ -91,7 +91,7 @@ services:
       - Database__ConnectionString=Data Source=/var/baget/baget.db
       - Search__Type=Database
       - Mirror__Enabled=true
-      - Mirror__PackageSource=https://api.nuget.org/v3/index.json
+      - Mirror__PackageSource=https://funfair.myget.org/F/internal/auth/071ea13d-90dd-4b3d-a2be-6133beba5d05/api/v3/index.json
       - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
