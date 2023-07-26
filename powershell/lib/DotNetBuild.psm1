@@ -3,7 +3,7 @@ function BuildVersion {
 }
 
 function GetNoWarn {
-    return "-p:NoWarn=MSB3243"
+    return "-p:NoWarn=MSB3243,NU1802"
 }
 
 function DotNet-DumpOutput {
@@ -164,12 +164,13 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildClean: srcFolder not specified")
 )
      
+    [string]$noWarn = GetNoWarn
     Write-Information " * Cleaning"
     try {
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet clean --configuration=Release -nodeReuse:False 2>&1
+        $result = dotnet clean --configuration=Release -nodeReuse:False $noWarn 2>&1
         if(!$?) {
             Write-Information ">>> Clean Failed"
             DotNet-DumpOutput -result $result
@@ -193,11 +194,13 @@ param(
     )
      
     Write-Information " * Restoring"
+    [string]$noWarn = GetNoWarn
+    
     try {
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet restore -nodeReuse:False -r:linux-x64 2>&1
+        $result = dotnet restore -nodeReuse:False -r:linux-x64 $noWarn 2>&1
         if(!$?) {
             Write-Information ">>> Restore Failed"
             DotNet-DumpOutput -result $result
@@ -293,9 +296,6 @@ param(
     Write-Information " * Publishing"
     do {
         Set-Location -Path $srcFolder
-#       run: dotnet publish --no-restore -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained:true -p:NoWarn=NETSDK1179 -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=${{ env.BUILD_VERSION }} -p:IncludeNativeLibrariesForSelfExtract=false -p:SolutionDir=..\\ --output ../server-dist
-#       -p:NoWarn=NETSDK1179 
-#       --no-restore
 
         DotNet-ShutdownBuildServer
         if($framework) {
@@ -327,12 +327,13 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildRunUnitTestsLinux: srcFolder not specified")
     )
      
+    [string]$noWarn = GetNoWarn
     Write-Information " * Unit Tests"
     do {
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration 2>&1
+        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration $noWarn 2>&1
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
@@ -356,12 +357,13 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildRunUnitTestsWindows: srcFolder not specified")
     )
      
+    [string]$noWarn = GetNoWarn
     Write-Information " * Unit Tests"
     do {
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration 2>&1
+        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration $noWarn 2>&1
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
@@ -397,12 +399,14 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildRunIntegrationTests: srcFolder not specified")
 )
 
+    [string]$noWarn = GetNoWarn
+    
     Write-Information " * Unit Tests and Integration Tests"
     do {
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False 2>&1
+        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False $noWarn 2>&1
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
