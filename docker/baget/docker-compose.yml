@@ -22,35 +22,9 @@ services:
       - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel_Default=Information
+      - Logging__Console__LogLevel__Default=Debug
     volumes:
       - /home/markr/docker/baget-data/nuget:/var/baget
-
-  nuget-sync:
-    image: loicsharma/baget:latest
-    hostname: baget-nuget-sync
-    command: import downloads
-    restart: unless-stopped
-    stop_grace_period: 500s
-    stop_signal: SIGINT
-    environment:
-      - ApiKey=Upload
-      - Storage__Type=FileSystem
-      - Storage__Path=/var/baget/packages
-      - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/var/baget/baget.db
-      - Search__Type=Database
-      - Mirror__Enabled=true
-      - Mirror__PackageSource=https://api.nuget.org/v3/index.json
-      - Mirror__PackageDownloadTimeoutSeconds=600
-      - AllowPackageOverwrites=true
-      - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel_Default=Information
-    volumes:
-      - /home/markr/docker/baget-data/nuget:/var/baget
-    depends_on:
-      nuget:
-        condition: service_started
 
   funfair:
     image: loicsharma/baget:latest
@@ -71,33 +45,6 @@ services:
       - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel_Default=Information
+      - Logging__Console__LogLevel_Default=Debug
     volumes:
       - /home/markr/docker/baget-data/funfair:/var/baget
-
-  funfair-sync:
-    image: loicsharma/baget:latest
-    hostname: baget-funfair-sync
-    command: import downloads
-    restart: unless-stopped
-    stop_grace_period: 500s
-    stop_signal: SIGINT
-    environment:
-      - ApiKey=Upload
-      - Storage__Type=FileSystem
-      - Storage__Path=/var/baget/packages
-      - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/var/baget/baget.db
-      - Search__Type=Database
-      - Mirror__Enabled=true
-      - Mirror__PackageSource=https://dotnet-nuget.s3.eu-west-1.amazonaws.com/index.json
-      - Mirror__PackageDownloadTimeoutSeconds=600
-      - AllowPackageOverwrites=true
-      - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel_Default=Information
-    volumes:
-      - /home/markr/docker/baget-data/funfair:/var/baget
-    depends_on:
-      funfair:
-        condition: service_started               
-
