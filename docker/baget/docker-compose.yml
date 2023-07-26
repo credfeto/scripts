@@ -4,12 +4,10 @@ services:
  
   nuget:
     image: loicsharma/baget:latest
-    hostname: baget-nuget
+    container_name: nuget
     restart: unless-stopped
     stop_grace_period: 500s
     stop_signal: SIGINT
-    ports:
-      - 5555:80
     environment:
       - ApiKey=Upload
       - Storage__Type=FileSystem
@@ -23,21 +21,26 @@ services:
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
       - Logging__Console__LogLevel__Default=Debug
-#      - Kestrel__Endpoints__Https__Url=https://localhost
-#      - Kestrel__Endpoints__Https__Certificate__Path=/server.pfx
-#      - ASPNETCORE_URLS=https://localhost
     volumes:
       - /home/markr/docker/baget-data/nuget:/var/baget
       - /home/markr/work/personal/scripts/baget/server.pfx:/server.pfx
 
+  nuget-nginx:
+    image: nginx:stable-alpine
+    container_name: nuget-nginx
+    volumes:
+      - ./api.nuget.local/proxy.conf:/etc/nginx/conf.d/default.conf
+      - ./certs/api.nuget.local.pem/:/etc/nginx/ssl/cert.pem
+      - ./certs/api.nuget.local.key/:/etc/nginx/ssl/cert.key
+    ports:
+      - 5555:443
+
   funfair:
     image: loicsharma/baget:latest
-    hostname: baget-funfair
+    container_name: funfair
     restart: unless-stopped
     stop_grace_period: 500s
     stop_signal: SIGINT
-    ports:
-      - 5556:80 
     environment:
       - ApiKey=Upload
       - Storage__Type=FileSystem
@@ -53,3 +56,13 @@ services:
       - Logging__Console__LogLevel_Default=Debug
     volumes:
       - /home/markr/docker/baget-data/funfair:/var/baget
+
+  funfair-nginx:
+    image: nginx:stable-alpine
+    container_name: funfair-nginx
+    volumes:
+      - ./api.nuget.local/proxy.conf:/etc/nginx/conf.d/default.conf
+      - ./certs/funfair.nuget.local.pem/:/etc/nginx/ssl/cert.pem
+      - ./certs/funfair.nuget.local.key/:/etc/nginx/ssl/cert.key
+    ports:
+      - 5556:443
