@@ -1,0 +1,20 @@
+version: "3"
+ 
+services:
+ 
+  updater:
+    image: loicsharma/baget:latest
+    hostname: baget
+    ports:
+      - 5555:80
+    environment:
+      - ApiKey=Upload
+      - Storage__Type=FileSystem
+      - Storage__Path=/var/baget/packages
+      - Database__Type=Sqlite
+      - Database__ConnectionString=Data Source=/var/baget/baget.db
+      - Search__Type=Database
+    volumes:
+      - /home/markr/docker/baget-data:/var/baget
+#    deploy:
+#      replicas: 4
