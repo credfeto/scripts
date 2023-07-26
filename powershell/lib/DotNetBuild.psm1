@@ -3,7 +3,7 @@ function BuildVersion {
 }
 
 function GetNoWarn {
-    # MSB3243
+    # MSB3243 - two assemblies of the same name, but different version
     # NU1802 - restoring from HTTP source
     return "-p:NoWarn=NU1802"
 }
