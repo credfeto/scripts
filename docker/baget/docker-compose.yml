@@ -9,7 +9,7 @@ services:
     stop_grace_period: 500s
     stop_signal: SIGINT
     ports:
-      - 5555:443
+      - 5555:80
     environment:
       - ApiKey=Upload
       - Storage__Type=FileSystem
@@ -23,9 +23,9 @@ services:
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
       - Logging__Console__LogLevel__Default=Debug
-      - Kestrel__Endpoints__Https__Url=https://localhost
-      - Kestrel__Endpoints__Https__Certificate__Path=/server.pfx
-      - ASPNETCORE_URLS=https://localhost
+#      - Kestrel__Endpoints__Https__Url=https://localhost
+#      - Kestrel__Endpoints__Https__Certificate__Path=/server.pfx
+#      - ASPNETCORE_URLS=https://localhost
     volumes:
       - /home/markr/docker/baget-data/nuget:/var/baget
       - /home/markr/work/personal/scripts/baget/server.pfx:/server.pfx
