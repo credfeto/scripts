@@ -54,7 +54,6 @@ services:
 
   funfair:
     image: loicsharma/baget:latest
-    command: import downloads
     restart: unless-stopped
     stop_grace_period: 500s
     stop_signal: SIGINT
