@@ -5,7 +5,7 @@ function BuildVersion {
 function GetNoWarn {
     # MSB3243
     # NU1802 - restoring from HTTP source
-    return '-p:NoWarn=NU1802'
+    return "-p:NoWarn=NU1802"
 }
 
 function DotNet-DumpOutput {
