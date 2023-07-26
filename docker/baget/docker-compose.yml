@@ -2,9 +2,9 @@ version: "3"
  
 services:
  
-  updater:
+  nuget:
     image: loicsharma/baget:latest
-    hostname: baget
+    hostname: baget-nuget
     ports:
       - 5555:80
     environment:
@@ -14,7 +14,24 @@ services:
       - Database__Type=Sqlite
       - Database__ConnectionString=Data Source=/var/baget/baget.db
       - Search__Type=Database
+      - Mirror__Enabled=true
+      - Mirror__PackageSource=https://api.nuget.org/v3/index.json
     volumes:
-      - /home/markr/docker/baget-data:/var/baget
-#    deploy:
-#      replicas: 4
+      - /home/markr/docker/baget-data/nuget:/var/baget
+
+  funfair:
+    image: loicsharma/baget:latest
+    hostname: baget-funfair
+    ports:
+      - 5556:80 
+    environment:
+      - ApiKey=Upload
+      - Storage__Type=FileSystem
+      - Storage__Path=/var/baget/packages
+      - Database__Type=Sqlite
+      - Database__ConnectionString=Data Source=/var/baget/baget.db
+      - Search__Type=Database
+      - Mirror__Enabled=true
+      - Mirror__PackageSource=https://funfair.myget.org/F/internal/auth/071ea13d-90dd-4b3d-a2be-6133beba5d05/api/v3/index.json
+    volumes:
+      - /home/markr/docker/baget-data/nuget:/var/baget
