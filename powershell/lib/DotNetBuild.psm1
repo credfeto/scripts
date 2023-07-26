@@ -164,13 +164,12 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildClean: srcFolder not specified")
 )
      
-    [string]$noWarn = GetNoWarn
     Write-Information " * Cleaning"
     try {
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet clean --configuration=Release -nodeReuse:False $noWarn 2>&1
+        $result = dotnet clean --configuration=Release -nodeReuse:False  2>&1
         if(!$?) {
             Write-Information ">>> Clean Failed"
             DotNet-DumpOutput -result $result
