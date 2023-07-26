@@ -28,6 +28,9 @@ services:
   nuget-nginx:
     image: nginx:stable-alpine
     container_name: nuget-nginx
+    restart: unless-stopped
+    stop_grace_period: 5s
+    stop_signal: SIGINT
     volumes:
       - ./api.nuget.local/proxy.conf:/etc/nginx/conf.d/default.conf
       - ./certs/api.nuget.local.pem/:/etc/nginx/ssl/cert.pem
@@ -60,6 +63,9 @@ services:
   funfair-nginx:
     image: nginx:stable-alpine
     container_name: funfair-nginx
+    restart: unless-stopped
+    stop_grace_period: 5s
+    stop_signal: SIGINT
     volumes:
       - ./api.nuget.local/proxy.conf:/etc/nginx/conf.d/default.conf
       - ./certs/funfair.nuget.local.pem/:/etc/nginx/ssl/cert.pem
