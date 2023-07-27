@@ -20,7 +20,7 @@ services:
       - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel__Default=Debug
+      - Logging__Console__LogLevel__Default=Warning
     volumes:
       - /home/markr/docker/baget-data/nuget:/var/baget
       - /home/markr/work/personal/scripts/baget/server.pfx:/server.pfx
@@ -43,7 +43,7 @@ services:
       - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel_Default=Debug
+      - Logging__Console__LogLevel_Default=Warning
     volumes:
       - /home/markr/docker/baget-data/funfair-release:/var/baget
 
@@ -65,14 +65,14 @@ services:
       - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel_Default=Debug
+      - Logging__Console__LogLevel_Default=Warning
     volumes:
       - /home/markr/docker/baget-data/funfair-prerelease:/var/baget
 
 
   nginx:
     image: nginx:stable-alpine
-    container_name: funfair-nginx
+    container_name: nginx
     restart: unless-stopped
     stop_grace_period: 5s
     stop_signal: SIGINT
