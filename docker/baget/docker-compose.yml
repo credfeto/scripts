@@ -23,7 +23,6 @@ services:
       - Logging__Console__LogLevel__Default=Warning
     volumes:
       - /home/markr/docker/baget-data/nuget:/var/baget
-      - /home/markr/work/personal/scripts/baget/server.pfx:/server.pfx
 
   funfair-release:
     image: loicsharma/baget:latest
