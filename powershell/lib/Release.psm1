@@ -263,17 +263,16 @@ function Release-TryCreateNextPatch {
             [boolean]$okToRelease = DotNet-CheckSolution -srcFolder $srcPath -preRelease $false
             if(!$okToRelease) {
                 Write-Information "SKIPPING RELEASE: $repo does not pass release build checks!"
-                continue
+                return
             }
             
             [boolean]$okToRelease = DotNet-BuildSolution -srcFolder $srcPath -preRelease $false
             if(!$okToRelease) {
                 Write-Information "SKIPPING RELEASE: $repo does build!"
-                continue
+                return
             }
         }
     }
-    
     
     # At least $autoReleasePendingPackages auto updates... consider creating a release
     
