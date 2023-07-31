@@ -125,6 +125,7 @@ param(
 function DotNet-CheckSolution {
 param(
     [string] $srcFolder = $(throw "DotNet-CheckSolution: srcFolder not specified")
+    [bool] $preRelease = $(throw "DotNet-CheckSolution: preRelease not specified")
 )
      
     Write-Information " * Checking Solution"
@@ -141,7 +142,7 @@ param(
         Write-Information " * Solution Found: $solution"
         
         DotNetTool-Require -packageId "FunFair.BuildCheck"
-        Write-Information "dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild True"
+        Write-Information "dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild $preRelease"
         $result = dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild True
         if(!$?) {
             Write-Information ">>> Solution Check Failed"
@@ -523,7 +524,7 @@ param(
     {
         Write-Information "Building Source in $srcFolder"
         
-        [bool]$buildOk = DotNet-CheckSolution -srcFolder $srcFolder
+        [bool]$buildOk = DotNet-CheckSolution -srcFolder $srcFolder -preRelease $true
         Write-Information "Result $buildOk" 
         if(!$buildOk) {
             return $false

@@ -205,50 +205,92 @@ function Release-TryCreateNextPatch {
     
     Write-Information "Checking if can create release for $repo"
             
-    if(!$repo.Contains("template")) {
-        Write-Information "Processing Release Notes in $changeLog"
-        
-        [string[]]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
-        foreach($line in $releaseNotes) {
-            Write-Information $line
-        }
-        [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes -packages $packages
-        
-        Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
-        [DateTime]$lastCommitDate = Get-GetLastCommitDate -repoPath $repoFolder
-        [DateTime]$now = [DateTime]::UtcNow                                    
-        
-        [TimeSpan]$durationTimeSpan = ($now - $lastCommitDate)
-        $duration = $durationTimeSpan.TotalHours
-        Write-Information "Duration since last commit $duration hours"
+    if($repo.Contains("template")) {
+        Write-Information "SKIPPING RELEASE: $repo is a template"
+        return
+    } 
     
-        [string]$skippingReason = "INSUFFICIENT UPDATES"                
-        [bool]$shouldCreateRelease = $false
-        if($autoUpdateCount -ge $autoReleasePendingPackages) {
-            if($duration -gt $minimumHoursBeforeAutoRelease) {
+    Write-Information "Processing Release Notes in $changeLog"
+    
+    [string[]]$releaseNotes = ChangeLog-GetUnreleased -fileName $changeLog
+    foreach($line in $releaseNotes) {
+        Write-Information $line
+    }
+    [int]$autoUpdateCount = IsAllAutoUpdates -releaseNotes $releaseNotes -packages $packages
+    
+    Write-Information "Checking Versions: Updated: $autoUpdateCount Trigger: $autoReleasePendingPackages"
+    [DateTime]$lastCommitDate = Get-GetLastCommitDate -repoPath $repoFolder
+    [DateTime]$now = [DateTime]::UtcNow                                    
+    
+    [TimeSpan]$durationTimeSpan = ($now - $lastCommitDate)
+    $duration = $durationTimeSpan.TotalHours
+    Write-Information "Duration since last commit $duration hours"
+
+    [string]$skippingReason = "INSUFFICIENT UPDATES"                
+    [bool]$shouldCreateRelease = $false
+    if($autoUpdateCount -ge $autoReleasePendingPackages) {
+        if($duration -gt $minimumHoursBeforeAutoRelease) {
+            $shouldCreateRelease = $true
+            [string]$skippingReason = "RELEASING NORMAL"
+        }
+        else {
+            [string]$skippingReason = "INSUFFICIENT DURATION SINCE LAST UPDATE"
+        }
+    }
+    
+    if(!$shouldCreateRelease) {
+        if($autoUpdateCount -ge 1) {
+            if($duration -gt $inactivityHoursBeforeAutoRelease) {
                 $shouldCreateRelease = $true
-                [string]$skippingReason = "RELEASING NORMAL"
-            }
-            else {
-                [string]$skippingReason = "INSUFFICIENT DURATION SINCE LAST UPDATE"
+                [string]$skippingReason = "RELEASING AFTER INACTIVITY"
+                Write-Information "SKIPPING RELEASE: $repo - $skippingReason : $autoUpdateCount"
+                return;
             }
         }
+    }
+
+    if(!$shouldCreateRelease ) {
+        Write-Information "SKIPPING RELEASE: $repo - $skippingReason : $autoUpdateCount"
+        return;
+    }
         
-        if(!$shouldCreateRelease) {
-            if($autoUpdateCount -ge 1) {
-                if($duration -gt $inactivityHoursBeforeAutoRelease) {
-                    $shouldCreateRelease = $true
-                    [string]$skippingReason = "RELEASING AFTER INACTIVITY"
-                }
+    [string]$srcPath = Join-Path -Path $repoFolder -ChildPath "src"
+    [bool]$srcExists = Test-Path -Path $srcPath
+    if($srcExists) {
+        $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
+        if ($projects.Length -gt 0) {
+            # check solution builds
+            [boolean]$okToRelease = DotNet-CheckSolution -srcFolder $srcPath -preRelease $false
+            if(!$okToRelease) {
+                Write-Information "SKIPPING RELEASE: $repo does not pass release build checks!"
+                continue
+            }
+            
+            [boolean]$okToRelease = DotNet-BuildSolution -srcFolder $srcPath -preRelease $false
+            if(!$okToRelease) {
+                Write-Information "SKIPPING RELEASE: $repo does build!"
+                continue
             }
         }
+    }
     
-        if($shouldCreateRelease ) {
-            # At least $autoReleasePendingPackages auto updates... consider creating a release
-            
-            [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoFolder
-            if(!$hasPendingDependencyUpdateBranches) {            
-                if (ShouldAlwaysCreatePatchRelease -repo $repo) {
+    
+    # At least $autoReleasePendingPackages auto updates... consider creating a release
+    
+    [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoFolder
+    if(!$hasPendingDependencyUpdateBranches) {            
+        if (ShouldAlwaysCreatePatchRelease -repo $repo) {
+            Write-Information "**** MAKE RELEASE ****"
+            Write-Information "Changelog: $changeLog"
+            Write-Information "Repo: $repoFolder"
+            Write-Information "Reason: $skippingReason"
+            Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
+        }
+        else {
+            $allowUpdates = CheckRepoForAllowedAutoUpgrade -repo $repo
+            if($allowUpdates) {
+                [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
+                if (!$publishable) {
                     Write-Information "**** MAKE RELEASE ****"
                     Write-Information "Changelog: $changeLog"
                     Write-Information "Repo: $repoFolder"
@@ -256,44 +298,25 @@ function Release-TryCreateNextPatch {
                     Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                 }
                 else {
-                    $allowUpdates = CheckRepoForAllowedAutoUpgrade -repo $repo
-                    if($allowUpdates) {
-                        [bool]$publishable = DotNet-HasPublishableExe -srcFolder $srcPath
-                        if (!$publishable) {
-                            Write-Information "**** MAKE RELEASE ****"
-                            Write-Information "Changelog: $changeLog"
-                            Write-Information "Repo: $repoFolder"
-                            Write-Information "Reason: $skippingReason"
-                            Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
-                        }
-                        else {
-                            if (ShouldAlwaysCreatePatchRelease -repo $repo) {
-                                Write-Information "**** MAKE RELEASE ****"
-                                Write-Information "Changelog: $changeLog"
-                                Write-Information "Repo: $repoFolder"
-                                Write-Information "Reason: $skippingReason"
-                                Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
-                            }
-                            else {
-                                Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
-                            }
-                        }
+                    if (ShouldAlwaysCreatePatchRelease -repo $repo) {
+                        Write-Information "**** MAKE RELEASE ****"
+                        Write-Information "Changelog: $changeLog"
+                        Write-Information "Repo: $repoFolder"
+                        Write-Information "Reason: $skippingReason"
+                        Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                     }
                     else {
-                        Write-Information "SKIPPING RELEASE: $repo is a explicitly prohibited"
+                        Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
                     }
                 }
-            } 
+            }
             else {
-                Write-Information "SKIPPING RELEASE: $repo Found pending update branches"
+                Write-Information "SKIPPING RELEASE: $repo is a explicitly prohibited"
             }
         }
-        else {
-            Write-Information "SKIPPING RELEASE: $repo - $skippingReason : $autoUpdateCount"
-        }
-    }
+    } 
     else {
-        Write-Information "SKIPPING RELEASE: $repo is a template"
+        Write-Information "SKIPPING RELEASE: $repo Found pending update branches"
     }
 }
 

@@ -241,7 +241,7 @@ param(
             continue
         }
         
-        [boolean]$okBefore = DotNet-CheckSolution -srcFolder $srcPath
+        [boolean]$okBefore = DotNet-CheckSolution -srcFolder $srcPath -preRelease $true
         if(!$okBefore) {
             Write-Information "Skipping $packageId as solution is not in a good state"
             continue
@@ -261,7 +261,7 @@ param(
 
         Write-Information "***** $repo FOUND UPDATE TO $packageId for $update ******"
         
-        [boolean]$okAfter = DotNet-CheckSolution -srcFolder $srcPath
+        [boolean]$okAfter = DotNet-CheckSolution -srcFolder $srcPath -preRelease $true
         if(!$okAfter) {
             Write-Information "Skipping $packageId as solution is not in a good state after update attempt (probable mismatch of packages)"
             continue
