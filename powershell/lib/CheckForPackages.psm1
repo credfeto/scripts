@@ -117,7 +117,7 @@ param(
         
         # has updates
         [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
-        [string]$regexPattern = "::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)"
+        [string]$regexPattern = "^::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
 
         $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
         $regexMatches = $regex.Matches($results.ToLower());
