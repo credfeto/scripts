@@ -261,7 +261,7 @@ function Release-TryCreateNextPatch {
         return;
     }
         
-    [string]$srcPath = Join-Path -Path $repoFolder -ChildPath "src"
+    [string]$srcPath = Join-Path -Path $repoPath -ChildPath "src"
     [bool]$srcExists = Test-Path -Path $srcPath
     if($srcExists) {
         $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
