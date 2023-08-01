@@ -124,7 +124,7 @@ param(
 
 function DotNet-CheckSolution {
 param(
-    [string] $srcFolder = $(throw "DotNet-CheckSolution: srcFolder not specified")
+    [string] $srcFolder = $(throw "DotNet-CheckSolution: srcFolder not specified"),
     [bool] $preRelease = $(throw "DotNet-CheckSolution: preRelease not specified")
 )
      
