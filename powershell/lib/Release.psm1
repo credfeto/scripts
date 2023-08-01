@@ -206,7 +206,7 @@ function Release-TryCreateNextPatch {
     Write-Information "Checking if can create release for $repo"
             
     if($repo.Contains("template")) {
-        Write-Information "SKIPPING RELEASE: $repo is a template"
+        Write-Information "SKIPPING RELEASE: $repo IS A TEMPLATE"
         return
     } 
     
@@ -262,13 +262,13 @@ function Release-TryCreateNextPatch {
             # check solution builds
             [boolean]$okToRelease = DotNet-CheckSolution -srcFolder $srcPath -preRelease $false
             if(!$okToRelease) {
-                Write-Information "SKIPPING RELEASE: $repo does not pass release build checks!"
+                Write-Information "SKIPPING RELEASE: $repo DOES NOT PASS RELEASE BUILD CHECKS!"
                 return
             }
             
-            [boolean]$okToRelease = DotNet-BuildSolution -srcFolder $srcPath -preRelease $false
+            [boolean]$okToRelease = DotNet-BuildSolution -srcFolder $srcPath
             if(!$okToRelease) {
-                Write-Information "SKIPPING RELEASE: $repo does build!"
+                Write-Information "SKIPPING RELEASE: $repo DOES BUILD!"
                 return
             }
         }
