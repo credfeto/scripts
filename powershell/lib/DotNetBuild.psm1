@@ -143,7 +143,7 @@ param(
         
         DotNetTool-Require -packageId "FunFair.BuildCheck"
         Write-Information "dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild $preRelease"
-        $result = dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild True
+        $result = dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild $preRelease 2>&1
         if(!$?) {
             Write-Information ">>> Solution Check Failed"
             DotNet-DumpOutput -result $result
