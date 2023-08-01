@@ -168,14 +168,14 @@ param(
     [bool]$srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $false) {
         # no source to update
-        Write-Information "* No src folder in repo"
+        Release-Skip -repo $repo -message "NO SRC FOLDER IN REPO"
         return;
     }
 
     $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
     if ($projects.Length -eq 0) {
         # no source to update
-        Write-Information "* No C# projects in repo"
+        Release-Skip -repo $repo -message "NO C# PROJECTS IN REPO"
         return;
     }
     
@@ -215,7 +215,7 @@ param(
     if ($codeOk -eq $false)
     {
         # no point updating
-        Write-Information "* WARNING: Solution doesn't build without any changes - no point in trying to update packages"
+        Release-Skip -repo $repo -message "SOLUTION DOESN'T BUILD WITHOUT ANY CHANGES - NO POINT IN TRYING TO UPDATE PACKAGES"
         return;
     }
     
