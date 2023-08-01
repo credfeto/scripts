@@ -328,11 +328,11 @@ param(
             Release-TryCreateNextPatch -repo $repo -repoPath $repoFolder -changeLog $changeLog
         }
         else {
-            Write-Information "SKIPPING RELEASE: $repo UPDATED $packagesUpdated DURING THIS RUN"
+            Release-Skip -repo $repo -message "UPDATED $packagesUpdated DURING THIS RUN"
         }
     }
     else {
-        Write-Information "SKIPPING RELEASE: $repo CREATED $branchesCreated DURING THIS RUN"
+        Release-Skip -repo $repo -message "CREATED $branchesCreated DURING THIS RUN"
     }
 }
 

@@ -191,6 +191,14 @@ param (
 }
 
 
+function Release-Skip {
+    param(
+    [string]$repo = $(throw "Release-Skip: repo not specified"),
+    [string]$message = $(throw "Release-Skip: message not specified"), 
+)
+    Write-Information "SKIPPING RELEASE: $repo $message"
+}
+
 function Release-TryCreateNextPatch {
     param(
     [string]$repo = $(throw "Release-TryCreateNextPatch: repo not specified"), 
@@ -206,7 +214,7 @@ function Release-TryCreateNextPatch {
     Write-Information "Checking if can create release for $repo"
             
     if($repo.Contains("template")) {
-        Write-Information "SKIPPING RELEASE: $repo IS A TEMPLATE"
+        Release-Skip -repo $repo -message "IS A TEMPLATE"
         return
     } 
     
@@ -242,15 +250,14 @@ function Release-TryCreateNextPatch {
         if($autoUpdateCount -ge 1) {
             if($duration -gt $inactivityHoursBeforeAutoRelease) {
                 $shouldCreateRelease = $true
-                [string]$skippingReason = "RELEASING AFTER INACTIVITY"
-                Write-Information "SKIPPING RELEASE: $repo - $skippingReason : $autoUpdateCount"
+                Release-Skip -repo $repo -message "RELEASING AFTER INACTIVITY : $autoUpdateCount"
                 return;
             }
         }
     }
 
     if(!$shouldCreateRelease ) {
-        Write-Information "SKIPPING RELEASE: $repo - $skippingReason : $autoUpdateCount"
+        Release-Skip -repo $repo -message "$skippingReason : $autoUpdateCount"
         return;
     }
         
@@ -262,13 +269,13 @@ function Release-TryCreateNextPatch {
             # check solution builds
             [boolean]$okToRelease = DotNet-CheckSolution -srcFolder $srcPath -preRelease $false
             if(!$okToRelease) {
-                Write-Information "SKIPPING RELEASE: $repo DOES NOT PASS RELEASE BUILD CHECKS!"
+                Release-Skip -repo $repo -message "DOES NOT PASS RELEASE BUILD CHECKS!"
                 return
             }
             
             [boolean]$okToRelease = DotNet-BuildSolution -srcFolder $srcPath
             if(!$okToRelease) {
-                Write-Information "SKIPPING RELEASE: $repo DOES BUILD!"
+                Release-Skip -repo $repo -message "DOES NOT BUILD!"
                 return
             }
         }
@@ -305,20 +312,20 @@ function Release-TryCreateNextPatch {
                         Release-Create -repo $repo -changelog $changeLog -repoPath $repoFolder
                     }
                     else {
-                        Write-Information "SKIPPING RELEASE: $repo contains publishable executables"
+                        Release-Skip -repo $repo -message "CONTAINS PUBLISHABLE EXECUTABLES"
                     }
                 }
             }
             else {
-                Write-Information "SKIPPING RELEASE: $repo is a explicitly prohibited"
+                Release-Skip -repo $repo -message "EXPLICITLY PROHIBITED"
             }
         }
     } 
     else {
-        Write-Information "SKIPPING RELEASE: $repo Found pending update branches"
+        Release-Skip -repo $repo -message "FOUND PENDING UPDATE BRANCHES"
     }
 }
 
-
+Export-ModuleMember -Function Release-Skip
 Export-ModuleMember -Function Release-Create
 Export-ModuleMember -Function Release-TryCreateNextPatch
