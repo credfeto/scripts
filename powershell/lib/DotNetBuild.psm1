@@ -155,8 +155,9 @@ param(
         Write-Information "   - Solution Check Succeeded"
 
         return $true
-    } catch  {
+    } catch {
         Write-Information ">>> Solution Check Failed"
+        Write-Information $error
         return $false
     }
 }
