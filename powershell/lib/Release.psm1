@@ -194,7 +194,7 @@ param (
 function Release-Skip {
     param(
     [string]$repo = $(throw "Release-Skip: repo not specified"),
-    [string]$message = $(throw "Release-Skip: message not specified"), 
+    [string]$message = $(throw "Release-Skip: message not specified") 
 )
     Write-Information "SKIPPING RELEASE: $repo $message"
 }
