@@ -250,8 +250,7 @@ function Release-TryCreateNextPatch {
         if($autoUpdateCount -ge 1) {
             if($duration -gt $inactivityHoursBeforeAutoRelease) {
                 $shouldCreateRelease = $true
-                Release-Skip -repo $repo -message "RELEASING AFTER INACTIVITY : $autoUpdateCount"
-                return;
+                [string]$skippingReason = "RELEASING AFTER INACTIVITY : $autoUpdateCount"
             }
         }
     }
