@@ -17,7 +17,7 @@ function getPackageIdRegex {
 
 function getPackageRegex {
 param(
-    [String]$packageId =  $(throw "getPackageIdRegex: packageId not specified")
+    [String]$packageId =  $(throw "getPackageRegex: packageId not specified")
 )
     if(!$regexCache.Contains($packageId)) {
         Write-Information ">> Creating Regex for $packageId"    
