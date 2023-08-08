@@ -133,10 +133,12 @@ param(
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
         DotNetTool-Require -packageId "Credfeto.Package.Update"
+        Write-Information "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
         DotNetTool-Require -packageId "Credfeto.Package.Update"
+        Write-Information "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
     }
     
@@ -190,10 +192,12 @@ param(
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
         DotNetTool-Require -packageId "Credfeto.Package.Update"
+        Write-Information "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
         DotNetTool-Require -packageId "Credfeto.Package.Update"
+        Write-Information "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
     }
 
