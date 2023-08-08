@@ -16,24 +16,27 @@ function getPackageIdRegex {
 
 
 function getPackageRegex {
-    param([String]$packageId =  $(throw "getPackageIdRegex: packageId not specified")
-    )
-
-if($regexCache.Contains($packageId) -eq $false) {
-    Write-Information ">> Creating Regex for $packageId"    
-    $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, $regexOptions)
-    $regexCache.Add($packageId, $regex)
+param(
+    [String]$packageId =  $(throw "getPackageIdRegex: packageId not specified")
+)
+    if(!$regexCache.Contains($packageId)) {
+        Write-Information ">> Creating Regex for $packageId"    
+        $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, $regexOptions)
+        $regexCache[$packageId] = $regex
+        
+        return $regex
+    }else {
+        Write-Information ">> Using Regex for $packageId"
+        $regex = $regexCache[$packageId]
+        
+        if(!$regex) {
+          throw "Regex not found for $packageId"
+        }
     
-    return $regex
-}else {
-    Write-Information ">> Using Regex for $packageId"
-    $regex = $regexCache[$packageId]
-    
-    return $regex
+        return $regex
+    }
 }
 
-
-}
 function Packages_Get {
 param (
     [string]$fileName = $(throw "Packages_Get: fileName not specified")
