@@ -1,4 +1,39 @@
+$regexCache = @{}
+$regexOptions = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::MultiLine
 
+function getPackageIdRegex {
+    param([String]$packageId =  $(throw "getPackageIdRegex: packageId not specified")
+    )
+
+   # has updates
+  [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
+  [string]$regexPattern = "^::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
+
+  Write-Information ">> Regex: $regexPattern"
+  
+  return $regexPattern
+}
+
+
+function getPackageRegex {
+    param([String]$packageId =  $(throw "getPackageIdRegex: packageId not specified")
+    )
+
+if($regexCache.Contains($packageId) -eq $false) {
+    Write-Information ">> Creating Regex for $packageId"    
+    $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, $regexOptions)
+    $regexCache.Add($packageId, $regex)
+    
+    return $regex
+}else {
+    Write-Information ">> Using Regex for $packageId"
+    $regex = $regexCache[$packageId]
+    
+    return $regex
+}
+
+
+}
 function Packages_Get {
 param (
     [string]$fileName = $(throw "Packages_Get: fileName not specified")
@@ -115,11 +150,11 @@ param(
     {
         WriteLogs -logs $results
         
-        # has updates
-        [string]$regexPattern = getPackageIdRegex -packageId $packageId
+        # has updates?
+        $regex = getPackageRegex -packageId $packageId
+        $resultsLines = $results -join "`n"
         
-        $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
-        $regexMatches = $regex.Matches($results.ToLower());
+        $regexMatches = $regex.Matches($resultsLines);
         if($regexMatches.Count -gt 0) {
             [string]$version = $regexMatches[0].Groups["Version"].Value
             Write-Information "Found: $version"
@@ -138,16 +173,6 @@ param(
     return $null
 }
 
-function getPackageIdRegex {
-    param([String]$packageId =  $(throw "checkForUpdatesPrefix: packageId not specified")
-    )
-
-   # has updates
-  [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
-  [string]$regexPattern = "^::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
-
-  return $regexPattern
-}
 
 function Packages_CheckForUpdatesPrefix{
 param(
@@ -173,11 +198,12 @@ param(
         
         WriteLogs -logs $results
         
-        # has updates
-        [string]$regexPattern = getPackageIdRegex -packageId $packageId
+        # has updates?
+        $regex = getPackageRegex -packageId $packageId
+        $resultsLines = $results -join "`n"
+        
+        $regexMatches = $regex.Matches($resultsLines);
 
-        $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, [System.Text.RegularExpressions.RegexOptions]::MultiLine)
-        $regexMatches = $regex.Matches($results.ToLower());
         if($regexMatches.Count -gt 0) {
             [string]$version = $regexMatches[0].Groups["Version"].Value
             Write-Information "Found: $version"
