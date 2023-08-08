@@ -10,7 +10,10 @@ function getPackageIdRegex {
 
    # has updates
   [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
-  [string]$regexPattern = "^::set-env\sname=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
+  [string]$regexPattern = "^::set-env\sname=$packageIdAsRegex(.*?)::(?<Version>\d+(\.\d+)+)$"
+  if($exactMatch) {
+    $regexPattern = "^::set-env\sname=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
+  }
 
   Write-Information ">> Regex: $regexPattern"
   
@@ -89,10 +92,10 @@ param(
         Write-Information ">> Searching for $packageId in [$message]"
         $regexMatches = $regex.Matches($message);
         $matchCount = $regexMatches.Count
-        Write-Information ">> Found $matchCount matches" 
+        #Write-Information ">> Found $matchCount matches" 
         if($matchCount -gt 0) {
             [string]$version = $regexMatches[0].Groups["Version"].Value
-            Write-Information "Found: [$version]"
+            #Write-Information ">>Found: [$version]"
             return $version
         }
     }
