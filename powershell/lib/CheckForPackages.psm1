@@ -1,13 +1,16 @@
 $regexCache = @{}
-$regexOptions = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::MultiLine
+$regexOptions = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase
+# -bor [System.Text.RegularExpressions.RegexOptions]::MultiLine
 
 function getPackageIdRegex {
-    param([String]$packageId =  $(throw "getPackageIdRegex: packageId not specified")
+    param(
+        [String]$packageId = $(throw "getPackageIdRegex: packageId not specified"),
+        [bool]$exactMatch =  $(throw "getPackageIdRegex: exactMatch not specified")
     )
 
    # has updates
   [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
-  [string]$regexPattern = "^::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
+  [string]$regexPattern = "^::set-env\sname=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
 
   Write-Information ">> Regex: $regexPattern"
   
@@ -17,17 +20,23 @@ function getPackageIdRegex {
 
 function getPackageRegex {
 param(
-    [String]$packageId =  $(throw "getPackageRegex: packageId not specified")
+    [String]$packageId =  $(throw "getPackageRegex: packageId not specified"),
+    [bool]$exactMatch =  $(throw "getPackageIdRegex: exactMatch not specified")
 )
-    if(!$regexCache.Contains($packageId)) {
+    $key = $packageId.ToLower()
+    if($exactMatch) {
+        $key = $key + "**-exact-match"
+    }
+    if(!$regexCache.Contains($key)) {
         Write-Information ">> Creating Regex for $packageId"    
+        [string]$regexPattern = getPackageIdRegex -packageId $packageId -exactMatch $exactMatch
         $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, $regexOptions)
-        $regexCache[$packageId] = $regex
+        $regexCache[$key] = $regex
         
         return $regex
     }else {
         Write-Information ">> Using Regex for $packageId"
-        $regex = $regexCache[$packageId]
+        $regex = $regexCache[$key]
         
         if(!$regex) {
           throw "Regex not found for $packageId"
@@ -67,6 +76,28 @@ param (
     }
     
     return $false
+}
+
+function getVersion {
+param(
+    [string[]]$logs,
+    $regex
+)
+    
+    foreach($message in $logs)
+    {
+        Write-Information ">> Searching for $packageId in [$message]"
+        $regexMatches = $regex.Matches($message);
+        $matchCount = $regexMatches.Count
+        Write-Information ">> Found $matchCount matches" 
+        if($matchCount -gt 0) {
+            [string]$version = $regexMatches[0].Groups["Version"].Value
+            Write-Information "Found: [$version]"
+            return $version
+        }
+    }
+    
+    return $null
 }
 
 function WriteLogs {
@@ -153,18 +184,16 @@ param(
     
     if ($exitCode -gt 0)
     {
-        WriteLogs -logs $results
+        #WriteLogs -logs $results
         
         # has updates?
-        $regex = getPackageRegex -packageId $packageId
-        $resultsLines = $results -join "`n"
+        $regex = getPackageRegex -packageId $packageId -exactMatch $True
         
-        $regexMatches = $regex.Matches($resultsLines);
-        if($regexMatches.Count -gt 0) {
-            [string]$version = $regexMatches[0].Groups["Version"].Value
-            Write-Information "Found: $version"
+        [string]$version = getVersion -logs $results -regex $regex
+        if($version -ne $null -and $version -ne "") {
+            Write-Information "* Found: $version"
             return $version
-        }
+        } 
         
         Write-Information " * No Changes"    
     }
@@ -203,19 +232,15 @@ param(
 
     if($?) {
         
-        WriteLogs -logs $results
+        #WriteLogs -logs $results
         
         # has updates?
-        $regex = getPackageRegex -packageId $packageId
-        $resultsLines = $results -join "`n"
-        
-        $regexMatches = $regex.Matches($resultsLines);
-
-        if($regexMatches.Count -gt 0) {
-            [string]$version = $regexMatches[0].Groups["Version"].Value
-            Write-Information "Found: $version"
+        $regex = getPackageRegex -packageId $packageId -exactMatch $False
+        [string]$version = getVersion -logs $results -regex $regex
+        if($version -ne $null -and $version -ne "") {
+            Write-Information "* Found: $version"
             return $version
-        }
+        } 
     }
     else
     {

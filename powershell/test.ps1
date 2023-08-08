@@ -60,6 +60,14 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: XmlDoc"
 }
 
+try {
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "CheckForPackages.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error "$_"
+    Throw "Error while loading supporting PowerShell Scripts: CheckForPackages"
+}
+
 #$ret = GlobalJson_Update -sourceFileName '/home/markr/work/funfair/funfair-build-check/src/global.json' -targetFileName '/home/markr/work/funfair/BuildBot/src/global.json'
 #Write-Host $ret
 
@@ -323,47 +331,5 @@ catch {
 # }
 # 
 
-$regexCache = @{}
 
-function getPackageIdRegex {
-    param([String]$packageId =  $(throw "checkForUpdatesPrefix: packageId not specified")
-    )
-
-   # has updates
-  [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
-  [string]$regexPattern = "^::set-env name=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
-
-    Write-Information "Regex: $regexPattern"
-  return $regexPattern
-}
-
-
-[string[]]$results = @("Total updates: 1", "::set-env name=Meziantou.Analyzer::2.0.81","* No Changes")
-
-$resultsLine = $results -join "`n"
-
-$packageId = "Meziantou.Analyzer"
-$regexPattern = getPackageIdRegex -packageId $packageId
-
-
-Write-Information "Results Line: $resultsLine"
-
-if($regexCache.Contains($packageId) -eq $false) {
-    Write-Information "Creating Regex"
-    $options = [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::MultiLine
-    $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, $options)
-    $regexCache.Add($packageId, $regex)
-}else {
-    Write-Information "Using Regex"
-    $regex = $regexCache[$packageId]
-}
-
-$regexMatches = $regex.Matches($resultsLine);
-
-if($regexMatches.Count -gt 0) {
-            [string]$version = $regexMatches[0].Groups["Version"].Value
-            Write-Information "Found: $version"
-            return $version
-} else {
-        Write-Information " * No Changes"    
-}
+[string]$update = Packages_CheckForUpdates -repoFolder '/home/markr/work/funfair/BuildBot' -packageCache "~/packages.cache" -packageId 'Meziantou' -exactMatch $false
