@@ -1,0 +1,8 @@
+#! /bin/sh
+
+flatpak update -y
+
+flatpak run com.brave.Browser &
+
+flatpak run com.discordapp.Discord &
+
