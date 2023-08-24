@@ -1,22 +1,17 @@
 ---
-  - hosts:
-      build
-      DevEthereum
-      StagingEthereum
-      LiveEthereum
-      LiveWallet
-      Clients1
-      Clients2
-      Clients3
-      Clients4
-      Clients5
-      Clients6
-      ffBuild
-    remote_user: root
+- hosts:
+    build
+    DevEthereum
+    StagingEthereum
+    LiveEthereum
+    LiveWallet
+    Clients
+    ffBuild
+  remote_user: root
 
-    tasks:
-    - debug:
-        msg:
-        - "ansible_distribution {{ hostvars[inventory_hostname].ansible_distribution }}"
-        - "major version {{ hostvars[inventory_hostname].ansible_distribution_major_version }}"
-        - "version {{ hostvars[inventory_hostname].ansible_distribution_version }}"
+  tasks:
+  - debug:
+      msg:
+      - "ansible_distribution {{ hostvars[inventory_hostname].ansible_distribution }}"
+      - "major version {{ hostvars[inventory_hostname].ansible_distribution_major_version }}"
+      - "version {{ hostvars[inventory_hostname].ansible_distribution_version }}"
