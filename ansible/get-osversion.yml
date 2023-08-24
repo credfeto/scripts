@@ -5,7 +5,12 @@
       StagingEthereum
       LiveEthereum
       LiveWallet
-      Clients
+      Clients1
+      Clients2
+      Clients3
+      Clients4
+      Clients5
+      Clients6
       ffBuild
     remote_user: root
 
