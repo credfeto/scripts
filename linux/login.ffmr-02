@@ -9,3 +9,5 @@ flatpak run com.google.Chrome &
 flatpak run com.discordapp.Discord &
 
 flatpak run org.telegram.desktop &
+
+flatpak run us.zoom.Zoom &

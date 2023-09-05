@@ -1,0 +1,5 @@
+#! /bin/sh
+
+flatpak update -y
+
+yay -Syu --noconfirm
