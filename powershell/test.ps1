@@ -68,6 +68,14 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: CheckForPackages"
 }
 
+try {
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "ProjectCleanup.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error "$_"
+    Throw "Error while loading supporting PowerShell Scripts: ProjectCleanup"
+}
+
 #$ret = GlobalJson_Update -sourceFileName '/home/markr/work/funfair/funfair-build-check/src/global.json' -targetFileName '/home/markr/work/funfair/BuildBot/src/global.json'
 #Write-Host $ret
 
@@ -332,4 +340,6 @@ catch {
 # 
 
 
-[string]$update = Packages_CheckForUpdates -repoFolder '/home/markr/work/funfair/BuildBot' -packageCache "~/packages.cache" -packageId 'Meziantou' -exactMatch $false
+# [string]$update = Packages_CheckForUpdates -repoFolder '/home/markr/work/funfair/BuildBot' -packageCache "~/packages.cache" -packageId 'Meziantou' -exactMatch $false
+
+Project_Cleanup -projectFile "/home/markr/work/funfair/funfair-server-code-analysis/src/FunFair.CodeAnalysis/FunFair.CodeAnalysis.csproj"

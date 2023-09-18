@@ -9,6 +9,11 @@ param (
     $propertyGroups = $project.SelectNodes("PropertyGroup")
     foreach($propertyGroup in $propertyGroups) {
         $children = $propertyGroup.SelectNodes("*")
+        $attributes = [ordered]@{}
+        foreach($attribute in $propertyGroup.Attributes) {
+            $attValue = $propertyGroup.GetAttribute($attribute.Name)             
+            $attributes[$attribute.Name] = $attValue
+        }
         $orderedChildren = @{}
         [bool]$replace = $true
         foreach($child in $children) {
@@ -38,6 +43,10 @@ param (
                     $item = $orderedChildren[$entryKey]
                     $propertyGroup.AppendChild($item)
                 }
+                
+                foreach($attribute in $attributes.Keys) {
+                    $propertyGroup.SetAttribute($attribute, $attributes[$attribute])
+                }
             }
             else {
                 $toRemove.Add($propertyGroup)
@@ -65,7 +74,6 @@ param (
     foreach($itemGroup in $itemGroups) {
         if($itemGroup.HasAttributes) {
             # Skip groups that have attributes
-            Write-Information "Has Attributes"
             Continue
         }
     
