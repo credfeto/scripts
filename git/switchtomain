@@ -6,12 +6,14 @@ do
   echo "$line"
   CURRENT_DIR=$line  
 
-
+  DEFAULT_BRANCH=$(git -C "$CURRENT_DIR" remote show origin | sed -n '/HEAD branch/s/.*: //p')  
   echo ""
   echo "Retrieving $CURRENT_DIR..."
   git -C "$CURRENT_DIR" remote get-url origin
   git -C "$CURRENT_DIR" fetch origin
-  git -C "$CURRENT_DIR" checkout main
+  [ -z "$DEFAULT_BRANCH"] && echo "**** No default branch found" && continue
+  
+  git -C "$CURRENT_DIR" checkout $DEFAULT_BRANCH
   git -C "$CURRENT_DIR" fetch origin
   
   echo " * done"
