@@ -11,10 +11,10 @@ do
   echo "Retrieving $CURRENT_DIR..."
   git -C "$CURRENT_DIR" remote get-url origin
   git -C "$CURRENT_DIR" fetch origin
-  [ -z "$DEFAULT_BRANCH"] && echo "**** No default branch found" && continue
   
-  git -C "$CURRENT_DIR" checkout $DEFAULT_BRANCH
-  git -C "$CURRENT_DIR" fetch origin
+  [ -z "$DEFAULT_BRANCH"] && echo "**** No default branch found"
+  [ ! -z "$DEFAULT_BRANCH"] && git -C "$CURRENT_DIR" checkout "$DEFAULT_BRANCH"
+  [ ! -z "$DEFAULT_BRANCH"] && git -C "$CURRENT_DIR" fetch origin
   
   echo " * done"
 done
