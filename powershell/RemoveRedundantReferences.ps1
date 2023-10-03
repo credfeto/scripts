@@ -96,6 +96,16 @@ function IsDoNotRemovePackage {
         # Has bug fix
         return $true
     }
+    
+    if($PackageId -eq "BenchmarkDotNet") {
+        # Has bug fix
+        return $true
+    }
+    
+    if($PackageId -eq "BenchmarkDotNet.Diagnostics.dotTrace") {
+        # Has bug fix
+        return $true
+    }
 
     if($PackageId -eq "System.IdentityModel.Tokens.Jwt") {         
         if($allPackageIds -contains "Microsoft.AspNetCore.Authentication.JwtBearer") {
