@@ -36,7 +36,7 @@ function IsIgnoreProject {
         return $true
     }
     
-    if($projectName.EndsWith -eq ".All.csproj") {
+    if($projectName.EndsWith(".All.csproj")) {
         ## Skip metaprojects
         return $true
     }
