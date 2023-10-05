@@ -447,18 +447,34 @@ param(
     return $true
 }
 
-function CheckReferences {
+function GetProjects {
 param(
     [string]$sourceDirectory
 )
+    $projects = @()
+    
     $files = Get-ChildItem -Path $sourceDirectory -Filter *.csproj -Recurse
     
     WriteProgress "Number of projects: $($files.Length)"
     foreach($file in $files) {
         $ignoreProject = IsIgnoreProject -projectName $($file.Name)
         WriteProgress "Found * $($file.FullName) (Ignore: $($ignoreProject))"
+        if(!$ignoreProject) {
+            $projects += $file
+        }
     }
+
+    return $projects;
+}
+
+function CheckReferences {
+param(
+    [string]$sourceDirectory
+)
+    $files = GetProjects -sourceDirectory $sourceDirectory
     
+    WriteProgress "Number of projects to check: $($files.Length)"
+
     WriteSectionStart "Checking Projects"
     
     $stopWatch = [System.Diagnostics.Stopwatch]::startNew()
