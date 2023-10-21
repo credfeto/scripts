@@ -87,7 +87,7 @@ sudo $BASEDIR/sqlcompare \
 echo "Running sqlcmd to import $OUTPUT"
 sqlcmd \
   -C \
-  -S "$SERVER" \
+  -S "$SQLCOMPARE_SERVER" \
   -U "$USER" \
   -P "$PASSWORD" \
   -d "$DB" \
