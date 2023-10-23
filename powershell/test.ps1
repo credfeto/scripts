@@ -102,14 +102,14 @@ catch {
 # 
 # $file = Get-Content -Path $changelog
 # 
-# # Write-Host $file
+# # Log -message $file
 # 
 # $expr = "(?ms)" + "^\s*\-\s*FF\-1429\s*\-\sUpdated\s+(?<PackageId>.+(\.+)*?)\sto\s+(\d+\..*)$"
 # foreach($line in $file) {
 # 
 #     $m = $line -match $expr
 #     if($m) {    
-#         Write-Host $matches.PackageId
+#         Log -message $matches.PackageId
 #     }
 # }
 
@@ -214,11 +214,11 @@ catch {
 #     
 #     if($excludes.Count -gt 0) {
 #         $excluded = $excludes -join " "
-#         Write-Information "Excluding: $excluded"        
+#         Log -message "Excluding: $excluded"
 #         return $excludes
 #     }
 #     else {
-#         Write-Information "Excluding: <<None>>"
+#         Log -message "Excluding: <<None>>"
 #         return $null        
 #     }
 # }
@@ -285,12 +285,12 @@ catch {
 #     
 #     if($excludes.Count -gt 0) {
 #         $excluded = $excludes -join " "
-#         Write-Information "Excluding: $excluded"
+#         Log -message "Excluding: $excluded"
 #        
 #         return $excludes
 #     }
 #     else {
-#         Write-Information "Excluding: <<None>>"
+#         Log -message "Excluding: <<None>>"
 #         return $null        
 #     }
 # }
@@ -300,10 +300,7 @@ catch {
 #     [string[]]$logs
 #     )
 #     
-#     foreach($message in $logs)
-#     {
-#         Write-Information $message
-#     }
+#     Log-Batch -messages &logs
 # }
 # 
 # $packageCache = "/home/markr/packageCache.json"
@@ -312,7 +309,7 @@ catch {
 # $repoFolder = "/home/markr/work/funfair/funfair-ethereum-gas-server/src"
 # $exclude = @()
 #  
-# Write-Information "Updating Package Prefix"
+# Log -message "Updating Package Prefix"
 # $search = buildPackageSearch -packageId $packageId -exactMatch $False
 # $excludes = buildExcludes -exclude $exclude
 # if($excludes) {
@@ -333,15 +330,15 @@ catch {
 #     $regexMatches = $regex.Matches($results.ToLower());
 #     if($regexMatches.Count -gt 0) {
 #         [string]$version = $regexMatches[0].Groups["Version"].Value
-#         Write-Information "Found: $version"
+#         Log -message "Found: $version"
 #         return $version
 #     }
 # 
-#     Write-Information " * No Changes"
+#     Log -message " * No Changes"
 # }
 # else
 # {
-#     Write-Information " * ERROR: Failed to update $packageId"
+#     Log -message " * ERROR: Failed to update $packageId"
 #     WriteLogs -logs $results
 # }
 # 

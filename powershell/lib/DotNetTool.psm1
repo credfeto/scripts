@@ -4,9 +4,7 @@ $standardSource = 'https://api.nuget.org/v3/index.json'
 function DotNetTool-Log {
 param($result)
 
-    foreach($line in $result) {
-        Write-Information $line
-    }
+    Log-Batch -messages $result
 }
 
 function DotNetTool-Error {
@@ -21,26 +19,26 @@ function getLatestReleasePackage($packageId) {
 
 	try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Write-Information "Looking for $packageId in $standardSource"
+        Log -message "Looking for $packageId in $standardSource"
         $packages = Find-Package -Name $packageId -Source $standardSource -AllVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
         if($packages) {
         
             foreach($package in $packages) {
                 $version = $package.Version
-                Write-Information "* Found $packageId version $version"
+                Log -message "* Found $packageId version $version"
                 return $version
             }
             
 			[string]$foundVersion = $packages[0].Version
-			Write-Information "* Found $foundVersion"
+			Log -message "* Found $foundVersion"
             return $foundVersion
         }
 
-		Write-Information "- Not Found"
+		Log -message "- Not Found"
         return $null
 	}
 	catch {
-		Write-Information "# Not Found - Error"
+		Log -message "# Not Found - Error"
 		return $null
 	}
 }
@@ -50,35 +48,35 @@ function getLatestPreReleasePackage($packageId) {
 
 	try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Write-Information "Looking for $packageId in $standardSource"
+        Log -message "Looking for $packageId in $standardSource"
         $packages = Find-Package -Name $packageId -Source $standardSource -AllowPrereleaseVersions -ProviderName NuGet -ErrorAction:SilentlyContinue 
         if($packages) {
             foreach($package in $packages) {
                 $version = $package.Version
-                Write-Information "* Found $packageId version $version"
+                Log -message "* Found $packageId version $version"
                 if($version -lt "100.0.0.0") {
-                    Write-Information "* Found $packageId version $version"
+                    Log -message "* Found $packageId version $version"
                     return $version
                 }
             }
                     
 			[string]$foundVersion = $packages[0].Version
-			Write-Information "* Found $foundVersion"
+			Log -message "* Found $foundVersion"
             return $foundVersion
         }
 
-		Write-Information "- Not Found"
+		Log -message "- Not Found"
         return $null
 	}
 	catch {
-		Write-Information "# Not Found - Error"
+		Log -message "# Not Found - Error"
 		return $null
 	}
 }
 
 function findPreReleasePackageVersion( $packageId) {
 
-    Write-Information "Looking for latest version of $packageId (Includes pre-release)"
+    Log -message "Looking for latest version of $packageId (Includes pre-release)"
 
     [string]$package = getLatestPreReleasePackage -packageId $packageId
     if($package) {
@@ -94,7 +92,7 @@ function isInstalled($packageId) {
     $result = &dotnet tool list --local
     $entry = $result | ? { $_ -match "^" + $packageIdRegex + "\s+(\d+\..*)$" }
 
-	Write-Information "Found: $entry"
+	Log -message "Found: $entry"
 	
 	if($entry -ne $null) {
 	    return $true
@@ -120,7 +118,7 @@ param(
 
     if(isInstalled -packageId $packageId) {
 
-        Write-Information "Removing currently installed $packageId"
+        Log -message "Removing currently installed $packageId"
         $result = dotnet tool uninstall --local $packageId
         if(!$?) {
             DotNetTool-Error -result $result
@@ -136,7 +134,7 @@ param(
     [string] $version = $(throw "DotNetTool-InstallVersion: Version not specified")
     )
 
-    Write-Information "Installing $version of $packageId"
+    Log -message "Installing $version of $packageId"
     $result = dotnet tool install --local $packageId --version $version
     if(!$?) {
         DotNetTool-Error -result $result
@@ -203,7 +201,7 @@ param(
         [string]$version = findPreReleasePackageVersion -packageId $packageId
 
         if($version -ne $null) {
-            Write-Information "Installing $version of $packageId"
+            Log -message "Installing $version of $packageId"
             $result = dotnet tool install --local $packageId --version $version
             if(!$?) {
                 DotNetTool-Error -result $result
@@ -218,7 +216,7 @@ param(
     }
     
     if($packageId -eq "funfair.buildcheck") {
-        Write-Information "Installing latest version of $packageId"
+        Log -message "Installing latest version of $packageId"
         $latestReleaseVersion = getLatestReleasePackage -packageId $packageId
 
         $result = dotnet tool install --local $packageId --version $latestReleaseVersion
@@ -232,7 +230,7 @@ param(
     }
         
     # Install released version
-    Write-Information "Installing latest release version of $packageId"
+    Log -message "Installing latest release version of $packageId"
     $result = dotnet tool install --local $packageId
     if(!$?) {
         DotNetTool-Error -result $result
@@ -272,14 +270,14 @@ function DotNetTool-Require{
 param(
     [string] $packageId = $(throw "DotNetTool-Install: packageId not specified")
 )
-    Write-information "Checking that $packageId is installed..."
+    Log -message "Checking that $packageId is installed..."
     $installed = DotNetTool-IsInstalled -packageId $packageId
     
     if(!$installed) {
         throw "Package $packageId is not installed"
     }
     
-    Write-information "$packageId found"
+    Log -message "$packageId found"
     $restored = dotnet tool restore
     DotNetTool-Log -result $restored    
 }

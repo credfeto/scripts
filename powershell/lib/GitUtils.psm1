@@ -18,10 +18,8 @@ function Git-Log {
 param(
     [string[]]$result
     )
-    
-    foreach($line in $result) {
-        Write-Information $line
-    }
+
+    Log-Batch -messages $result
 }
 
 function Git-ValidateBranchName {
@@ -58,7 +56,7 @@ function GetRepoPath {
         throw "Could not determine repo path"
     }
     
-    Write-Information "Using Repo: $repoPath"
+    Log -message "Using Repo: $repoPath"
     
     return $repoPath
 }
@@ -70,7 +68,7 @@ param(
     [string] $upstream = "origin"
     )
     
-    Write-Information "Git-GetDefaultBranch: $repoPath ($upstream)"
+    Log -message "Git-GetDefaultBranch: $repoPath ($upstream)"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -87,7 +85,7 @@ param(
         [string] $upstream = "origin"
     )
     
-    Write-Information "Git-GetRemoteBranches: $repoPath ($upstream)"
+    Log -message "Git-GetRemoteBranches: $repoPath ($upstream)"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -97,23 +95,23 @@ param(
 
     [string]$remotePrefix = "$upstream/"
     
-    Write-Information "Looking for Remote Branches for : $remotePrefix"
+    Log -message "Looking for Remote Branches for : $remotePrefix"
     
     foreach($item in $result) {
         [string]$branch = $item.Trim()
         if(!$branch.StartsWith($remotePrefix)) {
-            Write-Information "- Skipping $branch"
+            Log -message "- Skipping $branch"
             continue
         }
 
         $branch = $branch.SubString($remotePrefix.Length)
         $branch = $branch.Split(" ")[0]
         if($branch -eq "HEAD") {
-            Write-Information "- Skipping $branch"
+            Log -message "- Skipping $branch"
             continue
         }
 
-        Write-Information "+ Found $upstream/$branch"
+        Log -message "+ Found $upstream/$branch"
         $branches += $branch
     }
 
@@ -125,7 +123,7 @@ param(
         [string] $repoPath = $(throw "Git-RemoveAllLocalBranches: repoPath not specified")
     )
     
-    Write-Information "Git-RemoveAllLocalBranches: $repoPath"
+    Log -message "Git-RemoveAllLocalBranches: $repoPath"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -143,7 +141,7 @@ param(
         [string] $repoPath = $(throw "Git-ResetToMaster: repoPath not specified")
     )
     
-    Write-Information "Git-ResetToMaster: $repoPath"
+    Log -message "Git-ResetToMaster: $repoPath"
     
     $repack = IsOnRamDisk -Path $repoPath
 
@@ -186,7 +184,7 @@ param(
     [string] $repoPath = $(throw "Git-HasUnCommittedChanges: repoPath not specified")
     )
     
-    Write-Information "Git-HasUnCommittedChanges: $repoPath"
+    Log -message "Git-HasUnCommittedChanges: $repoPath"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -205,7 +203,7 @@ param(
     [string] $repo = $(throw "Git-GetFolderForRepo: repo not specified")
     )
 
-    Write-Information "Git-GetFolderForRepo: $repo"
+    Log -message "Git-GetFolderForRepo: $repo"
     
     # Extract the folder from the repo name
     [string] $folder = $repo.Substring($repo.LastIndexOf("/")+1)
@@ -220,27 +218,27 @@ param(
     [string] $repoFolder = $(throw "Git-EnsureSynchronised: repoFolder not specified")
     )
     
-    Write-Information "Git-EnsureSynchronised: $repoFolder ($repo)"
+    Log -message "Git-EnsureSynchronised: $repoFolder ($repo)"
 
-    Write-Information "Repo: $repo"
-    Write-Information "Folder: $repoFolder"
+    Log -message "Repo: $repo"
+    Log -message "Folder: $repoFolder"
 
     [string]$gitHead = Join-Path -Path $repoFolder -ChildPath ".git" 
     [string]$gitHead = Join-Path -Path $gitHead -ChildPath "HEAD" 
     
-    Write-Information "Head: $gitHead"
+    Log -message "Head: $gitHead"
 
     [bool]$gitHeadCloned = Test-Path -path $gitHead
 
     if ($gitHeadCloned -eq $True) {
-        Write-Information "Already Cloned"
+        Log -message "Already Cloned"
         Set-Location -Path $repoFolder
 
         Git-ResetToMaster -repoPath $repoFolder
     }
     else
     {
-        Write-Information "Cloning..."
+        Log -message "Cloning..."
         $result = git clone $repo --recurse-submodules 2>&1 
         Git-Log -result $result
         Set-Location -Path $repoFolder
@@ -253,7 +251,7 @@ param(
     [string] $message = $(throw "Git-Commit: message not specified")
     )
     
-    Write-Information "Git-Commit: $repoPath ($message)"
+    Log -message "Git-Commit: $repoPath ($message)"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -268,13 +266,13 @@ param(
     [String[]] $files = $(throw "Git-Commit-Named: files not specified")
     )
     
-    Write-Information "Git-Commit-Named: $repoPath ($message)"
+    Log -message "Git-Commit-Named: $repoPath ($message)"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
     foreach($file in $files) {
         [string]$fileUnix = $file.Replace("\", "/")
-        Write-Information "Staging $fileUnix"
+        Log -message "Staging $fileUnix"
         & git -C $repoPath add $fileUnix | Out-Null
     }
 
@@ -286,7 +284,7 @@ param(
     [string] $repoPath = $(throw "Git-Push: repoPath not specified")
     )
     
-    Write-Information "Git-Push: $repoPath"
+    Log -message "Git-Push: $repoPath"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -300,7 +298,7 @@ param(
     [string] $branchName = $(throw "Git-PushOrigin: branchName not specified")
     )
     
-    Write-Information "Git-PushOrigin: $repoPath ($branchName)"
+    Log -message "Git-PushOrigin: $repoPath ($branchName)"
     
     [string]$upstream = "origin";
 
@@ -318,7 +316,7 @@ param(
     [string] $branchName = $(throw "Git-DoesBranchExist: branchName not specified")
     )
     
-    Write-Information "Git-DoesBranchExist: $repoPath ($branchName)"
+    Log -message "Git-DoesBranchExist: $repoPath ($branchName)"
     
     [string]$upstream = "origin";
     [string]$repoPath = GetRepoPath -repoPath $repoPath
@@ -356,7 +354,7 @@ param(
     [string] $branchName = $(throw "Git-CreateBranch: branchName not specified")
     )
     
-    Write-Information "Git-CreateBranch: $repoPath ($branchName)"
+    Log -message "Git-CreateBranch: $repoPath ($branchName)"
     
     Git-ValidateBranchName -branchName $branchName -method "Git-CreateBranch"
 
@@ -364,19 +362,19 @@ param(
 
     [bool]$branchExists = Git-DoesBranchExist -branchName $branchName -repoPath $repoPath
     if($branchExists -eq $true) {
-        Write-Information "Failed to create branch $branchName - branch already exists"
+        Log -message "Failed to create branch $branchName - branch already exists"
         return $false
     }
 
     $result = git -C $repoPath checkout -b $branchName 2>&1
     if(!$?) {
         Git-Log -result $result
-        Write-Information "Failed to create branch $branchName - Create branch failed - Call failed."
+        Log -message "Failed to create branch $branchName - Create branch failed - Call failed."
         return $false
     }
 
     Git-Log -result $result
-    Write-Information "Created branch $branchName"
+    Log -message "Created branch $branchName"
 
     return $true;
 }
@@ -387,7 +385,7 @@ param(
     [string] $branchName = $(throw "Git-DeleteBranch: branchName not specified")
     )
     
-    Write-Information "Git-DeleteBranch: $repoPath ($branchName)"
+    Log -message "Git-DeleteBranch: $repoPath ($branchName)"
 
     [string]$upstream = "origin"
 
@@ -414,7 +412,7 @@ param(
     [string] $repoPath = $(throw "Git-ReNormalise: repoPath not specified")
     )
     
-    Write-Information "Git-ReNormalise: $repoPath"
+    Log -message "Git-ReNormalise: $repoPath"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
@@ -432,7 +430,7 @@ param(
     [string] $repoPath = $(throw "Git-Get-HeadRev: repoPath not specified")
     )
     
-    Write-Information "Git-Get-HeadRev: $repoPath"
+    Log -message "Git-Get-HeadRev: $repoPath"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
@@ -440,7 +438,7 @@ param(
 
     if(!$?) {
         Git-Log -result $result
-        Write-Information "Failed to get head rev"
+        Log -message "Failed to get head rev"
         return $null
     }
 
@@ -452,7 +450,7 @@ function Git-HasSubmodules {
     [string] $repoPath = $(throw "Git-HasSubmodules: repoPath not specified")
     )
     
-    Write-Information "Git-HasSubmodules: $repoPath"
+    Log -message "Git-HasSubmodules: $repoPath"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -460,7 +458,7 @@ function Git-HasSubmodules {
 
     if(!$?) {
         Git-Log -result $result
-        Write-Information "Failed to get submodules."
+        Log -message "Failed to get submodules."
         return $false
     }
 
@@ -468,8 +466,8 @@ function Git-HasSubmodules {
         return $false
     }
     
-    Write-Information "Submodules found:"
-    Write-Information $result
+    Log -message "Submodules found:"
+    Log -message $result
 
     return $true
 }
@@ -481,7 +479,7 @@ param(
     [string]$branchPrefix = $(throw "Git-RemoveBranchesForPrefix: branchPrefix not specified")
     )
     
-    Write-Information "Git-RemoveBranchesForPrefix: $repoPath ($branchForUpdate, $branchPrefix)"
+    Log -message "Git-RemoveBranchesForPrefix: $repoPath ($branchForUpdate, $branchPrefix)"
 
     [string]$upstream = "origin"
     
@@ -489,17 +487,17 @@ param(
 
     [string[]]$remoteBranches = Git-GetRemoteBranches -repoPath $repoFolder -upstream $upstream
     
-    Write-Information "Looking for branches to remove based on prefix: $branchPrefix"        
+    Log -message "Looking for branches to remove based on prefix: $branchPrefix"
     foreach($branch in $remoteBranches) {
         if($branchForUpdate) {
             if($branch -eq $branchForUpdate) {
-                Write-Information "- Skipping branch just pushed to: $branch"
+                Log -message "- Skipping branch just pushed to: $branch"
                 continue
             }
         }
         
         if($branch.StartsWith($branchPrefix)) {
-            Write-Information "+ Deleting older branch for package: $branch"
+            Log -message "+ Deleting older branch for package: $branch"
             Git-DeleteBranch -branchName $branch -repoPath $repoFolder
         }
     }        
@@ -510,7 +508,7 @@ param(
     [string] $repoPath = $(throw "Get-GetLastCommitDate: repoPath not specified")
     )
     
-    Write-Information "Git-GetLastCommitDate: $repoPath"
+    Log -message "Git-GetLastCommitDate: $repoPath"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
@@ -526,7 +524,7 @@ param(
     [string] $repoFile = $(throw "Git-LoadRepoList: repoPath not specified")
     )
     
-    Write-Information "Git-LoadRepoList: $repoFile"
+    Log -message "Git-LoadRepoList: $repoFile"
 
     [string[]] $content = Get-Content -Path $repoFile
 

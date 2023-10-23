@@ -15,7 +15,7 @@ function getPackageIdRegex {
     $regexPattern = "^::set-env\sname=$packageIdAsRegex::(?<Version>\d+(\.\d+)+)$"
   }
 
-  Write-Information ">> Regex: $regexPattern"
+  Log -message ">> Regex: $regexPattern"
   
   return $regexPattern
 }
@@ -31,14 +31,14 @@ param(
         $key = $key + "**-exact-match"
     }
     if(!$regexCache.Contains($key)) {
-        Write-Information ">> Creating Regex for $packageId"    
+        Log -message ">> Creating Regex for $packageId"
         [string]$regexPattern = getPackageIdRegex -packageId $packageId -exactMatch $exactMatch
         $regex = new-object System.Text.RegularExpressions.Regex($regexPattern, $regexOptions)
         $regexCache[$key] = $regex
         
         return $regex
     }else {
-        Write-Information ">> Using Regex for $packageId"
+        Log -message ">> Using Regex for $packageId"
         $regex = $regexCache[$key]
         
         if(!$regex) {
@@ -89,13 +89,13 @@ param(
     
     foreach($message in $logs)
     {
-        Write-Information ">> Searching for $packageId in [$message]"
+        Log -message ">> Searching for $packageId in [$message]"
         $regexMatches = $regex.Matches($message);
         $matchCount = $regexMatches.Count
-        #Write-Information ">> Found $matchCount matches" 
+        #Log -message ">> Found $matchCount matches"
         if($matchCount -gt 0) {
             [string]$version = $regexMatches[0].Groups["Version"].Value
-            #Write-Information ">>Found: [$version]"
+            #Log -message ">>Found: [$version]"
             return $version
         }
     }
@@ -107,11 +107,8 @@ function WriteLogs {
     param(
     [string[]]$logs
     )
-    
-    foreach($message in $logs)
-    {
-        Write-Information $message
-    }
+
+    Log-Batch -messages $logs
 }
 
 function buildPackageSearch{
@@ -143,12 +140,12 @@ param(
     
     if($excludes.Count -gt 0) {
         $excluded = $excludes -join " "
-        Write-Information "Excluding: $excluded"
+        Log -message "Excluding: $excluded"
        
         return $excludes
     }
     else {
-        Write-Information "Excluding: <<None>>"
+        Log -message "Excluding: <<None>>"
         return $null        
     }
 }
@@ -162,25 +159,25 @@ param(
     $exclude    
     )
 
-    Write-Information "Updating Package Exact"
+    Log -message "Updating Package Exact"
     $search = buildPackageSearch -packageId $packageId -exactMatch $True
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
         DotNetTool-Require -packageId "Credfeto.Package.Update"
-        Write-Information "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes"
+        Log -message "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
         DotNetTool-Require -packageId "Credfeto.Package.Update"
-        Write-Information "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search"
+        Log -message "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
     }
     
     $exitCode = $?
-    Write-Information "Result: $exitCode"
+    Log -message "Result: $exitCode"
     
     if ($exitCode -lt 0) {
-        Write-Information " * ERROR: Failed to update $packageId"    
+        Log -message " * ERROR: Failed to update $packageId"
         WriteLogs -logs $results
         throw "Failed to update $packageId"
     }    
@@ -194,15 +191,15 @@ param(
         
         [string]$version = getVersion -logs $results -regex $regex
         if($version -ne $null -and $version -ne "") {
-            Write-Information "* Found: $version"
+            Log -message "* Found: $version"
             return $version
         } 
         
-        Write-Information " * No Changes"    
+        Log -message " * No Changes"
     }
     else
     {
-        Write-Information " * ERROR: Failed to update $packageId"    
+        Log -message " * ERROR: Failed to update $packageId"
         WriteLogs -logs $results
     }
 
@@ -219,17 +216,17 @@ param(
     $exclude
     )
 
-    Write-Information "Updating Package Prefix"
+    Log -message "Updating Package Prefix"
     $search = buildPackageSearch -packageId $packageId -exactMatch $False
     $excludes = buildExcludes -exclude $exclude
     if($excludes) {
         DotNetTool-Require -packageId "Credfeto.Package.Update"
-        Write-Information "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes"
+        Log -message "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search --exclude $excludes
     }
     else {
         DotNetTool-Require -packageId "Credfeto.Package.Update"
-        Write-Information "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search"
+        Log -message "dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search"
         $results = dotnet updatepackages --cache $packageCache --folder $repoFolder --package-id $search
     }
 
@@ -241,7 +238,7 @@ param(
         $regex = getPackageRegex -packageId $packageId -exactMatch $False
         [string]$version = getVersion -logs $results -regex $regex
         if($version -ne $null -and $version -ne "") {
-            Write-Information "* Found: $version"
+            Log -message "* Found: $version"
             return $version
         } 
     }
@@ -250,7 +247,7 @@ param(
         WriteLogs -logs $results
     }
     
-    Write-Information " * No Changes"    
+    Log -message " * No Changes"
     return $null
 }
 

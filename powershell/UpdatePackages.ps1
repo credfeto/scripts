@@ -133,7 +133,7 @@ param(
 
     if ($lastRevision -eq $currentRevision)
     {
-        Write-Information "Repo not changed since last successful build"
+        Log -message "Repo not changed since last successful build"
         Return $true
     }
 
@@ -155,18 +155,18 @@ param(
 
     Set-Location -Path $root
 
-    Write-Information ""
-    Write-Information "***********************************************************************************"
-    Write-Information "***********************************************************************************"
-    Write-Information "***********************************************************************************"
-    Write-Information "***********************************************************************************"
-    Write-Information ""
-    Write-Information "Processing Repo: $repo"
+    Log -message ""
+    Log -message "***********************************************************************************"
+    Log -message "***********************************************************************************"
+    Log -message "***********************************************************************************"
+    Log -message "***********************************************************************************"
+    Log -message ""
+    Log -message "Processing Repo: $repo"
 
     # Extract the folder from the repo name
     [string]$folder = Git-GetFolderForRepo -repo $repo
 
-    Write-Information "Folder: $folder"
+    Log -message "Folder: $folder"
     [string]$repoFolder = Join-Path -Path $root -ChildPath $folder
 
     Git-EnsureSynchronised -repo $repo -repofolder $repoFolder
@@ -189,15 +189,15 @@ param(
     $currentlyInstalledPackages = DotNetPackages-Get -srcFolder $srcPath
     if($currentlyInstalledPackages.Length -eq 0) {
         # no source to update
-        Write-Information "* No C# packages to update in repo"
+        Log -message "* No C# packages to update in repo"
         return;
     }    
 
     [string]$lastRevision = Tracking_Get -basePath $trackingFolder -repo $repo
     [string]$currentRevision = Git-Get-HeadRev -repoPath $repoFolder
 
-    Write-Information "Last Revision:    $lastRevision"
-    Write-Information "Current Revision: $currentRevision"
+    Log -message "Last Revision:    $lastRevision"
+    Log -message "Current Revision: $currentRevision"
 
     [string]$changeLog = Join-Path -Path $repoFolder -ChildPath "CHANGELOG.md"
 
@@ -237,20 +237,20 @@ param(
         
         [bool]$shouldUpdatePackages = Packages_ShouldUpdate -installed $currentlyInstalledPackages -packageId $packageId -exactMatch $exactMatch
         
-        Write-Information ""
-        Write-Information "------------------------------------------------"
-        Write-Information "Looking for updates of $packageId"
-        Write-Information "Exact Match: $exactMatch"
-        Write-Information "Package installed in solution: $shouldUpdatePackages"
+        Log -message ""
+        Log -message "------------------------------------------------"
+        Log -message "Looking for updates of $packageId"
+        Log -message "Exact Match: $exactMatch"
+        Log -message "Package installed in solution: $shouldUpdatePackages"
                 
         if(!$shouldUpdatePackages) {
-            Write-Information "Skipping $packageId as not installed"
+            Log -message "Skipping $packageId as not installed"
             continue
         }
         
         [boolean]$okBefore = DotNet-CheckSolution -srcFolder $srcPath -preRelease $true
         if(!$okBefore) {
-            Write-Information "Skipping $packageId as solution is not in a good state"
+            Log -message "Skipping $packageId as solution is not in a good state"
             continue
         }
         
@@ -258,7 +258,7 @@ param(
         [string]$update = Packages_CheckForUpdates -repoFolder $repoFolder -packageCache $packageCache -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
         
         if([string]::IsNullOrEmpty($update)) {
-            Write-Information "***** $repo NO UPDATES TO $packageId ******"
+            Log -message "***** $repo NO UPDATES TO $packageId ******"
             Git-ResetToMaster -repoPath $repoFolder
             
             # Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
@@ -266,11 +266,11 @@ param(
             Continue
         }
 
-        Write-Information "***** $repo FOUND UPDATE TO $packageId for $update ******"
+        Log -message "***** $repo FOUND UPDATE TO $packageId for $update ******"
         
         [boolean]$okAfter = DotNet-CheckSolution -srcFolder $srcPath -preRelease $true
         if(!$okAfter) {
-            Write-Information "Skipping $packageId as solution is not in a good state after update attempt (probable mismatch of packages)"
+            Log -message "Skipping $packageId as solution is not in a good state after update attempt (probable mismatch of packages)"
             continue
         }
                 
@@ -279,7 +279,7 @@ param(
         [bool]$branchExists = Git-DoesBranchExist -branchName $branchName  -repoPath $repoFolder
         if(!$branchExists) {
 
-            Write-Information ">>>> Checking to see if code builds against $packageId $update <<<<"
+            Log -message ">>>> Checking to see if code builds against $packageId $update <<<<"
             $codeOK = DotNet-BuildSolution -srcFolder $srcPath
             Set-Location -Path $repoFolder
             if($codeOK) {
@@ -293,14 +293,14 @@ param(
                 [string]$lastRevision = $currentRevision
                 Tracking_Set -basePath $trackingFolder -repo $repo -value $currentRevision
 
-                Write-Information "Last Revision:    $lastRevision"
-                Write-Information "Current Revision: $currentRevision"
+                Log -message "Last Revision:    $lastRevision"
+                Log -message "Current Revision: $currentRevision"
 
-                Write-Information "WARNING: Removing other branches similar to $branchPrefix as committed to master for $update"
+                Log -message "WARNING: Removing other branches similar to $branchPrefix as committed to master for $update"
                 Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
             }
             else {
-                Write-Information "Create Branch $branchName"
+                Log -message "Create Branch $branchName"
                 [bool]$branchOk = Git-CreateBranch -branchName $branchName -repoPath $repoFolder
                 if($branchOk) {
                     ChangeLog-RemoveEntry -fileName $changeLog -entryType "Changed" -code "Dependencies" -message "Updated $packageId to "
@@ -310,22 +310,22 @@ param(
 
                     $branchesCreated += 1
 
-                    Write-Information "WARNING: Removing other branches similar to $branchPrefix as new branch created for $update ($branchName)"
+                    Log -message "WARNING: Removing other branches similar to $branchPrefix as new branch created for $update ($branchName)"
                     Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $branchName -branchPrefix $branchPrefix
                 } else {
-                    Write-Information ">>> ERROR: FAILED TO CREATE BRANCH <<<"
+                    Log -message ">>> ERROR: FAILED TO CREATE BRANCH <<<"
                 }
             }
         }
         else {
-            Write-Information "Branch $branchName already exists - skipping"
+            Log -message "Branch $branchName already exists - skipping"
         }
  
         Git-ResetToMaster -repoPath $repoFolder
     }
     
-    Write-Information "$repo Updated run created $branchesCreated branches"
-    Write-Information "$repo Updated run updated $packagesUpdated packages"
+    Log -message "$repo Updated run created $branchesCreated branches"
+    Log -message "$repo Updated run updated $packagesUpdated packages"
     
     Git-ResetToMaster -repoPath $repoFolder
         
@@ -345,13 +345,13 @@ param(
 
 #########################################################################
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 Set-Location -Path $root
-Write-Information "Root Folder: $root"
+Log -message "Root Folder: $root"
 
 DotNetTool-Require -packageId "Credfeto.Package.Update"
 DotNetTool-Require -packageId "Credfeto.Changelog.Cmd"
@@ -359,17 +359,17 @@ DotNetTool-Require -packageId "FunFair.BuildVersion"
 DotNetTool-Require -packageId "FunFair.BuildCheck"
 
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 dotnet tool list
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 $packages = Packages_Get -fileName $packagesToUpdate
 
@@ -382,4 +382,4 @@ ForEach($repo in $repoList) {
     processRepo -repo $repo -packages $packages -baseFolder $root
 }
 
-Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
+Log -message ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"

@@ -4,7 +4,7 @@ param(
     )
     
     foreach($line in $result) {
-        Write-Information $line
+        Log -message $line
         if($line.Contains("dotnet tool restore")) {
             dotnet tool list
             throw "Missing dotnet tool"
@@ -25,21 +25,17 @@ function BuildVersion-GetNextPatch {
     $result = dotnet buildversion --BuildNumber 9999 --WarningsAsErrors
 
     if(!$?) {
-        foreach($line in $result) {
-            Write-Information $line
-        }
+        Log-Batch -messages $result
         BuildVersion-IsMissingTool -result $result
         throw "Could Not Determine Release (command failed)"
     }
-    
-    foreach($line in $result) {
-        Write-Information $line
-    }
+
+    Log-Batch -messages $result
 
     $match = select-string "Version:\s(\d+\.\d+\.\d+)\.\d+\-[master|main]" -InputObject $result
     if($match) {
         [string]$version = $match.Matches.Groups[1].Value
-        Write-Information "Found Release Branch ($version)"
+        Log -message "Found Release Branch ($version)"
         return $version
     }
 

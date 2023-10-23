@@ -2,10 +2,8 @@
 param(
     [string[]]$result
     )
-    
-    foreach($line in $result) {
-        Write-Information $line
-    }
+
+    Log-Batch -message $result
 }
 
 function Changelog-IsMissingTool {
@@ -14,7 +12,7 @@ param(
     )
     
     foreach($line in $result) {
-        Write-Information $line
+        Log -message $line
         if($line.Contains("dotnet tool restore")) {
             dotnet tool list
             throw "Missing dotnet tool"
@@ -49,16 +47,16 @@ param(
     [string] $message = $(throw "ChangeLog-AddEntry: message not specified")
     )
     
-    Write-Information ">>> Updating Changelog <<<"
+    Log -message ">>> Updating Changelog <<<"
 
     DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$result = dotnet changelog --changelog $fileName --add $entryType --message "$code - $message"
     Changelog-Log -result $result
     if($?) {
-        Write-Information "* Changelog Updated"
+        Log -message "* Changelog Updated"
     }
     else {
-        Write-Information "* Changelog NOT Updated"
+        Log -message "* Changelog NOT Updated"
         Changelog-IsMissingTool -result $result
         throw "Failed to update changelog"
     }
@@ -91,16 +89,16 @@ param(
     [string] $message = $(throw "ChangeLog-RemoveEntry: message not specified")
     )
     
-    Write-Information ">>> Updating Changelog <<<"
+    Log -message ">>> Updating Changelog <<<"
 
     DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$result = dotnet changelog --changelog $fileName --remove $entryType --message "$code - $message"
     Changelog-Log -result $result
     if($?) {
-        Write-Information "* Changelog Updated"
+        Log -message "* Changelog Updated"
     }
     else {
-        Write-Information "* Changelog NOT Updated"
+        Log -message "* Changelog NOT Updated"
         Changelog-IsMissingTool -result $result
         throw "Failed to update changelog"
     }
@@ -112,16 +110,16 @@ function ChangeLog-CreateRelease {
         [string] $release = $(throw "ChangeLog-CreateRelease: release not specified")
     )
 
-    Write-Information ">>> Creating Changelog release notes for $release <<<"
+    Log -message ">>> Creating Changelog release notes for $release <<<"
 
     DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$result = dotnet changelog --changelog $fileName --create-release $release
     Changelog-Log -result $result
     if($?) {
-        Write-Information "* Changelog Updated"
+        Log -message "* Changelog Updated"
     }
     else {
-        Write-Information "* Changelog NOT Updated"
+        Log -message "* Changelog NOT Updated"
         Changelog-IsMissingTool -result $result
         throw "Failed to update changelog"
     }
@@ -132,7 +130,7 @@ function ChangeLog-GetUnreleased {
         [string] $fileName = $(throw "ChangeLog-GetUnreleased: fileName not specified")
     )
 
-    Write-Information ">>> Reading Changelog unreleased content <<<"
+    Log -message ">>> Reading Changelog unreleased content <<<"
 
     DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$releaseNotes = dotnet changelog --changelog $fileName --un-released $release
@@ -150,7 +148,7 @@ function ChangeLog-GetUnreleased {
 
     }
     else {
-        Write-Information "* Changelog NOT extracted"
+        Log -message "* Changelog NOT extracted"
         Changelog-IsMissingTool -result $releaseNotes        
         throw "Failed to extract changelog"
     }

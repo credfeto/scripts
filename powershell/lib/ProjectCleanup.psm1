@@ -20,7 +20,7 @@ param (
             [string]$name = ($child.Name).ToString().ToUpper()
             if($name -eq "#COMMENT") {
                 $replace = $false;
-                Write-Information "$filename SKIPPING GROUP AS Found Comment"
+                Log -message "$filename SKIPPING GROUP AS Found Comment"
                 Break
             }
             
@@ -30,7 +30,7 @@ param (
                     # Skip DefineConstants as they can be added many times
                     Break
                 }
-                Write-Information "$filename SKIPPING GROUP AS Found Duplicate item $name"
+                Log -message "$filename SKIPPING GROUP AS Found Duplicate item $name"
                 Break
             }
             $orderedChildren.Add($name, $child)
@@ -121,7 +121,7 @@ param (
         $includes = $itemGroup.SelectNodes("Folder")
         if($includes.Count -ne 0) {
             foreach($include in $includes) {
-                Write-Information "* Found Folder to remove $( $include.Include )"
+                Log -message "* Found Folder to remove $( $include.Include )"
                 $toRemove += $include
             }
         }

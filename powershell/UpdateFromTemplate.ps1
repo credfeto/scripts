@@ -170,10 +170,10 @@ param (
 
     [string]$targetFolder = $targetFileName.Substring(0, $targetFileName.LastIndexOf("/"))
     
-    Write-Information "--- Ensure folder exists: $targetFolder for $targetFileName"
+    Log -message "--- Ensure folder exists: $targetFolder for $targetFileName"
     [bool]$targetFolderExists = Test-Path -Path $targetFolder -PathType Container
     if($targetFolderExists -eq $false) {
-        Write-Information "--- Creating folder: $targetFolder"
+        Log -message "--- Creating folder: $targetFolder"
         New-Item -ItemType Directory -Path $targetFolder
     }    
     
@@ -184,35 +184,35 @@ param (
         
         [bool]$update = $false
         if($trgExists) {
-            Write-Information "--- Files exist - checking hash"
+            Log -message "--- Files exist - checking hash"
             $srcHash = Get-FileHash -Path $sourceFileName -Algorithm SHA512
             $trgHash = Get-FileHash -Path $targetFileName -Algorithm SHA512
             
-            Write-Information " --- SRC: $( $srcHash.Hash )"
-            Write-Information " --- TRG: $( $trgHash.Hash )"
+            Log -message " --- SRC: $( $srcHash.Hash )"
+            Log -message " --- TRG: $( $trgHash.Hash )"
         
             if($srcHash -eq $trgHash) {
                 $update = $false
-                Write-Information "--- Identical $sourceFileName to $targetFileName"
+                Log -message "--- Identical $sourceFileName to $targetFileName"
             }
             else {
-                Write-Information "--- Different $sourceFileName to $targetFileName"
+                Log -message "--- Different $sourceFileName to $targetFileName"
                 $update = $true
             }
         }
         else {
-            Write-Information "--- Target file does not exist - copying $sourceFileName to $targetFileName"
+            Log -message "--- Target file does not exist - copying $sourceFileName to $targetFileName"
             $update = $true
         }
                       
         if($update) {
-            Write-Information "--- Copy $sourceFileName to $targetFileName"
+            Log -message "--- Copy $sourceFileName to $targetFileName"
             Copy-Item $sourceFileName -Destination $targetFileName -Force
             return $true
         }
     }
     elseif($trgExists) {
-        Write-Information "--- Delete"
+        Log -message "--- Delete"
         #Remove-Item -Path $targetFileName
 
         #return $null
@@ -233,7 +233,7 @@ param (
     
     [string]$fileName = convertToOsPath -path $fileName
 
-    Write-Information "Checking $fileName"
+    Log -message "Checking $fileName"
 
     [string]$sourceFileName = makePath -Path $sourceRepo -ChildPath $fileName
     [string]$targetFileName = makePath -Path $targetRepo -ChildPath $fileName
@@ -247,7 +247,7 @@ param(
     [String]$repoPath = $(throw "doCommit: repoPath not specified")
 )
 
-    Write-Information "Staging $fileName in $repoPath"
+    Log -message "Staging $fileName in $repoPath"
     [String[]] $files = $filename.Replace("\", "/")
     Git-Commit-Named -repoPath $repoPath -message "[Dependencies] - Update $fileName to match the template repo" -files $fileName
 }
@@ -281,14 +281,14 @@ param(
     [string]$srcExists = Test-Path -Path $srcPath
     if($srcExists -eq $false) {
         # no source to update
-        Write-Information "* No src folder in repo"
+        Log -message "* No src folder in repo"
         return $false
     }
 
     $projects = Get-ChildItem -Path $srcPath -Filter *.csproj -Recurse
     if($projects.Length -eq 0) {
         # no source to update
-        Write-Information "* No C# projects in repo"
+        Log -message "* No C# projects in repo"
         return $false;
     }
 
@@ -326,7 +326,7 @@ param(
                 [string]$branchName = "template/$fileName".Replace("\", "/")
                 [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
                 if($branchOk) {
-                    Write-Information "Create Branch $branchName"
+                    Log -message "Create Branch $branchName"
                     doCommit -repoPath $targetRepo -fileName $fileName
                     Git-PushOrigin -repoPath $targetRepo -branchName $branchName
                 }
@@ -364,7 +364,7 @@ param (
     [string]$sourceFileName = "$solution.DotSettings"
     $sourceTemplateExists = Test-Path -Path $sourceFileName
     if(!$sourceTemplateExists) {
-        Write-Information "ERROR: $sourceFileName does not exist"
+        Log -message "ERROR: $sourceFileName does not exist"
         return
     }  
     
@@ -375,7 +375,7 @@ param (
 
         [string]$fileNameForCommit = $targetFileName.SubString($targetRepo.Length + 1)
 
-        Write-Information "Update $targetFileName"
+        Log -message "Update $targetFileName"
         [bool]$ret = updateOneFile -sourceFileName $sourceFileName -targetFileName $targetFileName
         if($ret) {
             doCommit -repoPath $targetRepo -fileName $fileNameForCommit
@@ -419,7 +419,7 @@ param(
 
     [bool]$targetMergeFileNameExists = Test-Path -Path $targetFileName
     if($targetMergeFileNameExists -eq $true) {
-        Write-Information "Performing update on $targetFileName with text replacements"
+        Log -message "Performing update on $targetFileName with text replacements"
             
         [string]$srcContent = Get-Content -Path $sourceFileName -Raw
         [string]$trgContent = Get-Content -Path $targetFileName -Raw
@@ -433,7 +433,7 @@ param(
         
     }
     else {
-        Write-Information "Performing add on $targetFileName with text replacements"
+        Log -message "Performing add on $targetFileName with text replacements"
         
         $srcContent = Get-Content -Path $sourceFileName -Raw
         
@@ -455,12 +455,12 @@ param(
     $fileName = convertToOsPath -path $fileName
     [string]$mergeFileName = convertToOsPath -path $mergeFileName
     
-    Write-Information "Merging ? $fileName"
+    Log -message "Merging ? $fileName"
     [string]$sourceFileName = makePath -Path $sourceRepo -ChildPath $fileName
-    Write-Information "Source File: $sourceFileName"
+    Log -message "Source File: $sourceFileName"
     [bool]$sourceFileNameExists = Test-Path -Path $sourceFileName -PathType Leaf
     if($sourceFileNameExists -eq $false) {
-        Write-Information "Non-Existent Source File: $sourceFileName"
+        Log -message "Non-Existent Source File: $sourceFileName"
         return
     }
 
@@ -469,12 +469,12 @@ param(
 
     [bool]$targetMergeFileNameExists = Test-Path -Path $targetMergeFileName
     if($targetMergeFileNameExists -eq $true) {
-        Write-Information "Found $mergeFileName"
+        Log -message "Found $mergeFileName"
         
-        Write-Information "Source File: $sourceFileName"
+        Log -message "Source File: $sourceFileName"
         [string]$srcContent = Get-Content -Path $sourceFileName -Raw
         
-        Write-Information "Merge File: $targetMergeFileName"
+        Log -message "Merge File: $targetMergeFileName"
         [string]$mergeContent = Get-Content -Path $targetMergeFileName -Raw
 
         [string]$trgContent = $srcContent + $mergeContent
@@ -497,7 +497,7 @@ param(
     )
 
     [string]$srcPath = makePath -Path $sourceRepo -ChildPath ".github"
-    Write-Information "Config Path: $srcPath"
+    Log -message "Config Path: $srcPath"
     [string]$targetFileName = makePath -Path $targetRepo -ChildPath ".github/dependabot.yml"
 
     [bool]$updateGitHubActions = $hasNonTemplateWorkFlows
@@ -553,9 +553,9 @@ param (
     [string]$originalBranchPrefix = $(throw "commitGlobalJsonVersionUpdateToMaster: originalBranchPrefix not specified")
     )
 
-    Write-Information "**** BUILD OK ****"
+    Log -message "**** BUILD OK ****"
     
-    Write-Information "**** DOTNET VERSION UPDATE TO $dotnetVersion"
+    Log -message "**** DOTNET VERSION UPDATE TO $dotnetVersion"
     Git-Commit -repoPath $targetRepo -message "[SDK] - Updated DotNet SDK to $dotnetVersion"
     Git-Push -repoPath $targetRepo
     Git-DeleteBranch -repoPath $targetRepo -branchName $branchName
@@ -574,10 +574,10 @@ param (
     [string]$originalBranchPrefix = $(throw "commitGlobalJsonVersionUpdateToBranch: originalBranchPrefix not specified")
     )
 
-    Write-Information "**** BUILD FAILURE ****"
+    Log -message "**** BUILD FAILURE ****"
     [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
     if ($branchOk -eq $true) {
-        Write-Information "Create Branch $branchName"
+        Log -message "Create Branch $branchName"
         Git-Commit -repoPath $targetRepo -message "[SDK] - Updated DotNet SDK to $dotnetVersion"
         Git-PushOrigin -repoPath $targetRepo -branchName $branchName
     }
@@ -600,7 +600,7 @@ param(
 
     [string]$localFileName = convertToOsPath -path $fileName
 
-    Write-Information "Checking $localFileName"
+    Log -message "Checking $localFileName"
 
     [string]$sourceFileName = makePath -Path $sourceRepo -ChildPath $localFileName
     [string]$targetFileName = makePath -Path $targetRepo -ChildPath $localFileName
@@ -608,25 +608,25 @@ param(
     [string]$originalBranchPrefix = "template/$fileName".Replace("\", "/")
     [string]$branchName = $originalBranchPrefix
 
-    Write-Information "*****************"
-    Write-Information "** GLOBAL.JSON **"
-    Write-Information "*****************"
+    Log -message "*****************"
+    Log -message "** GLOBAL.JSON **"
+    Log -message "*****************"
     $updated = GlobalJson_Update -sourceFileName $sourceFileName -targetFileName $targetFileName
     
-    Write-Information "File Changed: $( $updated.Update )"
-    Write-Information "Version Changed: $( $updated.UpdatingVersion )"
-    Write-Information "New Version: $( $updated.NewVersion )"
+    Log -message "File Changed: $( $updated.Update )"
+    Log -message "Version Changed: $( $updated.UpdatingVersion )"
+    Log -message "New Version: $( $updated.NewVersion )"
 
     if ($updated.Update -eq $true) {    
-        Write-Information "** PROCESSING GLOBAL.JSON UPDATE"
+        Log -message "** PROCESSING GLOBAL.JSON UPDATE"
         [string]$sourceCodeFolder = makePath -Path $targetRepo -ChildPath "src"
-        Write-Information "Src Folder: $sourceCodeFolder"
+        Log -message "Src Folder: $sourceCodeFolder"
 
         if($updated.UpdatingVersion -eq $true) {
         
             [string]$dotnetVersion = $updated.NewVersion
 
-            Write-Information "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
+            Log -message "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
             [string]$changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
             ChangeLog-RemoveEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to "
             ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to $dotnetVersion"
@@ -640,36 +640,36 @@ param(
 
                 $result = commitGlobalJsonVersionUpdateToMaster -dotnetVersion $dotnetVersion -targetRepo $targetRepo -branchName $branchName -originalBranchPrefix $originalBranchPrefix
 
-                Write-Information "Commit Result: $result"
+                Log -message "Commit Result: $result"
                 
                 return "VERSION"
             }
             else {
                 $result = commitGlobalJsonVersionUpdateToBranch -dotnetVersion $dotnetVersion -targetRepo $targetRepo -branchName $branchName -originalBranchPrefix $originalBranchPrefix
                 
-                Write-Information "Commit Result: $result"
+                Log -message "Commit Result: $result"
                 
                 return "PENDING"
             }
         }
         else {
         
-            Write-Information "** GLOBAL.JSON VERSION UNCHANGED BUT CONTENT CHANGED"
+            Log -message "** GLOBAL.JSON VERSION UNCHANGED BUT CONTENT CHANGED"
 
             [bool]$codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
             Set-Location -Path $targetRepo
             if ($codeOK -eq $true) {
-                Write-Information "**** BUILD OK ****"
+                Log -message "**** BUILD OK ****"
                 doCommit -repoPath $targetRepo -fileName $fileName
 
                 # Remove any previous template updates that didn't create a version specific branch
                 Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
             }
             else {
-                Write-Information "**** BUILD FAILURE ****"
+                Log -message "**** BUILD FAILURE ****"
                 [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
                 if ($branchOk -eq $true) {
-                    Write-Information "Create Branch $branchName"
+                    Log -message "Create Branch $branchName"
                     doCommit -repoPath $targetRepo -fileName $fileName
                     Git-PushOrigin -repoPath $targetRepo -branchName $branchName
                 }
@@ -681,8 +681,8 @@ param(
         }
     }
     else {
-        Write-Information "No GLOBAL.JSON UPDATE"
-        Write-Information "Ensuring $branchName no longer exists"
+        Log -message "No GLOBAL.JSON UPDATE"
+        Log -message "Ensuring $branchName no longer exists"
         Git-DeleteBranch -repoPath $targetRepo -branchName $branchName        
         
         return "NONE"
@@ -725,25 +725,25 @@ param (
     [string]$templateRepoHash = $(throw "processRepo: templateRepoHash not specified")
     )
 
-    Write-Information ""
-    Write-Information "***************************************************************"
-    Write-Information "***************************************************************"
-    Write-Information ""
+    Log -message ""
+    Log -message "***************************************************************"
+    Log -message "***************************************************************"
+    Log -message ""
 
     Set-Location -Path $baseFolder
-    Write-Information "Base Folder: $baseFolder"
+    Log -message "Base Folder: $baseFolder"
     
-    Write-Information "Processing Repo: $repo"
-    Write-Information "Source Repo: $sourceRepo"
+    Log -message "Processing Repo: $repo"
+    Log -message "Source Repo: $sourceRepo"
 
     # Extract the folder from the repo name
     [string]$folder = Git-GetFolderForRepo -repo $repo
 
-    Write-Information "Folder: $folder"
+    Log -message "Folder: $folder"
     [string]$targetRepo = Join-Path -Path $baseFolder -ChildPath $folder
 
     if($sourceRepo -eq $targetRepo) {
-        Write-Information "Skipping updating $repo as it is the same as the template"
+        Log -message "Skipping updating $repo as it is the same as the template"
         Return
     }
     if([string]::IsNullOrEmpty($targetRepo)) {
@@ -758,11 +758,11 @@ param (
     [string]$currentRevision = Git-Get-HeadRev -repoPath $targetRepo
     $currentRevision = "$scriptsHash/$templateRepoHash/$currentRevision"
 
-    Write-Information "Last Revision:    $lastRevision"
-    Write-Information "Current Revision: $currentRevision"
+    Log -message "Last Revision:    $lastRevision"
+    Log -message "Current Revision: $currentRevision"
 
     if($lastRevision -eq $currentRevision) {
-        Write-Information "Repo not changed"
+        Log -message "Repo not changed"
         Return
     }
 
@@ -796,13 +796,13 @@ param (
             # Process files in src folder
             updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\CodeAnalysis.ruleset"
             [string]$versionResult = updateGlobalJson -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\global.json"
-            Write-Information ".NET VERSION UPDATED: $versionResult"
+            Log -message ".NET VERSION UPDATED: $versionResult"
             [bool]$dotnetVersionUpdated = $versionResult -eq "VERSION"
-            Write-Information ".NET VERSION UPDATED: $dotnetVersionUpdated"
+            Log -message ".NET VERSION UPDATED: $dotnetVersionUpdated"
         }
         
         if($repo.Contains("funfair")) {
-            Write-Information "Repo Folder contains 'funfair': $repo"
+            Log -message "Repo Folder contains 'funfair': $repo"
             updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\FunFair.props"
             updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\packageicon.png"
         }
@@ -825,37 +825,37 @@ param (
 
     
     [string]$issueTemplates = makePath -Path $sourceRepo -ChildPath ".github\ISSUE_TEMPLATE"
-    Write-Information "Looking for issue templates in $issueTemplates"
+    Log -message "Looking for issue templates in $issueTemplates"
     $files = Get-ChildItem -Path $issueTemplates -Filter *.md -File -Attributes Normal, Hidden -Recurse
     ForEach ($file in $files)
     {
         [string]$srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
-        Write-Information " * Found issue template: $srcFileName"
+        Log -message " * Found issue template: $srcFileName"
 
         updateActionAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
     }
         
     [string]$actions = makePath -Path $sourceRepo -ChildPath ".github\actions"
-    Write-Information "Looking for action in $actions"
+    Log -message "Looking for action in $actions"
     $files = Get-ChildItem -Path $actions -Filter *.yml -File -Attributes Normal, Hidden -Recurse
     ForEach ($file in $files)
     {
         [string]$srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
-        Write-Information " * Found action $srcFileName"
+        Log -message " * Found action $srcFileName"
 
         updateActionAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
     }
 
     [string]$workflows = makePath -Path $sourceRepo -ChildPath ".github\workflows"
-    Write-Information "Looking for Workflows in $workflows"
+    Log -message "Looking for Workflows in $workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml -File -Attributes Normal, Hidden
     ForEach ($file in $files)
     {
         [string]$srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
-        Write-Information " * Found Workflow $srcFileName"
+        Log -message " * Found Workflow $srcFileName"
 
         updateWorkFlowAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
     }
@@ -863,7 +863,7 @@ param (
     [string]$targetWorkflows = makePath -Path $targetRepo -ChildPath ".github\workflows"
     $files = Get-ChildItem -Path $targetWorkflows -Filter *.yml -File -Attributes Normal, Hidden
     foreach($line in $files) {
-        Write-Information "* $line"
+        Log -message "* $line"
     }
     
     $obsoleteWorkflows = @(
@@ -901,7 +901,7 @@ param (
         }
 
         if(!$match) {
-            Write-Information "Non-Template Workflow found: $targetFileName"
+            Log -message "Non-Template Workflow found: $targetFileName"
             $hasNonTemplateWorkFlows = $true
             break
         }
@@ -914,12 +914,12 @@ param (
     }
 
     [string]$linters = makePath -Path $sourceRepo -ChildPath ".github\linters"
-    Write-Information "Looking for Lint config in $linters"
+    Log -message "Looking for Lint config in $linters"
     $files = Get-ChildItem -Path $linters -File -Attributes Normal, Hidden
     ForEach ($file in $files) {
         [string]$srcFileName = $file.FullName
         $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
-        Write-Information " * Found Linter config $srcFileName"
+        Log -message " * Found Linter config $srcFileName"
 
         updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
     }
@@ -939,7 +939,7 @@ param (
     Git-ResetToMaster -repoPath $targetRepo
         
     if($dotnetVersionUpdated -eq $true) {
-        Write-Information "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
+        Log -message "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
         
         if(!$repo.Contains("template"))
         {
@@ -950,7 +950,7 @@ param (
     Git-ResetToMaster -repoPath $targetRepo
     Git-ReNormalise -repoPath $targetRepo
 
-    Write-Information "Updating Tracking for $repo to $currentRevision"
+    Log -message "Updating Tracking for $repo to $currentRevision"
     Tracking_Set -basePath $trackingFolder -repo $repo -value $currentRevision
 }
 
@@ -964,10 +964,10 @@ param(
 
     [int]$repoCount = $repositoryList.Count
 
-    Write-Information "Found $repoCount repositories to process"
+    Log -message "Found $repoCount repositories to process"
 
     ForEach($gitRepository in $repositoryList) {
-        Write-Information "* $gitRepository"
+        Log -message "* $gitRepository"
     }
 
     ForEach($gitRepository in $repositoryList) {
@@ -982,40 +982,40 @@ param(
 #########################################################################
 
 Set-Location -Path $root
-Write-Information "Root Folder: $root"
+Log -message "Root Folder: $root"
 
 DotNetTool-Require -packageId "Credfeto.Changelog.Cmd"
 DotNetTool-Require -packageId "FunFair.BuildVersion"
 DotNetTool-Require -packageId "FunFair.BuildCheck"
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 dotnet tool list
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 
-Write-Information "Repository List: $repos"
+Log -message "Repository List: $repos"
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
 
     
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
-Write-Information "Loading template: $templateRepo"
+Log -message "Loading template: $templateRepo"
 
 # Extract the folder from the repo name
 [string]$templateFolder = Git-GetFolderForRepo -repo $templateRepo
 
-Write-Information "Template Folder: $templateFolder"
+Log -message "Template Folder: $templateFolder"
 [string]$templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
 
 Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
@@ -1023,22 +1023,22 @@ Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 Set-Location -Path $templateRepoFolder
 
 [string]$templateRepoHash = Git-Get-HeadRev -repoPath $templateRepoFolder
-Write-Information "Template Rev Hash = $templateRepoHash"
+Log -message "Template Rev Hash = $templateRepoHash"
 
 Set-Location -Path $root
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder -baseFolder $root -templateRepoHash $templateRepoHash
 
 Set-Location -Path $root
 
-Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
+Log -message ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"

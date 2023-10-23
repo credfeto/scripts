@@ -3,8 +3,8 @@ param (
     [string] $sourceFolder = $(throw "Resharper_ConvertSuppressionCommentToSuppressMessage: sourceFolder not specified")
     )
     
-    Write-Information "* Changing Resharper disable once comments to SuppressMessage"
-    Write-Information "  - Folder: $sourceFolder"
+    Log -message "* Changing Resharper disable once comments to SuppressMessage"
+    Log -message "  - Folder: $sourceFolder"
 
     [string]$emptyLine = [char]13 + [char]10
 
@@ -94,11 +94,11 @@ param (
             {
                 [string]$content = $updatedContent
                 if($changedFile -eq $False) {
-                    Write-Information "* $fileName"
+                    Log -message "* $fileName"
                     [bool]$changedFile = $True
                 }
 
-                Write-Information "   - Changed $replacement comment to SuppressMessage"
+                Log -message "   - Changed $replacement comment to SuppressMessage"
             }
         }
 
@@ -116,11 +116,11 @@ param (
             {
                 [string]$content = $updatedContent
                 if($changedFile -eq $False) {
-                    Write-Information "* $fileName"
+                    Log -message "* $fileName"
                     [bool]$changedFile = $True
                 }
 
-                Write-Information "   - Removed $replacement comment"
+                Log -message "   - Removed $replacement comment"
             }
         }
 
@@ -130,11 +130,11 @@ param (
         {
             [string]$content = $updatedContent
             if($changedFile -eq $False) {
-                Write-Information "* $fileName"
+                Log -message "* $fileName"
                 [bool]$changedFile = $True
             }
 
-            Write-Information "   - Removed blank lines (end tag)"
+            Log -message "   - Removed blank lines (end tag)"
         }
 
         [string]$replacementText = '${Start}' + $emptyLine + '${End}'
@@ -143,11 +143,11 @@ param (
         {
             [string]$content = $updatedContent
             if($changedFile -eq $False) {
-                Write-Information "* $fileName"
+                Log -message "* $fileName"
                 [bool]$changedFile = $True
             }
 
-            Write-Information "   - Removed blank lines (single tag)"
+            Log -message "   - Removed blank lines (single tag)"
         }
 
         if($content -ne $originalContent) {

@@ -14,7 +14,7 @@ function DotNet-DumpOutput {
     )
 
     foreach ($item in $result) {
-        Write-Information ">>>>>> $item"
+        Log -message ">>>>>> $item"
     }
 }
 
@@ -24,7 +24,7 @@ param(
     )
     
     foreach($line in $result) {
-        Write-Information $line
+        Log -message $line
         if($line.Contains("dotnet tool restore")) {
             dotnet tool list
             throw "Missing dotnet tool"
@@ -53,14 +53,14 @@ param(
     # AD0001: Analyzer 'X' threw an exception of type 'Y'
     [bool]$retry = $resultsAsText.Contains("AD0001")    
     if($retry) {
-        Write-Information ">>>>>> Code Analysis Crashed"
+        Log -message ">>>>>> Code Analysis Crashed"
         return $true
     }
     
     # CS8034 - Unable to load Analyzer assembly X : Could not load file or assembly 'Y'. Access is denied.
     [bool]$retry = $resultsAsText.Contains("CS8034")    
     if($retry) {
-        Write-Information ">>>>>> Code Analysis could not load assembly"
+        Log -message ">>>>>> Code Analysis could not load assembly"
         return $true
     }
     
@@ -108,14 +108,14 @@ param(
     if($targets) {
         $targets = $targets | Sort-Object
         
-        Write-Information "Found Targets:"
+        Log -message "Found Targets:"
         [string]$target = $null
         foreach($candidate in $targets) {
-            Write-Information "* $candidate"
+            Log -message "* $candidate"
             $target = $candidate 
         }
         
-        Write-Information "Matching Target : $target" 
+        Log -message "Matching Target : $target"
         return $target
     }
     
@@ -128,36 +128,36 @@ param(
     [bool] $preRelease = $(throw "DotNet-CheckSolution: preRelease not specified")
 )
      
-    Write-Information " * Checking Solution"
+    Log -message " * Checking Solution"
     try {
         Set-Location -Path $srcFolder
         
         $solutions = Get-ChildItem -Path $srcFolder -Filter *.sln
         if($solutions.Count -ne 1) {
-            Write-Information " * No Solution Found"
+            Log -message " * No Solution Found"
             return $false
         }
         
         $solution = $solutions[0].FullName
-        Write-Information " * Solution Found: $solution"
+        Log -message " * Solution Found: $solution"
         
         DotNetTool-Require -packageId "FunFair.BuildCheck"
-        Write-Information "dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild $preRelease"
+        Log -message "dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild $preRelease"
         $result = dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild $preRelease 2>&1
         if(!$?) {
-            Write-Information ">>> Solution Check Failed"
+            Log -message ">>> Solution Check Failed"
             DotNet-DumpOutput -result $result
             DotNet-IsMissingTool -result $result            
             
             return $false
         }
         
-        Write-Information "   - Solution Check Succeeded"
+        Log -message "   - Solution Check Succeeded"
 
         return $true
     } catch {
-        Write-Information ">>> Solution Check Failed"
-        Write-Information $error
+        Log -message ">>> Solution Check Failed"
+        Log -message $error
         return $false
     }
 }
@@ -168,7 +168,7 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildClean: srcFolder not specified")
 )
      
-    Write-Information " * Cleaning"
+    Log -message " * Cleaning"
     [string]$noWarn = GetNoWarn
     
     try {
@@ -177,15 +177,15 @@ param(
         DotNet-ShutdownBuildServer
         $result = dotnet clean --configuration=Release -nodeReuse:False $noWarn 2>&1
         if(!$?) {
-            Write-Information ">>> Clean Failed"
+            Log -message ">>> Clean Failed"
             DotNet-DumpOutput -result $result
             return $false
         }
         
-        Write-Information "   - Clean Succeeded"
+        Log -message "   - Clean Succeeded"
         return $true
     } catch  {
-        Write-Information ">>> Clean Failed"
+        Log -message ">>> Clean Failed"
         return $false
     }
     finally {
@@ -198,7 +198,7 @@ param(
     [string] $srcFolder = $(throw "DotNet-BuildRestore: srcFolder not specified")
     )
      
-    Write-Information " * Restoring"
+    Log -message " * Restoring"
     [string]$noWarn = GetNoWarn
     
     try {
@@ -207,15 +207,15 @@ param(
         DotNet-ShutdownBuildServer
         $result = dotnet restore -nodeReuse:False -r:linux-x64 $noWarn 2>&1
         if(!$?) {
-            Write-Information ">>> Restore Failed"
+            Log -message ">>> Restore Failed"
             DotNet-DumpOutput -result $result
             return $false
         }
 
-        Write-Information "   - Restore Succeeded"
+        Log -message "   - Restore Succeeded"
         return $true
     } catch  {
-        Write-Information ">>> Restore Failed"
+        Log -message ">>> Restore Failed"
         return $false
     }
     finally {
@@ -231,7 +231,7 @@ param(
     [string]$version = BuildVersion
     [string]$noWarn = GetNoWarn
 
-    Write-Information " * Building"
+    Log -message " * Building"
     do {
         Set-Location -Path $srcFolder
 
@@ -240,14 +240,14 @@ param(
         if(!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
-                Write-Information ">>> Build Failed"
+                Log -message ">>> Build Failed"
                 DotNet-DumpOutput -result $result
                 DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
-            Write-Information "   - Build Succeeded"
+            Log -message "   - Build Succeeded"
             DotNet-ShutdownBuildServer
             return $true
         }
@@ -263,7 +263,7 @@ param(
     [string]$version = BuildVersion    
     [string]$noWarn = GetNoWarn
     
-    Write-Information " * Packing"
+    Log -message " * Packing"
     do {
         Set-Location -Path $srcFolder
 
@@ -272,14 +272,14 @@ param(
         if(!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
-                Write-Information ">>> Packing Failed"
+                Log -message ">>> Packing Failed"
                 DotNet-DumpOutput -result $result
                 DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
-            Write-Information "   - Packing Succeeded"
+            Log -message "   - Packing Succeeded"
             DotNet-ShutdownBuildServer
             return $true
         }
@@ -298,7 +298,7 @@ param(
 
     [string]$noWarn = GetNoWarn 
     
-    Write-Information " * Publishing"
+    Log -message " * Publishing"
     do {
         Set-Location -Path $srcFolder
 
@@ -312,14 +312,14 @@ param(
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry)
             {
-                Write-Information ">>> Publishing Failed"
+                Log -message ">>> Publishing Failed"
                 DotNet-DumpOutput -result $result
                 DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
-            Write-Information "   - Publishing Succeeded"
+            Log -message "   - Publishing Succeeded"
             DotNet-ShutdownBuildServer
             return $true
         }
@@ -333,7 +333,7 @@ param(
     )
      
     [string]$noWarn = GetNoWarn
-    Write-Information " * Unit Tests"
+    Log -message " * Unit Tests"
     do {
         Set-Location -Path $srcFolder
 
@@ -342,14 +342,14 @@ param(
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
-                Write-Information ">>> Tests Failed"
+                Log -message ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
                 DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
-            Write-Information "   - Tests Succeeded"
+            Log -message "   - Tests Succeeded"
             DotNet-ShutdownBuildServer
             return $true
         }            
@@ -363,7 +363,7 @@ param(
     )
      
     [string]$noWarn = GetNoWarn
-    Write-Information " * Unit Tests"
+    Log -message " * Unit Tests"
     do {
         Set-Location -Path $srcFolder
 
@@ -372,14 +372,14 @@ param(
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
-                Write-Information ">>> Tests Failed"
+                Log -message ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
                 DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
-            Write-Information "   - Tests Succeeded"
+            Log -message "   - Tests Succeeded"
             DotNet-ShutdownBuildServer
             return $true
         }
@@ -406,7 +406,7 @@ param(
 
     [string]$noWarn = GetNoWarn
     
-    Write-Information " * Unit Tests and Integration Tests"
+    Log -message " * Unit Tests and Integration Tests"
     do {
         Set-Location -Path $srcFolder
 
@@ -415,14 +415,14 @@ param(
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
-                Write-Information ">>> Tests Failed"
+                Log -message ">>> Tests Failed"
                 DotNet-DumpOutput -result $result
                 DotNet-ShutdownBuildServer
                 return $false
             }
         }
         else {
-            Write-Information "   - Tests Succeeded"
+            Log -message "   - Tests Succeeded"
             DotNet-ShutdownBuildServer
             return $true
         }
@@ -451,7 +451,7 @@ function DotNet-HasPackable {
                 if($publishable -ne $null) {
                     [string]$publishableValue = $publishable.InnerText.Trim()
                     if($publishableValue -eq "True") {
-                        Write-Information "*** Found Packable Library"
+                        Log -message "*** Found Packable Library"
                         return $true
                     }
                 }
@@ -459,7 +459,7 @@ function DotNet-HasPackable {
         }
     }
 
-    Write-Information "*** No Packable Library Found"
+    Log -message "*** No Packable Library Found"
     return $false
 }
 
@@ -483,7 +483,7 @@ param(
                 if($publishable -ne $null) {
                     [string]$publishableValue = $publishable.InnerText.Trim()
                     if($publishableValue -eq "True") {
-                        Write-Information "*** Found Publishable Executable"
+                        Log -message "*** Found Publishable Executable"
                         return $true
                     }
                 }
@@ -491,7 +491,7 @@ param(
         }
     }
 
-    Write-Information "*** No Publishable Executable Found"
+    Log -message "*** No Publishable Executable Found"
     return $false
 }
 
@@ -523,28 +523,28 @@ param(
 
     try
     {
-        Write-Information "Building Source in $srcFolder"
+        Log -message "Building Source in $srcFolder"
         
         [bool]$buildOk = DotNet-CheckSolution -srcFolder $srcFolder -preRelease $true
-        Write-Information "Result $buildOk" 
+        Log -message "Result $buildOk"
         if(!$buildOk) {
             return $false
         }
 
         [bool]$buildOk = DotNet-BuildClean -srcFolder $srcFolder
-        Write-Information "Result $buildOk" 
+        Log -message "Result $buildOk"
         if(!$buildOk) {
             return $false
         }
         
         [bool]$buildOk = DotNet-BuildRestore -srcFolder $srcFolder
-        Write-Information "Result $buildOk"
+        Log -message "Result $buildOk"
         if(!$buildOk) {
             return $false
         }
 
         [bool]$buildOk = DotNet-Build -srcFolder $srcFolder
-        Write-Information "Result $buildOk"
+        Log -message "Result $buildOk"
         if(!$buildOk) {
             return $false
         }
@@ -552,7 +552,7 @@ param(
         [bool]$isPackable = DotNet-HasPackable -srcFolder $srcFolder
         if($isPackable -eq $true) {
             [bool]$buildOk = DotNet-Pack -srcFolder $srcFolder
-            Write-Information "Result $buildOk"
+            Log -message "Result $buildOk"
             if(!$buildOk) {
                 return $false
             }
@@ -561,7 +561,7 @@ param(
         [bool]$isPublishable = DotNet-HasPublishableExe -srcFolder $srcFolder
         if($isPublishable -eq $true) {
             [bool]$buildOk = DotNet-Publish -srcFolder $srcFolder
-            Write-Information "Result $buildOk"
+            Log -message "Result $buildOk"
             if(!$buildOk) {
                 return $false
             }
@@ -573,14 +573,14 @@ param(
         
         if($includeIntegrationTests -eq $false) {
             [bool]$buildOk = DotNet-BuildRunUnitTests -srcFolder $srcFolder
-            Write-Information "Result $buildOk"
+            Log -message "Result $buildOk"
             if(!$buildOk) {
                 return $false
             }
         }
         else {
             [bool]$buildOk = DotNet-BuildRunIntegrationTests -srcFolder $srcFolder
-            Write-Information "Result $buildOk"
+            Log -message "Result $buildOk"
             if(!$buildOk) {
                 return $false
             }

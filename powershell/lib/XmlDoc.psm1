@@ -3,8 +3,8 @@ param (
     [string] $sourceFolder = $(throw "XmlDoc_RemoveComments: sourceFolder not specified")
     )
     
-    Write-Information "* Removing XmlDoc Comments from C# files"
-    Write-Information "  - Folder: $sourceFolder"
+    Log -message "* Removing XmlDoc Comments from C# files"
+    Log -message "  - Folder: $sourceFolder"
 
     [bool]$changed = $false
     $files = Get-ChildItem -Path $sourceFolder -Filter "*.cs" -Recurse
@@ -33,8 +33,8 @@ param (
             $updatedContent = $target -Join "`n"
             if($updatedContent -ne $originalContent) {
                 $changed = $true
-                Write-Information "* $fileName"
-                Write-Information "   - Removed xml comments"
+                Log -message "* $fileName"
+                Log -message "   - Removed xml comments"
                 $content = $updatedContent
             }
         }
@@ -55,7 +55,7 @@ function XmlDoc_DisableDocCommentForProject {
         
     [string[]]$warningsToRemove = @("1591", "CS1591")
         
-    Write-Information "* $fileName"
+    Log -message "* $fileName"
     $data = [xml](Get-Content $projectPath)
           
     [bool]$projectChanged = $false
@@ -65,7 +65,7 @@ function XmlDoc_DisableDocCommentForProject {
         if($docNode) {
             $propertyGroup.RemoveChild($docNode)
             $projectChanged = $true
-            Write-information "   - Removed DocumentationFile"
+            Log -message "   - Removed DocumentationFile"
         }
     }
   
@@ -90,7 +90,7 @@ function XmlDoc_DisableDocCommentForProject {
                             $noWarning.InnerText = $noWarnTextUpdated
                         }                        
                         $projectChanged = $true
-                        Write-Information "   - Updated NoWarn"
+                        Log -message "   - Updated NoWarn"
                         [bool]$projectChanged = $true
                     }
                 }
@@ -117,8 +117,8 @@ param (
         [string] $sourceFolder = $(throw "XmlDoc_DisableDocComment: sourceFolder not specified")
     )
     
-    Write-Information "* Removing XmlDoc Comments from C# projects"
-    Write-Information "  - Folder: $sourceFolder"
+    Log -message "* Removing XmlDoc Comments from C# projects"
+    Log -message "  - Folder: $sourceFolder"
 
     [bool]$changed = $false
     $files = Get-ChildItem -Path $sourceFolder -Filter "*.csproj" -Recurse

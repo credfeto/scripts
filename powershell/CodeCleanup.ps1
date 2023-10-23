@@ -122,7 +122,7 @@ param(
 
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
     if(!$buildOk) {
-        Write-Information ">>>>> Build Failed! [From clean checkin]"
+        Log -message ">>>>> Build Failed! [From clean checkin]"
         return $null
     }
     
@@ -130,10 +130,10 @@ param(
         $xmlDocCommentsRemoved = XmlDoc_RemoveComments -sourceFolder $sourceFolder
         $xmlDocCommentsSettingsChanged = XmlDoc_DisableDocComment -sourceFolder $sourceFolder
         if($xmlDocCommentsRemoved -Or $xmlDocCommentsSettingsChanged) {
-            Write-Information "* Building after removing xml doc comments"
+            Log -message "* Building after removing xml doc comments"
             $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
             if(!$buildOk) {
-                Write-Information ">>>>> Build Failed! [From xmldoc removal]"
+                Log -message ">>>>> Build Failed! [From xmldoc removal]"
                 return $false
             }            
         }
@@ -141,55 +141,55 @@ param(
 
     $changed = Resharper_ConvertSuppressionCommentToSuppressMessage -sourceFolder $sourceFolder
     if($changed) {
-        Write-Information "* Building after simple cleanup"
+        Log -message "* Building after simple cleanup"
         $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
         if(!$buildOk) {
-            Write-Information ">>>>> Build Failed! [From simple cleanup]"
+            Log -message ">>>>> Build Failed! [From simple cleanup]"
             return $false
         }
         
         # TODO: Consider commiting at this point.
     }
     
-    Write-Information "* Running Code Cleanup"
-    Write-Information "  - Solution: $Solution"
-    Write-Information "  - Workspace Cache Folder: $workspaceCache"
-    Write-Information "  - Cache Folder: $cachesFolder"
-    Write-Information "  - Settings File: $settingsFile"
+    Log -message "* Running Code Cleanup"
+    Log -message "  - Solution: $Solution"
+    Log -message "  - Workspace Cache Folder: $workspaceCache"
+    Log -message "  - Cache Folder: $cachesFolder"
+    Log -message "  - Settings File: $settingsFile"
 
     # Cleanup each project
-    Write-Information "  * Cleaning Projects"
+    Log -message "  * Cleaning Projects"
     $projects = Get-ChildItem -Path $sourceFolder -Filter "*.csproj" -Recurse
     ForEach($project in $projects) {
         $projectFile = $project.FullName
-        Write-Information "    - Project $projectFile"
+        Log -message "    - Project $projectFile"
         
-        Write-Information        "    - Reorder CSPROJ"
+        Log -message        "    - Reorder CSPROJ"
         Project_Cleanup -projectFile $projectFile
 
-        Write-Information "* Building after simple cleanup"
+        Log -message "* Building after simple cleanup"
         $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
         if(!$buildOk) {
-            Write-Information ">>>>> Build Failed! [From simple project cleanup]"
+            Log -message ">>>>> Build Failed! [From simple project cleanup]"
             return $false
         }
         
         # TODO: Consider commiting at this point.
 
-        Write-Information "    - JB Code Cleanup"
+        Log -message "    - JB Code Cleanup"
         DotNetTool-Require -packageId "JetBrains.ReSharper.GlobalTools"
         dotnet jb cleanupcode --profile="Full Cleanup" $projectFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
          # --no-buildin-settings
         if(!$?) {
-            Write-Information ">>>>> Code Cleanup failed"
+            Log -message ">>>>> Code Cleanup failed"
             throw "Code Cleanup for project failed"
             return $false
         }
         
-        Write-Information "* Building after simple cleanup"
+        Log -message "* Building after simple cleanup"
         $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
         if(!$buildOk) {
-            Write-Information ">>>>> Build Failed! [From project cleanup]"
+            Log -message ">>>>> Build Failed! [From project cleanup]"
             return $false
         }
 
@@ -197,23 +197,23 @@ param(
     }
     
     # Cleanup the solution
-    Write-Information "  * Cleaning Whole Solution"
+    Log -message "  * Cleaning Whole Solution"
     DotNetTool-Require -packageId "JetBrains.ReSharper.GlobalTools"
     dotnet jb cleanupcode --profile="Full Cleanup" $solutionFile --properties:Configuration=Release --properties:nodeReuse=False --caches-home:"$cachesFolder" --settings:"$settingsFile" --verbosity:INFO
      
      # --no-buildin-settings
     if(!$?) {
-        Write-Information ">>>>> Code Cleanup failed"
+        Log -message ">>>>> Code Cleanup failed"
         throw "Code Cleanup for solution failed"
     }
 
-    Write-Information "* Building after cleanup"
+    Log -message "* Building after cleanup"
     $buildOk = DotNet-BuildSolution -srcFolder $sourceFolder
     if($buildOk) {
         return $true
     }
 
-    Write-Information ">>>>> Build Failed! [From Solution Cleanup]"
+    Log -message ">>>>> Build Failed! [From Solution Cleanup]"
     return $false
 }
 
@@ -236,14 +236,14 @@ param(
     [string]$workspaceCache = $(throw "processRepo: workspaceCache not specified")
     )
     
-    Write-Information ""
-    Write-Information "***************************************************************"
-    Write-Information "***************************************************************"
-    Write-Information ""
+    Log -message ""
+    Log -message "***************************************************************"
+    Log -message "***************************************************************"
+    Log -message ""
 
     Set-Location -Path $root
     
-    Write-Information "Processing Repo: $repo"
+    Log -message "Processing Repo: $repo"
     
     [bool]$removeXmlDoc = !$repo.Contains("funfair")
     [bool]$removeXmlDoc = $true
@@ -251,9 +251,9 @@ param(
     # Extract the folder from the repo name
     $folder = Git-GetFolderForRepo -repo $repo
 
-    Write-Information "Folder: $folder"
+    Log -message "Folder: $folder"
     $repoFolder = Join-Path -Path $root -ChildPath $folder
-    Write-Information "Repo Folder: $repoFolder"
+    Log -message "Repo Folder: $repoFolder"
 
     Git-EnsureSynchronised -repo $repo -repoFolder $repoFolder
 
@@ -262,11 +262,11 @@ param(
     $lastRevision = Tracking_Get -basePath $trackingFolder -repo $repo
     $currentRevision = Git-Get-HeadRev -repoPath $repoFolder 
 
-    Write-Information "Last Revision:    $lastRevision"
-    Write-Information "Current Revision: $currentRevision"
+    Log -message "Last Revision:    $lastRevision"
+    Log -message "Current Revision: $currentRevision"
 
     if( $lastRevision -eq $currentRevision) {
-        Write-Information "Repo not changed"
+        Log -message "Repo not changed"
     }
 
     $hasCleanedSuccessFully = $false
@@ -336,7 +336,7 @@ param(
     }
 
     if($hasCleanedSuccessFully -eq $true) {
-        Write-Information "Updating Tracking for $repo to $currentRevision"
+        Log -message "Updating Tracking for $repo to $currentRevision"
         Tracking_Set -basePath $root -repo $trackingFolder -value $currentRevision
     }
 
@@ -349,32 +349,32 @@ param(
 #########################################################################
 
 Set-Location -Path $root
-Write-Information "Root Folder: $root"
+Log -message "Root Folder: $root"
 
 DotNetTool-Require -packageId "JetBrains.ReSharper.GlobalTools"
 DotNetTool-Require -packageId "FunFair.BuildVersion"
 DotNetTool-Require -packageId "FunFair.BuildCheck"
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 dotnet tool list
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 [string[]] $repoList = Git-LoadRepoList -repoFile $repos
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
-Write-Information "Root: $root"
-Write-Information "Workspace Cache: $tempFolder"
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
+Log -message "Root: $root"
+Log -message "Workspace Cache: $tempFolder"
 
 ForEach($repo in $repoList) {
     if($repo.Trim() -eq "") {
@@ -386,4 +386,4 @@ ForEach($repo in $repoList) {
 
 Set-Location -Path $root
 
-Write-Information ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"
+Log -message ">>>>>>>>>>>> ALL REPOS PROCESSED <<<<<<<<<<<<"

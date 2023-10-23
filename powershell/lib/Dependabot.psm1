@@ -238,7 +238,7 @@ param(
     [bool] $hasSubModules = $(throw "Dependabot-BuildConfig: hasSubModules not specified")
     )
 
-    Write-Information "Building Dependabot Config:"
+    Log -message "Building Dependabot Config:"
     [string]$trgContent = "version: 2
 updates:
 "
@@ -247,24 +247,24 @@ updates:
 
     if($hasSubModules)
     {
-        Write-Information " --> Adding Git Submodules"
+        Log -message " --> Adding Git Submodules"
         [string]$templateContent = githubSubmodulesDependabotTemplate
         [string]$trgContent = $trgContent.Trim() + $newline + $newline
         [string]$trgContent = $trgContent + $templateContent
     }
     else {
-        Write-Information " --> NO Git Submodules"
+        Log -message " --> NO Git Submodules"
     }
 
     $files = Get-ChildItem -Path $repoRoot -Filter *.csproj -Recurse
     if($files) {
-        Write-Information " --> Adding .NET"
+        Log -message " --> Adding .NET"
         [string]$templateContent = dotNetDependabotTemplate
         [string]$trgContent = $trgContent.Trim() + $newline + $newline
         [string]$trgContent = $trgContent + $templateContent
     }
     else {
-        Write-Information " --> NO .NET"
+        Log -message " --> NO .NET"
     }
     
     $files = Get-ChildItem -Path $repoRoot -Filter 'package.json' -Recurse
@@ -273,25 +273,25 @@ updates:
             [string]$dirName = $file.Directory.FullName
             [string]$path = $dirName.SubString($repoRoot.length)
             
-            Write-Information " --> Adding Javascript: $path"            
+            Log -message " --> Adding Javascript: $path"
             [string]$templateContent = javascriptDependabotTemplate -path $path 
             [string]$trgContent = $trgContent.Trim() + $newline + $newline
             [string]$trgContent = $trgContent + $templateContent
         }
     }
     else {
-        Write-Information " --> NO Javascript"
+        Log -message " --> NO Javascript"
     }
     
     $files = Get-ChildItem -Path $repoRoot -Filter 'Dockerfile' -Recurse
     if($files) {
-        Write-Information " --> Adding Docker"
+        Log -message " --> Adding Docker"
         [string]$templateContent = dockerDependabotTemplate
         [string]$trgContent = $trgContent.Trim() + $newline + $newline
         [string]$trgContent = $trgContent + $templateContent
     }
     else {
-        Write-Information " --> NO Docker"
+        Log -message " --> NO Docker"
     }
     
     if($updateGitHubActions)
@@ -299,30 +299,30 @@ updates:
         [string]$actionsTargetPath = makePath -Path $repoRoot -ChildPath ".github"
         $files = Get-ChildItem -Path $actionsTargetPath -Filter *.yml -Recurse
         if ($files) {
-            Write-Information " --> Adding Github Actions"
+            Log -message " --> Adding Github Actions"
             [string]$templateContent = githubActionsDependabotTemplate
             [string]$trgContent = $trgContent.Trim() + $newline + $newline
             [string]$trgContent = $trgContent + $templateContent
         }
         else {
-            Write-Information " --> NO Github Actions"
+            Log -message " --> NO Github Actions"
         }
     }
 
     $files = Get-ChildItem -Path $repoRoot -Filter requirements.txt -Recurse
     if($files) {
-        Write-Information " --> Adding Python"
+        Log -message " --> Adding Python"
         [string]$templateContent = pythonDependabotTemplate
         [string]$trgContent = $trgContent.Trim() + $newline + $newline
         [string]$trgContent = $trgContent +  $templateContent
     }
     else {
-        Write-Information " --> NO Python"
+        Log -message " --> NO Python"
     }
     
     [string]$trgContent = $trgContent.Trim() + $newline
     
-    Write-Information " --> Done"
+    Log -message " --> Done"
     Set-Content -Path $configFileName -Value $trgContent
 }
 

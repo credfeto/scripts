@@ -133,7 +133,7 @@ param(
 
     if ($lastRevision -eq $currentRevision)
     {
-        Write-Information "Repo not changed since last successful build"
+        Log -message "Repo not changed since last successful build"
         Return $true
     }
 
@@ -154,18 +154,18 @@ param(
 
     Set-Location -Path $folder
 
-    Write-Information ""
-    Write-Information "***********************************************************************************"
-    Write-Information "***********************************************************************************"
-    Write-Information "***********************************************************************************"
-    Write-Information "***********************************************************************************"
-    Write-Information ""
-    Write-Information "Processing Cache folder: $folder"
+    Log -message ""
+    Log -message "***********************************************************************************"
+    Log -message "***********************************************************************************"
+    Log -message "***********************************************************************************"
+    Log -message "***********************************************************************************"
+    Log -message ""
+    Log -message "Processing Cache folder: $folder"
 
     $currentlyInstalledPackages = DotNetPackages-Get -srcFolder $folder
     if($currentlyInstalledPackages.Length -eq 0) {
         # no source to update
-        Write-Information "* No C# packages to update"
+        Log -message "* No C# packages to update"
         return;
     }    
 
@@ -178,33 +178,33 @@ param(
         
         [bool]$shouldUpdatePackages = Packages_ShouldUpdate -installed $currentlyInstalledPackages -packageId $packageId -exactMatch $exactMatch
         
-        Write-Information ""
-        Write-Information "------------------------------------------------"
-        Write-Information "Looking for updates of $packageId"
-        Write-Information "Exact Match: $exactMatch"
-        Write-Information "Package installed in solution: $shouldUpdatePackages"
+        Log -message ""
+        Log -message "------------------------------------------------"
+        Log -message "Looking for updates of $packageId"
+        Log -message "Exact Match: $exactMatch"
+        Log -message "Package installed in solution: $shouldUpdatePackages"
                 
         if(!$shouldUpdatePackages) {
-            Write-Information "Skipping $packageId as not installed"
+            Log -message "Skipping $packageId as not installed"
             continue
         }
         
         [string]$update = Packages_CheckForUpdates -repoFolder $folder -packageCache $packageCache -packageId $package.packageId -exactMatch $exactMatch -exclude $package.exclude
         
         if([string]::IsNullOrEmpty($update)) {
-            Write-Information "***** $repo NO UPDATES TO $packageId ******"
+            Log -message "***** $repo NO UPDATES TO $packageId ******"
             
             # Git-RemoveBranchesForPrefix -repoPath $repoFolder -branchForUpdate $null -branchPrefix $branchPrefix
             
             Continue
         }
 
-        Write-Information "***** $repo FOUND UPDATE TO $packageId for $update ******"
+        Log -message "***** $repo FOUND UPDATE TO $packageId for $update ******"
         
         $packagesUpdated += 1
     }
     
-    Write-Information "Cache update run updated $packagesUpdated packages"
+    Log -message "Cache update run updated $packagesUpdated packages"
 }
 
 function CreateProject {
@@ -216,41 +216,41 @@ param(
     $packageCacheContent = Get-Content -Path $packageCache -Raw | ConvertFrom-Json
     
     $project = Join-Path -Path $workFolder -ChildPath "Package.Cache.Update.Temp.csproj"
-    Write-Information "Creating project $project..."
+    Log -message "Creating project $project..."
     
     $projectContent = "<Project Sdk=`"Microsoft.NET.Sdk`">" + "`r`n"
     $projectContent += "  <ItemGroup>" + "`r`n"
     foreach($package in $packageCacheContent.PSObject.Properties) {
         $packageId = $package.Name
         $version = $package.Value
-        Write-Information "* Package: $packageId - $version"
+        Log -message "* Package: $packageId - $version"
         $projectContent += "    <PackageReference Include=`"$packageId`" Version=`"$version`" />"
     }
     $projectContent += "  </ItemGroup>" + "`r`n"
     $projectContent += "</Project>" + "`r`n"
     Set-Content -Path $project -Value $projectContent
-    Write-Information "Done $project..."
+    Log -message "Done $project..."
 }
 
 #########################################################################
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 Set-Location -Path $root
-Write-Information "Root Folder: $root"
+Log -message "Root Folder: $root"
 
 DotNetTool-Require -packageId "Credfeto.Package.Update"
 DotNetTool-Require -packageId "Credfeto.Changelog.Cmd"
 DotNetTool-Require -packageId "FunFair.BuildVersion"
 DotNetTool-Require -packageId "FunFair.BuildCheck"
 
-Write-Information ""
-Write-Information "***************************************************************"
-Write-Information "***************************************************************"
-Write-Information ""
+Log -message ""
+Log -message "***************************************************************"
+Log -message "***************************************************************"
+Log -message ""
 
 $packages = Packages_Get -fileName $packagesToUpdate
 
@@ -271,4 +271,4 @@ if($packageCacheToWriteExists) {
 ProcessFolder -folder $packageWorkFolder -packages $packages -packageCache $packageCacheToWrite
 ###############
 
-Write-Information ">>>>>>>>>>>> COMPLETE <<<<<<<<<<<<"
+Log -message ">>>>>>>>>>>> COMPLETE <<<<<<<<<<<<"

@@ -257,7 +257,7 @@ param(
     )
     
     if($sourceFilesBase -ne $null) {
-        Write-Information "Updating project files under $sourceFilesBase"
+        Log -message "Updating project files under $sourceFilesBase"
         $projects = Get-ChildItem -Path $sourceFilesBase -Directory
 
         Foreach($project in $projects) {
@@ -281,7 +281,7 @@ param(
                     PathsExclude = @()
                 }
         
-                Write-Information "+++ Adding Label $labelName"
+                Log -message "+++ Adding Label $labelName"
                 $config += $newLabel
             }
         }
@@ -296,11 +296,11 @@ param(
     ForEach($group in $config) {
 
         $groupName = $group.Name
-        Write-Information "Adding group $groupName"
+        Log -message "Adding group $groupName"
         
         if ($group.Paths)
         {
-            Write-Information " - With Paths..."
+            Log -message " - With Paths..."
             [bool]$first = $true
             [string]$all = ' - any: [ '
             
@@ -320,7 +320,7 @@ param(
 
             if ($group.PathsExclude)
             {
-                Write-Information " - With Excluded Paths..."
+                Log -message " - With Excluded Paths..."
                 $sortedPaths = $group.PathsExclude
                 $sortedPaths = $sortedPaths | sort
 
@@ -340,13 +340,13 @@ param(
             $all += ' ]'
 
             if($first -ne $true) {
-                Write-Information " - Adding Group with file match"
+                Log -message " - Adding Group with file match"
                 $labeller += '"' + $group.Name + '":'
                 $labeller += $all
             }
         }
 
-        Write-Information " - Adding Colour Group"
+        Log -message " - Adding Colour Group"
         $labelsWithColour += ' - name: "' + $group.Name + '"'
         $labelsWithColour += '   color: "' + $group.Colour + '"'
         if($group.Description -ne $null) {
@@ -362,4 +362,3 @@ param(
 
 
 Export-ModuleMember -Function Labels_Update
-    

@@ -43,7 +43,7 @@ function GlobalJson_Update
     [bool]$trgFreezeExists = Test-Path -Path $targetFreezeFileName
     if ($trgFreezeExists -eq $true) {
         # no source to update
-        Write-Information "* no global.json is frozen in target"
+        Log -message "* no global.json is frozen in target"
         return [pscustomobject]@{
             Update = $false
             UpdatingVersion = $false
@@ -54,7 +54,7 @@ function GlobalJson_Update
     [bool]$srcExists = Test-Path -Path $sourceFileName
     if ($srcExists -eq $false) {
         # no source to update
-        Write-Information "* no global.json in template"
+        Log -message "* no global.json in template"
 
         return [pscustomobject]@{
             Update = $false
@@ -68,7 +68,7 @@ function GlobalJson_Update
 
     [bool]$trgExists = Test-Path -Path $targetFileName
     if ($trgExists -ne $true) {
-        Write-Information "Target global.json does not exist: creating"
+        Log -message "Target global.json does not exist: creating"
 
         $reformatted = ReformatJsonForSaving -source $srcContent 
         Set-Content -Path $targetFileName -Value $reformatted 
@@ -87,7 +87,7 @@ function GlobalJson_Update
     [string]$trgContent = ReformatJson -source $trgContent
 
     if ($srcContent -eq $trgContent) {
-        Write-Information "* target global.json same as source"
+        Log -message "* target global.json same as source"
         
         return [pscustomobject]@{
             Update = $false
@@ -100,13 +100,13 @@ function GlobalJson_Update
 
     [string]$sourceVersion = $srcGlobal.sdk.version
     [string]$targetVersion = $trgGlobal.sdk.version
-    Write-Information "Source Version: $sourceVersion"
-    Write-Information "Target Version: $targetVersion"
+    Log -message "Source Version: $sourceVersion"
+    Log -message "Target Version: $targetVersion"
     
     if($targetVersion.Contains("-") -and !$sourceVersion.Contains("-") -and $targetVersion.StartsWith($sourceVersion)) {
         # target is a preview version, but source is release
         
-        Write-Information "* target global.json is a pre-release version of the GA release in source ($targetVersion ==> $sourceVersion)"       
+        Log -message "* target global.json is a pre-release version of the GA release in source ($targetVersion ==> $sourceVersion)"
 
         $reformatted = ReformatJsonForSaving -source $srcContent 
         Set-Content -Path $targetFileName -Value $reformatted 
@@ -120,7 +120,7 @@ function GlobalJson_Update
     
     
     if ($targetVersion -gt $sourceVersion) {
-        Write-Information "* Target global.json specifies a newer version of .net ($targetVersion > $sourceVersion)"
+        Log -message "* Target global.json specifies a newer version of .net ($targetVersion > $sourceVersion)"
         
         return [pscustomobject]@{
             Update = $false
@@ -130,7 +130,7 @@ function GlobalJson_Update
     }
 
     if ($targetVersion -lt $sourceVersion) {
-        Write-Information "* Target global.json specifies a older version of .net ($targetVersion < $sourceVersion)"
+        Log -message "* Target global.json specifies a older version of .net ($targetVersion < $sourceVersion)"
 
         $reformatted = ReformatJsonForSaving -source $srcContent 
         Set-Content -Path $targetFileName -Value $reformatted 
@@ -142,7 +142,7 @@ function GlobalJson_Update
         }
     }
     
-    Write-Information "* Target global.json different but not by version"
+    Log -message "* Target global.json different but not by version"
     $reformatted = ReformatJsonForSaving -source $srcContent 
     Set-Content -Path $targetFileName -Value $reformatted 
 
