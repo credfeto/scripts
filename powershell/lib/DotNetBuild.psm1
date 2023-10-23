@@ -590,7 +590,7 @@ param(
         return $true
     }
     catch {
-        Write-Error "Something failed, badly!"
+        ErrorLog -message "Something failed, badly!"
         return $false
     }
     finally {

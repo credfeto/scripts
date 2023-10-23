@@ -97,8 +97,8 @@ DotNetTool-Require 'FunFair.BuildCheck'
 #Write-Host "Installed: $installed"
 
 #if($installed -eq $false) {
-#    Write-Error ""
-#    Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install Credfeto.Changelog.Cmd']"
+#    ErrorLog -message ""
+#    ErrorLog -message "#teamcity[buildStatus status='FAILURE' text='Failed to install Credfeto.Changelog.Cmd']"
 #}
 
 # $changelog = "/data/work/funfair/funfair-server-code-analysis/CHANGELOG.md"
@@ -252,8 +252,8 @@ DotNetTool-Require 'FunFair.BuildCheck'
 # [bool]$installed = DotNetTool-Install -packageId $packageIdToInstall -preReleaseVersion $preRelease
 # 
 # if($installed -eq $false) {
-#     Write-Error ""
-# 	Write-Error "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
+#     ErrorLog -message ""
+# 	ErrorLog -message "#teamcity[buildStatus status='FAILURE' text='Failed to install $packageIdToInstall']"
 # }
 # 
 # DotNetTool-Require -packageId $packageIdToInstall
