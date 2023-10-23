@@ -213,7 +213,7 @@ param(
         Log -message "Installing latest version of $packageId"
         $latestReleaseVersion = getLatestReleasePackage -packageId $packageId
 
-        $result = dotnet tool install --local $packageId --version $latestReleaseVersion
+        [string[]]$result = dotnet tool install --local $packageId --version $latestReleaseVersion
         if(!$?) {
             DotNetTool-Error -result $result
             return $false
@@ -225,7 +225,7 @@ param(
         
     # Install released version
     Log -message "Installing latest release version of $packageId"
-    $result = dotnet tool install --local $packageId
+    [string[]]$result = dotnet tool install --local $packageId
     if(!$?) {
         DotNetTool-Error -result $result
         return $false

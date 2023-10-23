@@ -7,7 +7,8 @@ param(
     foreach($line in $result) {
         Log -message $line
         if($line.Contains("dotnet tool restore")) {
-            dotnet tool list
+            [string[]]$tools = dotnet tool list
+            Log-Batch -messages $tools
             throw "Missing dotnet tool"
         }
     }

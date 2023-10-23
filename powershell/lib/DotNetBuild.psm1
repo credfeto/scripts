@@ -26,14 +26,15 @@ param(
     foreach($line in $result) {
         Log -message $line
         if($line.Contains("dotnet tool restore")) {
-            dotnet tool list
+            [string[]]$tools = dotnet tool list
+            Log-Batch -messages $tools
             throw "Missing dotnet tool"
         }
     }
 }
 
 function DotNet-ShutdownBuildServer {
-    $results = dotnet build-server shutdown 2>$null > $null
+    [string[]]$results = dotnet build-server shutdown 2>$null > $null
     if(!$?) {        
         DotNet-DumpOutput -result $results
         #throw "Failed to shutdown build server"
@@ -143,7 +144,7 @@ param(
         
         DotNetTool-Require -packageId "FunFair.BuildCheck"
         Log -message "dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild $preRelease"
-        $result = dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild $preRelease 2>&1
+        [string[]]$result = dotnet buildcheck -Solution $solution -WarningAsErrors True -PreReleaseBuild $preRelease 2>&1
         if(!$?) {
             Log -message ">>> Solution Check Failed"
             DotNet-DumpOutput -result $result
@@ -175,7 +176,7 @@ param(
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet clean --configuration=Release -nodeReuse:False $noWarn 2>&1
+        [string[]]$result = dotnet clean --configuration=Release -nodeReuse:False $noWarn 2>&1
         if(!$?) {
             Log -message ">>> Clean Failed"
             DotNet-DumpOutput -result $result
@@ -205,7 +206,7 @@ param(
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet restore -nodeReuse:False -r:linux-x64 $noWarn 2>&1
+        [string[]]$result = dotnet restore -nodeReuse:False -r:linux-x64 $noWarn 2>&1
         if(!$?) {
             Log -message ">>> Restore Failed"
             DotNet-DumpOutput -result $result
@@ -236,7 +237,7 @@ param(
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet build --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version $noWarn  2>&1
+        [string[]]$result = dotnet build --no-restore -warnAsError -nodeReuse:False --configuration=Release -p:Version=$version $noWarn  2>&1
         if(!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
@@ -268,7 +269,7 @@ param(
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet pack --no-restore -nodeReuse:False --configuration=Release -p:Version=$version $noWarn 2>&1
+        [string[]]$result = dotnet pack --no-restore -nodeReuse:False --configuration=Release -p:Version=$version $noWarn 2>&1
         if(!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
@@ -304,9 +305,9 @@ param(
 
         DotNet-ShutdownBuildServer
         if($framework) {
-            $result = dotnet publish -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false $noWarn -nodeReuse:False 2>&1
+            [string[]]$result = dotnet publish -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --framework:$framework --self-contained -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false $noWarn -nodeReuse:False 2>&1
         } else {
-            $result = dotnet publish -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false $noWarn -nodeReuse:False 2>&1
+            [string[]]$result = dotnet publish -warnaserror -p:PublishSingleFile=true --configuration:Release -r:linux-x64 --self-contained -p:PublishReadyToRun=False -p:PublishReadyToRunShowWarnings=True -p:PublishTrimmed=False -p:DisableSwagger=False -p:TreatWarningsAsErrors=True -p:Version=$version -p:IncludeNativeLibrariesForSelfExtract=false $noWarn -nodeReuse:False 2>&1
         }
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
@@ -338,7 +339,7 @@ param(
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration $noWarn 2>&1
+        [string[]]$result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName\!~Integration $noWarn 2>&1
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
@@ -368,7 +369,7 @@ param(
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration $noWarn 2>&1
+        [string[]]$result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False --filter FullyQualifiedName!~Integration $noWarn 2>&1
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
@@ -411,7 +412,7 @@ param(
         Set-Location -Path $srcFolder
 
         DotNet-ShutdownBuildServer
-        $result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False $noWarn 2>&1
+        [string[]]$result = dotnet test --configuration Release --no-build --no-restore -nodeReuse:False $noWarn 2>&1
         if (!$?) {
             [bool]$retry = DotNet-IsCodeAnalysisCrash -result $result
             if (!$retry) {
