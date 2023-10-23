@@ -90,6 +90,7 @@ Log -message "Starting test..."
 
 # DotNetTool-Install -packageId 'FunFair.BuildCheck' -preReleaseVersion $false
 
+DotNetTool-Require 'FunFair.BuildCheck'
 
 
 #[bool]$installed = DotNetTool-Install -packageId "Credfeto.Changelog.Cmd" -preReleaseVersion $preRelease

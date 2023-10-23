@@ -1,11 +1,27 @@
 
+function Log-GetDate {
+
+    [string]$now = Get-Date -AsUtc -Format "yyyy-MM-dd@HH:mm:ss"
+
+    return $now
+}
+
+function Log-Common {
+   param (
+       [string]$now,
+       [string]$message
+   )
+
+   Write-Information "$($now): $($message)"
+}
+
 function Log {
     param (
         [string]$message
     )
 
-    [string]$now = Get-Date -AsUtc -Format "yyyy-mm-dd@HH:mm:ss"
-    Write-Information "$now - $message"
+    [string]$now = Log-GetDate
+    Log-Common -now $now -message $message
 }
 
 function Log-Batch {
@@ -13,9 +29,9 @@ function Log-Batch {
         [string[]]$messages
     )
 
-    [string]$now = Get-Date -AsUtc -Format "yyyy-mm-dd@HH:mm:ss"
+    [string]$now = Log-GetDate
     foreach($msg in $messages) {
-        Write-Information "$now - $msg"
+        Log-Common -now $now -message $message
     }
 }
 
