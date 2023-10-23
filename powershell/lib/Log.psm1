@@ -1,7 +1,6 @@
 
 function Log {
     param (
-        [Parameter(Mandatory=$true)]
         [string]$message
     )
 
@@ -11,7 +10,6 @@ function Log {
 
 function Log-Batch {
     param (
-        [Parameter(Mandatory=$true)]
         [string[]]$messages
     )
 

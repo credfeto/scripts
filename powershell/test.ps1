@@ -302,7 +302,7 @@ Log -message "Starting test..."
 #     [string[]]$logs
 #     )
 #     
-#     Log-Batch -messages &logs
+#     Log-Batch -messages $logs
 # }
 # 
 # $packageCache = "/home/markr/packageCache.json"
