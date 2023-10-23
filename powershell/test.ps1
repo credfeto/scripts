@@ -298,14 +298,7 @@ DotNetTool-Require 'FunFair.BuildCheck'
 #     }
 # }
 # 
-# function WriteLogs {
-#     param(
-#     [string[]]$logs
-#     )
-#     
-#     Log-Batch -messages $logs
-# }
-# 
+#
 # $packageCache = "/home/markr/packageCache.json"
 # $packageId = "MSBuild.Sdk.SqlProj"
 # $exactMatch = $true
@@ -323,7 +316,7 @@ DotNetTool-Require 'FunFair.BuildCheck'
 # }    
 # if ($?)
 # {
-#     WriteLogs -logs $results
+#     Log-Batch -messages $results
 #     
 #     # has updates
 #     [string]$packageIdAsRegex = $packageId.Replace(".", "\.").ToLower()
@@ -342,7 +335,7 @@ DotNetTool-Require 'FunFair.BuildCheck'
 # else
 # {
 #     Log -message " * ERROR: Failed to update $packageId"
-#     WriteLogs -logs $results
+#     Log-Batch -messages $results
 # }
 # 
 

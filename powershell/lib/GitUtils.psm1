@@ -14,14 +14,6 @@ function IsOnRamDisk {
     return $false
 }
 
-function Git-Log {
-param(
-    [string[]]$result
-    )
-
-    Log-Batch -messages $result
-}
-
 function Git-ValidateBranchName {
 param (
     [string] $branchName = $(throw "Git-ValidateBranchName: branchName not specified"),
@@ -190,11 +182,11 @@ param(
 
     $result = git -C $repoPath diff --no-patch --exit-code 2>&1
     if(!$?) {
-        Git-Log -result $result
+        Log-Batch -messages $result
         return $true
     }
     
-    Git-Log -result $result
+    Log-Batch -messages $result
     return $false
 }
 
@@ -240,7 +232,7 @@ param(
     {
         Log -message "Cloning..."
         $result = git clone $repo --recurse-submodules 2>&1 
-        Git-Log -result $result
+        Log-Batch -messages $result
         Set-Location -Path $repoFolder
     }
 }
@@ -368,12 +360,12 @@ param(
 
     $result = git -C $repoPath checkout -b $branchName 2>&1
     if(!$?) {
-        Git-Log -result $result
+        Log-Batch -messages $result
         Log -message "Failed to create branch $branchName - Create branch failed - Call failed."
         return $false
     }
 
-    Git-Log -result $result
+    Log-Batch -messages $result
     Log -message "Created branch $branchName"
 
     return $true;
@@ -437,7 +429,7 @@ param(
     $result = git -C $repoPath rev-parse HEAD 2>&1    
 
     if(!$?) {
-        Git-Log -result $result
+        Log-Batch -messages $result
         Log -message "Failed to get head rev"
         return $null
     }
@@ -457,7 +449,7 @@ function Git-HasSubmodules {
     $result = git -C $repoPath submodule 2>&1
 
     if(!$?) {
-        Git-Log -result $result
+        Log-Batch -messages $result
         Log -message "Failed to get submodules."
         return $false
     }

@@ -22,7 +22,7 @@ param(
 function BuildVersion-GetNextPatch {
     DotNetTool-Require -packageId "FunFair.BuildVersion"
     
-    $result = dotnet buildversion --BuildNumber 9999 --WarningsAsErrors
+    [string[]]$result = dotnet buildversion --BuildNumber 9999 --WarningsAsErrors
 
     if(!$?) {
         Log-Batch -messages $result

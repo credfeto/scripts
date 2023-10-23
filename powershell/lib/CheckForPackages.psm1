@@ -103,14 +103,6 @@ param(
     return $null
 }
 
-function WriteLogs {
-    param(
-    [string[]]$logs
-    )
-
-    Log-Batch -messages $logs
-}
-
 function buildPackageSearch{
     param(
         [string]$packageId,
@@ -178,13 +170,13 @@ param(
     
     if ($exitCode -lt 0) {
         Log -message " * ERROR: Failed to update $packageId"
-        WriteLogs -logs $results
+        Log-Batch -messages $results
         throw "Failed to update $packageId"
     }    
     
     if ($exitCode -gt 0)
     {
-        #WriteLogs -logs $results
+        #Log-Batch -messages $results
         
         # has updates?
         $regex = getPackageRegex -packageId $packageId -exactMatch $True
@@ -200,7 +192,7 @@ param(
     else
     {
         Log -message " * ERROR: Failed to update $packageId"
-        WriteLogs -logs $results
+        Log-Batch -messages $results
     }
 
     
@@ -232,7 +224,7 @@ param(
 
     if($?) {
         
-        #WriteLogs -logs $results
+        #Log-Batch -messages $results
         
         # has updates?
         $regex = getPackageRegex -packageId $packageId -exactMatch $False
@@ -244,7 +236,7 @@ param(
     }
     else
     {
-        WriteLogs -logs $results
+        Log-Batch -messages $results
     }
     
     Log -message " * No Changes"

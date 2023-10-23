@@ -1,11 +1,4 @@
-﻿function Changelog-Log {
-param(
-    [string[]]$result
-    )
-
-    Log-Batch -message $result
-}
-
+﻿
 function Changelog-IsMissingTool {
 param(
     [string[]]$result
@@ -51,7 +44,7 @@ param(
 
     DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$result = dotnet changelog --changelog $fileName --add $entryType --message "$code - $message"
-    Changelog-Log -result $result
+    Log-Batch -messages $result
     if($?) {
         Log -message "* Changelog Updated"
     }
@@ -93,7 +86,7 @@ param(
 
     DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$result = dotnet changelog --changelog $fileName --remove $entryType --message "$code - $message"
-    Changelog-Log -result $result
+    Log-Batch -messages $result
     if($?) {
         Log -message "* Changelog Updated"
     }
@@ -114,7 +107,7 @@ function ChangeLog-CreateRelease {
 
     DotNetTool-Require -packageId "Credfeto.ChangeLog.Cmd"
     [string[]]$result = dotnet changelog --changelog $fileName --create-release $release
-    Changelog-Log -result $result
+    Log-Batch -messages $result
     if($?) {
         Log -message "* Changelog Updated"
     }
