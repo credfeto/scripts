@@ -180,7 +180,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath diff --no-patch --exit-code 2>&1
+    [string[]]$result = git -C $repoPath diff --no-patch --exit-code 2>&1
     if(!$?) {
         Log-Batch -messages $result
         return $true
@@ -231,7 +231,7 @@ param(
     else
     {
         Log -message "Cloning..."
-        $result = git clone $repo --recurse-submodules 2>&1 
+        [string[]]$result = git clone $repo --recurse-submodules 2>&1
         Log-Batch -messages $result
         Set-Location -Path $repoFolder
     }
@@ -358,7 +358,7 @@ param(
         return $false
     }
 
-    $result = git -C $repoPath checkout -b $branchName 2>&1
+    [string[]]$result = git -C $repoPath checkout -b $branchName 2>&1
     if(!$?) {
         Log-Batch -messages $result
         Log -message "Failed to create branch $branchName - Create branch failed - Call failed."
@@ -426,7 +426,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
-    $result = git -C $repoPath rev-parse HEAD 2>&1    
+    [string[]]$result = git -C $repoPath rev-parse HEAD 2>&1
 
     if(!$?) {
         Log-Batch -messages $result
@@ -446,7 +446,7 @@ function Git-HasSubmodules {
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    $result = git -C $repoPath submodule 2>&1
+    [string[]]$result = git -C $repoPath submodule 2>&1
 
     if(!$?) {
         Log-Batch -messages $result

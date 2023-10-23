@@ -1,12 +1,6 @@
 
 $standardSource = 'https://api.nuget.org/v3/index.json'
 
-function DotNetTool-Log {
-param($result)
-
-    Log-Batch -messages $result
-}
-
 function DotNetTool-Error {
 param($result)
 
@@ -119,12 +113,12 @@ param(
     if(isInstalled -packageId $packageId) {
 
         Log -message "Removing currently installed $packageId"
-        $result = dotnet tool uninstall --local $packageId
+        [string[]]$result = dotnet tool uninstall --local $packageId
         if(!$?) {
             DotNetTool-Error -result $result
             throw "Failed to uninstall $packageId"
         }
-        DotNetTool-Log -result $result         
+        Log-Batch -messages $result
     }
 }
 
@@ -135,13 +129,13 @@ param(
     )
 
     Log -message "Installing $version of $packageId"
-    $result = dotnet tool install --local $packageId --version $version
+    [string[]]$result = dotnet tool install --local $packageId --version $version
     if(!$?) {
         DotNetTool-Error -result $result
         return $false
     }
     
-    DotNetTool-Log -result $result
+    Log-Batch -messages $result
     
     [bool]$installed = isInstalled -packageId $packageId
     return [bool]$installed    
@@ -169,13 +163,13 @@ param(
     [bool]$manifestExists = Test-Path -path '.config\dotnet-tools.json'
     if ($manifestExists -ne $true)
     {
-        $result = dotnet new tool-manifest
+        [string[]]$result = dotnet new tool-manifest
         if(!$?) {
             DotNetTool-Error -result $result
             throw "Failed to uninstall $packageId"
         }
         
-        DotNetTool-Log -result $result         
+        Log-Batch -messages $result
     }
 
     # Uninstall if already installed 
@@ -202,13 +196,13 @@ param(
 
         if($version -ne $null) {
             Log -message "Installing $version of $packageId"
-            $result = dotnet tool install --local $packageId --version $version
+            [string[]]$result = dotnet tool install --local $packageId --version $version
             if(!$?) {
                 DotNetTool-Error -result $result
                 return $false
             }
             
-            DotNetTool-Log -result $result
+            Log-Batch -messages $result
             
             [bool]$installed = isInstalled -packageId $packageId
 			return [bool]$installed
@@ -252,7 +246,7 @@ param(
         throw "Failed to list installed packages $packageId"
     }
     
-    DotnetTool-Log -result $result
+    Log-Batch -messages $result
     
     $lowerPackageId = $packageId.ToLower() + " "
     
@@ -278,8 +272,8 @@ param(
     }
     
     Log -message "$packageId found"
-    $restored = dotnet tool restore
-    DotNetTool-Log -result $restored    
+    [string[]]$restored = dotnet tool restore
+    Log-Batch -messages $restored
 }
 
 Export-ModuleMember -Function DotNetTool-Install
