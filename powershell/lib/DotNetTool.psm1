@@ -1,14 +1,6 @@
 
 $standardSource = 'https://api.nuget.org/v3/index.json'
 
-function DotNetTool-Error {
-param($result)
-
-    foreach($line in $result) {
-        Write-Error $line
-    }
-}
-
 function getLatestReleasePackage($packageId) {
 
 	try {
@@ -115,7 +107,7 @@ param(
         Log -message "Removing currently installed $packageId"
         [string[]]$result = dotnet tool uninstall --local $packageId
         if(!$?) {
-            DotNetTool-Error -result $result
+            ErrorLog-Batch -messages $result
             throw "Failed to uninstall $packageId"
         }
         Log-Batch -messages $result
@@ -131,7 +123,7 @@ param(
     Log -message "Installing $version of $packageId"
     [string[]]$result = dotnet tool install --local $packageId --version $version
     if(!$?) {
-        DotNetTool-Error -result $result
+        ErrorLog-Batch -messages $result
         return $false
     }
     
@@ -165,7 +157,7 @@ param(
     {
         [string[]]$result = dotnet new tool-manifest
         if(!$?) {
-            DotNetTool-Error -result $result
+            ErrorLog-Batch -messages $result
             throw "Failed to uninstall $packageId"
         }
         
@@ -198,7 +190,7 @@ param(
             Log -message "Installing $version of $packageId"
             [string[]]$result = dotnet tool install --local $packageId --version $version
             if(!$?) {
-                DotNetTool-Error -result $result
+                ErrorLog-Batch -messages $result
                 return $false
             }
             
@@ -215,7 +207,7 @@ param(
 
         [string[]]$result = dotnet tool install --local $packageId --version $latestReleaseVersion
         if(!$?) {
-            DotNetTool-Error -result $result
+            ErrorLog-Batch -messages $result
             return $false
         }
         
@@ -227,7 +219,7 @@ param(
     Log -message "Installing latest release version of $packageId"
     [string[]]$result = dotnet tool install --local $packageId
     if(!$?) {
-        DotNetTool-Error -result $result
+        ErrorLog-Batch -messages $result
         return $false
     }
     
@@ -242,10 +234,11 @@ param(
     
     [string[]] $result = dotnet tool list
     if(!$?) {
-        DotNetTool-Error -result $result
+        ErrorLog-Batch -messages $result
         throw "Failed to list installed packages $packageId"
     }
-    
+
+    Log -message "Installed Packages:"
     Log-Batch -messages $result
     
     $lowerPackageId = $packageId.ToLower() + " "

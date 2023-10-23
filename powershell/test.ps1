@@ -342,4 +342,4 @@ DotNetTool-Require 'FunFair.BuildCheck'
 
 # [string]$update = Packages_CheckForUpdates -repoFolder '/home/markr/work/funfair/BuildBot' -packageCache "~/packages.cache" -packageId 'Meziantou' -exactMatch $false
 
-Project_Cleanup -projectFile "/home/markr/work/funfair/funfair-server-code-analysis/src/FunFair.CodeAnalysis/FunFair.CodeAnalysis.csproj"
+# Project_Cleanup -projectFile "/home/markr/work/funfair/funfair-server-code-analysis/src/FunFair.CodeAnalysis/FunFair.CodeAnalysis.csproj"
