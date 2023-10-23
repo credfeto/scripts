@@ -2,14 +2,14 @@
 $standardSource = 'https://api.nuget.org/v3/index.json'
 
 function DotNetTool-Log {
-param([string[]]$result)
-    foreach($line in $result) {
-        Write-Error $line
-    }
+param($result)
+
+    Log-Batch -messages $result
 }
 
 function DotNetTool-Error {
-param([string[]]$result)
+param($result)
+
     foreach($line in $result) {
         Write-Error $line
     }

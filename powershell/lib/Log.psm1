@@ -9,7 +9,7 @@ function Log-GetDate {
 function Log-Common {
    param (
        [string]$now,
-       [string]$message
+       $message
    )
 
    Write-Information "$($now): $($message)"
@@ -26,7 +26,7 @@ function Log {
 
 function Log-Batch {
     param (
-        [string[]]$messages
+        $messages
     )
 
     [string]$now = Log-GetDate
