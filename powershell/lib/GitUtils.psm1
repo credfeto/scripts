@@ -123,7 +123,7 @@ param(
     foreach($item in $result) {
         [string]$branch = $item.Trim()
         if(!$branch.StartsWith("* ")) {
-            $complete = git -C $repoPath branch -d $branch 2>&1
+            [string[]]$complete = git -C $repoPath branch -d $branch 2>&1
         }
     }
 }
@@ -318,7 +318,7 @@ param(
 
     Git-ValidateBranchName -branchName $branchName -method "Git-DoesBranchExist"
 
-    $result = git -C $repoPath branch --remote 2>&1
+    [string[]]$result = git -C $repoPath branch --remote 2>&1
 
     [string]$regex = $branchName.replace(".", "\.") + "$"
 
