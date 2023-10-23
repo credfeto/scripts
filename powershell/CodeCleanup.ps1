@@ -35,6 +35,13 @@ $ScriptDirectory = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $ScriptDirectory = Join-Path -Path $ScriptDirectory -ChildPath "lib" 
 Write-Information "Loading Modules from $ScriptDirectory"
 try {
+    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Log.psm1") -Force -DisableNameChecking
+}
+catch {
+    Write-Error "$_"
+    Throw "Error while loading supporting PowerShell Scripts: Log"
+}
+try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "DotNetTool.psm1") -Force -DisableNameChecking
 }
 catch {
