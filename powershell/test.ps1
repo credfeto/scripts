@@ -83,6 +83,8 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: ProjectCleanup"
 }
 
+Log -message "Starting test..."
+
 #$ret = GlobalJson_Update -sourceFileName '/home/markr/work/funfair/funfair-build-check/src/global.json' -targetFileName '/home/markr/work/funfair/BuildBot/src/global.json'
 #Write-Host $ret
 
