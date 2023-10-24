@@ -9,10 +9,10 @@ do
 
   echo ""
   echo "Retrieving $CURRENT_DIR..."
-  git -C "$CURRENT_DIR" remote get-url origin
-  git -C "$CURRENT_DIR" fetch origin
-  git -C "$CURRENT_DIR" checkout main
-  git -C "$CURRENT_DIR" fetch origin
+  git -C "$CURRENT_DIR" remote get-url origin 2>&1
+  git -C "$CURRENT_DIR" fetch origin 2>&1
+  git -C "$CURRENT_DIR" checkout main 2>&1
+  git -C "$CURRENT_DIR" fetch origin 2>&1
   
   echo " * done"
 done

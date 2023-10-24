@@ -64,7 +64,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    [string[]]$result = git -C $repoPath remote show $upstream
+    [string[]]$result = git -C $repoPath remote show $upstream 2>&1
     
     [string] $branch =  $result | Select-String -Pattern 'HEAD branch: (.*)' -CaseSensitive | %{$_.Matches.Groups[1].value}
     
@@ -146,23 +146,23 @@ param(
     [string]$upstreamBranch = "$upstream/$defaultBranch"
     
     # junk any existing checked out files
-    & git -C $repoPath reset HEAD --hard | Out-Null
-    & git -C $repoPath clean -f -x -d | Out-Null
-    & git -C $repoPath checkout $defaultBranch | Out-Null
-    & git -C $repoPath reset HEAD --hard | Out-Null
-    & git -C $repoPath clean -f -x -d | Out-Null
-    & git -C $repoPath fetch --recurse-submodules | Out-Null
+    & git -C $repoPath reset HEAD --hard 2>&1 | Out-Null
+    & git -C $repoPath clean -f -x -d 2>&1 | Out-Null
+    & git -C $repoPath checkout $defaultBranch 2>&1 | Out-Null
+    & git -C $repoPath reset HEAD --hard 2>&1 | Out-Null
+    & git -C $repoPath clean -f -x -d 2>&1 | Out-Null
+    & git -C $repoPath fetch --recurse-submodules 2>&1 | Out-Null
     
     # NOTE Loses all local commits on master
-    & git -C $repoPath reset --hard $upstreamBranch | Out-Null
-    & git -C $repoPath remote update $upstream --prune | Out-Null
-    & git -C $repoPath prune | Out-Null
+    & git -C $repoPath reset --hard $upstreamBranch 2>&1 | Out-Null
+    & git -C $repoPath remote update $upstream --prune 2>&1 | Out-Null
+    & git -C $repoPath prune 2>&1 | Out-Null
     
     $newHead = Git-Get-HeadRev -repoPath $repoPath
     if($head -ne $newHead) {
         if(!$repack) {
             # ONLY GC if head is different, i.e. something has changed    
-            & git -C $repoPath gc --aggressive --prune | Out-Null
+            & git -C $repoPath gc --aggressive --prune 2>&1 | Out-Null
         }
     }
     
@@ -247,8 +247,8 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    & git -C $repoPath add -A | Out-Null
-    & git -C $repoPath commit -m"$message" | Out-Null
+    & git -C $repoPath add -A 2>&1 | Out-Null
+    & git -C $repoPath commit -m"$message" 2>&1 | Out-Null
 }
 
 function Git-Commit-Named {
@@ -265,10 +265,10 @@ param(
     foreach($file in $files) {
         [string]$fileUnix = $file.Replace("\", "/")
         Log -message "Staging $fileUnix"
-        & git -C $repoPath add $fileUnix | Out-Null
+        & git -C $repoPath add $fileUnix 2>&1 | Out-Null
     }
 
-    & git -C $repoPath commit -m"$message" | Out-Null
+    & git -C $repoPath commit -m"$message" 2>&1 | Out-Null
 }
 
 function Git-Push {
@@ -298,7 +298,7 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
 
-    & git -C $repoPath push --set-upstream $upstream $branchName -v | Out-Null
+    & git -C $repoPath push --set-upstream $upstream $branchName -v 2>&1 | Out-Null
 }
 
 
@@ -387,13 +387,13 @@ param(
 
     [bool]$branchExists = Git-DoesBranchExist -branchName $branchName -repoPath $repoPath
     if($branchExists) {
-        & git -C $repoPath branch -D $branchName | Out-Null
+        & git -C $repoPath branch -D $branchName 2>&1 | Out-Null
     }
     
     [string]$upstreamBranch = "$upstream/$branchName"
     [bool]$branchExists = Git-DoesBranchExist -branchName $upstreamBranch -repoPath $repoPath
     if($branchExists) {
-        & git -C $repoPath push $upstream ":$branchName" | Out-Null
+        & git -C $repoPath push $upstream ":$branchName" 2>&1 | Out-Null
     }
 
     return $true;
@@ -408,11 +408,11 @@ param(
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
-    & git -C $repoPath add . --renormalize | Out-Null
+    & git -C $repoPath add . --renormalize 2>&1 | Out-Null
     [bool]$hasChanged = Git-HasUnCommittedChanges -repoPath $repoPath
     if($hasChanged -eq $true) {
-        & git -C $repoPath commit -m"Renormalised files" | Out-Null
-        & git -C $repoPath push | Out-Null
+        & git -C $repoPath commit -m"Renormalised files" 2>&1 | Out-Null
+        & git -C $repoPath push 2>&1 | Out-Null
     }
 }
 

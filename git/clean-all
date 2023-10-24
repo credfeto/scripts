@@ -8,9 +8,9 @@ do
 
   echo ""
   echo "Retrieving $CURRENT_DIR..."
-  git -C "$CURRENT_DIR" remote get-url origin
-  git -C "$CURRENT_DIR" clean -f -d -x 
-  git -C "$CURRENT_DIR" remote update origin --prune
+  git -C "$CURRENT_DIR" remote get-url origin 2>&1
+  git -C "$CURRENT_DIR" clean -f -d -x 2>&1
+  git -C "$CURRENT_DIR" remote update origin --prune 2>&1
   
   echo " * done"
 done

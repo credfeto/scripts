@@ -8,16 +8,16 @@ do
 
   echo ""
   echo "Retrieving $CURRENT_DIR..."
-  git -C "$CURRENT_DIR" remote get-url origin
-  git -C "$CURRENT_DIR" fetch --prune --prune-tags
-  git -C "$CURRENT_DIR" remote update origin --prune
+  git -C "$CURRENT_DIR" remote get-url origin 2>&1
+  git -C "$CURRENT_DIR" fetch --prune --prune-tags 2>&1
+  git -C "$CURRENT_DIR" remote update origin --prune 2>&1
   
-  git -C "$CURRENT_DIR" status
+  git -C "$CURRENT_DIR" status 2>&1
   if [ $? -eq 0 ]
   then
     echo " + No pending changes in working folder. Rebasing..."
-    git -C "$CURRENT_DIR" rebase
-    git -C "$CURRENT_DIR" rebase --abort 2> /dev/null
+    git -C "$CURRENT_DIR" rebase 2>&1
+    git -C "$CURRENT_DIR" rebase --abort 2>&1 > /dev/null
   fi 
 
   echo " * done"
