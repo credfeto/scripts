@@ -1,6 +1,7 @@
 #! /bin/sh
 
 flatpak update -y
+flatpak uninstall --unused -y
 
 flatpak run com.brave.Browser &
 
