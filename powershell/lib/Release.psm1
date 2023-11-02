@@ -68,6 +68,10 @@ param(
     if($repo.Contains("funfair-build-version")) {
         return $true
     }
+    
+    if($repo.Contains("funfair-content-package-builder")) {
+        return $true
+    }
 
     return $false
 }
