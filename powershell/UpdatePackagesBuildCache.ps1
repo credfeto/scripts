@@ -246,11 +246,14 @@ DotNetTool-Require -packageId "Credfeto.Package.Update"
 DotNetTool-Require -packageId "Credfeto.Changelog.Cmd"
 DotNetTool-Require -packageId "FunFair.BuildVersion"
 DotNetTool-Require -packageId "FunFair.BuildCheck"
+dotnet new install MSBuild.Sdk.SqlProj.Templates
 
 Log -message ""
 Log -message "***************************************************************"
 Log -message "***************************************************************"
 Log -message ""
+
+
 
 $packages = Packages_Get -fileName $packagesToUpdate
 

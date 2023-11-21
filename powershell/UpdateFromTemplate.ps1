@@ -987,6 +987,7 @@ Log -message "Root Folder: $root"
 DotNetTool-Require -packageId "Credfeto.Changelog.Cmd"
 DotNetTool-Require -packageId "FunFair.BuildVersion"
 DotNetTool-Require -packageId "FunFair.BuildCheck"
+dotnet new install MSBuild.Sdk.SqlProj.Templates
 
 Log -message ""
 Log -message "***************************************************************"
@@ -1036,6 +1037,7 @@ Log -message "***************************************************************"
 Log -message "***************************************************************"
 Log -message "***************************************************************"
 Log -message ""
+
 
 processAll -repositoryList $repoList -templateRepositoryFolder $templateRepoFolder -baseFolder $root -templateRepoHash $templateRepoHash
 

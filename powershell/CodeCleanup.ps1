@@ -354,6 +354,7 @@ Log -message "Root Folder: $root"
 DotNetTool-Require -packageId "JetBrains.ReSharper.GlobalTools"
 DotNetTool-Require -packageId "FunFair.BuildVersion"
 DotNetTool-Require -packageId "FunFair.BuildCheck"
+dotnet new install MSBuild.Sdk.SqlProj.Templates
 
 Log -message ""
 Log -message "***************************************************************"
