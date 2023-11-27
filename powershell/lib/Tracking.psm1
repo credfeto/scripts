@@ -8,9 +8,10 @@ param (
     [string]$srcExists = Test-Path -Path $fileName
     if($srcExists -eq $true) {
 
-        $obj = Get-Content -Path $srcPath| Out-String | ConvertFrom-Json
+        $obj = Get-Content -Path $srcPath | Out-String | ConvertFrom-Json
+        Log -message "Tracking_Read: $obj"
 
-        $obj.psobject.properties | Foreach { $content[$_.Name] = $_.Value }
+        $obj.psobject.properties | ForEach { $content[$_.Name] = $_.Value }
     }
 
     return $content
