@@ -118,10 +118,13 @@ param(
     Log -message "Git-RemoveAllLocalBranches: $repoPath"
 
     [string]$repoPath = GetRepoPath -repoPath $repoPath
-
+    
     [string[]]$result = git -C $repoPath branch 2>&1
+    
+    Log-Batch -messages $result
     foreach($item in $result) {
         [string]$branch = $item.Trim()
+        Log -message "Found: $branch"
         if(!$branch.StartsWith("* ")) {
             [string[]]$complete = git -C $repoPath branch -d $branch 2>&1
         }
@@ -427,6 +430,11 @@ param(
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
     [string[]]$result = git -C $repoPath rev-parse HEAD 2>&1
+
+    Log -message "Head Rev"    
+    Log-Batch -messages $result1
+    
+    Log -message
 
     if(!$?) {
         Log-Batch -messages $result
