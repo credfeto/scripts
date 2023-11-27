@@ -750,17 +750,12 @@ param (
         throw "Target Repo did not set up correctly"
     }
     
-    Log -message "Here 1**"
     Git-EnsureSynchronised -repo $repo -repoFolder $targetRepo
-    Log -message "Here 2**"
 
     Set-Location -Path $targetRepo
 
-Log -message "Here 3**"
     [string]$lastRevision = Tracking_Get -basePath $trackingFolder -repo $repo
-    Log -message "Here 4**"
     [string]$currentRevision = Git-Get-HeadRev -repoPath $targetRepo
-    Log -message "Here 5**"
     $currentRevision = "$scriptsHash/$templateRepoHash/$currentRevision"
 
     Log -message "Last Revision:    $lastRevision"
