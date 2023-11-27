@@ -10,9 +10,9 @@ param (
     [string]$srcExists = Test-Path -Path $fileName
     if($srcExists -eq $true) {
         $fileContent = Get-Content -Path $srcPath | Out-String
-        Log -message "Tracking_Read: $content"
+        Log -message "Tracking_Read: $fileContent"
         
-        if($content) {
+        if($fileContent) {
             $obj = $fileContent | ConvertFrom-Json
             Log -message "Tracking_Read: $obj"
 
