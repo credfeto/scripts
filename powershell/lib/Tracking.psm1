@@ -17,10 +17,12 @@ param (
             Log -message "Tracking_Read: $obj"
 
             $obj.psobject.properties | ForEach { $content[$_.Name] = $_.Value }
-        Log -message "Tracking_Read: $obj"
+        }
+        else {
+            Log -message "Tracking_Read: $fileName is empty"
+        }
     }
-    else 
-    {
+    else {
         Log -message "Tracking_Read: $fileName does not exist"
     }
 
