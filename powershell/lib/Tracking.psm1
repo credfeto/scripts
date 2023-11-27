@@ -2,16 +2,24 @@ function Tracking_Read {
 param (
     [string] $fileName = $(throw "Tracking_Read: fileName not specified")
     )
+    
+    Log -message "Tracking_Read: $fileName"
 
     $content = @{}
 
     [string]$srcExists = Test-Path -Path $fileName
     if($srcExists -eq $true) {
-
-        $obj = Get-Content -Path $srcPath | Out-String | ConvertFrom-Json
+        $content = Get-Content -Path $srcPath | Out-String
+        Log -message "Tracking_Read: $content"
+        
+        $obj = $content | ConvertFrom-Json
         Log -message "Tracking_Read: $obj"
 
         $obj.psobject.properties | ForEach { $content[$_.Name] = $_.Value }
+    }
+    else 
+    {
+        Log -message "Tracking_Read: $fileName does not exist"
     }
 
     return $content
