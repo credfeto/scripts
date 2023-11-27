@@ -434,15 +434,16 @@ param(
     Log -message "Head Rev"    
     Log-Batch -messages $result
     
-    Log -message
-
     if(!$?) {
         Log-Batch -messages $result
         Log -message "Failed to get head rev"
         return $null
     }
+    
+    [string]$rev = $result.Trim()
+    Log -message "Head Rev: $rev"
 
-    return $result.Trim()
+    return $rev
 }
 
 function Git-HasSubmodules {
