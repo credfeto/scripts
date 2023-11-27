@@ -12,10 +12,12 @@ param (
         $content = Get-Content -Path $srcPath | Out-String
         Log -message "Tracking_Read: $content"
         
-        $obj = $content | ConvertFrom-Json
-        Log -message "Tracking_Read: $obj"
+        if($content) {
+            $obj = $content | ConvertFrom-Json
+            Log -message "Tracking_Read: $obj"
 
-        $obj.psobject.properties | ForEach { $content[$_.Name] = $_.Value }
+            $obj.psobject.properties | ForEach { $content[$_.Name] = $_.Value }
+        Log -message "Tracking_Read: $obj"
     }
     else 
     {
