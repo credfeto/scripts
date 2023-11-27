@@ -127,6 +127,7 @@ param(
         Log -message "Found: $branch"
         if(!$branch.StartsWith("* ")) {
             [string[]]$complete = git -C $repoPath branch -d $branch 2>&1
+            Log -message "Removed: $branch : $complete"
         }
     }
 }
