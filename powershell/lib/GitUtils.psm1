@@ -120,7 +120,7 @@ param(
     [string]$repoPath = GetRepoPath -repoPath $repoPath
     
     [string[]]$result = git -C $repoPath branch 2>&1
-    
+    Log -message "Found: ..."
     Log-Batch -messages $result
     foreach($item in $result) {
         [string]$branch = $item.Trim()
