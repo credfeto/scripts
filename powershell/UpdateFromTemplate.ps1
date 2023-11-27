@@ -986,8 +986,14 @@ param(
 
 #########################################################################
 
-Set-Location -Path $root
+Log -message "Repos: $repos"
 Log -message "Root Folder: $root"
+Log -message "Work Folder: $work"
+Log -message "Tracking: $trackingFolder"
+Log -message "Template: $templateRepo"
+
+Set-Location -Path $root
+
 
 DotNetTool-Require -packageId "Credfeto.Changelog.Cmd"
 DotNetTool-Require -packageId "FunFair.BuildVersion"
