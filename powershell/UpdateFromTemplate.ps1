@@ -1019,7 +1019,9 @@ Log -message "Loading template: $templateRepo"
 Log -message "Template Folder: $templateFolder"
 [string]$templateRepoFolder = Join-Path -Path $root -ChildPath $templateFolder
 
+Log -message "Here 3"
 Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
+Log -message "Here 4"
 
 Set-Location -Path $templateRepoFolder
 
