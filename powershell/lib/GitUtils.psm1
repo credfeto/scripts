@@ -432,7 +432,7 @@ param(
     [string[]]$result = git -C $repoPath rev-parse HEAD 2>&1
 
     Log -message "Head Rev"    
-    Log-Batch -messages $result1
+    Log-Batch -messages $result
     
     Log -message
 
