@@ -1023,7 +1023,9 @@ Git-EnsureSynchronised -repo $templateRepo -repofolder $templateRepoFolder
 
 Set-Location -Path $templateRepoFolder
 
+Log -message "Here 1"
 [string]$templateRepoHash = Git-Get-HeadRev -repoPath $templateRepoFolder
+Log -message "Here 2"
 Log -message "Template Rev Hash = $templateRepoHash"
 
 Set-Location -Path $root
