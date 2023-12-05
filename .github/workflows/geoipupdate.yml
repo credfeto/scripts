@@ -60,7 +60,11 @@ jobs:
         run: geoipupdate --config-file GeoIP.conf --database-directory geoip
       - name: "Update changelog if changes occured"
         shell: bash
-        run: git diff -s --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[GEOIP] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
+        run: |
+          git diff -s --exit-code || \
+          dotnet changelog --remove Changed --message "GEOIP - Updated GEOIP DB from MaxMind"
+          git diff -s --exit-code || \
+          dotnet changelog --add Changed --message "GEOIP - Updated GEOIP DB from MaxMind ($(date +'%Y-%m-%d'))"
       - name: "Commit changes"
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
