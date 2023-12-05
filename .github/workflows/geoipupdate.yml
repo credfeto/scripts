@@ -43,10 +43,7 @@ jobs:
             echo LicenseKey ${{ secrets.MAXMIND_LICENSE_KEY }}
             echo EditionIDs GeoLite2-Country
           } >> GeoIP.conf
-      - name: "Get Run Date"
-        shell: bash
-        run: echo "WHEN=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-      - name: "add Maxmind PPA"
+      - name: "Add Maxmind PPA"
         shell: bash
         run: sudo add-apt-repository ppa:maxmind/ppa
       - name: "Update repository cache"
