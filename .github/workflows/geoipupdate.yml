@@ -26,10 +26,12 @@ jobs:
       - name: Install Changelog tool
         run: dotnet tool install --local Credfeto.ChangeLog.Cmd
       - run: |
-          echo AccountID ${{ secrets.MAXMIND_ACCOUNT_ID }} > GeoIP.conf
-          echo LicenseKey ${{ secrets.MAXMIND_LICENSE_KEY }} >> GeoIP.conf
-          echo EditionIDs GeoLite2-Country >> GeoIP.conf
-      - run: echo WHEN=`date +"%Y-%m-%d"` >> $GITHUB_ENV
+          {
+            echo AccountID ${{ secrets.MAXMIND_ACCOUNT_ID }}
+            echo LicenseKey ${{ secrets.MAXMIND_LICENSE_KEY }}
+            echo EditionIDs GeoLite2-Country
+          } >> GeoIP.conf
+      - run: echo 'WHEN=$(date +"%Y-%m-%d")' >> $GITHUB_ENV
       - run: sudo add-apt-repository ppa:maxmind/ppa
       - run: sudo apt update
       - run: sudo apt install geoipupdate
