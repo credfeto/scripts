@@ -3,6 +3,11 @@ name: Perform Maxmind GEOIP Updates
 on:
   schedule:
     - cron: "15 3 * * *"
+  push:
+    branches:
+      - "main"
+    paths:
+      - '.github/workflows/geoipupdate.yml'
 
 jobs:
   update-geoip:
