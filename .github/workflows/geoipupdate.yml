@@ -10,39 +10,58 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: "Get Latest source"
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
           token: ${{ secrets.SOURCE_PUSH_TOKEN }}
-      - uses: credfeto/action-dotnet-version-detect@v1.3.0
-      - uses: actions/setup-dotnet@v3
+      - name: "Detect dotnet version"
+        uses: credfeto/action-dotnet-version-detect@v1.3.0
+      - name: "Install dotnet"
+        uses: actions/setup-dotnet@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-      - name: Enable dotnet tools
+      - name: "Enable dotnet tools"
+        shell: bash
         run: dotnet new tool-manifest
-      - name: Install Changelog tool
+      - name: "Install Changelog tool"
+        shell: bash
         run: dotnet tool install --local Credfeto.ChangeLog.Cmd
-      - run: |
+      - name: "Save MaxMind credentials"
+        shell: bash
+        run: |
           {
             echo AccountID ${{ secrets.MAXMIND_ACCOUNT_ID }}
             echo LicenseKey ${{ secrets.MAXMIND_LICENSE_KEY }}
             echo EditionIDs GeoLite2-Country
           } >> GeoIP.conf
-      - run: echo 'WHEN=$(date +"%Y-%m-%d")' >> $GITHUB_ENV
-      - run: sudo add-apt-repository ppa:maxmind/ppa
-      - run: sudo apt update
-      - run: sudo apt install geoipupdate
-      - run: geoipupdate --config-file GeoIP.conf --database-directory geoip
-      - name: Update changelog if changes occured
+      - name: "Get Run Date"
+        shell: bash
+        run: echo "WHEN=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      - name: "add Maxmind PPA"
+        shell: bash
+        run: sudo add-apt-repository ppa:maxmind/ppa
+      - name: "Update repository cache"
+        shell: bash
+        run: sudo apt update
+      - name: "Install geoipupdate"
+        shell: bash
+        run: sudo apt install geoipupdate
+      - name: "Get latest maxmind DB"
+        shell: bash
+        run: geoipupdate --config-file GeoIP.conf --database-directory geoip
+      - name: "Update changelog if changes occured"
+        shell: bash
         run: git diff -s --exit-code || dotnet changelog -changelog CHANGELOG.md -add Changed -message "[GEOIP] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: "Commit changes"
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "[GEOIP] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
           file_pattern: "*.mmdb CHANGELOG.md"
-          commit_user_name: "fun-geoip[bot]"
+          commit_user_name: "credfeto-geoip[bot]"
           commit_user_email: "credfeto@users.noreply.github.com"
-          commit_author: "fun-geoip[bot] <credfeto@users.noreply.github.com>"
+          commit_author: "credfeto-geoip[bot] <credfeto@users.noreply.github.com>"
           skip_dirty_check: false
