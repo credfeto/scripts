@@ -24,7 +24,7 @@ jobs:
       - name: "Detect dotnet version"
         uses: credfeto/action-dotnet-version-detect@v1.3.0
       - name: "Install dotnet"
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
