@@ -870,6 +870,9 @@ param (
         "cc.yml",
         "check-case.yml",
         "codacy-analysis.yml",
+        "codeql-analysis-csharp.yml",
+        "codeql-analysis-javascript.yml"
+        "codeql-analysis-python.yml",
         "dependabot-auto-merge.yml",
         "dependabot-rebase.yml",
         "linter.yml",
