@@ -4,8 +4,8 @@ services:
     image: postgres:16.0
     container_name: postgresql
     volumes:
-      - /var/lib/postgresql/data:/var/lib/postgresql/data
-      - /var/lib/postgresql/postgres_password:/run/secrets/postgres-passwd
+      - /var/lib/postgres/data:/var/lib/postgresql/data
+      - /var/lib/postgres/postgres_password:/run/secrets/postgres-passwd
     ports:
       - 5432:5432
     environment:
