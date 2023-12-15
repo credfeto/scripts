@@ -4,7 +4,7 @@ services:
     image: postgres:16.0
     container_name: postgresql
     volumes:
-      - /var/lib/postgres/data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
       - /var/lib/postgres/postgres_password:/run/secrets/postgres-passwd
     ports:
       - 5432:5432
@@ -18,3 +18,21 @@ services:
       nofile:
         soft: 20000
         hard: 20000
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: mypgadminpass
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  pgadmin_data:
