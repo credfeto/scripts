@@ -215,12 +215,18 @@ function Release-TryCreateNextPatch {
 [double]$minimumHoursBeforeAutoRelease = 4
 [double]$inactivityHoursBeforeAutoRelease = 2 * $minimumHoursBeforeAutoRelease
     
+    # *********************************************************
+    # * 1 Template Repos
+
     Log -message "Checking if can create release for $repo"
             
     if($repo.Contains("template")) {
         Release-Skip -repo $repo -message "IS A TEMPLATE"
         return
     } 
+
+    # *********************************************************
+    # * 2 RELEASE NOTES AND DURATION
     
     Log -message "Processing Release Notes in $changeLog"
     
@@ -261,6 +267,9 @@ function Release-TryCreateNextPatch {
         Release-Skip -repo $repo -message "$skippingReason : $autoUpdateCount"
         return;
     }
+
+    # *********************************************************
+    # * 3 CODE QUALITY AND BUILD
         
     [string]$srcPath = Join-Path -Path $repoPath -ChildPath "src"
     [bool]$srcExists = Test-Path -Path $srcPath
@@ -282,6 +291,9 @@ function Release-TryCreateNextPatch {
         }
     }
     
+    # *********************************************************
+    # * 4 Dispatch
+
     # At least $autoReleasePendingPackages auto updates... consider creating a release
     
     [bool]$hasPendingDependencyUpdateBranches = HasPendingDependencyUpdateBranches -repoPath $repoFolder
