@@ -1,4 +1,4 @@
-name: Perform Maxmind GEOIP Updates
+name: "GeoIP: Perform Maxmind GEOIP Updates"
 
 on:
   schedule:
@@ -26,7 +26,7 @@ jobs:
       - name: "Install dotnet"
         uses: actions/setup-dotnet@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SOURCE_PUSH_TOKEN }}
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - name: "Enable dotnet tools"
