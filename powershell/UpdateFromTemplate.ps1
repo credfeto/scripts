@@ -626,10 +626,12 @@ param(
         
             [string]$dotnetVersion = $updated.NewVersion
 
-            Log -message "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
-            [string]$changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
-            ChangeLog-RemoveEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to "
-            ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to $dotnetVersion"
+            if(!$targetRepo.Contains("template") -eq $true) {
+                Log -message "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
+                [string]$changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
+                ChangeLog-RemoveEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to "
+                ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to $dotnetVersion"
+            }
 
             # Change branch name so its obvious its a dotnet update rather than just a change to the file
             [string]$branchName = "depends/update-dotnet/$dotnetVersion/$fileName".Replace("\", "/")
