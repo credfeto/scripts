@@ -105,16 +105,6 @@ catch
 
 try
 {
-    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GlobalJson.psm1") -Force -DisableNameChecking
-}
-catch
-{
-    Write-Error "$_"
-    Throw "Error while loading supporting PowerShell Scripts: GlobalJson"
-}
-
-try
-{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Dependabot.psm1") -Force -DisableNameChecking
 }
 catch
@@ -591,106 +581,6 @@ param (
 
 }
 
-function updateGlobalJson{
-param(
-    [string]$sourceRepo = $(throw "updateGlobalJson: sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "updateGlobalJson: targetRepo not specified"), 
-    [string]$fileName = $(throw "updateGlobalJson: fileName not specified")
-    )
-
-    [string]$localFileName = convertToOsPath -path $fileName
-
-    Log -message "Checking $localFileName"
-
-    [string]$sourceFileName = makePath -Path $sourceRepo -ChildPath $localFileName
-    [string]$targetFileName = makePath -Path $targetRepo -ChildPath $localFileName
-
-    [string]$originalBranchPrefix = "template/$fileName".Replace("\", "/")
-    [string]$branchName = $originalBranchPrefix
-
-    Log -message "*****************"
-    Log -message "** GLOBAL.JSON **"
-    Log -message "*****************"
-    $updated = GlobalJson_Update -sourceFileName $sourceFileName -targetFileName $targetFileName
-    
-    Log -message "File Changed: $( $updated.Update )"
-    Log -message "Version Changed: $( $updated.UpdatingVersion )"
-    Log -message "New Version: $( $updated.NewVersion )"
-
-    if ($updated.Update -eq $true) {    
-        Log -message "** PROCESSING GLOBAL.JSON UPDATE"
-        [string]$sourceCodeFolder = makePath -Path $targetRepo -ChildPath "src"
-        Log -message "Src Folder: $sourceCodeFolder"
-
-        if($updated.UpdatingVersion -eq $true) {
-        
-            [string]$dotnetVersion = $updated.NewVersion
-
-            if(!$targetRepo.Contains("template") -eq $true) {
-                Log -message "** GLOBAL.JSON VERSION UPDATED: CREATING CHANGELOG ENTRY"
-                [string]$changeLogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
-                ChangeLog-RemoveEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to "
-                ChangeLog-AddEntry -fileName $changeLogFile -entryType Changed -code "SDK" -message "Updated DotNet SDK to $dotnetVersion"
-            }
-
-            # Change branch name so its obvious its a dotnet update rather than just a change to the file
-            [string]$branchName = "depends/update-dotnet/$dotnetVersion/$fileName".Replace("\", "/")
-
-            [bool]$codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
-            Set-Location -Path $targetRepo
-            if ($codeOK -eq $true) {
-
-                $result = commitGlobalJsonVersionUpdateToMaster -dotnetVersion $dotnetVersion -targetRepo $targetRepo -branchName $branchName -originalBranchPrefix $originalBranchPrefix
-
-                Log -message "Commit Result: $result"
-                
-                return "VERSION"
-            }
-            else {
-                $result = commitGlobalJsonVersionUpdateToBranch -dotnetVersion $dotnetVersion -targetRepo $targetRepo -branchName $branchName -originalBranchPrefix $originalBranchPrefix
-                
-                Log -message "Commit Result: $result"
-                
-                return "PENDING"
-            }
-        }
-        else {
-        
-            Log -message "** GLOBAL.JSON VERSION UNCHANGED BUT CONTENT CHANGED"
-
-            [bool]$codeOK = DotNet-BuildSolution -srcFolder $sourceCodeFolder
-            Set-Location -Path $targetRepo
-            if ($codeOK -eq $true) {
-                Log -message "**** BUILD OK ****"
-                doCommit -repoPath $targetRepo -fileName $fileName
-
-                # Remove any previous template updates that didn't create a version specific branch
-                Git-RemoveBranchesForPrefix -repoPath $targetRepo -branchForUpdate $branchName -branchPrefix $originalBranchPrefix
-            }
-            else {
-                Log -message "**** BUILD FAILURE ****"
-                [bool]$branchOk = Git-CreateBranch -repoPath $targetRepo -branchName $branchName
-                if ($branchOk -eq $true) {
-                    Log -message "Create Branch $branchName"
-                    doCommit -repoPath $targetRepo -fileName $fileName
-                    Git-PushOrigin -repoPath $targetRepo -branchName $branchName
-                }
-    
-                Git-ResetToMaster -repoPath $targetRepo
-            }
-            
-            return "CONTENT"
-        }
-    }
-    else {
-        Log -message "No GLOBAL.JSON UPDATE"
-        Log -message "Ensuring $branchName no longer exists"
-        Git-DeleteBranch -repoPath $targetRepo -branchName $branchName        
-        
-        return "NONE"
-    }
-}
-
 function updateLabel{
 param(
     [string]$baseFolder = $(throw "updateLabel: baseFolder not specified")
@@ -797,10 +687,6 @@ param (
 
             # Process files in src folder
             updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\CodeAnalysis.ruleset"
-            [string]$versionResult = updateGlobalJson -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\global.json"
-            Log -message ".NET VERSION UPDATED: $versionResult"
-            [bool]$dotnetVersionUpdated = $versionResult -eq "VERSION"
-            Log -message ".NET VERSION UPDATED: $dotnetVersionUpdated"
         }
         
         if($repo.Contains("funfair")) {

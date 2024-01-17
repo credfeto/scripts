@@ -49,16 +49,6 @@ catch {
     Throw "Error while loading supporting PowerShell Scripts: Labeler"
 }
 
-try
-{
-    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "GlobalJson.psm1") -Force -DisableNameChecking
-}
-catch
-{
-    Write-Error "$_"
-    Throw "Error while loading supporting PowerShell Scripts: GlobalJson"
-}
-
 try {
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "XmlDoc.psm1") -Force -DisableNameChecking
 }
