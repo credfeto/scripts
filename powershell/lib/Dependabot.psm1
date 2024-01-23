@@ -99,7 +99,7 @@ param([string]$path)
     interval: daily
     time: ""03:00""
     timezone: ""Europe/London""
-  open-pull-requests-limit: 2
+  open-pull-requests-limit: 20
   reviewers:
   - credfeto
   assignees:
