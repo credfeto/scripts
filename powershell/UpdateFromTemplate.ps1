@@ -698,55 +698,55 @@ param (
         updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "src\Directory.Build.props"
     }
 
-    #########################################################
-    # SIMPLE OVERWRITE UPDATES
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".editorconfig"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitleaks.toml"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitignore"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitattributes"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".tsqllintrc"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\pr-lint.yml"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\CODEOWNERS"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\PULL_REQUEST_TEMPLATE.md"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "CONTRIBUTING.md"
-    updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "SECURITY.md"
-
-    
-    [string]$issueTemplates = makePath -Path $sourceRepo -ChildPath ".github\ISSUE_TEMPLATE"
-    Log -message "Looking for issue templates in $issueTemplates"
-    $files = Get-ChildItem -Path $issueTemplates -Filter *.md -File -Attributes Normal, Hidden -Recurse
-    ForEach ($file in $files)
-    {
-        [string]$srcFileName = $file.FullName
-        $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
-        Log -message " * Found issue template: $srcFileName"
-
-        updateActionAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
-    }
-        
-    [string]$actions = makePath -Path $sourceRepo -ChildPath ".github\actions"
-    Log -message "Looking for action in $actions"
-    $files = Get-ChildItem -Path $actions -Filter *.yml -File -Attributes Normal, Hidden -Recurse
-    ForEach ($file in $files)
-    {
-        [string]$srcFileName = $file.FullName
-        $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
-        Log -message " * Found action $srcFileName"
-
-        updateActionAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
-    }
+#     #########################################################
+#     # SIMPLE OVERWRITE UPDATES
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".editorconfig"
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitleaks.toml"
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitignore"
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".gitattributes"
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".tsqllintrc"
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\pr-lint.yml"
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\CODEOWNERS"
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName ".github\PULL_REQUEST_TEMPLATE.md"
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "CONTRIBUTING.md"
+#     updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "SECURITY.md"
+# 
+#     
+#     [string]$issueTemplates = makePath -Path $sourceRepo -ChildPath ".github\ISSUE_TEMPLATE"
+#     Log -message "Looking for issue templates in $issueTemplates"
+#     $files = Get-ChildItem -Path $issueTemplates -Filter *.md -File -Attributes Normal, Hidden -Recurse
+#     ForEach ($file in $files)
+#     {
+#         [string]$srcFileName = $file.FullName
+#         $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
+#         Log -message " * Found issue template: $srcFileName"
+# 
+#         updateActionAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
+#     }
+#         
+#     [string]$actions = makePath -Path $sourceRepo -ChildPath ".github\actions"
+#     Log -message "Looking for action in $actions"
+#     $files = Get-ChildItem -Path $actions -Filter *.yml -File -Attributes Normal, Hidden -Recurse
+#     ForEach ($file in $files)
+#     {
+#         [string]$srcFileName = $file.FullName
+#         $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
+#         Log -message " * Found action $srcFileName"
+# 
+#         updateActionAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
+#     }
 
     [string]$workflows = makePath -Path $sourceRepo -ChildPath ".github\workflows"
     Log -message "Looking for Workflows in $workflows"
     $files = Get-ChildItem -Path $workflows -Filter *.yml -File -Attributes Normal, Hidden
-    ForEach ($file in $files)
-    {
-        [string]$srcFileName = $file.FullName
-        $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
-        Log -message " * Found Workflow $srcFileName"
-
-        updateWorkFlowAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
-    }
+#     ForEach ($file in $files)
+#     {
+#         [string]$srcFileName = $file.FullName
+#         $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
+#         Log -message " * Found Workflow $srcFileName"
+# 
+#         updateWorkFlowAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
+#     }
 
     [string]$targetWorkflows = makePath -Path $targetRepo -ChildPath ".github\workflows"
     $files = Get-ChildItem -Path $targetWorkflows -Filter *.yml -File -Attributes Normal, Hidden
@@ -804,22 +804,22 @@ param (
         Git-Push -repoPath $targetRepo
     }
 
-    [string]$linters = makePath -Path $sourceRepo -ChildPath ".github\linters"
-    Log -message "Looking for Lint config in $linters"
-    $files = Get-ChildItem -Path $linters -File -Attributes Normal, Hidden
-    ForEach ($file in $files) {
-        [string]$srcFileName = $file.FullName
-        $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
-        Log -message " * Found Linter config $srcFileName"
-
-        updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
-    }
+#     [string]$linters = makePath -Path $sourceRepo -ChildPath ".github\linters"
+#     Log -message "Looking for Lint config in $linters"
+#     $files = Get-ChildItem -Path $linters -File -Attributes Normal, Hidden
+#     ForEach ($file in $files) {
+#         [string]$srcFileName = $file.FullName
+#         $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
+#         Log -message " * Found Linter config $srcFileName"
+# 
+#         updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
+#     }
 
     #########################################################
     # COMPLICATED UPDATES
     
     # Update R# DotSettings
-    updateResharperSettings -sourceRepo $sourceRepo -targetRepo $targetRepo
+    # updateResharperSettings -sourceRepo $sourceRepo -targetRepo $targetRepo
     updateLabel -baseFolder $targetRepo
 
     buildDependabotConfig -sourceRepo $sourceRepo -targetRepo $targetRepo -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
