@@ -73,6 +73,7 @@ function dotNetDependabotTemplate {
   - dependency-name: ""SourceLink.Create.CommandLine""
   - dependency-name: ""System.Data.SqlClient""
   - dependency-name: ""TeamCity.VSTest.TestAdapter""
+  - dependency-name: ""ThisAssembly.AssemblyInfo""
   - dependency-name: ""ToStringWithoutOverrideAnalyzer""
   - dependency-name: ""TwitchLib.Api""
   - dependency-name: ""UAParser""
