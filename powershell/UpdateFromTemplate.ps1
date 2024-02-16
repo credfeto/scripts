@@ -754,9 +754,6 @@ param (
     
     updateLabel -baseFolder $targetRepo
 
-    buildDependabotConfig -sourceRepo $sourceRepo -targetRepo $targetRepo -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
-    removeLegacyDependabotConfig -targetRepo $targetRepo
-    
     Git-ReNormalise -repoPath $targetRepo
     
     Git-ResetToMaster -repoPath $targetRepo
