@@ -105,16 +105,6 @@ catch
 
 try
 {
-    Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Dependabot.psm1") -Force -DisableNameChecking
-}
-catch
-{
-    Write-Error "$_"
-    Throw "Error while loading supporting PowerShell Scripts: Dependabot"
-}
-
-try
-{
     Import-Module (Join-Path -Path $ScriptDirectory -ChildPath "Release.psm1") -Force -DisableNameChecking
 }
 catch
@@ -479,49 +469,6 @@ param(
 
 }
 
-function buildDependabotConfig {
-param(
-    [string]$sourceRepo = $(throw "buildDependabotConfig: sourceRepo not specified"), 
-    [string]$targetRepo = $(throw "buildDependabotConfig: targetRepo not specified"), 
-    [bool]$hasNonTemplateWorkFlows = $(throw "buildDependabotConfig: hasNonTemplateWorkFlows not specified")
-    )
-
-    [string]$srcPath = makePath -Path $sourceRepo -ChildPath ".github"
-    Log -message "Config Path: $srcPath"
-    [string]$targetFileName = makePath -Path $targetRepo -ChildPath ".github/dependabot.yml"
-
-    [bool]$updateGitHubActions = $hasNonTemplateWorkFlows
-     #-And !$targetRepo.ToLowerInvariant().Contains("funfair")
-
-    [bool]$hasSubModules = Git-HasSubModules -repoPath $targetRepo 
-    Dependabot-BuildConfig -configFileName $targetFileName -repoRoot $targetRepo -updateGitHubActions $updateGitHubActions -hasSubModules $hasSubModules
-
-    doCommit -repoPath $targetRepo -FileName ".github/dependabot.yml"
-    Git-Push -repoPath $targetRepo
-}
-
-function removeLegacyDependabotConfig {
-param(
-    [string]$targetRepo = $(throw "removeLegacyDependabotConfig: targetRepo not specified")
-    )
-    
-    [string]$trgPath = makePath -Path $targetRepo -ChildPath ".github"
-
-    $files = Get-ChildItem -Path $trgPath -filter "dependabot.config.template.*"
-    foreach($file in $files)
-    {
-        Remove-Item -Path $file.FullName
-    }
-
-    [bool]$uncommitted = Git-HasUnCommittedChanges -repoPath $targetRepo
-    If ($uncommitted -eq $true)
-    {
-        Git-Commit -repoPath $targetRepo -message "Removed old dependabot config templates"
-        Git-Push -repoPath $targetRepo
-    }
-}
-
-
 function ensureFolderExists{
 param(
     [string]$baseFolder = $(throw "ensureFolderExists: baseFolder not specified"), 
@@ -761,8 +708,6 @@ param (
         "codeql-analysis-csharp.yml",
         "codeql-analysis-javascript.yml"
         "codeql-analysis-python.yml",
-        "dependabot-auto-merge.yml",
-        "dependabot-rebase.yml",
         "linter.yml",
         "rebase.yml",
         "sqlcheck.yml",
@@ -804,22 +749,9 @@ param (
         Git-Push -repoPath $targetRepo
     }
 
-#     [string]$linters = makePath -Path $sourceRepo -ChildPath ".github\linters"
-#     Log -message "Looking for Lint config in $linters"
-#     $files = Get-ChildItem -Path $linters -File -Attributes Normal, Hidden
-#     ForEach ($file in $files) {
-#         [string]$srcFileName = $file.FullName
-#         $srcFileName = $srcFileName.SubString($sourceRepo.Length + 1)
-#         Log -message " * Found Linter config $srcFileName"
-# 
-#         updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName $srcFileName
-#     }
-
     #########################################################
     # COMPLICATED UPDATES
     
-    # Update R# DotSettings
-    # updateResharperSettings -sourceRepo $sourceRepo -targetRepo $targetRepo
     updateLabel -baseFolder $targetRepo
 
     buildDependabotConfig -sourceRepo $sourceRepo -targetRepo $targetRepo -hasNonTemplateWorkflows $hasNonTemplateWorkFlows
