@@ -1,15 +1,16 @@
 version: "3.8"
 services:
   mssql:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/mssql/server:2017-latest
     container_name: mssql
+    user: root
     volumes:
       - mssql_data:/var/opt/mssql/data
       - mssql_backup:/var/opt/mssql/backups
     ports:
       - 1433:1433
     environment:
-      - ACCEPT_EULA:Y
+      - ACCEPT_EULA=Y
       - SA_PASSWORD=$PASSWORD
       - MSSQL_PID=Developer
     restart: always
@@ -22,5 +23,7 @@ services:
 
 volumes:
   mssql_data:
+    external: true	
   mssql_backup:
+    external: true	
 
