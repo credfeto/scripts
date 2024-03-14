@@ -1,0 +1,51 @@
+#!/bin/bash
+
+TOKEN=
+REPO=
+
+while [ $# -gt 0 ]; do
+  key="$1"
+
+  case $key in
+    -t|--token)
+      TOKEN="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -r|--repo)
+      REPO="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    *)    # unknown option
+      die "unknown argument $1"
+      ;;
+  esac
+done
+
+[ -z "$TOKEN" ] && die "--token not specified"
+[ -z "$REPO" ] && die "--repo not specified"
+
+
+c="1"
+while [ $c -gt 0 ]
+do
+        c="0"
+
+        response=$(curl -s -H "Authorization: token $TOKEN" \
+             https://api.github.com/repos/$REPO/actions/runs?status=queued)
+
+        ids=$(echo $response | \
+             jq '.workflow_runs[] | select([.status] | inside(["queued"])) | .id')
+        set -- $ids
+        for i; do 
+                echo "Cancelling $i..."
+                curl \
+                     --silent \
+                     -H "Authorization: token $TOKEN" \
+                     -X POST "https://api.github.com/repos/$REPO/actions/runs/$i/cancel" > /dev/null
+                c=$[$c+1]
+        done
+
+        echo "Total $c in this batch"
+done
