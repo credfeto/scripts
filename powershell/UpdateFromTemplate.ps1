@@ -615,13 +615,6 @@ param (
     ensureFolderExists -baseFolder $targetRepo -subFolder ".github\linters"
     ensureFolderExists -baseFolder $targetRepo -subFolder ".github\ISSUE_TEMPLATE"
 
-    ## Ensure Changelog exists
-    [string]$targetChangelogFile = makePath -Path $targetRepo -ChildPath "CHANGELOG.md"
-    [bool]$targetChangeLogExists = Test-Path -Path $targetChangelogFile
-    if($targetChangeLogExists -eq $false) {
-        updateFileAndCommit -sourceRepo $sourceRepo -targetRepo $targetRepo -fileName "CHANGELOG.md"
-    }
-    
     #########################################################
     # COMPLICATED UPDATES
     
