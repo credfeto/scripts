@@ -627,19 +627,6 @@ param (
     
     updateLabel -baseFolder $targetRepo
 
-    Git-ReNormalise -repoPath $targetRepo
-    
-    Git-ResetToMaster -repoPath $targetRepo
-        
-    if($dotnetVersionUpdated -eq $true) {
-        Log -message "*** SHOULD BUMP RELEASE TO NEXT PATCH RELEASE VERSION ***"
-        
-        if(!$repo.Contains("template"))
-        {
-            Release-TryCreateNextPatch -repo $repo -repoPath $targetRepo -changelog $targetChangelogFile 
-        }        
-    }
-
     Git-ResetToMaster -repoPath $targetRepo
     Git-ReNormalise -repoPath $targetRepo
 
