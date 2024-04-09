@@ -7,6 +7,8 @@ flatpak run com.brave.Browser &
 
 flatpak run com.google.Chrome &
 
+flatpak run org.mozilla.firefox &
+
 flatpak run com.discordapp.Discord &
 
 flatpak run org.telegram.desktop &
