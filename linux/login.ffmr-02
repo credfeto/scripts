@@ -3,9 +3,9 @@
 flatpak update -y
 flatpak uninstall --unused -y
 
-flatpak run com.brave.Browser &
+flatpak run com.brave.Browser --enable-feature=UseOzonPlatform --ozone-platform=wayland &
 
-flatpak run com.google.Chrome &
+flatpak run com.google.Chrome --enable-feature=UseOzonPlatform --ozone-platform=wayland &
 
 flatpak run org.mozilla.firefox &
 
