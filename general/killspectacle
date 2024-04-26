@@ -1,0 +1,2 @@
+#! /bin/sh
+rm ~/.local/share/applications/org.kde.spectacle.desktop
