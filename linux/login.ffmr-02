@@ -3,7 +3,7 @@
 flatpak update -y
 flatpak uninstall --unused -y
 
-flatpak run com.brave.Browser --enable-feature=UseOzonPlatform --ozone-platform=wayland &
+flatpak run --branch=stable --arch=x86_64 --command=brave --file-forwarding com.brave.Browser --enable-feature=UseOzonPlatform --ozone-platform=wayland @@u %U @@ &
 
 flatpak run com.google.Chrome --enable-feature=UseOzonPlatform --ozone-platform=wayland &
 
