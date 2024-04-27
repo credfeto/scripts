@@ -20,8 +20,15 @@ param (
             [string]$name = ($child.Name).ToString().ToUpper()
             if($name -eq "#COMMENT") {
                 $replace = $false;
-                Log -message "$filename SKIPPING GROUP AS Found Comment"
-                Break
+                if($child.Value.Trim().ToUpper() -eq "DOTNET 7 FEATURES") {
+                    $toRemove.Add($child)
+                    Log -message "$filename ADDING REMOVABLE COMMENT $name"
+                    Break
+                }
+                else {
+                    Log -message "$filename SKIPPING GROUP AS Found Comment"
+                    Break
+                }
             }
             
             if($orderedChildren.Contains($name)) {
