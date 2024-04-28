@@ -20,7 +20,7 @@ param (
             [string]$name = ($child.Name).ToString().ToUpper()
             if($name -eq "#COMMENT") {
                 $replace = $false;
-                if($child.Value.Trim().ToUpper() -eq "DOTNET 7 FEATURES") {
+                if( ()$child.Value).Trim().ToUpper() -eq "DOTNET 7 FEATURES") {
                     $toRemove.Add($child)
                     Log -message "$filename ADDING REMOVABLE COMMENT $name"
                     Break
