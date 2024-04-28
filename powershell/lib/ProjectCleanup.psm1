@@ -19,7 +19,7 @@ param (
         foreach($child in $children) {
             [string]$name = ($child.Name).ToString().ToUpper()
             if($name -eq "#COMMENT") {
-                $replace = $false;
+                $replace = $false
                 [string]$childValue = ($child.Value).ToString().Trim().ToUpper() 
                 if($childValue -eq "DOTNET 7 FEATURES") {
                     $toRemove.Add($child)
