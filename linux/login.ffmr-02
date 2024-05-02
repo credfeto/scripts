@@ -3,9 +3,9 @@
 flatpak update -y
 flatpak uninstall --unused -y
 
-flatpak run --branch=stable --arch=x86_64 --command=brave --file-forwarding com.brave.Browser --enable-feature=UseOzonPlatform --ozone-platform=wayland @@u %U @@ &
+flatpak run --branch=stable --arch=x86_64 --command=brave --file-forwarding com.brave.Browser --enable-feature=UseOzonePlatform --ozone-platform=wayland @@u %U @@ &
 
-flatpak run com.google.Chrome --enable-feature=UseOzonPlatform --ozone-platform=wayland &
+flatpak run com.google.Chrome --enable-feature=UseOzonePlatform --ozone-platform=wayland &
 
 flatpak run org.mozilla.firefox &
 
@@ -14,3 +14,6 @@ flatpak run com.discordapp.Discord &
 flatpak run org.telegram.desktop &
 
 flatpak run us.zoom.Zoom &
+
+#flatpak run com.toolstack.Folio &
+flatoak run org.kde.marknote &
