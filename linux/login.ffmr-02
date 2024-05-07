@@ -15,5 +15,4 @@ flatpak run org.telegram.desktop &
 
 flatpak run us.zoom.Zoom &
 
-#flatpak run com.toolstack.Folio &
-flatoak run org.kde.marknote &
+flatpak run org.kde.marknote &
