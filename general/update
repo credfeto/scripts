@@ -1,0 +1,6 @@
+#! /bin/sh
+[ -f /usr/bin/flatpak ] && flatpak update -y
+[ -f /usr/bin/yay ] && yay -Syu --noconfirm
+
+
+[ -d /home/markr/work/personal/scripts/docker/baget ] && cd /home/markr/work/personal/scripts/docker/baget && sudo docker compose pull && sudo docker compose up -d && cd
