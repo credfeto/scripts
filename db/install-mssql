@@ -34,23 +34,23 @@ done
 [ -z "$SHARED_DATA" ] && die "--data not specified"
 
 echo "Ensuring network installed"
-docker network create multi-host-network
+sudo docker network create multi-host-network
 
 DOCKERIMAGE=mcr.microsoft.com/mssql/server:2022-latest
 echo "Getting container from registry"
-docker pull $DOCKERIMAGE
+sudo docker pull $DOCKERIMAGE
 
 echo "Ensuring Data exists"
-mkdir -p $SHARED_DATA/.db/data
-mkdir -p $SHARED_DATA/.db/logs
-mkdir -p $SHARED_DATA/.db/secrets
+sudo mkdir -p $SHARED_DATA/.db/data
+sudo mkdir -p $SHARED_DATA/.db/logs
+sudo mkdir -p $SHARED_DATA/.db/secrets
 
 echo "Ensuring docker has permission to access $SHARED_DATA"
-chown -R 10001:docker $SHARED_DATA
-chmod -R 700 $SHARED_DATA
+sudo chown -R 10001:docker $SHARED_DATA
+sudo chmod -R 700 $SHARED_DATA
  
 echo "Installing container"
-docker container stop mssql
-docker container rm mssql
+sudo docker container stop mssql
+sudo docker container rm mssql
 
-docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=$PASSWORD" -e "MSSQL_PID=Developer" -p 1433:1433  --name mssql --hostname sql -v $SHARED_DATA/.db/data:/var/opt/mssql/data -v $SHARED_DATA/.db/logs:/var/opt/mssql/logs -v $SHARED_DATA/.db/secrets:/var/opt/mssql/secrets -v/home:/home --network multi-host-network --restart always -d $DOCKERIMAGE
+sudo docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=$PASSWORD" -e "MSSQL_PID=Developer" -p 1433:1433  --name mssql --hostname sql -v $SHARED_DATA/.db/data:/var/opt/mssql/data -v $SHARED_DATA/.db/logs:/var/opt/mssql/logs -v $SHARED_DATA/.db/secrets:/var/opt/mssql/secrets -v/home:/home --network multi-host-network --restart always -d $DOCKERIMAGE
