@@ -1,6 +1,6 @@
 #! /bin/sh
 
-for package in $(dotnet tool list --local | tail -n +3 | cut -f 1 -d " ")
+for package in $(dotnet tool list --local | tail -n +3 | cut -f 1 -d " " | sort)
 do 
   echo "Updating $package..."
   dotnet tool update --local "$package"
