@@ -3,7 +3,7 @@
 flatpak update -y
 flatpak uninstall --unused -y
 
-flatpak run --branch=stable --arch=x86_64 --command=brave --file-forwarding com.brave.Browser --enable-feature=UseOzonePlatform --ozone-platform=wayland @@u %U @@ &
+flatpak run --branch=stable --arch=x86_64 --command=brave --file-forwarding com.brave.Browser --enable-feature=UseOzonePlatform --ozone-platform=wayland &
 
 flatpak run com.google.Chrome --enable-feature=UseOzonePlatform --ozone-platform=wayland &
 
@@ -17,4 +17,4 @@ flatpak run us.zoom.Zoom &
 
 flatpak run org.kde.marknote &
 
-flatpak run --branch=stable --arch=x86_64 --command=com.ghostery.browser --file-forwarding com.ghostery.browser @@u %u @@
+flatpak run --branch=stable --arch=x86_64 --command=com.ghostery.browser --file-forwarding com.ghostery.browser &
