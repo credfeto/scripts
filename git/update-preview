@@ -1,2 +1,2 @@
 #! /bin/sh
-git checkout main && git pull && git checkout depends/dotnet/9/preview && git pull && rebase
+git checkout main && git pull && git checkout depends/sdk/dotnet/9/preview && git pull && rebase
