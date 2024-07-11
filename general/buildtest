@@ -1,0 +1,15 @@
+#! /bin/sh
+BASEDIR=$(dirname "$(readlink -f "$0")")
+
+dotnet clean && \
+  dotnet restore && \
+  dotnet test \
+            -noConsoleLogger \
+            --configuration Release \
+            "/p:Version=0.0.0.1-test" \
+            "/p:IsProduction=false" \
+            --filter FullyQualifiedName\!~Integration \
+            --logger:"trx;LogFilePrefix=testResults" \
+            -nodeReuse:False \
+            -p:NoWarn=MSB4241 \
+            -p:SuppressNETCoreSdkPreviewMessage=true
