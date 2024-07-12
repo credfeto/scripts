@@ -3,6 +3,13 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 
 dotnet clean && \
   dotnet restore && \
+  dotnet build \
+            --configuration Release \
+            "/p:Version=0.0.0.1-test" \
+            "/p:IsProduction=false" \
+            -nodeReuse:False \
+            -p:NoWarn=MSB4241 \
+            -p:SuppressNETCoreSdkPreviewMessage=true && \
   dotnet test \
             -noConsoleLogger \
             --configuration Release \
