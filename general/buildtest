@@ -25,5 +25,5 @@ dotnet clean && \
             --logger:"trx;LogFilePrefix=testResults" \
             -nodeReuse:False \
             -p:NoWarn=MSB4241 \
-            -p:SuppressNETCoreSdkPreviewMessage=true \
+            -p:SuppressNETCoreSdkPreviewMessage=true && \
 echo "***** Completed *****"
