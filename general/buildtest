@@ -1,22 +1,29 @@
 #! /bin/sh
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
+echo "***** Checking... *****" && \
+$BASEDIR/buildcheck && \
+echo "***** Cleaning... *****" && \
 dotnet clean && \
+  echo "***** Restoring... *****" && \
   dotnet restore && \
+  echo "***** Building... *****" && \
   dotnet build \
             --configuration Release \
-            "/p:Version=0.0.0.1-test" \
-            "/p:IsProduction=false" \
+            "-p:Version=0.0.0.1-test" \
+            "-p:IsProduction=false" \
             -nodeReuse:False \
             -p:NoWarn=MSB4241 \
             -p:SuppressNETCoreSdkPreviewMessage=true && \
+  echo "***** Testing... *****" && \
   dotnet test \
             -noConsoleLogger \
             --configuration Release \
-            "/p:Version=0.0.0.1-test" \
-            "/p:IsProduction=false" \
+            "-p:Version=0.0.0.1-test" \
+            "-p:IsProduction=false" \
             --filter FullyQualifiedName\!~Integration \
             --logger:"trx;LogFilePrefix=testResults" \
             -nodeReuse:False \
             -p:NoWarn=MSB4241 \
-            -p:SuppressNETCoreSdkPreviewMessage=true
+            -p:SuppressNETCoreSdkPreviewMessage=true \
+echo "***** Completed *****"
