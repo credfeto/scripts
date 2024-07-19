@@ -18,4 +18,4 @@ BRANCH="depends/sdk/dotnet/$DOTNET_PREVIEW_VERSION/preview"
 
 echo "Using Branch: $BRANCH"
 
-git getch && git checkout main && git pull && git checkout -b "$BRANCH"
+git fetch && git checkout main && git pull && git checkout -b "$BRANCH"
