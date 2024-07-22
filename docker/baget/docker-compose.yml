@@ -23,7 +23,7 @@ services:
       - PackageDeletionBehavior=HardDelete
       - Logging__Console__LogLevel__Default=Warning
     volumes:
-      - /home/markr/docker/baget-data/nuget:/var/baget
+      - /cache/baget/nuget:/var/baget
 
   funfair-release:
     image: loicsharma/baget:latest
@@ -45,7 +45,7 @@ services:
       - PackageDeletionBehavior=HardDelete
       - Logging__Console__LogLevel_Default=Warning
     volumes:
-      - /home/markr/docker/baget-data/funfair-release:/var/baget
+      - /cache/baget/funfair-release:/var/baget
 
   funfair-prerelease:
     image: loicsharma/baget:latest
@@ -67,7 +67,7 @@ services:
       - PackageDeletionBehavior=HardDelete
       - Logging__Console__LogLevel_Default=Warning
     volumes:
-      - /home/markr/docker/baget-data/funfair-prerelease:/var/baget
+      - /cache/baget/funfair-prerelease:/var/baget
 
 
   nginx:
