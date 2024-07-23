@@ -28,4 +28,4 @@ sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel 9.0
 # Install/update powershell
 sudo /usr/share/dotnet/dotnet tool update --local PowerShell
 
-rm -f "BASEDIR/dotnet-install.sh"
+rm -f "$BASEDIR/dotnet-install.sh"
