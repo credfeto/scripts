@@ -11,10 +11,10 @@ flatpak run org.mozilla.firefox &
 
 flatpak run --branch=stable --arch=x86_64 --command=com.discordapp.Discord com.discordapp.Discord &
 
-flatpak run org.telegram.desktop &
+flatpak run --branch=stable --arch=x86_64 --command=telegram-desktop --file-forwarding org.telegram.desktop &
 
 flatpak run us.zoom.Zoom &
 
-flatpak run org.kde.marknote &
+flatpak run  --branch=stable --arch=x86_64 --command=marknote --file-forwarding org.kde.marknote &
 
 #flatpak run --branch=stable --arch=x86_64 --command=com.ghostery.browser --file-forwarding com.ghostery.browser &
