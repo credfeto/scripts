@@ -1,6 +1,12 @@
 #! /bin/bash
 
-files=(~/work/thirdparty/wallpapers/*.jpg)
+[ -d "$HOME/work/thirdparty/wallpapers" ] || exit 0
+[ ! -d "$HOME/Pictures/Backgrounds" ] && mkdir "$HOME/Pictures/Backgrounds"
+
+
+files=($HOME/work/thirdparty/wallpapers/*.jpg)
 wallpaper=${files[RANDOM % ${#files[@]}]}
 echo $wallpaper
-cp -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt.jpg"
+cp --reflink -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt.jpg"
+ln -s -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt-link.jpg"
+
