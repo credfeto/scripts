@@ -1,0 +1,6 @@
+#! /bin/bash
+
+files=(~/work/thirdparty/wallpapers/*.jpg)
+wallpaper=${files[RANDOM % ${#files[@]}]}
+echo $wallpaper
+cp -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt.jpg"

@@ -1,5 +1,7 @@
 #! /bin/sh
 
+wallpaper
+
 flatpak update -y
 flatpak uninstall --unused -y
 
