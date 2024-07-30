@@ -410,7 +410,7 @@ projects:
         type: evm
         endpoint: https://4.avax.avalanchego.clients.funfair.io/ext/bc/C/rpc
         evm:
-          chainId: 42161
+          chainId: 43114
         failsafe:
           timeout:
             duration: 15s
@@ -424,7 +424,7 @@ projects:
         type: evm
         endpoint: https://5.avax.avalanchego.clients.funfair.io/ext/bc/C/rpc
         evm:
-          chainId: 42161
+          chainId: 43114
         failsafe:
           timeout:
             duration: 15s
@@ -438,7 +438,7 @@ projects:
         type: evm
         endpoint: https://6.avax.avalanchego.clients.funfair.io/ext/bc/C/rpc
         evm:
-          chainId: 42161
+          chainId: 43114
         failsafe:
           timeout:
             duration: 15s
