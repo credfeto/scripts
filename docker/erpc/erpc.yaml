@@ -252,7 +252,7 @@ projects:
       # Optimism
       - id: op-mainnet-1
         type: evm
-        endpoint: https:/mainnet.optimism.io
+        endpoint: https://mainnet.optimism.io
         evm:
           chainId: 10
         failsafe:
@@ -328,7 +328,7 @@ projects:
       # Polygon
       - id: polygon-mainnet-1
         type: evm
-        endpoint: https:/polygon-rpc.com
+        endpoint: https://polygon-rpc.com
         evm:
           chainId: 137
         failsafe:
@@ -344,7 +344,7 @@ projects:
       # Base
       - id: base-mainnet-1
         type: evm
-        endpoint: https:/mainnet.base.org
+        endpoint: https://mainnet.base.org
         evm:
           chainId: 8453
         failsafe:
