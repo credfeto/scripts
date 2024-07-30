@@ -4,6 +4,7 @@ services:
 
    rpc:
      container_name: erpc
+     hostname: erpc
      image: ghcr.io/erpc/erpc:latest
      restart: always
      ports:
@@ -11,9 +12,14 @@ services:
        - 4001:4001
      volumes:
        - ./erpc.yaml:/root/erpc.yaml
+     depends_on:
+       - postgresql
+     networks:
+       erpc:
 
    postgresql:
      container_name: postgresql
+     hostname: postgresql
      image: postgres:13.4
      restart: always
      environment:
