@@ -42,7 +42,7 @@ ForEach($file in $files) {
     $properties.DatabaseConfiguration.Provider = "mssql"
     
     Write-Information "  - Setting DatabaseConfiguration:ConnectionString"
-    $properties.DatabaseConfiguration.ConnectionString = "Database=$database;Server=$server;User ID=$user;Password=$password;Application Name=$database;Connection Timeout=60"
+    $properties.DatabaseConfiguration.ConnectionString = "Database=$database;Server=$server;User ID=$user;Password=$password;Application Name=$database;Connection Timeout=60;TrustServerCertificate=true"
 
     $properties | ConvertTo-Json | Out-File -encoding ASCII $fileToUpdate
 }

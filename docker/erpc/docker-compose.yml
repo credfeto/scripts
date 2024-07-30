@@ -1,0 +1,33 @@
+
+services:
+  # docker run -v $(pwd)/erpc.yaml:/root/erpc.yaml -p 4000:4000 -p 4001:4001 ghcr.io/erpc/erpc:latest
+
+   rpc:
+     container_name: erpc
+     image: ghcr.io/erpc/erpc:latest
+     restart: always
+     ports:
+       - 4000:4000
+       - 4001:4001
+     volumes:
+       - ./erpc.yaml:/root/erpc.yaml
+
+   postgresql:
+     container_name: postgresql
+     image: postgres:13.4
+     restart: always
+     environment:
+       POSTGRES_USER: erpc
+       POSTGRES_PASSWORD: erpc
+       POSTGRES_DB: erpc
+     ports:
+       - 5432:5432
+     volumes:
+       - /db/postgresql/erpc:/var/lib/postgresql/data
+     networks:
+       erpc:
+
+networks:
+  erpc:
+    driver: bridge
+

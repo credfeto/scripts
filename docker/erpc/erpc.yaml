@@ -1,0 +1,107 @@
+logLevel: warn
+database:
+  evmJsonRpcCache:
+     driver: postgresql
+     postgresql:
+       connectionUri: postgres://erpc:erpc@postgresql:5432/erpc
+       table: rpc_cache
+server:
+  httpHost: 0.0.0.0
+  httpPort: 4000
+metrics:
+  enabled: true
+  host: 0.0.0.0
+  port: 4001
+projects:
+  - id: main
+    networks:
+      - architecture: evm
+        evm:
+          chainId: 1
+        failsafe:
+          timeout:
+            duration: 30s
+          retry:
+            maxCount: 3
+            delay: 500ms
+            backoffMaxDelay: 10s
+            backoffFactor: 0.3
+            jitter: 500ms
+          hedge:
+            delay: 3000ms
+            maxCount: 2
+      - architecture: evm
+        evm:
+          chainId: 42161
+        failsafe:
+          timeout:
+            duration: 30s
+          retry:
+            maxCount: 5
+            delay: 500ms
+            backoffMaxDelay: 10s
+            backoffFactor: 0.3
+            jitter: 200ms
+          hedge:
+            delay: 1000ms
+            maxCount: 2
+    upstreams:
+      - id: ff-ethereum-1
+        type: evm
+        endpoint: https://1.mainnet.geth.clients.funfair.io
+        evm:
+          chainId: 1
+        failsafe:
+          timeout:
+            duration: 15s
+          retry:
+            maxCount: 2
+            delay: 1000ms
+            backoffMaxDelay: 10s
+            backoffFactor: 0.3
+            jitter: 500ms
+      - id: ff-ethereum-2
+        type: evm   
+        endpoint: https://2.mainnet.geth.clients.funfair.io
+        evm:
+          chainId: 1    
+        failsafe:
+          timeout:
+            duration: 15s
+          retry:
+            maxCount: 2
+            delay: 1000ms
+            backoffMaxDelay: 10s
+            backoffFactor: 0.3
+            jitter: 500ms
+      - id: ff-ethereum-3
+        type: evm   
+        endpoint: https://3.mainnet.geth.clients.funfair.io
+        evm:
+          chainId: 1    
+        failsafe:
+          timeout:
+            duration: 15s
+          retry:
+            maxCount: 2
+            delay: 1000ms
+            backoffMaxDelay: 10s
+            backoffFactor: 0.3
+            jitter: 500ms
+rateLimiters:
+  budgets:
+    - id: default-budget
+      rules:
+        - method: '*'
+          maxCount: 10000
+          period: 1s
+    - id: global-blast
+      rules:
+        - method: '*'
+          maxCount: 1000
+          period: 1s
+    - id: global-quicknode
+      rules:
+        - method: '*'
+          maxCount: 300
+          period: 1s
