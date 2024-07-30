@@ -4,6 +4,3 @@ flatpak update -y
 flatpak uninstall --unused -y
 
 yay -Syu --noconfirm
-
-# Update the wallpaper
-wallpaper
