@@ -121,7 +121,7 @@ projects:
       # Evmos
       - architecture: evm
         evm:
-          chainId: 90001
+          chainId: 9001
         failsafe:
           timeout:
             duration: 30s
