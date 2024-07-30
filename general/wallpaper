@@ -10,3 +10,5 @@ echo $wallpaper
 cp --reflink -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt.jpg"
 ln -s -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt-link.jpg"
 
+[ -d "$HOME/.var/app/us.zoom.Zoom/.zoom/data/VirtualBkgnd_Custom" ] && cp --reflink -f "$wallpaper" "$(find $HOME/.var/app/us.zoom.Zoom/.zoom/data/VirtualBkgnd_Custom/\{*)"
+
