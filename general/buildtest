@@ -1,10 +1,12 @@
 #! /bin/sh
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
-echo "***** Checking... *****" && \
-$BASEDIR/buildcheck && \
-echo "***** Cleaning... *****" && \
-dotnet clean && \
+echo "***** Clearing NuGet cache... *****" && \
+  dotnet nuget locals http-cache --clear && \
+  echo "***** Checking... *****" && \
+  $BASEDIR/buildcheck && \
+  echo "***** Cleaning... *****" && \
+  dotnet clean && \
   echo "***** Restoring... *****" && \
   dotnet restore && \
   echo "***** Building... *****" && \
@@ -26,4 +28,4 @@ dotnet clean && \
             -nodeReuse:False \
             -p:NoWarn=MSB4241 \
             -p:SuppressNETCoreSdkPreviewMessage=true && \
-echo "***** Completed *****"
+  echo "***** Completed *****"
