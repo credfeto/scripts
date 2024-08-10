@@ -237,6 +237,45 @@ show_ssh_key() {
   [ ! -f "$PUBLIC_KEY_FILENAME" ] && die "Public key does not exist: $PUBLIC_KEY_FILENAME"
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
 }
+  
+import_ssh_key() {
+  HOST=
+  SOURCE=
+  while [ $# -gt 0 ]; do
+    key="$1"
+
+    case $key in
+      -h|--host)
+        HOST="$2"
+        shift # past argument
+        shift # past value
+        ;;
+      -s|--source)
+        SOURCE="$2"
+        shift # past argument
+        shift # past value
+        ;;
+      *)    # unknown option
+        shift # past argument
+        ;;
+    esac
+  done
+  
+  [ -z "$HOST" ] && die "--host not specified"
+  [ -z "$SOURCE" ] && die "--source not specified"
+  
+  KEY_BASE_NAME="id_$HOST"
+  PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
+  PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
+  [ -f "$PRIVATE_KEY_FILENAME" ] && die "Private key already exists: $PRIVATE_KEY_FILENAME"
+  [ -f "$PUBLIC_KEY_FILENAME" ] && die "Public key already exists: $PUBLIC_KEY_FILENAME"
+
+  # TODO - Die if existing keys are found
+  # TODO - Die if source key is missing
+  # TODO - Die if source key is invalid
+  # TODO - Copy source key to new key location
+}
+
 
 [ $# -lt 1 ] && die "No action specified"
 
@@ -253,6 +292,8 @@ elif [ "$ACTION" = "rotate" ]; then
   rotate_ssh_key "$@"
 elif [ "$ACTION" = "show" ]; then
   show_ssh_key "$@"
+elif [ "$ACTION" = "import" ]; then
+  import_ssh_key "$@"
 elif [ "$ACTION" = "help"  ] || [ "$ACTION" = "--?" ] || [ "$ACTION" = "--help" ]; then
   echo "$0"
   echo "$0 create --host <host> --comment <comment> [--no-password]"
