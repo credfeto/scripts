@@ -70,6 +70,9 @@ find_host_file() {
   return 1
 }
 
+###############################################################################
+# create_ssh_key
+###############################################################################
 create_ssh_key() {
   HOST=
   COMMENT=
@@ -129,6 +132,9 @@ create_ssh_key() {
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
 }
 
+###############################################################################
+# alias_ssh_key
+###############################################################################
 alias_ssh_key() {
   HOST=
   HOST_ALIAS=
@@ -169,6 +175,9 @@ alias_ssh_key() {
   sed -i s"/Host $HOST/Host $HOST $HOST_ALIAS/" "$SSH_HOSTS_FILE"
 }
 
+###############################################################################
+# rotate_ssh_key
+###############################################################################
 rotate_ssh_key() {
   HOST=
   COMMENT=
@@ -222,6 +231,9 @@ rotate_ssh_key() {
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
 }
 
+###############################################################################
+# revoke_ssh_key
+###############################################################################
 revoke_ssh_key()
 {
   HOST=
@@ -257,6 +269,9 @@ revoke_ssh_key()
   # TODO - better host processing code
 }
 
+###############################################################################
+# show_ssh_key
+###############################################################################
 show_ssh_key() {
   HOST=
   while [ $# -gt 0 ]; do
@@ -289,7 +304,9 @@ show_ssh_key() {
 }
 
 
-
+###############################################################################
+# use_ssh_key
+###############################################################################
 use_ssh_key() {
   HOST=
   while [ $# -gt 0 ]; do
@@ -323,7 +340,10 @@ use_ssh_key() {
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
   ssh-add "$PRIVATE_KEY_FILENAME"
 }
-  
+
+###############################################################################
+# import_ssh_key
+###############################################################################
 import_ssh_key() {
   HOST=
   SOURCE=
@@ -362,6 +382,17 @@ import_ssh_key() {
   # TODO - Copy source key to new key location
 }
 
+###############################################################################
+# audit_ssh_keys
+###############################################################################
+audit_ssh_keys() {
+  # TODO: write
+  # for keyfile in ~/.ssh/id_*; do ssh-keygen -l -f "${keyfile}"; done | uniq
+}
+
+###############################################################################
+# main
+###############################################################################
 
 [ $# -lt 1 ] && die "No action specified"
 
@@ -382,6 +413,8 @@ elif [ "$ACTION" = "use" ]; then
   use_ssh_key "$@"
 elif [ "$ACTION" = "import" ]; then
   import_ssh_key "$@"
+elif [ "$ACTION" = "audit" ]; then
+  audit_ssh_keys "$@"
 elif [ "$ACTION" = "help"  ] || [ "$ACTION" = "--?" ] || [ "$ACTION" = "--help" ]; then
   echo "$0"
   echo "$0 create --host <host> --comment <comment> [--no-password]"
@@ -393,11 +426,5 @@ elif [ "$ACTION" = "help"  ] || [ "$ACTION" = "--?" ] || [ "$ACTION" = "--help" 
 else
   die "Unknown action: $ACTION"
 fi
-
-# TODO: audit
-# for keyfile in ~/.ssh/id_*; do ssh-keygen -l -f "${keyfile}"; done | uniq
-
-# TODO: --use <host>
-# ssh-add <filename to host key>
 
 # TODO: host strict checking https://blog.g3rt.nl/ssh-host-key-validation-strict-yet-user-friendly.html
