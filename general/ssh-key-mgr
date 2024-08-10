@@ -30,7 +30,6 @@ fi
 
 PROG=$0
 BASEDIR="$(dirname "$(readlink -f "$0")")"
-echo "Script Dir: $BASEDIR"
 
 die() {
     echo
@@ -91,9 +90,116 @@ create_ssh_key() {
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
 }
 
+alias_ssh_key() {
+  HOST=
+  HOST_ALIAS=
+  while [ $# -gt 0 ]; do
+    key="$1"
+
+    case $key in
+      -h|--host)
+        HOST="$2"
+        shift # past argument
+        shift # past value
+        ;;
+      -a|--alias)
+        HOST_ALIAS="$2"
+        shift # past argument
+        shift # past value
+        ;;
+      *)    # unknown option
+        shift # past argument
+        ;;
+    esac
+  done
+  
+  [ -z "$HOST" ] && die "--host not specified"
+  [ -z "$HOST_ALIAS" ] && die "--additional-host not specified"
+    
+  sed -i s'/Host $HOST/Host $HOST $HOST_ALIAS/' "$SSH_HOSTS_FILE"
+}
+
+rotate_ssh_key() {
+  HOST=
+  COMMENT=
+  SKIP_PASSWORD=0
+  while [ $# -gt 0 ]; do
+    key="$1"
+
+    case $key in
+      -h|--host)
+        HOST="$2"
+        shift # past argument
+        shift # past value
+        ;;
+      -c|--comment)
+        COMMENT="$2"        
+        shift # past argument
+        shift # past value
+        ;;
+      -n|--no-password)
+        SKIP_PASSWORD=1        
+        shift # past argument
+        ;;
+      *)    # unknown option
+        shift # past argument
+        ;;
+    esac
+  done
+  
+  [ -z "$HOST" ] && die "--host not specified"
+  [ -z "$COMMENT" ] && die "--comment not specified"
+  
+  KEY_BASE_NAME="id_$HOST"
+  PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
+  PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
+  [ -f "$PRIVATE_KEY_FILENAME" ] && die "Private key already exists: $PRIVATE_KEY_FILENAME"
+  [ -f "$PUBLIC_KEY_FILENAME" ] && die "Public key already exists: $PUBLIC_KEY_FILENAME"
+  
+  echo "Creating new SSH key for $HOST"
+  echo "Comment: $COMMENT"
+  echo "Private Key: $PRIVATE_KEY_FILENAME"
+  echo "Public Key: $PRIVATE_KEY_FILENAME"
+  [ "$SKIP_PASSWORD" -eq "1" ] && ssh-keygen -o -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -P "" -f "$PRIVATE_KEY_FILENAME" 
+  [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -o -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME"
+  
+  {
+    echo "Host $HOST"
+    echo "  IdentityFile ~/.ssh/$KEY_BASE_NAME"
+    echo "  IdentitiesOnly yes"
+  } >> "$SSH_HOSTS_FILE"
+  
+  [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
+}
+
+show_ssh_key() {
+  HOST=
+  while [ $# -gt 0 ]; do
+    key="$1"
+
+    case $key in
+      -h|--host)
+        HOST="$2"
+        shift # past argument
+        shift # past value
+        ;;
+      *)    # unknown option
+        shift # past argument
+        ;;
+    esac
+  done
+  
+  [ -z "$HOST" ] && die "--host not specified"
+  
+  KEY_BASE_NAME="id_$HOST"
+  PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
+  PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
+  [ ! -f "$PRIVATE_KEY_FILENAME" ] && die "Private key does not exist: $PRIVATE_KEY_FILENAME"
+  [ ! -f "$PUBLIC_KEY_FILENAME" ] && die "Public key does not exist: $PUBLIC_KEY_FILENAME"
+  [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
+}
+
 [ $# -lt 1 ] && die "No arguments specified"
-
-
 
 ACTION=$1
 shift
@@ -105,9 +211,16 @@ elif [ "$ACTION" = "alias" ]; then
 elif [ "$ACTION" = "revoke" ]; then
   echo "Revoking SSH key"
 elif [ "$ACTION" = "rotate" ]; then
-  echo "Revoking SSH key"
+  rotate_ssh_key "$@"
 elif [ "$ACTION" = "show" ]; then
-  echo "Showing public key"
+  show_ssh_key "$@"
+elif [ "$ACTION" = "help"  ] || [ "$ACTION" = "--?" ] || [ "$ACTION" = "--help" ]; then
+  echo "$0"
+  echo "$0 create --host <host> --comment <comment> [--no-password]"
+  echo "$0 alias --host <host> --additional-host <host>"
+  echo "$0 revoke --host <host>"
+  echo "$0 rotate --host <host> --comment <comment> [--no-password]"
+  echo "$0 show --host <host>"
 else
   die "Invalid action: $ACTION"
 fi
