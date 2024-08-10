@@ -5,7 +5,8 @@ SSH_KEY_DIR=$HOME/.ssh
 SSH_HOSTS_FILE=$SSH_KEY_DIR/config
 SSH_KEY_ALGORITHM=ed25519
 # TODO: define a sane number here - don't want to wait for the end of time, but needs to be secure
-SSH_KEY_ROUNDS=1000000000
+#SSH_KEY_ROUNDS=1000000000
+SSH_KEY_ROUNDS=1500
 
 # Ensure SSH key directory exists with sane permissions
 [ ! -d "$SSH_KEY_DIR" ] && mkdir -p "$SSH_KEY_DIR"
@@ -40,6 +41,34 @@ die() {
 
 [ -f "/bin/ssh-keygen" ] || die "ssh-keygen not found"
 [ -f "/bin/sed" ] || die "sed not found"
+[ -f "/bin/cut" ] || die "cut not found"
+[ -f "/bin/grep" ] || die "grep not found"
+
+find_host_file() {
+  SEARCH_HOST=$1
+  grep "^Host\s" "$SSH_HOSTS_FILE" | cut -d' ' -f2- | while read HOST_GROUP;
+  do
+    if [ "$HOST_GROUP" != "*" ]; then
+      for HOST_NAME in $HOST_GROUP;
+      do
+        if [ "$SEARCH_HOST" = "$HOST_NAME" ]; then
+          for FILE_HOST_NAME in $HOST_GROUP;
+          do
+
+            TEST_KEY_BASE_NAME="id_$FILE_HOST_NAME"
+            TEST_PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$TEST_KEY_BASE_NAME"
+            if [ -f "$TEST_PRIVATE_KEY_FILENAME" ]; then
+              echo "$FILE_HOST_NAME"
+              return 0
+            fi;
+          done
+        fi
+      done
+    fi
+  done
+
+  return 1
+}
 
 create_ssh_key() {
   HOST=
@@ -109,7 +138,7 @@ alias_ssh_key() {
         shift # past argument
         shift # past value
         ;;
-      -a|--alias)
+      -a|--additional-host)
         HOST_ALIAS="$2"
         shift # past argument
         shift # past value
@@ -126,7 +155,10 @@ alias_ssh_key() {
   # TODO - check to see if the source host exists and die if not
   # TODO - check to see if the host alias doesn't exist and die if it does
   # TODO - better host processing code
-  sed -i s'/Host $HOST/Host $HOST $HOST_ALIAS/' "$SSH_HOSTS_FILE"
+  # TODO - support using an alias for the host whenever --host is specified for things like 'show' and 'use'
+  #echo "sed -i s"/Host $HOST/Host $HOST $HOST_ALIAS/"" "$SSH_HOSTS_FILE""
+  #-i
+  sed -i s"/Host $HOST/Host $HOST $HOST_ALIAS/" "$SSH_HOSTS_FILE"
 }
 
 rotate_ssh_key() {
@@ -229,13 +261,53 @@ show_ssh_key() {
   done
   
   [ -z "$HOST" ] && die "--host not specified"
+
+  HOST_FILE_HOST=$(find_host_file "$HOST")
+  [ -z "$HOST_FILE_HOST" ] && die "Could not find host key"
   
-  KEY_BASE_NAME="id_$HOST"
+
+  KEY_BASE_NAME="id_$HOST_FILE_HOST"
   PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
   PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
   [ ! -f "$PRIVATE_KEY_FILENAME" ] && die "Private key does not exist: $PRIVATE_KEY_FILENAME"
   [ ! -f "$PUBLIC_KEY_FILENAME" ] && die "Public key does not exist: $PUBLIC_KEY_FILENAME"
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
+}
+
+
+
+use_ssh_key() {
+  HOST=
+  while [ $# -gt 0 ]; do
+    key="$1"
+
+    case $key in
+      -h|--host)
+        HOST="$2"
+        shift # past argument
+        shift # past value
+        ;;
+      *)    # unknown option
+        shift # past argument
+        ;;
+    esac
+  done
+
+  [ -z "$HOST" ] && die "--host not specified"
+
+  [ -z "$SSH_AUTH_SOCK" ] && die "SSH_AUTH_SOCK not defined - is ssh-agent running?  systemctl enable --now --user ssh-agent.service"
+
+  HOST_FILE_HOST=$(find_host_file "$HOST")
+  [ -z "$HOST_FILE_HOST" ] && die "Could not find host key"
+
+  KEY_BASE_NAME="id_$HOST_FILE_HOST"
+
+  PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
+  PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
+  [ ! -f "$PRIVATE_KEY_FILENAME" ] && die "Private key does not exist: $PRIVATE_KEY_FILENAME"
+  [ ! -f "$PUBLIC_KEY_FILENAME" ] && die "Public key does not exist: $PUBLIC_KEY_FILENAME"
+  [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
+  ssh-add "$PRIVATE_KEY_FILENAME"
 }
   
 import_ssh_key() {
@@ -292,6 +364,8 @@ elif [ "$ACTION" = "rotate" ]; then
   rotate_ssh_key "$@"
 elif [ "$ACTION" = "show" ]; then
   show_ssh_key "$@"
+elif [ "$ACTION" = "use" ]; then
+  use_ssh_key "$@"
 elif [ "$ACTION" = "import" ]; then
   import_ssh_key "$@"
 elif [ "$ACTION" = "help"  ] || [ "$ACTION" = "--?" ] || [ "$ACTION" = "--help" ]; then
@@ -301,6 +375,15 @@ elif [ "$ACTION" = "help"  ] || [ "$ACTION" = "--?" ] || [ "$ACTION" = "--help" 
   echo "$0 revoke --host <host>"
   echo "$0 rotate --host <host> --comment <comment> [--no-password]"
   echo "$0 show --host <host>"
+  echo "$0 use --host <host>"
 else
   die "Unknown action: $ACTION"
 fi
+
+# TODO: audit
+# for keyfile in ~/.ssh/id_*; do ssh-keygen -l -f "${keyfile}"; done | uniq
+
+# TODO: --use <host>
+# ssh-add <filename to host key>
+
+# TODO: host strict checking https://blog.g3rt.nl/ssh-host-key-validation-strict-yet-user-friendly.html
