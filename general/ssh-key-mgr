@@ -37,6 +37,9 @@ die() {
     exit 1
 }
 
+[ -f "/bin/ssh-keygen" ] || die "ssh-keygen not found"
+[ -f "/bin/sed" ] || die "sed not found"
+
 create_ssh_key() {
   HOST=
   COMMENT=
@@ -78,8 +81,9 @@ create_ssh_key() {
   echo "Comment: $COMMENT"
   echo "Private Key: $PRIVATE_KEY_FILENAME"
   echo "Public Key: $PRIVATE_KEY_FILENAME"
-  [ "$SKIP_PASSWORD" -eq "1" ] && ssh-keygen -o -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -P "" -f "$PRIVATE_KEY_FILENAME" 
-  [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -o -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME"
+  [ "$SKIP_PASSWORD" -eq "1" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -P "" -f "$PRIVATE_KEY_FILENAME"
+  echo ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME" 
+  [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME"
   
   {
     echo "Host $HOST"
@@ -160,8 +164,8 @@ rotate_ssh_key() {
   echo "Comment: $COMMENT"
   echo "Private Key: $PRIVATE_KEY_FILENAME"
   echo "Public Key: $PRIVATE_KEY_FILENAME"
-  [ "$SKIP_PASSWORD" -eq "1" ] && ssh-keygen -o -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -P "" -f "$PRIVATE_KEY_FILENAME" 
-  [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -o -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME"
+  [ "$SKIP_PASSWORD" -eq "1" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -P "" -f "$PRIVATE_KEY_FILENAME" 
+  [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME"
   
   {
     echo "Host $HOST"
