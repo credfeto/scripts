@@ -101,6 +101,9 @@ create_ssh_key() {
   [ -z "$HOST" ] && die "--host not specified"
   [ -z "$COMMENT" ] && die "--comment not specified"
   
+  HOST_FILE_HOST=$(find_host_file "$HOST")
+  [ ! -z "$HOST_FILE_HOST" ] && die "Host already has key"
+
   KEY_BASE_NAME="id_$HOST"
   PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
   PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
@@ -152,6 +155,11 @@ alias_ssh_key() {
   [ -z "$HOST" ] && die "--host not specified"
   [ -z "$HOST_ALIAS" ] && die "--additional-host not specified"
 
+  #HOST_FILE_HOST=$(find_host_file "$HOST")
+  #[ -z "$HOST_FILE_HOST" ] && die "Could not find host key"
+
+  #KEY_BASE_NAME="id_$HOST_FILE_HOST"
+
   # TODO - check to see if the source host exists and die if not
   # TODO - check to see if the host alias doesn't exist and die if it does
   # TODO - better host processing code
@@ -192,7 +200,10 @@ rotate_ssh_key() {
   [ -z "$HOST" ] && die "--host not specified"
   [ -z "$COMMENT" ] && die "--comment not specified"
   
-  KEY_BASE_NAME="id_$HOST"
+  HOST_FILE_HOST=$(find_host_file "$HOST")
+  [ -z "$HOST_FILE_HOST" ] && die "Could not find host key"
+
+  KEY_BASE_NAME="id_$HOST_FILE_HOST"
   PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
   PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
   # TODO - Die if existing keys are not found
@@ -231,7 +242,10 @@ revoke_ssh_key()
   
   [ -z "$HOST" ] && die "--host not specified"
   
-  KEY_BASE_NAME="id_$HOST"
+  HOST_FILE_HOST=$(find_host_file "$HOST")
+  [ -z "$HOST_FILE_HOST" ] && die "Could not find host key"
+
+  KEY_BASE_NAME="id_$HOST_FILE_HOST"
   PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
   PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
   [ ! -f "$PRIVATE_KEY_FILENAME" ] && die "Private key does not exist: $PRIVATE_KEY_FILENAME"
