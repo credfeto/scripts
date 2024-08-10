@@ -4,6 +4,7 @@
 SSH_KEY_DIR=$HOME/.ssh
 SSH_HOSTS_FILE=$SSH_KEY_DIR/config
 SSH_KEY_ALGORITHM=ed25519
+# TODO: define a sane number here - don't want to wait for the end of time, but needs to be secure
 SSH_KEY_ROUNDS=1000000000
 
 # Ensure SSH key directory exists with sane permissions
@@ -85,6 +86,8 @@ create_ssh_key() {
   echo ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME" 
   [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME"
   
+  # TODO - Check for existing host entry and add missing config if needed
+  # TODO - better host processing code
   {
     echo "Host $HOST"
     echo "  IdentityFile ~/.ssh/$KEY_BASE_NAME"
@@ -119,7 +122,10 @@ alias_ssh_key() {
   
   [ -z "$HOST" ] && die "--host not specified"
   [ -z "$HOST_ALIAS" ] && die "--additional-host not specified"
-    
+
+  # TODO - check to see if the source host exists and die if not
+  # TODO - check to see if the host alias doesn't exist and die if it does
+  # TODO - better host processing code
   sed -i s'/Host $HOST/Host $HOST $HOST_ALIAS/' "$SSH_HOSTS_FILE"
 }
 
@@ -157,6 +163,9 @@ rotate_ssh_key() {
   KEY_BASE_NAME="id_$HOST"
   PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
   PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
+  # TODO - Die if existing keys are not found
+  # TODO - Backup existing keys at this point
+  
   [ -f "$PRIVATE_KEY_FILENAME" ] && die "Private key already exists: $PRIVATE_KEY_FILENAME"
   [ -f "$PUBLIC_KEY_FILENAME" ] && die "Public key already exists: $PUBLIC_KEY_FILENAME"
   
@@ -167,13 +176,39 @@ rotate_ssh_key() {
   [ "$SKIP_PASSWORD" -eq "1" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -P "" -f "$PRIVATE_KEY_FILENAME" 
   [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME"
   
-  {
-    echo "Host $HOST"
-    echo "  IdentityFile ~/.ssh/$KEY_BASE_NAME"
-    echo "  IdentitiesOnly yes"
-  } >> "$SSH_HOSTS_FILE"
-  
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
+}
+
+revoke_ssh_key()
+{
+  HOST=
+  while [ $# -gt 0 ]; do
+    key="$1"
+
+    case $key in
+      -h|--host)
+        HOST="$2"
+        shift # past argument
+        shift # past value
+        ;;
+      *)    # unknown option
+        shift # past argument
+        ;;
+    esac
+  done
+  
+  [ -z "$HOST" ] && die "--host not specified"
+  
+  KEY_BASE_NAME="id_$HOST"
+  PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
+  PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
+  [ ! -f "$PRIVATE_KEY_FILENAME" ] && die "Private key does not exist: $PRIVATE_KEY_FILENAME"
+  [ ! -f "$PUBLIC_KEY_FILENAME" ] && die "Public key does not exist: $PUBLIC_KEY_FILENAME"
+
+  # TODO - Die if existing keys are not found
+  # TODO - Backup existing keys at this point
+  # TODO - Remove host entry from SSH config
+  # TODO - better host processing code
 }
 
 show_ssh_key() {
@@ -203,17 +238,17 @@ show_ssh_key() {
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
 }
 
-[ $# -lt 1 ] && die "No arguments specified"
+[ $# -lt 1 ] && die "No action specified"
 
 ACTION=$1
 shift
 
 if [ "$ACTION" = "create" ]; then
   create_ssh_key "$@"
-elif [ "$ACTION" = "alias" ]; then
-  echo "Creating alias..."
+elif [ "$ACTION" = "alias" ]; then  
+  alias_ssh_key "$@"
 elif [ "$ACTION" = "revoke" ]; then
-  echo "Revoking SSH key"
+  revoke_ssh_key "$@"
 elif [ "$ACTION" = "rotate" ]; then
   rotate_ssh_key "$@"
 elif [ "$ACTION" = "show" ]; then
@@ -226,5 +261,5 @@ elif [ "$ACTION" = "help"  ] || [ "$ACTION" = "--?" ] || [ "$ACTION" = "--help" 
   echo "$0 rotate --host <host> --comment <comment> [--no-password]"
   echo "$0 show --host <host>"
 else
-  die "Invalid action: $ACTION"
+  die "Unknown action: $ACTION"
 fi
