@@ -5,6 +5,7 @@ SSH_KEY_DIR=$HOME/.ssh
 SSH_HOSTS_FILE=$SSH_KEY_DIR/config
 SSH_KEY_ALGORITHM=ed25519
 # TODO: define a sane number here - don't want to wait for the end of time, but needs to be secure
+# See: https://flak.tedunangst.com/post/new-openssh-key-format-and-bcrypt-pbkdf
 #SSH_KEY_ROUNDS=1000000000
 SSH_KEY_ROUNDS=1500
 
@@ -30,7 +31,7 @@ then
   chmod 600 "$SSH_HOSTS_FILE"
 fi 
 
-PROG=$0
+PROG="$(basename "$(readlink -f "$0")")"
 BASEDIR="$(dirname "$(readlink -f "$0")")"
 
 die() {
@@ -389,7 +390,7 @@ audit_ssh_keys() {
   for KEY_FILE in ~/.ssh/id_*; do
 
     if [ -f "$KEY_FILE.pub" ] && [ -f "$KEY_FILE" ] ; then
-        FILENAME=$(basename ${KEY_FILE})
+        FILENAME=$(basename "${KEY_FILE}")
         KEY=$(ssh-keygen -l -f "${KEY_FILE}")
         echo "$FILENAME: $KEY"
     fi | sort
@@ -422,13 +423,30 @@ elif [ "$ACTION" = "import" ]; then
 elif [ "$ACTION" = "audit" ]; then
   audit_ssh_keys "$@"
 elif [ "$ACTION" = "help"  ] || [ "$ACTION" = "--?" ] || [ "$ACTION" = "--help" ]; then
-  echo "$0"
-  echo "$0 create --host <host> --comment <comment> [--no-password]"
-  echo "$0 alias --host <host> --additional-host <host>"
-  echo "$0 revoke --host <host>"
-  echo "$0 rotate --host <host> --comment <comment> [--no-password]"
-  echo "$0 show --host <host>"
-  echo "$0 use --host <host>"
+  echo "SSH Key manager"
+  echo ""
+  echo "Usage:"
+  echo ""
+  echo "Generate a new SSH Key for a host"
+  echo " $PROG create --host <host> --comment <comment> [--no-password]"
+  echo ""
+  echo "Add an alias to use an existing key for another host"
+  echo " $PROG alias --host <host> --additional-host <host>"
+  echo ""
+  echo "Revoke an SSH Key"
+  echo " $PROG revoke --host <host>"
+  echo ""
+  echo "Replace an SSH Key generating a new one"
+  echo " $PROG rotate --host <host> --comment <comment> [--no-password]"
+  echo ""
+  echo "Show the public key for a host"
+  echo " $PROG show --host <host>"
+  echo ""
+  echo "Unlock an SSH Private key for a host and add to the ssh-agent"
+  echo " $PROG use --host <host>"
+  echo ""
+  echo "Audit the encryption details of all installed keys"
+  echo " $PROG audit"
 else
   die "Unknown action: $ACTION"
 fi
