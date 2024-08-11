@@ -1,8 +1,73 @@
 #! /bin/sh
 
+###############################################################################
+# SSH Key Manager
+#
+# Wrapper for using SSH keys per host with the host and identity file stored
+# and managed in ~/.ssh/config
+#
+###############################################################################
 
+
+###############################################################################
+# Usage:
+#
+# Generate a new SSH Key for a host
+#
+#   ssh-key-mgr create --host <host> --comment <comment> [--no-password]
+#
+#
+# Add an alias to use an existing key for another host
+#
+#   ssh-key-mgr alias --host <host> --additional-host <host>
+#
+# Revoke an SSH Key
+#
+#  ssh-key-mgr revoke --host <host>
+#
+#  ** Moves the old key into .ssh/revoked/<key> and removes the host entry 
+#     from the .ssh/config
+#
+#
+# Replace an SSH Key generating a new one
+#
+#   ssh-key-mgr rotate --host <host> --comment <comment> [--no-password]
+#
+#  ** Moves the old key into .ssh/old/<key>
+#
+#
+# Show the public key for a host
+#
+#   ssh-key-mgr show --host <host>
+#
+#
+# Unlock an SSH Private key for a host and add to the ssh-agent
+#
+#   ssh-key-mgr use --host <host>
+#  ** Requires ssh-agent to be running -run :
+# 
+#     systemctl enable --now --user ssh-agent.service
+#
+#  ** and make sure SSH_AUTH_SOCK environment variable is set   
+#
+#
+# Audit the encryption details of all installed keys
+#
+#   ssh-key-mgr audit
+#
+###############################################################################
+
+################################################################################
+# Configuration
+###############################################################################
+
+# SSH Key Directory
 SSH_KEY_DIR=$HOME/.ssh
+
+# SSH Hosts File / SSH Config file
 SSH_HOSTS_FILE=$SSH_KEY_DIR/config
+
+## Key algorithm to use
 SSH_KEY_ALGORITHM=ed25519
 
 # TODO: define a sane number here - don't want to wait for the end of time, but needs to be secure
