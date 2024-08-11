@@ -4,6 +4,7 @@
 SSH_KEY_DIR=$HOME/.ssh
 SSH_HOSTS_FILE=$SSH_KEY_DIR/config
 SSH_KEY_ALGORITHM=ed25519
+
 # TODO: define a sane number here - don't want to wait for the end of time, but needs to be secure
 # See: https://flak.tedunangst.com/post/new-openssh-key-format-and-bcrypt-pbkdf
 #SSH_KEY_ROUNDS=1000000000
@@ -27,6 +28,10 @@ then
     echo ""
     echo "  # Require Identity File"
     echo "  IdentitiesOnly yes"  
+    echo "  # SSH Agent"
+    echo "  AddKeysToAgent no"
+    echo ""
+
   } > "$SSH_HOSTS_FILE"
   chmod 600 "$SSH_HOSTS_FILE"
 fi 
@@ -47,7 +52,7 @@ die() {
 
 find_host_file() {
   SEARCH_HOST=$1
-  grep "^Host\s" "$SSH_HOSTS_FILE" | cut -d' ' -f2- | while read HOST_GROUP;
+  grep "^Host\s" "$SSH_HOSTS_FILE" | cut -d' ' -f2- | while read -r HOST_GROUP;
   do
     if [ "$HOST_GROUP" != "*" ]; then
       for HOST_NAME in $HOST_GROUP;
@@ -69,6 +74,20 @@ find_host_file() {
   done
 
   return 1
+}
+
+add_config_host_entry() {
+  HOST=$1
+  KEY_BASE_NAME=$1
+  
+  # TODO - better host processing code
+  {
+    echo "Host $HOST"
+    echo "  IdentityFile ~/.ssh/$KEY_BASE_NAME"
+    echo "  IdentitiesOnly yes"
+    echo "  AddKeysToAgent no"
+    echo ""
+  } >> "$SSH_HOSTS_FILE"
 }
 
 ###############################################################################
@@ -115,20 +134,12 @@ create_ssh_key() {
   [ -f "$PUBLIC_KEY_FILENAME" ] && die "Public key already exists: $PUBLIC_KEY_FILENAME"
   
   echo "Creating new SSH key for $HOST"
-  echo "Comment: $COMMENT"
-  echo "Private Key: $PRIVATE_KEY_FILENAME"
   echo "Public Key: $PRIVATE_KEY_FILENAME"
   [ "$SKIP_PASSWORD" -eq "1" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -P "" -f "$PRIVATE_KEY_FILENAME"
   echo ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME" 
   [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME"
   
-  # TODO - Check for existing host entry and add missing config if needed
-  # TODO - better host processing code
-  {
-    echo "Host $HOST"
-    echo "  IdentityFile ~/.ssh/$KEY_BASE_NAME"
-    echo "  IdentitiesOnly yes"
-  } >> "$SSH_HOSTS_FILE"
+  add_config_host_entry "$HOST" "$KEY_BASE_NAME"
   
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
 }
@@ -162,8 +173,8 @@ alias_ssh_key() {
   [ -z "$HOST" ] && die "--host not specified"
   [ -z "$HOST_ALIAS" ] && die "--additional-host not specified"
 
-  #HOST_FILE_HOST=$(find_host_file "$HOST")
-  #[ -z "$HOST_FILE_HOST" ] && die "Could not find host key"
+  HOST_FILE_HOST=$(find_host_file "$HOST")
+  [ -z "$HOST_FILE_HOST" ] && die "Could not find host key"
 
   #KEY_BASE_NAME="id_$HOST_FILE_HOST"
 
@@ -216,18 +227,27 @@ rotate_ssh_key() {
   KEY_BASE_NAME="id_$HOST_FILE_HOST"
   PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
   PUBLIC_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME.pub"
-  # TODO - Die if existing keys are not found
-  # TODO - Backup existing keys at this point
   
-  [ -f "$PRIVATE_KEY_FILENAME" ] && die "Private key already exists: $PRIVATE_KEY_FILENAME"
-  [ -f "$PUBLIC_KEY_FILENAME" ] && die "Public key already exists: $PUBLIC_KEY_FILENAME"
+  [ ! -f "$PRIVATE_KEY_FILENAME" ] && die "Private key does not exist: $PRIVATE_KEY_FILENAME"
+  [ ! -f "$PUBLIC_KEY_FILENAME" ] && die "Public key does not exist: $PUBLIC_KEY_FILENAME"
+  [ -f "$PRIVATE_KEY_FILENAME.new" ] && rm "$PRIVATE_KEY_FILENAME.new"
+  [ -f "$PRIVATE_KEY_FILENAME.new.pub" ] && rm "$PRIVATE_KEY_FILENAME.new.pub"
   
-  echo "Creating new SSH key for $HOST"
-  echo "Comment: $COMMENT"
-  echo "Private Key: $PRIVATE_KEY_FILENAME"
+  echo "Rotating SSH key for $HOST"
   echo "Public Key: $PRIVATE_KEY_FILENAME"
-  [ "$SKIP_PASSWORD" -eq "1" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -P "" -f "$PRIVATE_KEY_FILENAME" 
-  [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME"
+  [ "$SKIP_PASSWORD" -eq "1" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -P "" -f "$PRIVATE_KEY_FILENAME.new" 
+  [ "$SKIP_PASSWORD" -eq "0" ] && ssh-keygen -a "$SSH_KEY_ROUNDS" -t "$SSH_KEY_ALGORITHM" -C "$COMMENT" -f "$PRIVATE_KEY_FILENAME.new"
+  
+  if [ -f "$PRIVATE_KEY_FILENAME.new" ] && [ -f "$PRIVATE_KEY_FILENAME.new.pub" ]; then
+    [ -d "$SSH_KEY_DIR/old" ] || mkdir -p "$SSH_KEY_DIR/old"
+    
+    # Backup old key files so can recover if needed although this really should be killed for security
+    mv -f "$PUBLIC_KEY_FILENAME" "$SSH_KEY_DIR/old/$KEY_BASE_NAME.old.pub"
+    mv -f "$PRIVATE_KEY_FILENAME" "$SSH_KEY_DIR/old/$KEY_BASE_NAME.old"
+    
+    mv -f "$PRIVATE_KEY_FILENAME.new.pub" "$PUBLIC_KEY_FILENAME"
+    mv -f "$PRIVATE_KEY_FILENAME.new" "$PRIVATE_KEY_FILENAME"
+  fi
   
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
 }
@@ -264,8 +284,10 @@ revoke_ssh_key()
   [ ! -f "$PRIVATE_KEY_FILENAME" ] && die "Private key does not exist: $PRIVATE_KEY_FILENAME"
   [ ! -f "$PUBLIC_KEY_FILENAME" ] && die "Public key does not exist: $PUBLIC_KEY_FILENAME"
 
-  # TODO - Die if existing keys are not found
-  # TODO - Backup existing keys at this point
+  [ -d "$SSH_KEY_DIR/old" ] || mkdir -p "$SSH_KEY_DIR/old"
+  mv -f "$PRIVATE_KEY_FILENAME" "$SSH_KEY_DIR/old/$KEY_BASE_NAME.revoked"
+  mv -f "$PUBLIC_KEY_FILENAME" "$SSH_KEY_DIR/old/$KEY_BASE_NAME.revoked.pub"
+  
   # TODO - Remove host entry from SSH config
   # TODO - better host processing code
 }
@@ -293,8 +315,7 @@ show_ssh_key() {
   [ -z "$HOST" ] && die "--host not specified"
 
   HOST_FILE_HOST=$(find_host_file "$HOST")
-  [ -z "$HOST_FILE_HOST" ] && die "Could not find host key"
-  
+  [ -z "$HOST_FILE_HOST" ] && die "Could not find host key"  
 
   KEY_BASE_NAME="id_$HOST_FILE_HOST"
   PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
@@ -327,8 +348,8 @@ use_ssh_key() {
 
   [ -z "$HOST" ] && die "--host not specified"
 
-  [ -z "$SSH_AUTH_SOCK" ] && die "SSH_AUTH_SOCK not defined - is ssh-agent running?  systemctl enable --now --user ssh-agent.service"
-
+  [ -z "$SSH_AUTH_SOCK" ] && die "SSH_AUTH_SOCK not defined - is ssh-agent running? run systemctl enable --now --user ssh-agent.service"
+  
   HOST_FILE_HOST=$(find_host_file "$HOST")
   [ -z "$HOST_FILE_HOST" ] && die "Could not find host key"
 
@@ -370,6 +391,9 @@ import_ssh_key() {
   
   [ -z "$HOST" ] && die "--host not specified"
   [ -z "$SOURCE" ] && die "--source not specified"
+
+  HOST_FILE_HOST=$(find_host_file "$HOST")
+  [ -z "$HOST_FILE_HOST" ] || die "Host already in the SSH config"
   
   KEY_BASE_NAME="id_$HOST"
   PRIVATE_KEY_FILENAME="$SSH_KEY_DIR/$KEY_BASE_NAME"
@@ -377,10 +401,15 @@ import_ssh_key() {
   [ -f "$PRIVATE_KEY_FILENAME" ] && die "Private key already exists: $PRIVATE_KEY_FILENAME"
   [ -f "$PUBLIC_KEY_FILENAME" ] && die "Public key already exists: $PUBLIC_KEY_FILENAME"
 
-  # TODO - Die if existing keys are found
-  # TODO - Die if source key is missing
+  [ ! -f "$SOURCE" ] && die "Source private key does not exist: $SOURCE"
+  [ ! -f "$SOURCE.pub" ] && die "Source public key does not exist: $SOURCE.pub"
+
   # TODO - Die if source key is invalid
-  # TODO - Copy source key to new key location
+  
+  cp "$SOURCE" "$PRIVATE_KEY_FILENAME"
+  cp "$SOURCE.pub" "$PRIVATE_KEY_FILENAME"
+  
+  add_config_host_entry "$HOST" "$KEY_BASE_NAME"
 }
 
 ###############################################################################
@@ -395,6 +424,9 @@ audit_ssh_keys() {
         echo "$FILENAME: $KEY"
     fi | sort
   done
+  
+  [ -f "$SSH_KEY_DIR/id_rsa" ] && echo "Warning: default id_rsa key files exists"
+  [ -f "$SSH_KEY_DIR/id_ed25519" ] && echo "Warning: default id_ed25519 key files exists"
 }
 
 ###############################################################################
