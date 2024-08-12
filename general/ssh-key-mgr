@@ -425,7 +425,10 @@ use_ssh_key() {
   [ ! -f "$PRIVATE_KEY_FILENAME" ] && die "Private key does not exist: $PRIVATE_KEY_FILENAME"
   [ ! -f "$PUBLIC_KEY_FILENAME" ] && die "Public key does not exist: $PUBLIC_KEY_FILENAME"
   [ -f "$PUBLIC_KEY_FILENAME" ] && cat "$PUBLIC_KEY_FILENAME"
+  
   ssh-add "$PRIVATE_KEY_FILENAME"
+  echo "Loaded Keys:"
+  ssh-add -l
 }
 
 ###############################################################################
