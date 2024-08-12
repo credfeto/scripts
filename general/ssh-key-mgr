@@ -83,7 +83,7 @@ add_config_host_entry() {
   # TODO - better host processing code
   {
     echo "Host $HOST"
-    echo "  IdentityFile ~/.ssh/$KEY_BASE_NAME"
+    echo "  IdentityFile ~/.ssh/id_$KEY_BASE_NAME"
     echo "  IdentitiesOnly yes"
     echo "  AddKeysToAgent no"
     echo ""
