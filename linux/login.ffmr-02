@@ -18,3 +18,5 @@ flatpak run us.zoom.Zoom &
 flatpak run  --branch=stable --arch=x86_64 --command=marknote --file-forwarding org.kde.marknote &
 
 #flatpak run --branch=stable --arch=x86_64 --command=com.ghostery.browser --file-forwarding com.ghostery.browser &
+
+flatpak run com.chatterino.chatterino &
