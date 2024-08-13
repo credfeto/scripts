@@ -115,6 +115,27 @@ die() {
 [ -f "/bin/cut" ] || die "cut not found"
 [ -f "/bin/grep" ] || die "grep not found"
 
+contains_host() {
+  SEARCH_HOST=$1
+  HOST_GROUP=$2
+  FIRST=1
+
+
+  if [ "$HOST_GROUP" != "*" ]; then
+    for HOST_NAME in $HOST_GROUP;
+    do
+      if [ "$FIRST" -eq 0 ] && [ "$SEARCH_HOST" = "$HOST_NAME" ]; then
+        echo "1"
+        return 0
+      fi
+      FIRST=0
+    done
+  fi
+
+  echo "0"
+  return 1
+}
+
 find_host_file() {
   SEARCH_HOST=$1
   grep "^Host\s" "$SSH_HOSTS_FILE" | cut -d' ' -f2- | while read -r HOST_GROUP;
@@ -353,8 +374,39 @@ revoke_ssh_key()
   mv -f "$PRIVATE_KEY_FILENAME" "$SSH_KEY_DIR/old/$KEY_BASE_NAME.revoked"
   mv -f "$PUBLIC_KEY_FILENAME" "$SSH_KEY_DIR/old/$KEY_BASE_NAME.revoked.pub"
   
-  # TODO - Remove host entry from SSH config
-  # TODO - better host processing code
+  # Backup Hosts file
+  cp -f "$SSH_HOSTS_FILE" "$SSH_HOSTS_FILE.old"
+
+
+  # Remove the entry for the host
+  {
+  FOUND=0
+  SAVEIFS=$IFS
+  IFS='\n'
+  cat "$SSH_HOSTS_FILE.old" | while read -r LINE; do
+
+    IFS=$SAVEIFS
+    case $LINE in
+      Host*)
+        FOUND=$(contains_host "$HOST_FILE_HOST" "$LINE")
+        if [ "$FOUND" -eq 0 ]; then
+          echo "$LINE"
+        fi
+
+        ;;
+      *)
+        if [ "$FOUND" -eq 0 ]; then
+          echo "$LINE"
+        fi
+
+        # skip
+        ;;
+    esac
+    IFS='\n'
+  done;
+  } > "$SSH_HOSTS_FILE"
+
+
 }
 
 ###############################################################################
