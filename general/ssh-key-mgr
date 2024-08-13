@@ -75,6 +75,8 @@ SSH_KEY_ALGORITHM=ed25519
 #SSH_KEY_ROUNDS=1000000000
 SSH_KEY_ROUNDS=1500
 
+# TODO: host strict checking https://blog.g3rt.nl/ssh-host-key-validation-strict-yet-user-friendly.html
+
 # Ensure SSH key directory exists with sane permissions
 [ ! -d "$SSH_KEY_DIR" ] && mkdir -p "$SSH_KEY_DIR"
 [ -d "$SSH_KEY_DIR" ] && chmod 700 "$SSH_KEY_DIR"
@@ -627,4 +629,3 @@ else
   die "Unknown action: $ACTION"
 fi
 
-# TODO: host strict checking https://blog.g3rt.nl/ssh-host-key-validation-strict-yet-user-friendly.html
