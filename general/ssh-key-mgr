@@ -165,7 +165,6 @@ add_config_host_entry() {
   HOST=$1
   KEY_BASE_NAME=$1
   
-  # TODO - better host processing code
   {
     echo "Host $HOST"
     echo "  IdentityFile ~/.ssh/id_$KEY_BASE_NAME"
