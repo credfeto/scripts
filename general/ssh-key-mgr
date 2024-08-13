@@ -547,8 +547,9 @@ import_ssh_key() {
   [ ! -f "$SOURCE" ] && die "Source private key does not exist: $SOURCE"
   [ ! -f "$SOURCE.pub" ] && die "Source public key does not exist: $SOURCE.pub"
 
-  # TODO - Die if source key is invalid
-  
+  ssh-keygen -l -f "$SOURCE" || die "$SOURCE: invalid private key"
+  ssh-keygen -l -f "$SOURCE.pub" || die "$SOURCE.pub: invalid private key"
+
   cp "$SOURCE" "$PRIVATE_KEY_FILENAME"
   cp "$SOURCE.pub" "$PRIVATE_KEY_FILENAME"
   
@@ -568,7 +569,7 @@ audit_ssh_keys() {
     fi | sort
   done
   
-  [ -f "$SSH_KEY_DIR/id_rsa" ] && echo "Warning: default id_rsa key files exists"
+  [ -f "$SSH_KEY_DIR/id_rsa" ] && die "Warning: default id_rsa key files exists"
   [ -f "$SSH_KEY_DIR/id_ed25519" ] && echo "Warning: default id_ed25519 key files exists"
 }
 
