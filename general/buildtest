@@ -1,14 +1,31 @@
 #! /bin/sh
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
-echo "***** Clearing NuGet cache... *****" && \
-  dotnet nuget locals http-cache --clear && \
+CLEAR="http-cache"
+  while [ $# -gt 0 ]; do
+    key="$1"
+
+    case $key in
+      -a|--all)
+        CLEAR="all"
+        shift # past argument
+        ;;
+      *)    # unknown option
+        shift # past argument
+        ;;
+    esac
+  done
+
+echo "***** Clearing NuGet cache ($CLEAR)... *****" && \
+  dotnet nuget locals "$CLEAR" --clear && \
+  echo "***** Restoring... *****" && \
+  dotnet tool restore && \
   echo "***** Checking... *****" && \
   $BASEDIR/buildcheck && \
-  echo "***** Cleaning... *****" && \
-  dotnet clean && \
   echo "***** Restoring... *****" && \
   dotnet restore && \
+  echo "***** Cleaning... *****" && \
+  dotnet clean && \
   echo "***** Building... *****" && \
   dotnet build \
             --configuration Release \
