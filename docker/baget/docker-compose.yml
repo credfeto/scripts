@@ -95,3 +95,10 @@ services:
       - ./certs:/etc/nginx/ssl
     ports:
       - 5555:443
+    healthcheck:
+      test: service nginx status || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
