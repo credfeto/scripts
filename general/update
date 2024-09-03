@@ -1,6 +1,6 @@
 #! /bin/sh
 [ -f /usr/bin/flatpak ] && flatpak update -y
-[ -f /usr/bin/yay ] && yay -Syu --noconfirm
+[ -f /usr/bin/yay ] && yay -Syu --noconfirm && yay -Sc --noconfirm
 
 
 [ -f /usr/bin/docker ] && \
