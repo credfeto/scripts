@@ -9,13 +9,13 @@ buildagent-01.funfair.io
 buildagent-02.funfair.io
 
 [ethereum]
-novichok-rpc.funfair.io
-novichok-miner1.funfair.io
-novichok-miner2.funfair.io
+#novichok-rpc.funfair.io
+#novichok-miner1.funfair.io
+#novichok-miner2.funfair.io
 
 [DevEthereum]
-1.ethereum.dev.vpc.funfair.io
-2.ethereum.dev.vpc.funfair.io
+#1.ethereum.dev.vpc.funfair.io
+#2.ethereum.dev.vpc.funfair.io
 
 [StagingEthereum]
 1.ethereum.staging.vpc.funfair.io
@@ -26,8 +26,8 @@ novichok-miner2.funfair.io
 2.ethereum.live.vpc.funfair.io
 
 [LiveWallet]
-1.wallet.live.vpc.funfair.io
-2.wallet.live.vpc.funfair.io
+#1.wallet.live.vpc.funfair.io
+#2.wallet.live.vpc.funfair.io
 
 [Clients]
 1.clients.funfair.io
