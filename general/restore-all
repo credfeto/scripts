@@ -7,6 +7,6 @@ echo "Restoring packages"
 find "$HOME/work" -iname global.json | while read -r key; do
   CURRENT_DIR=$(dirname "$key")
   echo "* $CURRENT_DIR:"
-  cd "$CURRENT_DIR" && dotnet restore && echo "   * done"   
+  cd "$CURRENT_DIR" && dotnet restore && echo "   * done" || echo "   * failed"   
   
 done 
