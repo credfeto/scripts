@@ -14,7 +14,7 @@ services:
       - Storage__Type=FileSystem
       - Storage__Path=/var/baget/packages
       - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/var/baget/baget.db
+      - Database__ConnectionString=Data Source=/var/baget/db/baget.db
       - Search__Type=Database
       - Mirror__Enabled=true
       - Mirror__PackageSource=https://api.nuget.org/v3/index.json
@@ -23,7 +23,8 @@ services:
       - PackageDeletionBehavior=HardDelete
       - Logging__Console__LogLevel__Default=Warning
     volumes:
-      - /cache/baget/nuget:/var/baget
+      - /cache/baget/packages/nuget:/var/baget/packages
+      - /cache/baget/db/nuget:/var/baget/db
     healthcheck:
       test: curl --fail http://localhost/v3/index.json || exit 1
       interval: 30s
@@ -41,7 +42,7 @@ services:
       - Storage__Type=FileSystem
       - Storage__Path=/var/baget/packages
       - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/var/baget/baget.db
+      - Database__ConnectionString=Data Source=/var/baget/db/baget.db
       - Search__Type=Database
       - Mirror__Enabled=true
       - Mirror__PackageSource=https://dotnet-nuget.s3.eu-west-1.amazonaws.com/index.json
@@ -50,7 +51,8 @@ services:
       - PackageDeletionBehavior=HardDelete
       - Logging__Console__LogLevel_Default=Warning
     volumes:
-      - /cache/baget/funfair-release:/var/baget
+      - /cache/baget/packages/funfair-release:/var/baget/packages
+      - /cache/baget/db/funfair-release:/var/baget/db
     healthcheck:
       test: curl --fail http://localhost/v3/index.json || exit 1
       interval: 30s
@@ -68,7 +70,7 @@ services:
       - Storage__Type=FileSystem
       - Storage__Path=/var/baget/packages
       - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/var/baget/baget.db
+      - Database__ConnectionString=Data Source=/var/baget/db/baget.db
       - Search__Type=Database
       - Mirror__Enabled=true
       - Mirror__PackageSource=https://dotnet-nuget-prerelease.s3.eu-west-1.amazonaws.com/index.json
@@ -77,7 +79,8 @@ services:
       - PackageDeletionBehavior=HardDelete
       - Logging__Console__LogLevel_Default=Warning
     volumes:
-      - /cache/baget/funfair-prerelease:/var/baget
+      - /cache/baget/packages/funfair-prerelease:/var/baget/packages
+      - /cache/baget/db/funfair-prerelease:/var/baget/db
     healthcheck:
       test: curl --fail http://localhost/v3/index.json || exit 1
       interval: 30s
