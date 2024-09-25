@@ -10,3 +10,5 @@
    sudo docker compose pull && \
    sudo docker compose up -d && \
    cd
+
+[ -f "$HOME/work/personal/credfeto-systemd/install" ] && "$HOME/work/personal/credfeto-systemd/install"
