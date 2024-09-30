@@ -14,7 +14,7 @@ jobs:
   auto-rebase:
     runs-on: ubuntu-latest
 
-    if: github.ref == 'refs/heads/main' || github.event == 'release'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'release'
     timeout-minutes: 5
     steps:
       - name: "Initialise Workspace"
