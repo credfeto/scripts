@@ -19,7 +19,7 @@ permissions:
 jobs:
   bump-dotnet-sdk-version:
     if: endsWith(github.repository, 'funfair-server-template')
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, build]
 
     steps:
       - name: "Initialise Workspace"
