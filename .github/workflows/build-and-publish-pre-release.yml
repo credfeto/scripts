@@ -27,7 +27,7 @@ permissions:
 jobs:
   build-pre-release:
 
-    runs-on: [self-hosted, linux, build]
+    runs-on: ubuntu-latest
 
     steps:
       - name: "Initialise Workspace"
