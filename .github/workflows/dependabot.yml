@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   auto-rebase:
-    runs-on: [self-hosted, linux, build]
+    runs-on: ubuntu-latest
 
     if: github.ref == 'refs/heads/main' || github.event_name == 'release'
     timeout-minutes: 5
