@@ -1,7 +1,11 @@
 #! /bin/sh
 [ -f /usr/bin/flatpak ] && flatpak update -y
-[ -f /usr/bin/yay ] && yay -Syu --noconfirm && yay -Sc --noconfirm
 
+if [ -f /usr/bin/yay ]; then 
+	yay -Syu --noconfirm && yay -Sc --noconfirm
+else
+	sudo pacman -Syu --noconfirm
+fi
 
 [ -f /usr/bin/docker ] && \
    [ -f /usr/bin/docker-compose ] && \
