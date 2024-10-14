@@ -28,20 +28,29 @@ TOOLS="sleet \
        FunFair.Content.Packager.Cmd \
        FunFair.Content.PackageSigner.Cmd"
 
-echo "Installing tools"
+update() {
+    echo "Updating packages:"
+    for PACKAGE in ${TOOLS}; do
+    do
+        echo "* Updating $PACKAGE..."
+        dotnet tool update --local "$PACKAGE"
+    done
+    echo "All packages updated"
+}
+
+echo "Installing tools:"
 for PACKAGE in ${TOOLS}; do
-    echo "Installing$package..."
+    echo "* Installing $PACKAGE..."
     dotnet tool install --local "$PACKAGE" --create-manifest-if-needed
 done
 
+echo "All tools installed"
+
+
 while true
 do
-    echo "Waiting for new packages"
+    echo "Waiting for new packages..."
     sleep 120
 
-    for PACKAGE in ${TOOLS}; do
-    do
-        echo "Updating $package..."
-        dotnet tool update --local "$PACKAGE"
-    done
+    update
 done
