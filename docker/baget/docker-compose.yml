@@ -11,8 +11,6 @@ services:
     environment:
       POSTGRES_USER: nuget
       POSTGRES_PASSWORD: nuget
-    ports:
-      - 5432:5432
     volumes:
       - /db/postgresql/nuget:/var/lib/postgresql/data
 
@@ -35,22 +33,13 @@ services:
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
       - MaxPackageSizeGiB=10
-      - Logging__Console__LogLevel__Default=Information
-      #- Kestrel__Endpoints__Http__Url=http://localhost:8080
+      - Logging__Console__LogLevel__Default=Warning
     volumes:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/nuget:/data/packages
-      - /cache/baget/db/nuget:/data/db
     depends_on:
       postgresql:
         condition: service_started
-#    ports:
-#      - 8080:8080
-#    healthcheck:
-#      test: curl --fail http://127.0.0.1:8080/health || exit 1
-#      interval: 5s
-#      timeout: 4s
-#      retries: 5
 
   funfair-release:
     image: bagetter/bagetter:latest
@@ -62,8 +51,8 @@ services:
       - ApiKey=Upload
       - Storage__Type=FileSystem
       - Storage__Path=/data/packages
-      - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/data/db/baget.db
+      - Database__Type=PostgreSql
+      - Database__ConnectionString=Server=postgresql;Port=5432;Database=funfair-release;User Id=nuget;Password=nuget;
       - Search__Type=Database
       - Mirror__Enabled=true
       - Mirror__PackageSource=https://dotnet-nuget.s3.eu-west-1.amazonaws.com/index.json
@@ -71,19 +60,14 @@ services:
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
       - MaxPackageSizeGiB=10
-      - Logging__Console__LogLevel_Default=Information
-      #- Kestrel__Endpoints__Http__Url=http://localhost:8080
+      - Logging__Console__LogLevel_Default=Warning
     volumes:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/funfair-release:/data/packages
       - /cache/baget/db/funfair-release:/data/db
-#    ports:
-#      - 8081:8080
-#    healthcheck:
-#      test: curl --fail http://127.0.0.1:8080/health || exit 1
-#      interval: 5s
-#      timeout: 4s
-#      retries: 5
+    depends_on:
+      postgresql:
+        condition: service_started
 
   funfair-prerelease:
     image: bagetter/bagetter:latest
@@ -95,8 +79,8 @@ services:
       - ApiKey=Upload
       - Storage__Type=FileSystem
       - Storage__Path=/data/packages
-      - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/data/db/baget.db
+      - Database__Type=PostgreSql
+      - Database__ConnectionString=Server=postgresql;Port=5432;Database=funfair-prerelease;User Id=nuget;Password=nuget;
       - Search__Type=Database
       - Mirror__Enabled=true
       - Mirror__PackageSource=https://dotnet-nuget-prerelease.s3.eu-west-1.amazonaws.com/index.json
@@ -104,19 +88,14 @@ services:
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
       - MaxPackageSizeGiB=10
-      - Logging__Console__LogLevel_Default=Information
-      #- Kestrel__Endpoints__Http__Url=http://localhost:8080
+      - Logging__Console__LogLevel_Default=Warning
     volumes:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/funfair-prerelease:/data/packages
       - /cache/baget/db/funfair-prerelease:/data/db
-#    ports:
-#      - 8082:8080
-#    healthcheck:
-#      test: curl --fail http://127.0.0.1:8080/health || exit 1
-#      interval: 5s
-#      timeout: 4s
-#      retries: 5
+    depends_on:
+      postgresql:
+        condition: service_started
 
   nginx:
     image: nginx:stable-alpine

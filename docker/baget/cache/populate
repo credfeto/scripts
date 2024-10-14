@@ -8,7 +8,16 @@ echo "Installed SDKS:"
 dotnet --list-sdks
 
 echo "Waiting for start"
-sleep 60
+sleep 30
+
+
+echo "Clearing everything"
+dotnet nuget locals all --clear
+
+
+echo "Restoring tools"
+dotnet tool restore
+
 
 TOOLS="sleet \
        TSQLLint \
@@ -21,17 +30,18 @@ TOOLS="sleet \
 
 echo "Installing tools"
 for PACKAGE in ${TOOLS}; do
+    echo "Installing$package..."
     dotnet tool install --local "$PACKAGE" --create-manifest-if-needed
 done
 
 while true
 do
     echo "Waiting for new packages"
-    sleep 60
+    sleep 120
 
-    for package in $(dotnet tool list --local | tail -n +3 | cut -f 1 -d " " | sort)
+    for PACKAGE in ${TOOLS}; do
     do
-    echo "Updating $package..."
-    dotnet tool update --local "$package"
+        echo "Updating $package..."
+        dotnet tool update --local "$PACKAGE"
     done
 done
