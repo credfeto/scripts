@@ -1,21 +1,37 @@
 #! /bin/sh
 
-echo "Hello World"
-
 export PATH="$PATH:/root/.dotnet/tools"
-
-whoami
 
 echo "HOME: $HOME"
 
+echo "Installed SDKS:"
 dotnet --list-sdks
 
+echo "Waiting for start"
+sleep 60
+
 TOOLS="sleet \
+       TSQLLint \
        FunFair.BuildCheck \
        FunFair.BuildVersion \
-       Credfeto.Changelog.Cmd"
+       Credfeto.Changelog.Cmd \
+       Credfeto.Package.Push \
+       FunFair.Content.Packager.Cmd \
+       FunFair.Content.PackageSigner.Cmd"
 
+echo "Installing tools"
 for PACKAGE in ${TOOLS}; do
-    dotnet tool install --global "$PACKAGE"
+    dotnet tool install --local "$PACKAGE" --create-manifest-if-needed
 done
 
+while true
+do
+    echo "Waiting for new packages"
+    sleep 60
+
+    for package in $(dotnet tool list --local | tail -n +3 | cut -f 1 -d " " | sort)
+    do
+    echo "Updating $package..."
+    dotnet tool update --local "$package"
+    done
+done

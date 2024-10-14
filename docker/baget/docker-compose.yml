@@ -2,7 +2,20 @@
 #version: "3.8"
  
 services:
- 
+
+  postgresql:
+    container_name: postgresql
+    hostname: postgresql
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: nuget
+      POSTGRES_PASSWORD: nuget
+    ports:
+      - 5432:5432
+    volumes:
+      - /db/postgresql/nuget:/var/lib/postgresql/data
+
   nuget:
     image: bagetter/bagetter:latest
     container_name: nuget
@@ -13,8 +26,8 @@ services:
       - ApiKey=Upload
       - Storage__Type=FileSystem
       - Storage__Path=/data/packages
-      - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/data/db/baget.db
+      - Database__Type=PostgreSql
+      - Database__ConnectionString=Server=postgresql;Port=5432;Database=nuget;User Id=nuget;Password=nuget;
       - Search__Type=Database
       - Mirror__Enabled=true
       - Mirror__PackageSource=https://api.nuget.org/v3/index.json
@@ -28,6 +41,9 @@ services:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/nuget:/data/packages
       - /cache/baget/db/nuget:/data/db
+    depends_on:
+      postgresql:
+        condition: service_started
 #    ports:
 #      - 8080:8080
 #    healthcheck:
