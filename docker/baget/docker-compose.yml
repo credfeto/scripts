@@ -4,7 +4,7 @@
 services:
  
   nuget:
-    image: loicsharma/baget:latest
+    image: bagetter/bagetter:latest
     container_name: nuget
     restart: unless-stopped
     stop_grace_period: 500s
@@ -12,27 +12,32 @@ services:
     environment:
       - ApiKey=Upload
       - Storage__Type=FileSystem
-      - Storage__Path=/var/baget/packages
+      - Storage__Path=/data/packages
       - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/var/baget/db/baget.db
+      - Database__ConnectionString=Data Source=/data/db/baget.db
       - Search__Type=Database
       - Mirror__Enabled=true
       - Mirror__PackageSource=https://api.nuget.org/v3/index.json
       - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel__Default=Warning
+      - MaxPackageSizeGiB=10
+      - Logging__Console__LogLevel__Default=Information
+      #- Kestrel__Endpoints__Http__Url=http://localhost:8080
     volumes:
-      - /cache/baget/packages/nuget:/var/baget/packages
-      - /cache/baget/db/nuget:/var/baget/db
+      - /cache/baget/security/nuget:/root/.aspnet
+      - /cache/baget/packages/nuget:/data/packages
+      - /cache/baget/db/nuget:/data/db
+    ports:
+      - 8080:8080
     healthcheck:
-      test: curl --fail http://localhost/v3/index.json || exit 1
-      interval: 30s
-      timeout: 10s
+      test: curl --fail http://127.0.0.1:8080/health || exit 1
+      interval: 5s
+      timeout: 4s
       retries: 5
 
   funfair-release:
-    image: loicsharma/baget:latest
+    image: bagetter/bagetter:latest
     container_name: funfair-release
     restart: unless-stopped
     stop_grace_period: 500s
@@ -40,27 +45,32 @@ services:
     environment:
       - ApiKey=Upload
       - Storage__Type=FileSystem
-      - Storage__Path=/var/baget/packages
+      - Storage__Path=/data/packages
       - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/var/baget/db/baget.db
+      - Database__ConnectionString=Data Source=/data/db/baget.db
       - Search__Type=Database
       - Mirror__Enabled=true
       - Mirror__PackageSource=https://dotnet-nuget.s3.eu-west-1.amazonaws.com/index.json
       - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel_Default=Warning
+      - MaxPackageSizeGiB=10
+      - Logging__Console__LogLevel_Default=Information
+      #- Kestrel__Endpoints__Http__Url=http://localhost:8080
     volumes:
-      - /cache/baget/packages/funfair-release:/var/baget/packages
-      - /cache/baget/db/funfair-release:/var/baget/db
+      - /cache/baget/security/nuget:/root/.aspnet
+      - /cache/baget/packages/funfair-release:/data/packages
+      - /cache/baget/db/funfair-release:/data/db
+    ports:
+      - 8081:8080
     healthcheck:
-      test: curl --fail http://localhost/v3/index.json || exit 1
-      interval: 30s
-      timeout: 10s
+      test: curl --fail http://127.0.0.1:8080/health || exit 1
+      interval: 5s
+      timeout: 4s
       retries: 5
 
   funfair-prerelease:
-    image: loicsharma/baget:latest
+    image: bagetter/bagetter:latest
     container_name: funfair-prerelease
     restart: unless-stopped
     stop_grace_period: 500s
@@ -68,23 +78,28 @@ services:
     environment:
       - ApiKey=Upload
       - Storage__Type=FileSystem
-      - Storage__Path=/var/baget/packages
+      - Storage__Path=/data/packages
       - Database__Type=Sqlite
-      - Database__ConnectionString=Data Source=/var/baget/db/baget.db
+      - Database__ConnectionString=Data Source=/data/db/baget.db
       - Search__Type=Database
       - Mirror__Enabled=true
       - Mirror__PackageSource=https://dotnet-nuget-prerelease.s3.eu-west-1.amazonaws.com/index.json
       - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
       - PackageDeletionBehavior=HardDelete
-      - Logging__Console__LogLevel_Default=Warning
+      - MaxPackageSizeGiB=10
+      - Logging__Console__LogLevel_Default=Information
+      #- Kestrel__Endpoints__Http__Url=http://localhost:8080
     volumes:
-      - /cache/baget/packages/funfair-prerelease:/var/baget/packages
-      - /cache/baget/db/funfair-prerelease:/var/baget/db
+      - /cache/baget/security/nuget:/root/.aspnet
+      - /cache/baget/packages/funfair-prerelease:/data/packages
+      - /cache/baget/db/funfair-prerelease:/data/db
+    ports:
+      - 8082:8080
     healthcheck:
-      test: curl --fail http://localhost/v3/index.json || exit 1
-      interval: 30s
-      timeout: 10s
+      test: curl --fail http://127.0.0.1:8080/health || exit 1
+      interval: 5s
+      timeout: 4s
       retries: 5
 
   nginx:
@@ -100,8 +115,8 @@ services:
       - 5555:443
     healthcheck:
       test: curl --fail http://localhost/health || exit 1
-      interval: 30s
-      timeout: 10s
+      interval: 5s
+      timeout: 4s
       retries: 5
 
 
