@@ -1,0 +1,21 @@
+#! /bin/sh
+
+echo "Hello World"
+
+export PATH="$PATH:/root/.dotnet/tools"
+
+whoami
+
+echo "HOME: $HOME"
+
+dotnet --list-sdks
+
+TOOLS="sleet \
+       FunFair.BuildCheck \
+       FunFair.BuildVersion \
+       Credfeto.Changelog.Cmd"
+
+for PACKAGE in ${TOOLS}; do
+    dotnet tool install --global "$PACKAGE"
+done
+

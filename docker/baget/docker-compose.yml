@@ -126,3 +126,14 @@ services:
       funfair-release:
         condition: service_started
 
+  cache:
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    container_name: cache
+    depends_on:
+      nginx:
+        condition: service_healthy
+    volumes:
+      - ./cache/populate:/root/populate
+      - ./cache/nuget.config:/root/.nuget/NuGet/NuGet.Config
+    command:
+      /root/populate
