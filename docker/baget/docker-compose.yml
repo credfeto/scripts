@@ -1,18 +1,7 @@
 # Version is now obsolete
 #version: "3.8"
- 
-services:
 
-  postgresql:
-    container_name: postgresql
-    hostname: postgresql
-    image: postgres:16
-    restart: always
-    environment:
-      POSTGRES_USER: nuget
-      POSTGRES_PASSWORD: nuget
-    volumes:
-      - /db/postgresql/nuget:/var/lib/postgresql/data
+services:
 
   nuget:
     image: bagetter/bagetter:latest
@@ -21,25 +10,24 @@ services:
     stop_grace_period: 500s
     stop_signal: SIGINT
     environment:
-      - ApiKey=Upload
-      - Storage__Type=FileSystem
-      - Storage__Path=/data/packages
-      - Database__Type=PostgreSql
-      - Database__ConnectionString=Server=postgresql;Port=5432;Database=nuget;User Id=nuget;Password=nuget;
-      - Search__Type=Database
-      - Mirror__Enabled=true
-      - Mirror__PackageSource=https://api.nuget.org/v3/index.json
-      - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
-      - PackageDeletionBehavior=HardDelete
-      - MaxPackageSizeGiB=10
+      - ApiKey=Upload
+      - Database__ConnectionString=Data Source=/data/db/bagetter.db
+      - Database__Type=Sqlite
       - Logging__Console__LogLevel__Default=Warning
+      - MaxPackageSizeGiB=10
+      - MaxVersionsPerPackage=5
+      - Mirror__Enabled=true
+      - Mirror__PackageDownloadTimeoutSeconds=60000
+      - Mirror__PackageSource=https://api.nuget.org/v3/index.json
+      - PackageDeletionBehavior=HardDelete
+      - Search__Type=Database
+      - Storage__Path=/data/packages
+      - Storage__Type=FileSystem
     volumes:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/nuget:/data/packages
-    depends_on:
-      postgresql:
-        condition: service_started
+      - /cache/baget/db/nuget:/data/db
 
   funfair-release:
     image: bagetter/bagetter:latest
@@ -48,26 +36,24 @@ services:
     stop_grace_period: 500s
     stop_signal: SIGINT
     environment:
-      - ApiKey=Upload
-      - Storage__Type=FileSystem
-      - Storage__Path=/data/packages
-      - Database__Type=PostgreSql
-      - Database__ConnectionString=Server=postgresql;Port=5432;Database=funfair-release;User Id=nuget;Password=nuget;
-      - Search__Type=Database
-      - Mirror__Enabled=true
-      - Mirror__PackageSource=https://dotnet-nuget.s3.eu-west-1.amazonaws.com/index.json
-      - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
-      - PackageDeletionBehavior=HardDelete
-      - MaxPackageSizeGiB=10
+      - ApiKey=Upload
+      - Database__ConnectionString=Data Source=/data/db/bagetter.db
+      - Database__Type=Sqlite
       - Logging__Console__LogLevel_Default=Warning
+      - MaxPackageSizeGiB=10
+      - MaxVersionsPerPackage=5
+      - Mirror__Enabled=true
+      - Mirror__PackageDownloadTimeoutSeconds=60000
+      - Mirror__PackageSource=https://dotnet-nuget.s3.eu-west-1.amazonaws.com/index.json
+      - PackageDeletionBehavior=HardDelete
+      - Search__Type=Database
+      - Storage__Path=/data/packages
+      - Storage__Type=FileSystem
     volumes:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/funfair-release:/data/packages
       - /cache/baget/db/funfair-release:/data/db
-    depends_on:
-      postgresql:
-        condition: service_started
 
   funfair-prerelease:
     image: bagetter/bagetter:latest
@@ -76,26 +62,24 @@ services:
     stop_grace_period: 500s
     stop_signal: SIGINT
     environment:
-      - ApiKey=Upload
-      - Storage__Type=FileSystem
-      - Storage__Path=/data/packages
-      - Database__Type=PostgreSql
-      - Database__ConnectionString=Server=postgresql;Port=5432;Database=funfair-prerelease;User Id=nuget;Password=nuget;
-      - Search__Type=Database
-      - Mirror__Enabled=true
-      - Mirror__PackageSource=https://dotnet-nuget-prerelease.s3.eu-west-1.amazonaws.com/index.json
-      - Mirror__PackageDownloadTimeoutSeconds=600
       - AllowPackageOverwrites=true
-      - PackageDeletionBehavior=HardDelete
-      - MaxPackageSizeGiB=10
+      - ApiKey=Upload
+      - Database__ConnectionString=Data Source=/data/db/bagetter.db
+      - Database__Type=Sqlite
       - Logging__Console__LogLevel_Default=Warning
+      - MaxPackageSizeGiB=10
+      - MaxVersionsPerPackage=5
+      - Mirror__Enabled=true
+      - Mirror__PackageDownloadTimeoutSeconds=60000
+      - Mirror__PackageSource=https://dotnet-nuget-prerelease.s3.eu-west-1.amazonaws.com/index.json
+      - PackageDeletionBehavior=HardDelete
+      - Search__Type=Database
+      - Storage__Path=/data/packages
+      - Storage__Type=FileSystem
     volumes:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/funfair-prerelease:/data/packages
       - /cache/baget/db/funfair-prerelease:/data/db
-    depends_on:
-      postgresql:
-        condition: service_started
 
   nginx:
     image: nginx:stable-alpine

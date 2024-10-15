@@ -1,24 +1,6 @@
 #! /bin/sh
 
 export PATH="$PATH:/root/.dotnet/tools"
-
-echo "HOME: $HOME"
-
-echo "Installed SDKS:"
-dotnet --list-sdks
-
-echo "Waiting for start"
-sleep 30
-
-
-echo "Clearing everything"
-dotnet nuget locals all --clear
-
-
-echo "Restoring tools"
-dotnet tool restore
-
-
 TOOLS="sleet \
        TSQLLint \
        FunFair.BuildCheck \
@@ -28,10 +10,24 @@ TOOLS="sleet \
        FunFair.Content.Packager.Cmd \
        FunFair.Content.PackageSigner.Cmd"
 
+echo "HOME: $HOME"
+
+echo "Installed SDKS:"
+dotnet --list-sdks
+
+echo "Waiting for start"
+sleep 30
+
+echo "Clearing everything"
+dotnet nuget locals all --clear
+
+echo "Restoring tools"
+dotnet tool restore
+
+
 update() {
     echo "Updating packages:"
     for PACKAGE in ${TOOLS}; do
-    do
         echo "* Updating $PACKAGE..."
         dotnet tool update --local "$PACKAGE"
     done
@@ -46,11 +42,8 @@ done
 
 echo "All tools installed"
 
-
-while true
-do
-    echo "Waiting for new packages..."
-    sleep 120
-
+while sleep 120; do
     update
+
+    echo "Waiting for new packages..."
 done
