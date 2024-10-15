@@ -28,6 +28,11 @@ services:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/nuget:/data/packages
       - /cache/baget/db/nuget:/data/db
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+      interval: 5s
+      timeout: 4s
+      retries: 5
 
   funfair-release:
     image: bagetter/bagetter:latest
@@ -54,6 +59,11 @@ services:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/funfair-release:/data/packages
       - /cache/baget/db/funfair-release:/data/db
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+      interval: 5s
+      timeout: 4s
+      retries: 5
 
   funfair-prerelease:
     image: bagetter/bagetter:latest
@@ -80,6 +90,11 @@ services:
       - /cache/baget/security/nuget:/root/.aspnet
       - /cache/baget/packages/funfair-prerelease:/data/packages
       - /cache/baget/db/funfair-prerelease:/data/db
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+      interval: 5s
+      timeout: 4s
+      retries: 5
 
   nginx:
     image: nginx:stable-alpine
