@@ -3,6 +3,17 @@
 
 services:
 
+  nuget-postgresql:
+    container_name: nuget-postgresql
+    hostname: postgresql
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: nuget
+      POSTGRES_PASSWORD: nuget
+    volumes:
+      - /cache/baget/db/postgresql:/var/lib/postgresql/data
+
   nuget:
     image: bagetter/bagetter:latest
     container_name: nuget
@@ -12,8 +23,8 @@ services:
     environment:
       - AllowPackageOverwrites=true
       - ApiKey=Upload
-      - Database__ConnectionString=Data Source=/data/db/bagetter.db
-      - Database__Type=Sqlite
+      - Database__ConnectionString=Server=nuget-postgresql;Port=5432;Database=nuget;User Id=nuget;Password=nuget;
+      - Database__Type=PostgreSql
       - Logging__Console__LogLevel__Default=Warning
       - MaxPackageSizeGiB=10
       - MaxVersionsPerPackage=5
@@ -33,6 +44,9 @@ services:
       interval: 5s
       timeout: 4s
       retries: 5
+    depends_on:
+      nuget-postgresql:
+        condition: service_started
 
   funfair-release:
     image: bagetter/bagetter:latest
@@ -43,8 +57,8 @@ services:
     environment:
       - AllowPackageOverwrites=true
       - ApiKey=Upload
-      - Database__ConnectionString=Data Source=/data/db/bagetter.db
-      - Database__Type=Sqlite
+      - Database__ConnectionString=Server=nuget-postgresql;Port=5432;Database=funfair-release;User Id=nuget;Password=nuget;
+      - Database__Type=PostgreSql
       - Logging__Console__LogLevel_Default=Warning
       - MaxPackageSizeGiB=10
       - MaxVersionsPerPackage=5
@@ -64,6 +78,9 @@ services:
       interval: 5s
       timeout: 4s
       retries: 5
+    depends_on:
+      nuget-postgresql:
+        condition: service_started
 
   funfair-prerelease:
     image: bagetter/bagetter:latest
@@ -74,8 +91,8 @@ services:
     environment:
       - AllowPackageOverwrites=true
       - ApiKey=Upload
-      - Database__ConnectionString=Data Source=/data/db/bagetter.db
-      - Database__Type=Sqlite
+      - Database__ConnectionString=Server=nuget-postgresql;Port=5432;Database=funfair-prerelease;User Id=nuget;Password=nuget;
+      - Database__Type=PostgreSql
       - Logging__Console__LogLevel_Default=Warning
       - MaxPackageSizeGiB=10
       - MaxVersionsPerPackage=5
@@ -95,6 +112,9 @@ services:
       interval: 5s
       timeout: 4s
       retries: 5
+    depends_on:
+      nuget-postgresql:
+        condition: service_started
 
   nginx:
     image: nginx:stable-alpine
