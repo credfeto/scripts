@@ -5,7 +5,7 @@ services:
 
   nuget-postgresql:
     container_name: nuget-postgresql
-    hostname: postgresql
+    hostname: nuget-postgresql
     image: postgres:16
     restart: always
     environment:
