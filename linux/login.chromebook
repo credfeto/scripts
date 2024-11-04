@@ -5,5 +5,7 @@ flatpak uninstall --unused -y
 
 flatpak run com.brave.Browser --enable-feature=UseOzonPlatform --ozone-platform=wayland &
 
+flatpak run org.mozilla.Thunderbird &
+
 #flatpak run com.discordapp.Discord &
 
