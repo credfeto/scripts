@@ -34,7 +34,8 @@ echo "***** Clearing NuGet cache ($CLEAR)... *****" && \
             -p:ApiCompatGenerateSuppressionFile=true \
             -nodeReuse:False \
             -p:NoWarn=MSB4241 \
-            -p:SuppressNETCoreSdkPreviewMessage=true && \
+            -p:SuppressNETCoreSdkPreviewMessage=true \
+            -p:Optimize=true && \
   echo "***** Testing... *****" && \
   dotnet test \
             -noConsoleLogger \
@@ -46,5 +47,6 @@ echo "***** Clearing NuGet cache ($CLEAR)... *****" && \
             -p:ApiCompatGenerateSuppressionFile=true \
             -nodeReuse:False \
             -p:NoWarn=MSB4241 \
-            -p:SuppressNETCoreSdkPreviewMessage=true && \
+            -p:SuppressNETCoreSdkPreviewMessage=true \
+            -p:Optimize=true && \
   echo "***** Completed *****"
