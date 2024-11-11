@@ -58,9 +58,17 @@ REPORT="$OUTPUT.xml"
 
 [ -f "$OUTPUT" ] && sudo rm "$OUTPUT"
 
+[ -z "$REDGATE_EMAIL" ] && die "REDGATE_EMAIL not specified"
+[ -z "$REDGATE_PAT" ] && die "REDGATE_PAT not specified"
+
 echo "Running sqlcompare to produce $OUTPUT"
 sudo $BASEDIR/sqlcompare \
   "$HOME" \
+  "/email:$REDGATE_EMAIL" \
+  "/token:$REDGATE_PAT" \
+  /IAgreeToTheEULA \
+  /verbose \
+  /log:VERBOSE \
   /filter:"$FILTER" \
   /options:CaseSensitiveObjectDefinition,ConsiderNextFilegroupInPartitionSchemes,DecryptPost2kEncryptedObjects,DoNotOutputCommentHeader,ForceColumnOrder,IgnoreCertificatesAndCryptoKeys,IgnoreDatabaseAndServerName,IgnoreUserProperties,IgnoreUsersPermissionsAndRoleMemberships,IgnoreWhiteSpace,IgnoreWithElementOrder,IncludeDependencies,NoDeploymentLogging,ThrowOnFileParseFailed,UseCompatibilityLevel \
   /transactionIsolationLevel:SERIALIZABLE \
@@ -78,11 +86,16 @@ sudo $BASEDIR/sqlcompare \
   /database2:"$DB" \
   /username2:"$USER" \
   /password2:"$PASSWORD" \
-  /assertidentical
+  /assertidentical || die "sqlcompare failed"
 
 #  /scriptFile:"$OUTPUT" \
 
+[ ! -f "$LOG" ] && die "No log generated at $LOG"
+[ -f "$LOG" ] && cat "$LOG"
+
 [ ! -f "$OUTPUT" ] && die "No output generated at $OUTPUT"
+
+
 
 echo "Running sqlcmd to import $OUTPUT"
 sqlcmd \

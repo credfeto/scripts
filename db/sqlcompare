@@ -2,9 +2,29 @@
 USER_HOME=$1
 shift # past argument
 
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
 
 docker pull redgate/sqlcompare:latest
-echo "docker run --rm --interactive --tty --mount type=bind,src=$USER_HOME,dst=$USER_HOME --network multi-host-network redgate/sqlcompare:latest /IAgreeToTheEULA ""$@""" 
-docker run --rm --interactive --tty --mount type=bind,src=$USER_HOME,dst=$USER_HOME --network multi-host-network redgate/sqlcompare:latest /IAgreeToTheEULA "$@" 
+echo "docker run --rm \
+        --interactive \
+        --tty \
+        --mount type=bind,src=$USER_HOME,dst=$USER_HOME \
+        --network multi-host-network \
+        -e REDGATE_LICENSING_PAT_EMAIL=$REDGATE_EMAIL \
+        -e REDGATE_LICENSING_PAT_TOKEN=$REDGATE_PAT \
+        redgate/sqlcompare:latest \
+        /IAgreeToTheEULA \
+        ""$@""" 
+docker run --rm \
+  --interactive \
+  --tty \
+  --mount type=bind,src=$USER_HOME,dst=$USER_HOME \
+  --network multi-host-network \
+  redgate/sqlcompare:latest \
+  "$@" 
     
     
