@@ -60,12 +60,12 @@ REPORT="$OUTPUT.xml"
 
 [ -z "$REDGATE_EMAIL" ] && die "REDGATE_EMAIL not specified"
 [ -z "$REDGATE_PAT" ] && die "REDGATE_PAT not specified"
+#  "/email:$REDGATE_EMAIL" \
+#  "/token:$REDGATE_PAT" \
 
 echo "Running sqlcompare to produce $OUTPUT"
 sudo $BASEDIR/sqlcompare \
   "$HOME" \
-  "/email:$REDGATE_EMAIL" \
-  "/token:$REDGATE_PAT" \
   /IAgreeToTheEULA \
   /verbose \
   /log:VERBOSE \
@@ -86,7 +86,7 @@ sudo $BASEDIR/sqlcompare \
   /database2:"$DB" \
   /username2:"$USER" \
   /password2:"$PASSWORD" \
-  /assertidentical || die "sqlcompare failed"
+  /assertidentical
 
 #  /scriptFile:"$OUTPUT" \
 

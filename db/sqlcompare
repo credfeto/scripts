@@ -8,7 +8,9 @@ die() {
     exit 1
 }
 
-docker pull redgate/sqlcompare:latest
+SQLCOMPARE_VERSION=15.3.13
+
+docker pull redgate/sqlcompare:$SQLCOMPARE_VERSION
 echo "docker run --rm \
         --interactive \
         --tty \
@@ -16,7 +18,7 @@ echo "docker run --rm \
         --network multi-host-network \
         -e REDGATE_LICENSING_PAT_EMAIL=$REDGATE_EMAIL \
         -e REDGATE_LICENSING_PAT_TOKEN=$REDGATE_PAT \
-        redgate/sqlcompare:latest \
+        redgate/sqlcompare:$SQLCOMPARE_VERSION \
         /IAgreeToTheEULA \
         ""$@""" 
 docker run --rm \
@@ -24,7 +26,7 @@ docker run --rm \
   --tty \
   --mount type=bind,src=$USER_HOME,dst=$USER_HOME \
   --network multi-host-network \
-  redgate/sqlcompare:latest \
+  redgate/sqlcompare:$SQLCOMPARE_VERSION \
   "$@" 
     
     
