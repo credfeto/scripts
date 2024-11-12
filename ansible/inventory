@@ -22,8 +22,8 @@ buildagent-02.funfair.io
 #2.ethereum.staging.vpc.funfair.io
 
 [LiveEthereum]
-1.ethereum.live.vpc.funfair.io
-2.ethereum.live.vpc.funfair.io
+#1.ethereum.live.vpc.funfair.io
+#2.ethereum.live.vpc.funfair.io
 
 [LiveWallet]
 #1.wallet.live.vpc.funfair.io
