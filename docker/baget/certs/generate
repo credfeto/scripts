@@ -13,7 +13,7 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 DOMAIN=$1
 [ -z "$DOMAIN" ] && die "DOMAIN Not defiled"
 
-ALGORITHM=rsa:4096
+ALGORITHM=rsa:2048
 
 SERVER_KEY="$BASEDIR/$DOMAIN.key"
 SERVER_CRT="$BASEDIR/$DOMAIN.crt"
