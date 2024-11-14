@@ -124,9 +124,10 @@ services:
     stop_signal: SIGINT
     environment:
       - VERDACCIO_PORT=8080
+      - VERDACCIO_PUBLIC_URL=https://npm.local:5555
     volumes:
-      - ./verdacio/conf:/verdaccio/conf
-      - ./verdacio/plugins:/verdaccio/plugins
+      - ./npm/conf:/verdaccio/conf
+      - ./npm/plugins:/verdaccio/plugins
       - /cache/npm/storage:/verdaccio/storage
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://127.0.0.1:8080 || exit 1
