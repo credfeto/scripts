@@ -116,6 +116,19 @@ services:
       nuget-postgresql:
         condition: service_started
 
+  npm:
+    image: verdaccio/verdaccio
+    container_name: npm
+    restart: unless-stopped
+    stop_grace_period: 5s
+    stop_signal: SIGINT
+    environment:
+      - VERDACCIO_PORT=8080
+    volumes:
+      - ./verdacio/conf:/verdaccio/conf \
+      - ./verdacio/plugins:/verdaccio/plugins \
+       - /cache/npm/storage:/verdaccio/storage \
+
   nginx:
     image: nginx:stable-alpine
     container_name: nginx
@@ -138,6 +151,8 @@ services:
       funfair-prerelease:
         condition: service_started
       funfair-release:
+        condition: service_started
+      npm:
         condition: service_started
 
   cache:
