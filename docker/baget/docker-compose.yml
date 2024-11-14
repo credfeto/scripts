@@ -117,7 +117,7 @@ services:
         condition: service_started
 
   npm:
-    image: verdaccio/verdaccio
+    image: verdaccio/verdaccio:latest
     container_name: npm
     restart: unless-stopped
     stop_grace_period: 5s
@@ -125,9 +125,14 @@ services:
     environment:
       - VERDACCIO_PORT=8080
     volumes:
-      - ./verdacio/conf:/verdaccio/conf \
-      - ./verdacio/plugins:/verdaccio/plugins \
-       - /cache/npm/storage:/verdaccio/storage \
+      - ./verdacio/conf:/verdaccio/conf
+      - ./verdacio/plugins:/verdaccio/plugins
+      - /cache/npm/storage:/verdaccio/storage
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://127.0.0.1:8080 || exit 1
+      interval: 5s
+      timeout: 4s
+      retries: 5
 
   nginx:
     image: nginx:stable-alpine
