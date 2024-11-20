@@ -8,7 +8,8 @@ die() {
     exit 1
 }
 
-SQLCOMPARE_VERSION=15.3.13
+#SQLCOMPARE_VERSION=15.3.13
+SQLCOMPARE_VERSION=latest
 
 docker pull redgate/sqlcompare:$SQLCOMPARE_VERSION
 echo "docker run --rm \
@@ -20,7 +21,7 @@ echo "docker run --rm \
         -e REDGATE_LICENSING_PAT_TOKEN=$REDGATE_PAT \
         redgate/sqlcompare:$SQLCOMPARE_VERSION \
         /IAgreeToTheEULA \
-        ""$@""" 
+        ""$@"""  
 docker run --rm \
   --interactive \
   --tty \

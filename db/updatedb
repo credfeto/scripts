@@ -66,6 +66,8 @@ REPORT="$OUTPUT.xml"
 echo "Running sqlcompare to produce $OUTPUT"
 sudo $BASEDIR/sqlcompare \
   "$HOME" \
+  "/email:$REDGATE_EMAIL" \
+  "/token:$REDGATE_PAT" \
   /IAgreeToTheEULA \
   /verbose \
   /log:VERBOSE \
@@ -97,13 +99,13 @@ sudo $BASEDIR/sqlcompare \
 
 
 
-echo "Running sqlcmd to import $OUTPUT"
-sqlcmd \
-  -C \
-  -S "$SQLCOMPARE_SERVER" \
-  -U "$USER" \
-  -P "$PASSWORD" \
-  -d "$DB" \
-  -b \
-  -e \
-  -i "$OUTPUT"
+#echo "Running sqlcmd to import $OUTPUT"
+#sqlcmd \
+#  -C \
+#  -S "$SQLCOMPARE_SERVER" \
+#  -U "$USER" \
+#  -P "$PASSWORD" \
+#  -d "$DB" \
+#  -b \
+#  -e \
+#  -i "$OUTPUT"
