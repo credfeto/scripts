@@ -7,7 +7,9 @@ services:
     container_name: nuget-postgresql
     hostname: nuget-postgresql
     image: postgres:16
-    restart: always
+    restart: unless-stopped
+    stop_grace_period: 500s
+    stop_signal: SIGINT
     environment:
       POSTGRES_USER: nuget
       POSTGRES_PASSWORD: nuget
