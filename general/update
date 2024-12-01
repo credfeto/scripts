@@ -9,9 +9,9 @@ fi
 
 [ -f /usr/bin/docker ] && \
    [ -f /usr/bin/docker-compose ] && \
-   [ -d /home/markr/work/personal/scripts/docker/baget ] && \
+   [ -d /home/markr/work/personal/credfeto-dev-package-cache ] && \
    [ ! -f "$HOME/.no-baget" ] && \
-   cd /home/markr/work/personal/scripts/docker/baget && \
+   cd /home/markr/work/personal/credfeto-dev-package-cache && \
    sudo docker compose pull && \
    sudo docker compose up -d && \
    cd
