@@ -1,0 +1,4 @@
+#! /bin/sh
+
+flatpak uninstall com.brave.Browser -y 
+flatpak install com.brave.Browser -y
