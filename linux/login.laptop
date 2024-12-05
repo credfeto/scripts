@@ -14,3 +14,8 @@ flatpak run com.todoist.Todoist &
 flatpak run com.bitwarden.desktop &
 
 flatpak run org.mozilla.Thunderbird &
+
+flatpak run com.github.iwalton3.jellyfin-media-player &
+
+flatpak run com.ktechpit.whatsie &
+
