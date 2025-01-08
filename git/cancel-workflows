@@ -1,5 +1,18 @@
 #!/bin/bash
 
+
+PROG=$0
+
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
+
+BASEDIR="$(dirname "$(readlink -f "$0")")"
+echo "Script Dir: $BASEDIR"
+
+
 TOKEN=
 REPO=
 
