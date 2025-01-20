@@ -2,11 +2,15 @@ logLevel: warn
 database:
   evmJsonRpcCache:
     connectors:
-     - id: postgresql
-       driver: postgresql
-       postgresql:
-         connectionUri: postgres://erpc:erpc@postgresql:5432/erpc
-         table: rpc_cache
+      - id: postgresql
+        driver: postgresql
+        postgresql:
+          connectionUri: postgres://erpc:erpc@postgresql:5432/erpc
+          table: rpc_cache
+    policies:
+      - network: "*"
+        connector: "postgresql"
+
 server:
   httpHostV4: 0.0.0.0
   httpPort: 4000
