@@ -88,7 +88,7 @@ sudo $BASEDIR/sqlcompare \
   /database2:"$DB" \
   /username2:"$USER" \
   /password2:"$PASSWORD" \
-  /assertidenticala
+  /assertidentical
 
 #  /scriptFile:"$OUTPUT" \
 

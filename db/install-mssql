@@ -34,6 +34,16 @@ done
 [ -z "$PASSWORD" ] && die "--password not specified"
 [ -z "$SHARED_DATA" ] && die "--data not specified"
 
+
+echo "Ensuring Data exists"
+sudo mkdir -p $SHARED_DATA/data
+sudo mkdir -p $SHARED_DATA/logs
+sudo mkdir -p $SHARED_DATA/secrets
+
+echo "Ensuring docker has permission to access $SHARED_DATA"
+sudo chown -R 10001:docker $SHARED_DATA
+sudo chmod -R 700 $SHARED_DATA
+
 {
   echo "PASSWORD=$PASSWORD"
   echo "SHARED_DATA=$SHARED_DATA"
