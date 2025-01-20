@@ -1,0 +1,24 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql
+    hostname: sql
+    ports:
+      - "1433:1433/tcp"
+    volumes:
+      - $SHARED_DATA/db/data:/var/opt/mssql/data
+      - $SHARED_DATA/logs:/var/opt/mssql/logs
+      - $SHARED_DATA/secrets:/var/opt/mssql/secrets
+#      - /home:/home
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: $PASSWORD
+      MSSQL_PID: "Developer"
+    networks:
+      - multi-host-network
+    restart: always
+
+networks:
+  multi-host-network:
+    name: multi-host-network
+    driver: bridge
