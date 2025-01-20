@@ -1,16 +1,18 @@
 logLevel: warn
 database:
   evmJsonRpcCache:
-     driver: postgresql
-     postgresql:
-       connectionUri: postgres://erpc:erpc@postgresql:5432/erpc
-       table: rpc_cache
+    connectors:
+     - id: postgresql
+       driver: postgresql
+       postgresql:
+         connectionUri: postgres://erpc:erpc@postgresql:5432/erpc
+         table: rpc_cache
 server:
-  httpHost: 0.0.0.0
+  httpHostV4: 0.0.0.0
   httpPort: 4000
 metrics:
-  enabled: true
-  host: 0.0.0.0
+  enabled: false
+  hostV4: 0.0.0.0
   port: 4001
 projects:
   - id: main
@@ -23,7 +25,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 3
+            maxAttempts: 3
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -40,7 +42,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 5
+            maxAttempts: 5
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -58,7 +60,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 5
+            maxAttempts: 5
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -75,7 +77,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 5
+            maxAttempts: 5
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -92,7 +94,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 5
+            maxAttempts: 5
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -109,7 +111,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 5
+            maxAttempts: 5
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -126,7 +128,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 5
+            maxAttempts: 5
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -143,7 +145,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 5
+            maxAttempts: 5
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -160,7 +162,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 5
+            maxAttempts: 5
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -177,7 +179,7 @@ projects:
           timeout:
             duration: 30s
           retry:
-            maxCount: 5
+            maxAttempts: 5
             delay: 500ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -185,24 +187,6 @@ projects:
           hedge:
             delay: 1000ms
             maxCount: 2
-
-      # Ethereum Sepolia
-      - architecture: evm
-        evm:
-          chainId: 11155111
-        failsafe:
-          timeout:
-            duration: 30s
-          retry:
-            maxCount: 5
-            delay: 500ms
-            backoffMaxDelay: 10s
-            backoffFactor: 0.3
-            jitter: 200ms
-          hedge:
-            delay: 1000ms
-            maxCount: 2
-
 
     upstreams:
       # Ethereum Mainnet
@@ -215,7 +199,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -229,7 +213,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -243,7 +227,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -259,7 +243,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -275,7 +259,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -291,7 +275,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -305,7 +289,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -319,7 +303,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -335,7 +319,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -351,7 +335,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -367,7 +351,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -383,7 +367,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -399,7 +383,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -415,7 +399,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -429,7 +413,7 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
@@ -443,56 +427,12 @@ projects:
           timeout:
             duration: 15s
           retry:
-            maxCount: 2
+            maxAttempts: 2
             delay: 1000ms
             backoffMaxDelay: 10s
             backoffFactor: 0.3
             jitter: 500ms
       
-      # Ethereum Sepolia            
-      - id: ff-ethereum-mainnet-1
-        type: evm
-        endpoint: https://1.sepolia.geth.clients.funfair.io
-        evm:
-          chainId: 11155111
-        failsafe:
-          timeout:
-            duration: 15s
-          retry:
-            maxCount: 2
-            delay: 1000ms
-            backoffMaxDelay: 10s
-            backoffFactor: 0.3
-            jitter: 500ms
-      - id: ff-ethereum-mainnet-2
-        type: evm
-        endpoint: https://2.sepolia.geth.clients.funfair.io
-        evm:
-          chainId: 11155111
-        failsafe:
-          timeout:
-            duration: 15s
-          retry:
-            maxCount: 2
-            delay: 1000ms
-            backoffMaxDelay: 10s
-            backoffFactor: 0.3
-            jitter: 500ms
-      - id: ff-ethereum-mainnet-3
-        type: evm
-        endpoint: https://3.sepolia.geth.clients.funfair.io
-        evm:
-          chainId: 11155111
-        failsafe:
-          timeout:
-            duration: 15s
-          retry:
-            maxCount: 2
-            delay: 1000ms
-            backoffMaxDelay: 10s
-            backoffFactor: 0.3
-            jitter: 500ms
-
 
 rateLimiters:
   budgets:
