@@ -1,0 +1,3 @@
+#! /bin/sh
+
+dotnet build && git add -A && git commit -m"Code Cleanup" && git push
