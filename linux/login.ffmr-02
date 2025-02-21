@@ -13,7 +13,7 @@ flatpak run --branch=stable --arch=x86_64 --command=telegram-desktop --file-forw
 
 flatpak run us.zoom.Zoom &
 
-flatpak run  --branch=stable --arch=x86_64 --command=marknote --file-forwarding org.kde.marknote &
+flatpak run org.kde.klevernotes /home/markr/work/personal/notes &
 
 flatpak run com.chatterino.chatterino &
 
