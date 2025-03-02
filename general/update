@@ -2,18 +2,11 @@
 [ -f /usr/bin/flatpak ] && flatpak update -y
 
 if [ -f /usr/bin/yay ]; then 
-	yay -Syu --noconfirm && yay -Sc --noconfirm
+	yay -Syu --noconfirm
+	sudo rm -fr /var/cache/pacman/pkg/download-*
+	yay -Sc --noconfirm
 else
 	sudo pacman -Syu --noconfirm
 fi
-
-#[ -f /usr/bin/docker ] && \
-#   [ -f /usr/bin/docker-compose ] && \
-#   [ -d /home/markr/work/personal/credfeto-dev-package-cache ] && \
-#   [ ! -f "$HOME/.no-baget" ] && \
-#   cd /home/markr/work/personal/credfeto-dev-package-cache && \
-#   sudo docker compose pull && \
-#   sudo docker compose up -d && \
-#   cd
 
 [ -f "$HOME/work/personal/credfeto-systemd/install" ] && "$HOME/work/personal/credfeto-systemd/install"
