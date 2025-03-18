@@ -1,12 +1,19 @@
 #! /bin/sh
-[ -f /usr/bin/flatpak ] && flatpak update -y
 
-if [ -f /usr/bin/yay ]; then 
-	yay -Syu --noconfirm
-	sudo rm -fr /var/cache/pacman/pkg/download-*
-	yay -Sc --noconfirm
+if [ -f /usr/bin/topgrade ]; then
+  /usr/bin/topgrade -y  
 else
-	sudo pacman -Syu --noconfirm
+
+  [ -f /usr/bin/flatpak ] && flatpak update -y
+
+  if [ -f /usr/bin/yay ]; then 
+    yay -Syu --noconfirm
+    sudo rm -fr /var/cache/pacman/pkg/download-*
+    yay -Sc --noconfirm
+  else
+    sudo pacman -Syu --noconfirm
+  fi
+
 fi
 
 [ -f "$HOME/work/personal/credfeto-systemd/install" ] && "$HOME/work/personal/credfeto-systemd/install"
