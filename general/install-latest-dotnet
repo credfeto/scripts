@@ -12,7 +12,7 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 
 
 # update dotnet install scripts
-curl https://dot.net/v1/dotnet-install.sh -L -o "$BASEDIR/dotnet-install.sh"
+wget https://dot.net/v1/dotnet-install.sh -O "$BASEDIR/dotnet-install.sh"
 [ ! -f "$BASEDIR/dotnet-install.sh" ] && die "dotnet install script failed"
 
 chmod +x "$BASEDIR/dotnet-install.sh"

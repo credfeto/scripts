@@ -1,0 +1,43 @@
+#! /bin/sh
+
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
+
+BASEDIR=$(dirname "$(readlink -f "$0")")
+
+[ -z "$BASEDIR" ] && die "BASEDIR Not defiled"  
+
+DOMAIN=$1
+[ -z "$DOMAIN" ] && die "DOMAIN Not defiled"
+
+ALGORITHM=rsa:2048
+
+SERVER_KEY="$BASEDIR/$DOMAIN.key"
+SERVER_CRT="$BASEDIR/$DOMAIN.crt"
+SERVER_PFX="$BASEDIR/$DOMAIN.pfx"
+SERVER_PEM="$BASEDIR/$DOMAIN.pem"
+
+openssl req \
+    -newkey "$ALGORITHM" \
+    -x509 \
+    -nodes \
+    -keyout "$SERVER_KEY" \
+    -new \
+    -out "$SERVER_CRT" \
+    -config "$BASEDIR/openssl-custom.cnf" \
+    -sha256 \
+    -days 3650 || die "Failed to create server certificate"
+    
+openssl pkcs12 \
+    -export \
+    -out "$SERVER_PFX" \
+    -inkey "$SERVER_KEY" \
+    -in "$SERVER_CRT" || die "Failed to create $SERVER_PFX"
+    
+openssl pkcs12 \
+    -in "$SERVER_PFX" \
+    -out "$SERVER_PEM" \
+    -nodes  || die "Failed to create $SERVER_PEM"

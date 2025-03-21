@@ -1,0 +1,49 @@
+#! /bin/sh
+
+export PATH="$PATH:/root/.dotnet/tools"
+TOOLS="sleet \
+       TSQLLint \
+       FunFair.BuildCheck \
+       FunFair.BuildVersion \
+       Credfeto.Changelog.Cmd \
+       Credfeto.Package.Push \
+       FunFair.Content.Packager.Cmd \
+       FunFair.Content.PackageSigner.Cmd"
+
+echo "HOME: $HOME"
+
+echo "Installed SDKS:"
+dotnet --list-sdks
+
+echo "Waiting for start"
+sleep 30
+
+echo "Clearing everything"
+dotnet nuget locals all --clear
+
+echo "Restoring tools"
+dotnet tool restore
+
+
+update() {
+    echo "Updating packages:"
+    for PACKAGE in ${TOOLS}; do
+        echo "* Updating $PACKAGE..."
+        dotnet tool update --local "$PACKAGE"
+    done
+    echo "All packages updated"
+}
+
+echo "Installing tools:"
+for PACKAGE in ${TOOLS}; do
+    echo "* Installing $PACKAGE..."
+    dotnet tool install --local "$PACKAGE" --create-manifest-if-needed
+done
+
+echo "All tools installed"
+
+while sleep 120; do
+    update
+
+    echo "Waiting for new packages..."
+done
