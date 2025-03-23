@@ -1395,8 +1395,8 @@ get_download_link_from_aka_ms() {
 get_feeds_to_use()
 {
     feeds=(
-    "https://builds.dotnet.microsoft.com/dotnet"
-    "https://ci.dot.net/public"
+    "http://builds.dotnet.local:5554/dotnet"
+    "http://builds.dotnet.local:5554/dotnet/dotnet"
     )
 
     if [[ -n "$azure_feed" ]]; then
