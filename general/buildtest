@@ -45,7 +45,6 @@ dotnet build \
           -p:Optimize=true || die "######## Build Failed ########"
 echo "***** Testing... *****" 
 dotnet test \
-          -noConsoleLogger \
           --configuration Release \
           "-p:Version=0.0.0.1-test" \
           "-p:IsProduction=false" \
