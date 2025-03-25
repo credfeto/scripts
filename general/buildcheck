@@ -2,6 +2,12 @@
 BASEDIR=$(dirname "$(readlink -f "$0")")
 SOLUTION=$(readlink -f *.sln)
 
-[ -z "$SOLUTION" ] && echo "No Solution found in $(pwd)" && exit 1
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
 
-dotnet buildcheck -Solution "$SOLUTION" -WarningAsErrors true -PreReleaseBuild true
+[ -z "$SOLUTION" ] && die "No Solution found in $(pwd)"
+
+dotnet buildcheck -Solution "$SOLUTION" -WarningAsErrors true -PreReleaseBuild true || die "Check failed"
