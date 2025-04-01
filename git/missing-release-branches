@@ -11,7 +11,7 @@ git log --oneline | while read -r CHANGE; do
     
     FOUND=0
     git branch --remote | while read -r BRANCH; do
-      if [[ $BRANCH =~ REGEX_BRANCH ]]
+      if [[ $BRANCH =~ $REGEX_BRANCH ]]
       then
         FOUND=1
       fi
