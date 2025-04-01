@@ -1,0 +1,30 @@
+#! /bin/bash
+REGEX_CHANGELOG="^([0-9a-zA-Z]*)\s.*Changelog\sfor\s([0-9]*\.[0-9]*\.[0-9]*)$"
+
+git log --oneline | while read -r CHANGE; do 
+  if [[ $CHANGE =~ $REGEX_CHANGELOG ]]
+  then
+    CHANGE_HASH="${BASH_REMATCH[1]}"
+    CHANGE_RELEASE="${BASH_REMATCH[2]}"
+
+    REGEX_BRANCH="^origin/release/\$CHANGE_RELEASE$"
+    
+    FOUND=0
+    git branch --remote | while read -r BRANCH; do
+      if [[ $BRANCH =~ REGEX_BRANCH ]]
+      then
+        FOUND=1
+      fi
+    done
+    
+    if [ "$FOUND" -eq "0" ]
+    then
+      echo "* Found Release $CHANGE_RELEASE at in release/$CHANGE_RELEASE at $CHANGE_HASH"
+    else 
+      echo "- Missing Release $CHANGE_RELEASE in $CHANGE_HASH"
+      git checkout "$CHANGE_HASH" && git checkout -b "release/$CHANGE_RELEASE" && git push
+      git switch main
+    fi
+    
+  fi
+done 
