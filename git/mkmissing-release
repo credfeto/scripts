@@ -1,0 +1,15 @@
+#! /bin/sh
+
+BASEDIR="$(dirname "$(readlink -f "$0")")"
+echo "Script Dir: $BASEDIR"
+
+for line in $(find  $(pwd)/* -name '*.git' -printf '%h\n' | sort -u | grep -v .cache)
+do 
+  echo "$line"
+  CURRENT_DIR=$line  
+
+  echo "==== $CURRENT_DIR ==="
+  cd "$CURRENT_DIR" && "$BASEDIR/missing-release-branches" 
+
+  echo " * done"
+done
