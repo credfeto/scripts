@@ -1,0 +1,3 @@
+#! /bin/sh
+
+grep -riPo --include "*.csproj" 'PackageReference\sInclude=\"(.*)\"' . | cut -d ' ' -f 2 | cut -d '"' -f 2 | sort | uniq
