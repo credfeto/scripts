@@ -1,0 +1,25 @@
+#! /bin/sh
+
+PROG=$0
+
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
+
+BASEDIR="$(dirname "$(readlink -f "$0")")"
+echo "Script Dir: $BASEDIR"
+
+REPOS=personal
+WORKDIR=$HOME/work/$REPOS
+
+[ ! -d "$WORKDIR" ] && mkdir -p "$WORKDIR"
+
+cd "$WORKDIR" || die "Could not switch to $WORKDIR"
+
+curl "https://updates.markridgwell.com/$REPOS-repos.config" -o "$WORKDIR/repos.lst"
+
+clone-repos "$WORKDIR/repos.lst"
+
+fetch
