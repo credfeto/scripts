@@ -1,0 +1,11 @@
+#! /bin/sh
+flatpak install -y com.brave.Browser
+flatpak install -y org.mozilla.firefox
+flatpak install -y io.github.ungoogled_software.ungoogled_chromium
+flatpak install -y com.discordapp.Discord
+flatpak install -y com.spotify.Client
+flatpak install -y com.todoist.Todoist
+flatpak install -y com.bitwarden.desktop
+flatpak install -y org.mozilla.Thunderbird
+flatpak install -y com.github.iwalton3.jellyfin-media-player
+flatpak install -y com.ktechpit.whatsie

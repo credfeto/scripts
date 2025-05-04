@@ -1,0 +1,35 @@
+#! /bin/sh
+
+
+echo "TOOLS: $HOME/.config/dotnet-tools.json"
+
+ls -la "$HOME/.config/dotnet-tools.json"
+
+if [ ! -f "$HOME/.config/dotnet-tools.json" ]; then
+
+  cd $HOME && dotnet new tool-manifest
+
+fi
+
+[ -f "$HOME/.config/dotnet-tools.json" ] || echo "No tool manifest"
+[ -f "$HOME/.config/dotnet-tools.json" ] || exit 1
+
+
+TOOLS="sleet \
+       TSQLLint \
+       FunFair.BuildCheck \
+       FunFair.BuildVersion \
+       Credfeto.Changelog.Cmd \
+       Credfeto.Package.Push \
+       Credfeto.Package.Update \
+       FunFair.Content.Packager.Cmd \
+       FunFair.Content.PackageSigner.Cmd \
+       JetBrains.ReSharper.GlobalTools \
+       powershell \
+       dotnet-reportgenerator-globaltool \
+       csharpier"
+
+for TOOL in $TOOLS; do
+   echo "* $TOOL"
+   dotnet tool install --local "$TOOL"
+done
