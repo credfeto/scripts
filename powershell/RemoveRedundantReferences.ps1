@@ -72,7 +72,15 @@ function IsDoNotRemovePackage {
         return $true
     }
 
+    if($PackageId -eq "xunit.v3") {
+        return $true
+    }
+
     if($PackageId -eq "xunit.runner.visualstudio") {
+        return $true
+    }
+
+    if($PackageId -eq "xunit.runner.visualstudio.v3") {
         return $true
     }
 
