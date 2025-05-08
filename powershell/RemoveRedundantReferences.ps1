@@ -76,6 +76,10 @@ function IsDoNotRemovePackage {
         return $true
     }
 
+    if($PackageId -eq "xunit.v3.extensibility.core") {
+        return $true
+    }
+
     if($PackageId -eq "xunit.runner.visualstudio") {
         return $true
     }
