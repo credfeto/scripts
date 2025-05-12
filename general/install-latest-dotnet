@@ -12,6 +12,11 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 
 PROXY_HOST=http://builds.dotnet.local:5554/dotnet
 
+VERSIONS_TO_INSTALL="6.0 \
+                     7.0 \
+                     8.0 \
+                     9.0 \
+                     10.0"
 # update dotnet install scripts
 
 [ -f "$BASEDIR/dotnet-install.sh" ] && rm -f"$BASEDIR/dotnet-install.sh"
@@ -27,15 +32,19 @@ echo "Changing install script to use local proxy cache..."
 
 chmod +x "$BASEDIR/dotnet-install.sh"
 
-sudo rm -fr /usr/share/dotnet
+[ -d "/usr/share/dotnet" ] && sudo rm -fr /usr/share/dotnet
 
 # update to latest dotnet core
-sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel 6.0
-sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel 7.0
-sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel 8.0
-sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel 9.0
+for VERSION in $VERSIONS_TO_INSTALL; do
+  echo "**********************************************************************************************"
+  echo "* Installing dotnet $VERSION"
+  echo "**********************************************************************************************"
+  echo ""
+  sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel "$VERSION"
+  echo ""
+done
 
 # Install/update powershell
 sudo /usr/share/dotnet/dotnet tool update --local PowerShell
 
-# rm -f "$BASEDIR/dotnet-install.sh"
+dotnet tool restore
