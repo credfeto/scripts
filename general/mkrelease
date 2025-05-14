@@ -1,0 +1,15 @@
+#! /bin/sh
+BASEDIR=$(dirname "$(readlink -f "$0")")
+
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
+
+
+RELEASE=$1
+
+[ -z "$RELEASE" ] && die "Invalid release"
+
+dotnet changelog -c "$RELEASE" && git add -A && git commit -m"Changelog for $RELEASE" && git push
