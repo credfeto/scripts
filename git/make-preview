@@ -1,0 +1,21 @@
+#! /bin/sh
+
+PROG=$0
+
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
+
+BASEDIR="$(dirname "$(readlink -f "$0")")"
+
+. "$BASEDIR/preview-config"
+
+[ -z "$DOTNET_PREVIEW_VERSION" ] && die "DOTNET_PREVIEW_VERSION not defined"
+
+BRANCH="depends/sdk/dotnet/$DOTNET_PREVIEW_VERSION/preview"
+
+echo "Using Branch: $BRANCH"
+
+git fetch && git checkout main && git pull && git checkout -b "$BRANCH" && git push
