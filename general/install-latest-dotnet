@@ -11,6 +11,7 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 [ -z "$BASEDIR" ] && die "BASEDIR Not defiled"  
 
 PROXY_HOST=http://builds.dotnet.local:5554/dotnet
+[ -z "$DOTNET_BUILDS_CDN" ] || PROXY_HOST=$DOTNET_BUILDS_CDN
 
 VERSIONS_TO_INSTALL="6.0 \
                      7.0 \
