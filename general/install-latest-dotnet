@@ -6,11 +6,50 @@ die() {
     exit 1
 }
 
+
+
+# args:
+# zip_path - $1
+# out_path - $2
+# remote_file_size - $3
+extract_dotnet_package() {
+    eval $invocation
+
+    local zip_path="$1"
+    local out_path="$2"
+    local remote_file_size="$3"
+
+    local temp_out_path="$(mktemp -d "$temporary_file_template")"
+
+    local failed=false
+    tar -xzf "$zip_path" -C "$temp_out_path" > /dev/null || failed=true
+ 
+    local folders_with_version_regex='^.*/[0-9]+\.[0-9]+[^/]+/'
+    find "$temp_out_path" -type f | grep -Eo "$folders_with_version_regex" | sort | copy_files_or_dirs_from_list "$temp_out_path" "$out_path" false
+    find "$temp_out_path" -type f | grep -Ev "$folders_with_version_regex" | copy_files_or_dirs_from_list "$temp_out_path" "$out_path" "$override_non_versioned_files"
+
+    validate_remote_local_file_sizes "$zip_path" "$remote_file_size"
+
+    rm -rf "$temp_out_path"
+    if [ -z ${keep_zip+x} ]; then
+        rm -f "$zip_path" && say_verbose "Temporary archive file $zip_path was removed"
+    fi
+
+    if [ "$failed" = true ]; then
+        say_err "Extraction failed"
+        return 1
+    fi
+    return 0
+}
+
+temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
+
+
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
 [ -z "$BASEDIR" ] && die "BASEDIR Not defiled"  
 
-PROXY_HOST=http://builds.dotnet.local:5554/dotnet
+PROXY_HOST=http://builds.dotnet.local:5554
 [ -z "$DOTNET_BUILDS_CDN" ] || PROXY_HOST=$DOTNET_BUILDS_CDN
 
 VERSIONS_TO_INSTALL="6.0 \
@@ -37,10 +76,21 @@ chmod +x "$BASEDIR/dotnet-install.sh"
 
 # update to latest dotnet core
 for VERSION in $VERSIONS_TO_INSTALL; do
+
+  SDK_VERSION=$(curl -L -f "$PROXY_HOST/dotnet/Sdk/$VERSION/latest.version" || die "Could not read SDK Version from $PROXY_HOST/dotnet/Sdk/$VERSION/latest.version")
+
+
+  TEMPORARY_FILE="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
+
+
   echo "**********************************************************************************************"
   echo "* Installing dotnet $VERSION"
+  echo "*      Current SDK: $SDK_VERSION"
   echo "**********************************************************************************************"
   echo ""
+  # curl -L -f "$PROXY_HOSTdotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz" -o "$TEMPORARY_FILE" 
+  #     extract_dotnet_package "$zip_path" "$install_root" "$remote_file_size" || return 1
+
   sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel "$VERSION"
   echo ""
 done
