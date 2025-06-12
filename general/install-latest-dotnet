@@ -11,13 +11,11 @@ die() {
 # args:
 # zip_path - $1
 # out_path - $2
-# remote_file_size - $3
 extract_dotnet_package() {
     eval $invocation
 
     local zip_path="$1"
     local out_path="$2"
-    local remote_file_size="$3"
 
     local temp_out_path="$(mktemp -d "$temporary_file_template")"
 
@@ -28,18 +26,105 @@ extract_dotnet_package() {
     find "$temp_out_path" -type f | grep -Eo "$folders_with_version_regex" | sort | copy_files_or_dirs_from_list "$temp_out_path" "$out_path" false
     find "$temp_out_path" -type f | grep -Ev "$folders_with_version_regex" | copy_files_or_dirs_from_list "$temp_out_path" "$out_path" "$override_non_versioned_files"
 
-    validate_remote_local_file_sizes "$zip_path" "$remote_file_size"
-
     rm -rf "$temp_out_path"
-    if [ -z ${keep_zip+x} ]; then
-        rm -f "$zip_path" && say_verbose "Temporary archive file $zip_path was removed"
-    fi
+    rm -f "$zip_path" && say_verbose "Temporary archive file $zip_path was removed"
+    
 
     if [ "$failed" = true ]; then
         say_err "Extraction failed"
         return 1
     fi
     return 0
+}
+
+# args:
+# input_files - stdin
+# root_path - $1
+# out_path - $2
+# override - $3
+copy_files_or_dirs_from_list() {
+    eval $invocation
+
+    local root_path="$(remove_trailing_slash "$1")"
+    local out_path="$(remove_trailing_slash "$2")"
+    local override="$3"
+    local override_switch="$(get_cp_options "$override")"
+
+    cat | uniq | while read -r file_path; do
+        local path="$(remove_beginning_slash "${file_path#$root_path}")"
+        local target="$out_path/$path"
+        if [ "$override" = true ] || (! ([ -d "$target" ] || [ -e "$target" ])); then
+            sudo mkdir -p "$out_path/$(dirname "$path")"
+            if [ -d "$target" ]; then
+                sudo rm -rf "$target"
+            fi
+            sudo cp -R $override_switch "$root_path/$path" "$target"
+        fi
+    done
+}
+
+# args:
+# override - $1 (boolean, true or false)
+get_cp_options() {
+    eval $invocation
+
+    local override="$1"
+    local override_switch=""
+
+    if [ "$override" = false ]; then
+        override_switch="-n"
+
+        # create temporary files to check if 'cp -u' is supported
+        tmp_dir="$(sudo mktemp -d)"
+        tmp_file="$tmp_dir/testfile"
+        tmp_file2="$tmp_dir/testfile2"
+
+        sudo touch "$tmp_file"
+
+        # use -u instead of -n if it's available
+        if sudo cp -u "$tmp_file" "$tmp_file2" 2>/dev/null; then
+            override_switch="-u"
+        fi
+
+        # clean up
+        sudo rm -f "$tmp_file" "$tmp_file2"
+        sudo rm -rf "$tmp_dir"
+    fi
+
+    echo "$override_switch"
+}
+
+
+# args:
+# input - $1
+remove_trailing_slash() {
+    #eval $invocation
+
+    local input="${1:-}"
+    echo "${input%/}"
+    return 0
+}
+
+# args:
+# input - $1
+remove_beginning_slash() {
+    #eval $invocation
+
+    local input="${1:-}"
+    echo "${input#/}"
+    return 0
+}
+
+say() {
+    # using stream 3 (defined in the beginning) to not interfere with stdout of functions
+    # which may be used as return value
+    printf "%b\n" "${cyan:-}dotnet-install:${normal:-} $1" >&3
+}
+
+say_verbose() {
+    if [ "$verbose" = true ]; then
+        say "$1"
+    fi
 }
 
 temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
@@ -80,18 +165,19 @@ for VERSION in $VERSIONS_TO_INSTALL; do
   SDK_VERSION=$(curl -L -f "$PROXY_HOST/dotnet/Sdk/$VERSION/latest.version" || die "Could not read SDK Version from $PROXY_HOST/dotnet/Sdk/$VERSION/latest.version")
 
 
-  TEMPORARY_FILE="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
+  TEMPORARY_FILE="$(mktemp "$temporary_file_template")"
 
 
   echo "**********************************************************************************************"
-  echo "* Installing dotnet $VERSION"
-  echo "*      Current SDK: $SDK_VERSION"
+  echo "* Installing dotnet: $VERSION"
+  echo "*       Current SDK: $SDK_VERSION"
   echo "**********************************************************************************************"
   echo ""
-  # curl -L -f "$PROXY_HOSTdotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz" -o "$TEMPORARY_FILE" 
-  #     extract_dotnet_package "$zip_path" "$install_root" "$remote_file_size" || return 1
+  curl -L -f "$PROXY_HOST/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz" -o "$TEMPORARY_FILE" || die "Could not download"  
 
-  sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel "$VERSION"
+  extract_dotnet_package "$TEMPORARY_FILE" "/usr/share/dotnet" || die "Could not install" 
+  
+  #sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel "$VERSION"
   echo ""
 done
 
