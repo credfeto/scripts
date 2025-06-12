@@ -144,25 +144,25 @@ VERSIONS_TO_INSTALL="6.0 \
                      10.0"
 # update dotnet install scripts
 
-[ -f "$BASEDIR/dotnet-install.sh" ] && rm -f"$BASEDIR/dotnet-install.sh"
-echo "Downloading Latest install script"
-curl https://dot.net/v1/dotnet-install.sh -L -f -o "$BASEDIR/dotnet-install.sh" || die "Could not download install script"
-[ -f "$BASEDIR/dotnet-install.sh" ] || die "dotnet install script failed"
+#[ -f "$BASEDIR/dotnet-install.sh" ] && rm -f"$BASEDIR/dotnet-install.sh"
+#echo "Downloading Latest install script"
+#curl -s https://dot.net/v1/dotnet-install.sh -L -f -o "$BASEDIR/dotnet-install.sh" || die "Could not download install script"
+#[ -f "$BASEDIR/dotnet-install.sh" ] || die "dotnet install script failed"
 
-echo "Changing install script to use local proxy cache.."
-sed -i "s|https://builds.dotnet.microsoft.com/dotnet|$PROXY_HOST|g" "$BASEDIR/dotnet-install.sh"
-sed -i "s|https://ci.dot.net/public|$PROXY_HOST/dotnet|g" "$BASEDIR/dotnet-install.sh"
-#sed -i "s|https://aka.ms/dotnet|https://builds.dotnet.local:5555/dotnet|g" "$BASEDIR/dotnet-install.sh"
-echo "Changing install script to use local proxy cache..."
+#echo "Changing install script to use local proxy cache.."
+#sed -i "s|https://builds.dotnet.microsoft.com/dotnet|$PROXY_HOST|g" "$BASEDIR/dotnet-install.sh"
+#sed -i "s|https://ci.dot.net/public|$PROXY_HOST/dotnet|g" "$BASEDIR/dotnet-install.sh"
+##sed -i "s|https://aka.ms/dotnet|https://builds.dotnet.local:5555/dotnet|g" "$BASEDIR/dotnet-install.sh"
+#echo "Changing install script to use local proxy cache..."
 
-chmod +x "$BASEDIR/dotnet-install.sh"
+#chmod +x "$BASEDIR/dotnet-install.sh"
 
 [ -d "/usr/share/dotnet" ] && sudo rm -fr /usr/share/dotnet
 
 # update to latest dotnet core
 for VERSION in $VERSIONS_TO_INSTALL; do
 
-  SDK_VERSION=$(curl -L -f "$PROXY_HOST/dotnet/Sdk/$VERSION/latest.version" || die "Could not read SDK Version from $PROXY_HOST/dotnet/Sdk/$VERSION/latest.version")
+  SDK_VERSION=$(curl -s -L -f "$PROXY_HOST/dotnet/Sdk/$VERSION/latest.version" || die "Could not read SDK Version from $PROXY_HOST/dotnet/Sdk/$VERSION/latest.version")
 
 
   TEMPORARY_FILE="$(mktemp "$temporary_file_template")"
@@ -173,9 +173,11 @@ for VERSION in $VERSIONS_TO_INSTALL; do
   echo "*       Current SDK: $SDK_VERSION"
   echo "**********************************************************************************************"
   echo ""
-  curl -L -f "$PROXY_HOST/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz" -o "$TEMPORARY_FILE" || die "Could not download"  
+  curl -s  -L -f "$PROXY_HOST/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz" -o "$TEMPORARY_FILE" || die "Could not download"  
 
   extract_dotnet_package "$TEMPORARY_FILE" "/usr/share/dotnet" || die "Could not install" 
+  
+  /usr/share/dotnet/dotnet --list-sdks
   
   #sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel "$VERSION"
   echo ""
