@@ -134,6 +134,7 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 
 [ -z "$BASEDIR" ] && die "BASEDIR Not defiled"  
 
+DOTNET_SOURCE=https://builds.dotnet.microsoft.com
 PROXY_HOST=http://builds.dotnet.local:5554
 [ -z "$DOTNET_BUILDS_CDN" ] || PROXY_HOST=$DOTNET_BUILDS_CDN
 
@@ -162,7 +163,15 @@ VERSIONS_TO_INSTALL="6.0 \
 # update to latest dotnet core
 for VERSION in $VERSIONS_TO_INSTALL; do
 
-  SDK_VERSION=$(curl -s -L -f "$PROXY_HOST/dotnet/Sdk/$VERSION/latest.version" || die "Could not read SDK Version from $PROXY_HOST/dotnet/Sdk/$VERSION/latest.version")
+  SDK_VERSION=$(curl --connect-timeout 5 \
+                         --max-time 10 \
+                         --retry 5 \
+                         --retry-delay 0 \
+                         --retry-max-time 40 \
+                         -s \
+                         -L \
+                         -f \
+                         "$DOTNET_SOURCE/dotnet/Sdk/$VERSION/latest.version" || die "Could not read SDK Version from $DOTNET_SOURCE/dotnet/Sdk/$VERSION/latest.version")
 
 
   TEMPORARY_FILE="$(mktemp "$temporary_file_template")"
@@ -173,7 +182,15 @@ for VERSION in $VERSIONS_TO_INSTALL; do
   echo "*       Current SDK: $SDK_VERSION"
   echo "**********************************************************************************************"
   echo ""
-  curl -s  -L -f "$PROXY_HOST/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz" -o "$TEMPORARY_FILE" || die "Could not download"  
+  curl --max-time 10 \
+       --retry 5 \
+       --retry-delay 0 \
+       --retry-max-time 40 \
+       -s \
+       -L \
+       -f \
+       "$PROXY_HOST/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz" \
+       -o "$TEMPORARY_FILE" || die "Could not download"  
 
   extract_dotnet_package "$TEMPORARY_FILE" "/usr/share/dotnet" || die "Could not install" 
   
