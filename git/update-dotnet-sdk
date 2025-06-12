@@ -1,0 +1,54 @@
+#! /bin/sh
+
+PROG=$0
+
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
+
+BASEDIR="$(dirname "$(readlink -f "$0")")"
+
+. "$BASEDIR/preview-config"
+
+[ -z "$DOTNET_PREVIEW_VERSION" ] && die "DOTNET_PREVIEW_VERSION not defined"
+
+GLOBAL_JSON="$(pwd)/global.json"
+[ -f "$GLOBAL_JSON" ] || die "Could not find $GLOBAL_JSON"
+
+LATEST_GA_RELEASE=$(dotnet --list-sdks | cut -f 1 -d " " | grep "^$DOTNET_PREVIEW_VERSION\.[0-9]*\.[0-9]*$" | sort | tail -1)
+LATEST_PRE_RELEASE=$(dotnet --list-sdks | cut -f 1 -d " " | grep "^$DOTNET_PREVIEW_VERSION\.[0-9]*\.[0-9]*-" | sort | tail -1)
+
+if [ -n "$LATEST_GA_RELEASE" ]; then
+  echo "Latest GA release: $LATEST_GA_RELEASE";
+  
+  TMP_JSON=$(mktemp)
+  cat "$GLOBAL_JSON" | \
+      jq --arg sdk "$LATEST_GA_RELEASE" '.sdk.version=$sdk' | \
+      jq --arg allowPrerelease "false" '.sdk.allowPrerelease=$allowPrerelease' > \
+          "$TMP_JSON"
+  
+  rm -f "$GLOBAL_JSON"
+  mv "$TMP_JSON" "$GLOBAL_JSON"
+    
+  cat "$GLOBAL_JSON"
+  
+elif [ -n "$LATEST_PRE_RELEASE" ]; then
+  echo "Latest preview release: $LATEST_PRE_RELEASE"
+  
+  TMP_JSON=$(mktemp)
+  cat "$GLOBAL_JSON" | \
+        jq --arg sdk "$LATEST_PRE_RELEASE" '.sdk.version=$sdk' | \
+        jq --arg allowPrerelease "true" '.sdk.allowPrerelease=$allowPrerelease' > \
+            "$TMP_JSON"
+  
+  rm -f "$GLOBAL_JSON"
+  mv "$TMP_JSON" "$GLOBAL_JSON"
+        
+  cat "$GLOBAL_JSON"
+        
+else
+  die "No suitable release found"
+fi
+
