@@ -34,6 +34,8 @@ if [ -n "$LATEST_GA_RELEASE" ]; then
     
   cat "$GLOBAL_JSON"
   
+  git add "$GLOBAL_JSON" && git commit "$GLOBAL_JSON" -m"Updated DotNet SDK to $LATEST_GA_RELEASE" && git push
+  
 elif [ -n "$LATEST_PRE_RELEASE" ]; then
   echo "Latest preview release: $LATEST_PRE_RELEASE"
   
@@ -47,6 +49,8 @@ elif [ -n "$LATEST_PRE_RELEASE" ]; then
   mv "$TMP_JSON" "$GLOBAL_JSON"
         
   cat "$GLOBAL_JSON"
+  
+  git add "$GLOBAL_JSON" && git commit "$GLOBAL_JSON" -m"Updated DotNet SDK to $LATEST_PRE_RELEASE" && git push
         
 else
   die "No suitable release found"
