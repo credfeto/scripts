@@ -63,7 +63,7 @@ jobs:
           git diff -s --exit-code || \
           dotnet changelog --add Changed --message "GEOIP - Updated GEOIP DB from MaxMind ($(date +'%Y-%m-%d'))"
       - name: "Commit changes"
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "[GEOIP] - Updated GEOIP DB from MaxMind (${{ env.WHEN}})"
           file_pattern: "*.mmdb CHANGELOG.md"
