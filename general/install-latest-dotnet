@@ -136,7 +136,7 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 
 DOTNET_SOURCE=https://builds.dotnet.microsoft.com
 PROXY_HOST=http://builds.dotnet.local:5554
-[ -z "$DOTNET_BUILDS_CDN" ] || PROXY_HOST=$DOTNET_BUILDS_CDN
+#[ -z "$DOTNET_BUILDS_CDN" ] || PROXY_HOST=$DOTNET_BUILDS_CDN
 
 VERSIONS_TO_INSTALL="6.0 \
                      7.0 \
@@ -166,7 +166,7 @@ for VERSION in $VERSIONS_TO_INSTALL; do
   SDK_VERSION=$(curl --connect-timeout 5 \
                          --max-time 10 \
                          --retry 5 \
-                         --retry-delay 0 \
+                         --retry-delay 1 \
                          --retry-max-time 40 \
                          -s \
                          -L \
@@ -184,7 +184,7 @@ for VERSION in $VERSIONS_TO_INSTALL; do
   echo ""
   curl --max-time 10 \
        --retry 5 \
-       --retry-delay 0 \
+       --retry-delay 1 \
        --retry-max-time 40 \
        -s \
        -L \
