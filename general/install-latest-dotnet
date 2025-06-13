@@ -190,7 +190,7 @@ for VERSION in $VERSIONS_TO_INSTALL; do
        -L \
        -f \
        "$PROXY_HOST/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz" \
-       -o "$TEMPORARY_FILE" || die "Could not download"  
+       -o "$TEMPORARY_FILE" || die "Could not download: $PROXY_HOST/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz"  
 
   extract_dotnet_package "$TEMPORARY_FILE" "/usr/share/dotnet" || die "Could not install" 
   
