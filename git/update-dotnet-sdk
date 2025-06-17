@@ -26,7 +26,7 @@ if [ -n "$LATEST_GA_RELEASE" ]; then
   TMP_JSON=$(mktemp)
   cat "$GLOBAL_JSON" | \
       jq --arg sdk "$LATEST_GA_RELEASE" '.sdk.version=$sdk' | \
-      jq --arg allowPrerelease "false" '.sdk.allowPrerelease=$allowPrerelease' > \
+      jq --argjson allowPrerelease false '.sdk.allowPrerelease=$allowPrerelease' > \
           "$TMP_JSON"
   
   rm -f "$GLOBAL_JSON"
@@ -42,7 +42,7 @@ elif [ -n "$LATEST_PRE_RELEASE" ]; then
   TMP_JSON=$(mktemp)
   cat "$GLOBAL_JSON" | \
         jq --arg sdk "$LATEST_PRE_RELEASE" '.sdk.version=$sdk' | \
-        jq --arg allowPrerelease "true" '.sdk.allowPrerelease=$allowPrerelease' > \
+        jq --argjson allowPrerelease true '.sdk.allowPrerelease=$allowPrerelease' > \
             "$TMP_JSON"
   
   rm -f "$GLOBAL_JSON"
