@@ -143,20 +143,6 @@ VERSIONS_TO_INSTALL="6.0 \
                      8.0 \
                      9.0 \
                      10.0"
-# update dotnet install scripts
-
-#[ -f "$BASEDIR/dotnet-install.sh" ] && rm -f"$BASEDIR/dotnet-install.sh"
-#echo "Downloading Latest install script"
-#curl -s https://dot.net/v1/dotnet-install.sh -L -f -o "$BASEDIR/dotnet-install.sh" || die "Could not download install script"
-#[ -f "$BASEDIR/dotnet-install.sh" ] || die "dotnet install script failed"
-
-#echo "Changing install script to use local proxy cache.."
-#sed -i "s|https://builds.dotnet.microsoft.com/dotnet|$PROXY_HOST|g" "$BASEDIR/dotnet-install.sh"
-#sed -i "s|https://ci.dot.net/public|$PROXY_HOST/dotnet|g" "$BASEDIR/dotnet-install.sh"
-##sed -i "s|https://aka.ms/dotnet|https://builds.dotnet.local:5555/dotnet|g" "$BASEDIR/dotnet-install.sh"
-#echo "Changing install script to use local proxy cache..."
-
-#chmod +x "$BASEDIR/dotnet-install.sh"
 
 [ -d "/usr/share/dotnet" ] && sudo rm -fr /usr/share/dotnet
 
@@ -196,7 +182,6 @@ for VERSION in $VERSIONS_TO_INSTALL; do
   
   /usr/share/dotnet/dotnet --list-sdks
   
-  #sudo "$BASEDIR/dotnet-install.sh" --install-dir /usr/share/dotnet -channel "$VERSION"
   echo ""
 done
 
