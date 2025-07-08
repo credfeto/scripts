@@ -71,7 +71,7 @@ jobs:
       - name: "Get latest installed dotnet version"
         id: latest-dotnet-version
         run: |
-          echo "LATEST_RELEASE_VERSION=$(dotnet --list-sdks | d | grep "^[0-9]*\.[0-9]*\.[0-9]*$" | sort | tail -1)" >> "$GITHUB_OUTPUT"
+          echo "LATEST_RELEASE_VERSION=$(dotnet --list-sdks | cut -f 1 -d " " | grep "^[0-9]*\.[0-9]*\.[0-9]*$" | sort | tail -1)" >> "$GITHUB_OUTPUT"
 
       - name: "Display latest installed dotnet version"
         run: |
