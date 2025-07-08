@@ -8,14 +8,19 @@ die() {
 }
 
 
+PACK=0
 CLEAR="http-cache"
-  while [ $# -gt 0 ]; do
+while [ $# -gt 0 ]; do
     key="$1"
 
     case $key in
       -a|--all)
         CLEAR="all"
         shift # past argument
+        ;;
+      -p|--pack)
+        PACK=1
+        shift
         ;;
       *)    # unknown option
         shift # past argument
@@ -25,14 +30,19 @@ CLEAR="http-cache"
 
 echo "***** Clearing NuGet cache ($CLEAR)... *****" 
 dotnet nuget locals "$CLEAR" --clear  || die "######## Nuget Clear $CLEAR Failed ########"
+
 echo "***** Restoring... *****" 
 dotnet tool restore  || die "######## Tool Restore Failed ########"
+
 echo "***** Checking... *****" 
 $BASEDIR/buildcheck  || die "######## Build Check Failed ########"
+
 echo "***** Restoring... *****" 
 dotnet restore  || die "######## Restore Failed ########"
+
 echo "***** Cleaning... *****" 
 dotnet clean  || die "######## Clean Failed ########"
+
 echo "***** Building... *****" 
 dotnet build \
           --configuration Release \
@@ -43,6 +53,7 @@ dotnet build \
           -p:NoWarn=MSB4241 \
           -p:SuppressNETCoreSdkPreviewMessage=true \
           -p:Optimize=true || die "######## Build Failed ########"
+
 echo "***** Testing... *****" 
 dotnet test \
           --configuration Release \
@@ -54,4 +65,19 @@ dotnet test \
           -p:NoWarn=MSB4241 \
           -p:SuppressNETCoreSdkPreviewMessage=true \
           -p:Optimize=true || die "######## Tests Failed ########"
-  echo "***** Completed *****" 
+          
+if [ "$PACK" = "1" ]; then          
+  echo "***** Packing... *****" 
+  dotnet pack \
+            --configuration Release \
+            "-p:Version=0.0.0.1-test" \
+            "-p:IsProduction=false" \
+            --filter FullyQualifiedName\!~Integration \
+            -p:ApiCompatGenerateSuppressionFile=true \
+            -nodeReuse:False \
+            -p:NoWarn=MSB4241 \
+            -p:SuppressNETCoreSdkPreviewMessage=true \
+            -p:Optimize=true || die "######## Packing Failed ########"
+fi
+
+echo "***** Completed *****" 
