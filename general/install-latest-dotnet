@@ -134,6 +134,11 @@ say_verbose() {
     fi
 }
 
+say_err() {
+  say "$1"
+  exit 1
+}
+
 temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
 
 
