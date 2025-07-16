@@ -4,11 +4,21 @@
 [ ! -d "$HOME/Pictures/Backgrounds" ] && mkdir "$HOME/Pictures/Backgrounds"
 
 
+echo "Zoom Wallpaper"
+
 files=($HOME/work/thirdparty/wallpapers/*.jpg)
 wallpaper=${files[RANDOM % ${#files[@]}]}
 echo $wallpaper
 cp --reflink -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt.jpg"
 ln -s -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt-link.jpg"
 
-[ -d "$HOME/.var/app/us.zoom.Zoom/.zoom/data/VirtualBkgnd_Custom" ] && cp --reflink -f "$wallpaper" "$(find $HOME/.var/app/us.zoom.Zoom/.zoom/data/VirtualBkgnd_Custom/\{*)"
+if [ -d "$HOME/.var/app/us.zoom.Zoom/.zoom/data/VirtualBkgnd_Custom" ]; then
 
+  WP=$(find $HOME/.var/app/us.zoom.Zoom/.zoom/data/VirtualBkgnd_Custom/\{*)
+  echo "Wallpaper = $WP"
+
+  cp --reflink -f "$wallpaper" "$WP"
+
+fi
+
+exit 0
