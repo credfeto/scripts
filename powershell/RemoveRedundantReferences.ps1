@@ -313,6 +313,42 @@ function ShutdownBuildServer {
     }
 }
 
+function BuildSolution {
+            param([bool]$FullError)
+
+    ShutdownBuildServer
+
+    $errorCode = "AD0001"
+    $NewLine = [System.Environment]::NewLine
+    try {
+        do
+        {
+            $results = dotnet build -warnAsError -nodeReuse:False /p:SolutionDir=$solutionDirectory
+            if(!$?) {
+                $resultsAsText = $results -join $NewLine
+    #             WriteProgress "**** FAILED ****"
+                $retry = $resultsAsText.Contains($errorCode) 
+                if(!$retry)
+                {
+                    if($FullError)
+                    {
+                        Write-Error $resultsAsText
+                    }
+                    return $false
+                }
+            }
+            else {
+    #             WriteProgress "**** SUCCESS ****" 
+                return $true
+            }
+        }
+        while($true)
+    }
+    finally {
+        ShutdownBuildServer
+    }
+}
+
 function BuildProject {
     param([string]$FileName, [bool]$FullError)
 
@@ -539,6 +575,7 @@ param(
                 WriteProgress "* Building $( $file.Name ) using $minimalSdk instead of $sdk..."
                 $buildOk = BuildProject -FileName $file.FullName -FullError $false
                 Write-Host "Build OK: $buildOk"
+                $restore = $true
                 if($buildOk) {
                     WriteProgress "  - Building succeeded."
                     WriteProgress "$( $file.Name ) references SDK $sdk that could be reduced to $minimalSdk."
@@ -547,13 +584,23 @@ param(
                                                    Type = 'Sdk';
                                                    Name = $sdk;                                               
                                                }
+
+                    $buildOk = BuildSolution
+                    if($buildOk) {
+                        $restore = $false
+                    }                                                                                                           
                 }
                 else {
                     WriteProgress "  = Building failed."
                 }
                 
-                $projectXml[0].Node.Sdk = $sdk
-                $xml.Save($file.FullName)
+                if($restore) {
+                    $projectXml[0].Node.Sdk = $sdk
+                    $xml.Save($file.FullName)
+                }
+                else {
+                    $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
+                }
             } else {
                 WriteProgress "= SDK does not need changing. Currently $minimalSdk."
             }                   
@@ -643,6 +690,7 @@ param(
                 $buildOk = $true
             }
             
+            $restore = $true
             if($buildOk)
             {
                 WriteProgress "  - Building succeeded."
@@ -663,6 +711,11 @@ param(
                         Type = 'Project';
                         Name = $node.Node.Include;
                     }
+                }
+                
+                $buildOk = BuildSolution
+                if($buildOk) {
+                    $restore = $false
                 }
             }
             else
@@ -700,18 +753,23 @@ param(
             }
     
     
-            if($null -eq $previousNode)
-            {
-                $parentNode.PrependChild($node.Node) > $null
+            if($restore) {
+                if($null -eq $previousNode)
+                {
+                    $parentNode.PrependChild($node.Node) > $null
+                }
+                else
+                {
+                    $parentNode.InsertAfter($node.Node, $previousNode.Node) > $null
+                }
+        
+                # $xml.OuterXml
+        
+                $xml.Save($file.FullName)
             }
-            else
-            {
-                $parentNode.InsertAfter($node.Node, $previousNode.Node) > $null
+            else {
+                $rawFileContent = [System.IO.File]::ReadAllBytes($file.FullName)
             }
-    
-            # $xml.OuterXml
-    
-            $xml.Save($file.FullName)
         }
     
         [System.IO.File]::WriteAllBytes($file.FullName, $rawFileContent)
