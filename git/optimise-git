@@ -1,0 +1,30 @@
+#! /bin/sh
+
+echo PWD: $(pwd)
+
+for line in $(find $(pwd)/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache)
+do 
+  echo "$line"
+  CURRENT_DIR=$line  
+
+echo ""
+  echo "Optimising $CURRENT_DIR..."
+
+  echo "* Pruning remotes..."
+  for REMOTE in $(git -C "$CURRENT_DIR" remote)
+  do
+    echo "  + Pruning $REMOTE..."
+    git -C "$CURRENT_DIR" remote prune "$REMOTE"
+  done
+
+  echo "* Repacking..."
+  git -C "$CURRENT_DIR" repack
+  echo "* Pruning packed..."
+  git -C "$CURRENT_DIR" prune-packed
+  echo "* Expiring reflog..."
+  git -C "$CURRENT_DIR" reflog expire --expire=1.month.ago
+  echo "*Garbage collecting..."
+  git -C "$CURRENT_DIR" gc --aggressive --prune 2>&1
+
+  echo " * done"
+done
