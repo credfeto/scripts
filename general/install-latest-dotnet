@@ -144,8 +144,13 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 
 [ -z "$BASEDIR" ] && die "BASEDIR Not defiled"  
 
+USER_AGENT="DotnetVersionChecker/1.0.0"
 DOTNET_SOURCE=https://builds.dotnet.microsoft.com
 PROXY_HOST=http://builds.dotnet.local:5554
+
+VERSION_CHECK_SOURCE=$PROXY_HOST
+DOWNLOAD_SOURCE=$PROXY_HOST
+
 #[ -z "$DOTNET_BUILDS_CDN" ] || PROXY_HOST=$DOTNET_BUILDS_CDN
 
 VERSIONS_TO_INSTALL="6.0 \
@@ -158,6 +163,9 @@ VERSIONS_TO_INSTALL="6.0 \
 
 # update to latest dotnet core
 for VERSION in $VERSIONS_TO_INSTALL; do
+  
+  VERSION_URL=$VERSION_CHECK_SOURCE/dotnet/Sdk/$VERSION/latest.version
+  echo "Checking version from $VERSION_URL"
 
   SDK_VERSION=$(curl --connect-timeout 5 \
                          --max-time 10 \
@@ -167,7 +175,8 @@ for VERSION in $VERSIONS_TO_INSTALL; do
                          -s \
                          -L \
                          -f \
-                         "$DOTNET_SOURCE/dotnet/Sdk/$VERSION/latest.version" || die "Could not read SDK Version from $DOTNET_SOURCE/dotnet/Sdk/$VERSION/latest.version")
+                         --user-agent "$USER_AGENT" \
+                         "$VERSION_URL" || die "Could not read SDK Version from $VERSION_URL")
 
 
   TEMPORARY_FILE="$(mktemp "$temporary_file_template")"
@@ -178,6 +187,7 @@ for VERSION in $VERSIONS_TO_INSTALL; do
   echo "*       Current SDK: $SDK_VERSION"
   echo "**********************************************************************************************"
   echo ""
+  DOWNLOAD_URL=$DOWNLOAD_SOURCE/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz
   curl --max-time 10 \
        --retry 5 \
        --retry-delay 1 \
@@ -185,8 +195,9 @@ for VERSION in $VERSIONS_TO_INSTALL; do
        -s \
        -L \
        -f \
-       "$PROXY_HOST/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz" \
-       -o "$TEMPORARY_FILE" || die "Could not download: $PROXY_HOST/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz"  
+       --user-agent "$USER_AGENT" \
+       "$DOWNLOAD_URL" \
+       -o "$TEMPORARY_FILE" || die "Could not download: $DOWNLOAD_URL"  
 
   extract_dotnet_package "$TEMPORARY_FILE" "/usr/share/dotnet" || die "Could not install" 
   
