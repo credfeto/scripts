@@ -3,7 +3,7 @@
 BASEDIR="$(dirname "$(readlink -f "$0")")"
 echo "Script Dir: $BASEDIR"
 
-for line in $(find  $(pwd)/* -name '*.git' -printf '%h\n' | sort -u | grep -v .cache)
+for line in $(find ${pwd}/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache)
 do 
   echo "$line"
   CURRENT_DIR=$line  
