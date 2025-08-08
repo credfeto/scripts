@@ -137,6 +137,31 @@ say_err() {
   exit 1
 }
 
+#!/bin/bash
+
+set -e
+
+get_latest_dotnet_sdk_version() {
+    DOTNET_CHANNEL_VERSION=$1
+    [ -z "$DOTNET_CHANNEL_VERSION" ] && die "Dotnet channel version not defined" 
+    curl --connect-timeout 5 \
+         --max-time 10 \
+         --retry 5 \
+         --retry-delay 1 \
+         --retry-max-time 40 \
+         -s \
+         -L \
+         -f \
+         --user-agent "$USER_AGENT" \
+         https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json |
+    jq --arg v "$DOTNET_CHANNEL_VERSION" -r '
+            ."releases-index" 
+            | map(select(."channel-version" | contains($v)))
+            | first(.[])
+          | ."latest-sdk"'
+}
+
+
 temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
 
 
@@ -153,7 +178,8 @@ DOWNLOAD_SOURCE=$PROXY_HOST
 
 #[ -z "$DOTNET_BUILDS_CDN" ] || PROXY_HOST=$DOTNET_BUILDS_CDN
 
-VERSIONS_TO_INSTALL="6.0 \
+VERSIONS_TO_INSTALL="5.0 \
+                     6.0 \
                      7.0 \
                      8.0 \
                      9.0 \
@@ -164,20 +190,9 @@ VERSIONS_TO_INSTALL="6.0 \
 # update to latest dotnet core
 for VERSION in $VERSIONS_TO_INSTALL; do
   
-  VERSION_URL=$VERSION_CHECK_SOURCE/dotnet/Sdk/$VERSION/latest.version
-  echo "Checking version from $VERSION_URL"
-
-  SDK_VERSION=$(curl --connect-timeout 5 \
-                         --max-time 10 \
-                         --retry 5 \
-                         --retry-delay 1 \
-                         --retry-max-time 40 \
-                         -s \
-                         -L \
-                         -f \
-                         --user-agent "$USER_AGENT" \
-                         "$VERSION_URL" || die "Could not read SDK Version from $VERSION_URL")
-
+  SDK_VERSION=$(get_latest_dotnet_sdk_version "$VERSION")
+  
+  [ -z "$SDK_VERSION" ] && die "Could not determine latest SDK version for $VERSION"
 
   TEMPORARY_FILE="$(mktemp "$temporary_file_template")"
 
