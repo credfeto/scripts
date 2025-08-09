@@ -1,10 +1,27 @@
 #! /bin/bash
 
-[ -d "$HOME/work/thirdparty/wallpapers" ] || exit 0
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
+
+if [ -d "$HOME/work/thirdparty/wallpapers" ]; then
+  git -C "$HOME/work/thirdparty/wallpapers" pull
+else
+  [ -d "$HOME/work/thirdparty" ] || mkdir -p "$HOME/work/thirdparty" || die "Could not create $HOME/work/thirdparty" 
+  echo "h2"
+  git clone https://gitlab.com/credfeto/wallpapers.git "$HOME/work/thirdparty/wallpapers" || die "Could not clone"
+  echo "h3"
+fi
+ 
+if [ ! -d "$HOME/work/thirdparty/wallpapers" ]; then
+  echo "Could not find $HOME/work/thirdparty/wallpapers"
+  exit 0
+fi
+
 [ ! -d "$HOME/Pictures/Backgrounds" ] && mkdir "$HOME/Pictures/Backgrounds"
 
-
-echo "Zoom Wallpaper"
 
 files=($HOME/work/thirdparty/wallpapers/*.jpg)
 wallpaper=${files[RANDOM % ${#files[@]}]}
