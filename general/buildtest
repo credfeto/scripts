@@ -75,9 +75,9 @@ if [ "$PACK" = "1" ]; then
             --configuration Release \
             "-p:Version=0.0.0.1-test" \
             "-p:IsProduction=false" \
-            --filter FullyQualifiedName\!~Integration \
             -p:ApiCompatGenerateSuppressionFile=true \
             -nodeReuse:False \
+            -p:IncludeSymbols=False \
             -p:NoWarn=MSB4241 \
             -p:SuppressNETCoreSdkPreviewMessage=true \
             -p:Optimize=true || die "######## Packing Failed ########"
