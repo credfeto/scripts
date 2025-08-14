@@ -45,6 +45,7 @@ dotnet clean  || die "######## Clean Failed ########"
 
 echo "***** Building... *****" 
 dotnet build \
+          --warnaserror \
           --configuration Release \
           "-p:Version=0.0.0.1-test" \
           "-p:IsProduction=false" \
@@ -56,6 +57,7 @@ dotnet build \
 
 echo "***** Testing... *****" 
 dotnet test \
+          --warnaserror \
           --configuration Release \
           "-p:Version=0.0.0.1-test" \
           "-p:IsProduction=false" \
@@ -69,6 +71,7 @@ dotnet test \
 if [ "$PACK" = "1" ]; then          
   echo "***** Packing... *****" 
   dotnet pack \
+            --warnaserror \
             --configuration Release \
             "-p:Version=0.0.0.1-test" \
             "-p:IsProduction=false" \
