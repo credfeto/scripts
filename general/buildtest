@@ -8,25 +8,26 @@ die() {
 }
 
 
-PACK=0
 CLEAR="http-cache"
 while [ $# -gt 0 ]; do
     key="$1"
 
-    case $key in
-      -a|--all)
-        CLEAR="all"
-        shift # past argument
-        ;;
-      -p|--pack)
-        PACK=1
-        shift
-        ;;
-      *)    # unknown option
-        shift # past argument
-        ;;
-    esac
-  done
+  case $key in
+    -a|--all)
+      CLEAR="all"
+      shift # past argument
+      ;;
+    *)    # unknown option
+      shift # past argument
+      ;;
+  esac
+done
+
+PACK=0  
+HAS_PACKED=$(grep -R "<IsPackable>true</IsPackable>" . --include *.csproj | head -1)
+if [ -n "$HAS_PACKED" ]; then
+  PACK=1
+fi
 
 echo "***** Clearing NuGet cache ($CLEAR)... *****" 
 dotnet nuget locals "$CLEAR" --clear  || die "######## Nuget Clear $CLEAR Failed ########"
