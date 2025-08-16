@@ -1,6 +1,4 @@
 #! /bin/sh
-BASEDIR=$(dirname "$(readlink -f "$0")")
-SOLUTION=$(readlink -f *.sln)
 
 die() {
     echo
@@ -8,6 +6,9 @@ die() {
     exit 1
 }
 
+
+BASEDIR=$(dirname "$(readlink -f "$0")")
+SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
 [ -z "$SOLUTION" ] && die "No Solution found in $(pwd)"
 
 dotnet buildcheck -Solution "$SOLUTION" -WarningAsErrors true -PreReleaseBuild true || die "Check failed"

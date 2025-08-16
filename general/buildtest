@@ -1,5 +1,4 @@
 #! /bin/sh
-BASEDIR=$(dirname "$(readlink -f "$0")")
 
 die() {
     echo
@@ -7,6 +6,7 @@ die() {
     exit 1
 }
 
+BASEDIR=$(dirname "$(readlink -f "$0")")
 
 CLEAR="http-cache"
 while [ $# -gt 0 ]; do
@@ -29,6 +29,14 @@ if [ -n "$HAS_PACKED" ]; then
   PACK=1
 fi
 
+BASEDIR=$(dirname "$(readlink -f "$0")")
+SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
+[ -z "$SOLUTION" ] && die "No Solution found in $(pwd)"
+
+SOURCE_DIR=$(dirname "$SOLUTION");
+[ -z "$SOURCE_DIR" ] && die "No Solution dir found in $SOURCE_DIR"
+
+
 echo "***** Clearing NuGet cache ($CLEAR)... *****" 
 dotnet nuget locals "$CLEAR" --clear  || die "######## Nuget Clear $CLEAR Failed ########"
 
@@ -37,6 +45,8 @@ dotnet tool restore  || die "######## Tool Restore Failed ########"
 
 echo "***** Checking... *****" 
 $BASEDIR/buildcheck  || die "######## Build Check Failed ########"
+
+cd "$SOURCE_DIR" || die "Could not change to $SOURCE_DIR"
 
 echo "***** Restoring... *****" 
 dotnet restore  || die "######## Restore Failed ########"
