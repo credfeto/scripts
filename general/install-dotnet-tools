@@ -22,6 +22,8 @@ TOOLS="sleet \
        Credfeto.Changelog.Cmd \
        Credfeto.Package.Push \
        Credfeto.Package.Update \
+       Credfeto.DotNet.Code.Analysis.Overrides.Cmd \
+       Credfeto.DotNet.Repo.Tools.Cmd \
        FunFair.Content.Packager.Cmd \
        FunFair.Content.PackageSigner.Cmd \
        JetBrains.ReSharper.GlobalTools \
