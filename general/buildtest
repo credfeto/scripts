@@ -130,3 +130,6 @@ fi
 [ "$RESTORE" = "1" ] && git checkout "$SOURCE_DIR/CodeAnalysis.ruleset"
 
 echo "***** Completed *****" 
+
+
+ 
