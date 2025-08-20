@@ -8,6 +8,8 @@ die() {
 
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
+PRERELEASE=0
+RELEASE=0
 CLEAR="http-cache"
 while [ $# -gt 0 ]; do
     key="$1"
@@ -17,6 +19,14 @@ while [ $# -gt 0 ]; do
       CLEAR="all"
       shift # past argument
       ;;
+    -p|--pre-release)
+      PRERELEASE=1
+      shift # past argument
+      ;;
+    -r|--release)
+      RELEASE=1
+      shift # past argument
+      ;;      
     *)    # unknown option
       shift # past argument
       ;;
@@ -47,6 +57,29 @@ echo "***** Checking... *****"
 $BASEDIR/buildcheck  || die "######## Build Check Failed ########"
 
 cd "$SOURCE_DIR" || die "Could not change to $SOURCE_DIR"
+
+RESTORE=0
+if [ "$PRERELEASE" = "1" ] && 
+   [ -f "$SOURCE_DIR/CodeAnalysis.ruleset" ] &&
+   [ -f "$SOURCE_DIR/pre-release.rule-settings.json" ]; then
+      
+    dotnet code-analysis ruleset \
+                --ruleset "$SOURCE_DIR/CodeAnalysis.ruleset" \
+                --changes "$SOURCE_DIR/pre-release.rule-settings.json" || die "Failed to update $SOURCE_DIR/CodeAnalysis.ruleset"
+
+    RESTORE=1
+fi
+
+if [ "$RELEASE" = "1" ] && 
+   [ -f "$SOURCE_DIR/CodeAnalysis.ruleset" ] &&
+   [ -f "$SOURCE_DIR/release.rule-settings.json" ]; then
+      
+    dotnet code-analysis ruleset \
+                --ruleset "$SOURCE_DIR/CodeAnalysis.ruleset" \
+                --changes "$SOURCE_DIR/release.rule-settings.json" || die "Failed to update $SOURCE_DIR/CodeAnalysis.ruleset"
+
+    RESTORE=1
+fi
 
 echo "***** Restoring... *****" 
 dotnet restore  || die "######## Restore Failed ########"
@@ -93,5 +126,7 @@ if [ "$PACK" = "1" ]; then
             -p:SuppressNETCoreSdkPreviewMessage=true \
             -p:Optimize=true || die "######## Packing Failed ########"
 fi
+
+[ "$RESTORE" = "1" ] && git checkout "$SOURCE_DIR/CodeAnalysis.ruleset"
 
 echo "***** Completed *****" 
