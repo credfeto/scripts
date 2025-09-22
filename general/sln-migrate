@@ -1,0 +1,29 @@
+#! /bin/sh
+
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
+
+BASEDIR=$(dirname "$(readlink -f "$0")")
+
+SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
+[ -z "$SOLUTION" ] && die "No Solution found in $(pwd)"
+
+SOLUTIONX=$(find "$PWD" -type f -iname "*.slnx" | head -1)
+[ -z "$SOLUTIONX" ] || die "SolutionX found in $(pwd)"
+
+dotnet sln migrate || die "Migration failed"
+
+SOLUTIONX=$(find "$PWD" -type f -iname "*.slnx" | head -1)
+[ -z "$SOLUTIONX" ] && die "No SolutionX found in $(pwd) after migration"
+
+echo ""
+
+if [ -f "$SOLUTIONX" ]; then
+  [ -f "$SOLUTION" ] && rm -f "$SOLUTION"
+  [ -f "$SOLUTION.DotSettings" ] && mv "$SOLUTION.DotSettings" "$SOLUTIONX.DotSettings"
+  [ -f "$SOLUTION.DotSettings.user" ] && mv "$SOLUTION.DotSettings.user" "$SOLUTIONX.DotSettings.user"
+fi
+ 
