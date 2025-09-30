@@ -171,7 +171,8 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 
 USER_AGENT="DotnetVersionChecker/1.0.0"
 DOTNET_SOURCE=https://builds.dotnet.microsoft.com
-PROXY_HOST=http://builds.dotnet.local:5554
+#PROXY_HOST=http://builds.dotnet.local:5554
+PROXY_HOST=https://dotnet.markridgwell.com
 
 DOWNLOAD_SOURCE=$PROXY_HOST
 
