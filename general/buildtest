@@ -85,6 +85,9 @@ fi
 echo "***** Restoring... *****" 
 dotnet restore  || die "######## Restore Failed ########"
 
+echo "***** Checking for package vulnerabilities... *****" 
+SolutionDir="$SOURCE_DIR/" dotnet list "$SOLUTION" package --vulnerable --include-transitive || die "Vulnerabilities found"
+
 echo "***** Cleaning... *****" 
 dotnet clean  || die "######## Clean Failed ########"
 
