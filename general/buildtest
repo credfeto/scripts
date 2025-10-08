@@ -86,7 +86,13 @@ echo "***** Restoring... *****"
 dotnet restore  || die "######## Restore Failed ########"
 
 echo "***** Checking for package vulnerabilities... *****" 
-SolutionDir="$SOURCE_DIR/" dotnet list "$SOLUTION" package --vulnerable --include-transitive || die "Vulnerabilities found"
+SOURCES="--source https://api.nuget.org/v3/index.json"
+for SOURCE in $(dotnet nuget list source | grep https:// | awk '{$1=$1;print}');
+do
+  SOURCES="$SOURCES --source $SOURCE"
+done
+echo "Sources: $SOURCES"
+SolutionDir="$SOURCE_DIR/" dotnet list "$SOLUTION" package --vulnerable --include-transitive $SOURCES || die "Vulnerabilities found"
 
 echo "***** Cleaning... *****" 
 dotnet clean  || die "######## Clean Failed ########"
