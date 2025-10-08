@@ -95,43 +95,47 @@ echo "***** Building... *****"
 dotnet build \
           --warnaserror \
           --configuration Release \
-          "-p:Version=0.0.0.1-test" \
-          "-p:IsProduction=false" \
+           --no-restore \
           "-p:ApiCompatGenerateSuppressionFile=true" \
-          -nodeReuse:False \
-          "-p:NoWarn=MSB4241" \
-          "-p:SuppressNETCoreSdkPreviewMessage=true" \
           "-p:ContinuousIntegrationBuild=true" \
-          "-p:Optimize=true" || die "######## Build Failed ########"
+          "-p:IsProduction=false" \
+          "-p:NoWarn=MSB4241" \
+          "-p:Optimize=true" \
+          "-p:SuppressNETCoreSdkPreviewMessage=true" \
+          "-p:Version=0.0.0.1-test" \
+           -nodeReuse:False || die "######## Build Failed ########"
 
 echo "***** Testing... *****" 
 dotnet test \
           --warnaserror \
           --configuration Release \
-          "-p:Version=0.0.0.1-test" \
-          "-p:IsProduction=false" \
+           --no-restore \
+           --no-build \
           --filter FullyQualifiedName\!~Integration \
           "-p:ApiCompatGenerateSuppressionFile=true" \
-          -nodeReuse:False \
-          "-p:NoWarn=MSB4241" \
-          "-p:SuppressNETCoreSdkPreviewMessage=true" \
           "-p:ContinuousIntegrationBuild=true" \
-          "-p:Optimize=true" || die "######## Tests Failed ########"
+          "-p:IsProduction=false" \
+          "-p:NoWarn=MSB4241" \
+          "-p:Optimize=true" \
+          "-p:SuppressNETCoreSdkPreviewMessage=true" \
+          "-p:Version=0.0.0.1-test" \
+          -nodeReuse:False || die "######## Tests Failed ########"
           
 if [ "$PACK" = "1" ]; then          
   echo "***** Packing... *****" 
   dotnet pack \
             --warnaserror \
             --configuration Release \
-            "-p:Version=0.0.0.1-test" \
-            "-p:IsProduction=false" \
+           --no-restore \
             "-p:ApiCompatGenerateSuppressionFile=true" \
-            -nodeReuse:False \
-            "-p:IncludeSymbols=False" \
-            "-p:NoWarn=MSB4241" \
-            "-p:SuppressNETCoreSdkPreviewMessage=true" \
             "-p:ContinuousIntegrationBuild=true" \
-            "-p:Optimize=true" || die "######## Packing Failed ########"
+            "-p:IncludeSymbols=False" \
+            "-p:IsProduction=false" \
+            "-p:NoWarn=MSB4241" \
+            "-p:Optimize=true" \
+            "-p:SuppressNETCoreSdkPreviewMessage=true" \
+            "-p:Version=0.0.0.1-test" \
+            -nodeReuse:False || die "######## Packing Failed ########"
 fi
 
 [ "$RESTORE" = "1" ] && git checkout "$SOURCE_DIR/CodeAnalysis.ruleset"
