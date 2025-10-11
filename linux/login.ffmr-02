@@ -22,4 +22,5 @@ flatpak run org.mozilla.Thunderbird &
 #flatpak run com.google.Chrome --enable-feature=UseOzonePlatform --ozone-platform=wayland &
 #flatpak run --branch=stable --arch=x86_64 --command=com.ghostery.browser --file-forwarding com.ghostery.browser &
 
-streamlink --player=mpv https://twitch.tv/paults_aquaescape best &
+paults_aquaescape &
+

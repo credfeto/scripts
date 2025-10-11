@@ -1,0 +1,2 @@
+#! /bin/sh
+streamlink --player=mpv https://twitch.tv/paultentertainer best > /dev/null 2>&1 &
