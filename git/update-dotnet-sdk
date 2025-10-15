@@ -14,7 +14,7 @@ BASEDIR="$(dirname "$(readlink -f "$0")")"
 
 [ -z "$DOTNET_PREVIEW_VERSION" ] && die "DOTNET_PREVIEW_VERSION not defined"
 
-GLOBAL_JSON="$(pwd)/global.json"
+GLOBAL_JSON=$(find "$PWD" -type f -iname "global.json" | head -1)
 [ -f "$GLOBAL_JSON" ] || die "Could not find $GLOBAL_JSON"
 
 LATEST_GA_RELEASE=$(dotnet --list-sdks | cut -f 1 -d " " | grep "^$DOTNET_PREVIEW_VERSION\.[0-9]*\.[0-9]*$" | sort | tail -1)
