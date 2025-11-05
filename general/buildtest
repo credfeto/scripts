@@ -113,11 +113,9 @@ dotnet build \
 
 echo "***** Testing... *****" 
 dotnet test \
-          --warnaserror \
           --configuration Release \
            --no-restore \
            --no-build \
-          --filter FullyQualifiedName\!~Integration \
           "-p:ApiCompatGenerateSuppressionFile=true" \
           "-p:ContinuousIntegrationBuild=true" \
           "-p:IsProduction=false" \
@@ -125,8 +123,8 @@ dotnet test \
           "-p:Optimize=true" \
           "-p:SuppressNETCoreSdkPreviewMessage=true" \
           "-p:Version=0.0.0.1-test" \
-          -nodeReuse:False || die "######## Tests Failed ########"
-          
+          || die "######## Tests Failed ########"
+
 if [ "$PACK" = "1" ]; then          
   echo "***** Packing... *****" 
   dotnet pack \
