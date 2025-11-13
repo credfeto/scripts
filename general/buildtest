@@ -95,7 +95,8 @@ echo "Sources: $SOURCES"
 SolutionDir="$SOURCE_DIR/" dotnet list "$SOLUTION" package --vulnerable --include-transitive $SOURCES || die "Vulnerabilities found"
 
 echo "***** Cleaning... *****" 
-dotnet clean  || die "######## Clean Failed ########"
+dotnet clean  \
+          "--nowarn:MSB4241" \ || die "######## Clean Failed ########"
 
 echo "***** Building... *****" 
 dotnet build \
@@ -105,7 +106,7 @@ dotnet build \
           "-p:ApiCompatGenerateSuppressionFile=true" \
           "-p:ContinuousIntegrationBuild=true" \
           "-p:IsProduction=false" \
-          "-p:NoWarn=MSB4241" \
+          "--nowarn:MSB4241" \
           "-p:Optimize=true" \
           "-p:SuppressNETCoreSdkPreviewMessage=true" \
           "-p:Version=0.0.0.1-test" \
@@ -119,7 +120,6 @@ dotnet test \
           "-p:ApiCompatGenerateSuppressionFile=true" \
           "-p:ContinuousIntegrationBuild=true" \
           "-p:IsProduction=false" \
-          "-p:NoWarn=MSB4241" \
           "-p:Optimize=true" \
           "-p:SuppressNETCoreSdkPreviewMessage=true" \
           "-p:Version=0.0.0.1-test" \
@@ -135,7 +135,7 @@ if [ "$PACK" = "1" ]; then
             "-p:ContinuousIntegrationBuild=true" \
             "-p:IncludeSymbols=False" \
             "-p:IsProduction=false" \
-            "-p:NoWarn=MSB4241" \
+            "--nowarn:MSB4241" \
             "-p:Optimize=true" \
             "-p:SuppressNETCoreSdkPreviewMessage=true" \
             "-p:Version=0.0.0.1-test" \
