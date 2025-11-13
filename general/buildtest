@@ -96,7 +96,7 @@ SolutionDir="$SOURCE_DIR/" dotnet list "$SOLUTION" package --vulnerable --includ
 
 echo "***** Cleaning... *****" 
 dotnet clean  \
-          "--nowarn:MSB4241" \ || die "######## Clean Failed ########"
+          "--nowarn:MSB4241" || die "######## Clean Failed ########"
 
 echo "***** Building... *****" 
 dotnet build \
