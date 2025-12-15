@@ -1,2 +1,5 @@
 #! /bin/sh
-streamlink --player=mpv https://twitch.tv/paultentertainer best > /dev/null 2>&1 &
+BASEDIR="$(dirname "$(readlink -f "$0")")"
+
+"$BASEDIR/stream" paultentertainer
+
