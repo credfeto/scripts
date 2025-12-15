@@ -117,6 +117,7 @@ dotnet test \
           --configuration Release \
            --no-restore \
            --no-build \
+           --long-running 10 \
           "-p:ApiCompatGenerateSuppressionFile=true" \
           "-p:ContinuousIntegrationBuild=true" \
           "-p:IsProduction=false" \
