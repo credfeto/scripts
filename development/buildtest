@@ -59,25 +59,40 @@ $BASEDIR/buildcheck  || die "######## Build Check Failed ########"
 
 cd "$SOURCE_DIR" || die "Could not change to $SOURCE_DIR"
 
-RESTORE=0
-if [ "$PRERELEASE" = "1" ] && 
-   [ -f "$SOURCE_DIR/CodeAnalysis.ruleset" ] &&
-   [ -f "$SOURCE_DIR/pre-release.rule-settings.json" ]; then
-      
-    dotnet code-analysis ruleset \
-                --ruleset "$SOURCE_DIR/CodeAnalysis.ruleset" \
-                --changes "$SOURCE_DIR/pre-release.rule-settings.json" || die "Failed to update $SOURCE_DIR/CodeAnalysis.ruleset"
+RULESET_TYPE=NONE
+RULESET_FILE=
+RULESET_ADJUSTMENT_FILE=
+if [ -f "$SOURCE_DIR/CodeAnalysis.ruleset" ]; then
+  RULESET_TYPE=ruleset
+  RULESET_FILE="$SOURCE_DIR/CodeAnalysis.ruleset"
 
-    RESTORE=1
 fi
 
-if [ "$RELEASE" = "1" ] && 
-   [ -f "$SOURCE_DIR/CodeAnalysis.ruleset" ] &&
-   [ -f "$SOURCE_DIR/release.rule-settings.json" ]; then
-      
-    dotnet code-analysis ruleset \
-                --ruleset "$SOURCE_DIR/CodeAnalysis.ruleset" \
-                --changes "$SOURCE_DIR/release.rule-settings.json" || die "Failed to update $SOURCE_DIR/CodeAnalysis.ruleset"
+if [ -f "$SOURCE_DIR/../.globalconfig" ]; then
+  RULESET_TYPE=ruleset
+  RULESET_FILE="$SOURCE_DIR/../.globalconfig"
+
+fi
+
+
+
+RESTORE=0
+if [ "$RULESET_TYPE" != "NONE" ]; then
+
+    if [ "$PRERELEASE" = "1" ] && 
+          [ -f "$SOURCE_DIR/pre-release.rule-settings.json" ]; then
+        RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/pre-release.rule-settings.json"
+    elif [ "$RELEASE" = "1" ] && 
+       [ -f "$SOURCE_DIR/release.rule-settings.json" ]; then
+    
+        RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/pre-release.rule-settings.json"      
+        RESTORE=1
+    fi
+
+    [ -n "$RULESET_ADJUSTMENT_FILE" ] && \
+        dotnet code-analysis "$RULESET_TYPE" \
+                    --ruleset "$RULESET_FILE" \
+                    --changes "$RULESET_ADJUSTMENT_FILE" || die "Failed to update $RULESET_FILE"
 
     RESTORE=1
 fi
@@ -143,7 +158,7 @@ if [ "$PACK" = "1" ]; then
             -nodeReuse:False || die "######## Packing Failed ########"
 fi
 
-[ "$RESTORE" = "1" ] && git checkout "$SOURCE_DIR/CodeAnalysis.ruleset"
+[ "$RESTORE" = "1" ] && git checkout "$RULESET_ADJUSTMENT_FILE"
 
 echo "***** Completed *****" 
 
