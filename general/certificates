@@ -1,7 +1,0 @@
-#! /bin/sh
-
-CERTIFICATE=~/work/funfair/funfair-ethereum-proxy-server-monitor/proxy-server-monitor/ssl/server.crt
-HOSTNAME=localhost
-
-certutil -d sql:$HOME/.pki/nssdb -A -i $CERTIFICATE -n $HOSTNAME -t "P,,"
-certutil -d sql:$HOME/.pki/nssdb -L

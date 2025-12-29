@@ -1,8 +1,0 @@
-#! /bin/sh
-git checkout main && git pull
-dotnet changelog -a Removed -m"Packages on MyGet feed as MyGet has disappeared completely"
-dotnet changelog -a Added -m"Packages on new NuGet feed"
-git add ../CHANGELOG.md
-git commit -m"MyGet has left the building"
-git push
-
