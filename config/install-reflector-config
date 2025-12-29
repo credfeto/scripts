@@ -1,7 +1,0 @@
-#! /bin/sh
-
-sudo cp -f reflector.conf /etc/xdg/reflector/reflector.conf
-
-sudo systemctl enable --now reflector
-sudo systemctl restart reflector
-

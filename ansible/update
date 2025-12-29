@@ -1,2 +1,0 @@
-#! /bin/sh
-ansible-playbook update.yml -f 10 -i inventory -b

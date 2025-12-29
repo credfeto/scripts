@@ -1,12 +1,17 @@
 #! /bin/sh
-flatpak install -y com.brave.Browser
-flatpak install -y org.mozilla.firefox
-flatpak install -y io.github.ungoogled_software.ungoogled_chromium
-flatpak install -y com.opera.Opera
-flatpak install -y com.discordapp.Discord
-flatpak install -y com.spotify.Client
-flatpak install -y com.todoist.Todoist
-flatpak install -y com.bitwarden.desktop
-flatpak install -y org.mozilla.Thunderbird
-flatpak install -y com.github.iwalton3.jellyfin-media-player
-flatpak install -y com.ktechpit.whatsie
+
+PACKAGES="com.brave.Browser \
+          org.mozilla.firefox \
+          com.opera.Opera \
+          com.discordapp.Discord \
+          com.spotify.Client \
+          com.todoist.Todoist \
+          com.bitwarden.desktop \
+          org.mozilla.Thunderbird \
+          com.github.iwalton3.jellyfin-media-player \
+          com.ktechpit.whatsie"
+
+for PACKAGE in $PACKAGES; do
+  echo "* Installing $PACKAGE..."
+  flatpak install -y "$PACKAGE"
+done
