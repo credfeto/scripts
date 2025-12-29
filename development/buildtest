@@ -8,8 +8,7 @@ die() {
 
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
-PRERELEASE=0
-RELEASE=0
+RULESET_ADJUSTMENT_FILE=
 CLEAR="http-cache"
 while [ $# -gt 0 ]; do
     key="$1"
@@ -20,11 +19,11 @@ while [ $# -gt 0 ]; do
       shift # past argument
       ;;
     -p|--pre-release)
-      PRERELEASE=1
+      [ -f "$SOURCE_DIR/pre-release.rule-settings.json" ] && RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/pre-release.rule-settings.json"
       shift # past argument
       ;;
     -r|--release)
-      RELEASE=1
+      [ -f "$SOURCE_DIR/release.rule-settings.json" ] && RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/release.rule-settings.json"
       shift # past argument
       ;;      
     *)    # unknown option
@@ -47,7 +46,6 @@ SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
 SOURCE_DIR=$(dirname "$SOLUTION");
 [ -z "$SOURCE_DIR" ] && die "No Solution dir found in $SOURCE_DIR"
 
-
 echo "***** Clearing NuGet cache ($CLEAR)... *****" 
 dotnet nuget locals "$CLEAR" --clear  || die "######## Nuget Clear $CLEAR Failed ########"
 
@@ -55,46 +53,32 @@ echo "***** Restoring... *****"
 dotnet tool restore  || die "######## Tool Restore Failed ########"
 
 echo "***** Checking... *****" 
-$BASEDIR/buildcheck  || die "######## Build Check Failed ########"
+"$BASEDIR/buildcheck"  || die "######## Build Check Failed ########"
 
 cd "$SOURCE_DIR" || die "Could not change to $SOURCE_DIR"
 
-RULESET_TYPE=NONE
+RULESET_TYPE=
 RULESET_FILE=
-RULESET_ADJUSTMENT_FILE=
 if [ -f "$SOURCE_DIR/CodeAnalysis.ruleset" ]; then
   RULESET_TYPE=ruleset
   RULESET_FILE="$SOURCE_DIR/CodeAnalysis.ruleset"
-
 fi
 
 if [ -f "$SOURCE_DIR/../.globalconfig" ]; then
-  RULESET_TYPE=ruleset
-  RULESET_FILE="$SOURCE_DIR/../.globalconfig"
-
+  RULESET_TYPE=globalconfig
+  RULESET_FILE="$(readlink -f "$SOURCE_DIR/../.globalconfig")"
 fi
 
-
-
 RESTORE=0
-if [ "$RULESET_TYPE" != "NONE" ]; then
+if [ -n "$RULESET_TYPE" ] && [ -f "$RULESET_ADJUSTMENT_FILE" ]; then
+  echo "Overriding $RULESET_FILE with $RULESET_ADJUSTMENT_FILE"
 
-    if [ "$PRERELEASE" = "1" ] && 
-          [ -f "$SOURCE_DIR/pre-release.rule-settings.json" ]; then
-        RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/pre-release.rule-settings.json"
-    elif [ "$RELEASE" = "1" ] && 
-       [ -f "$SOURCE_DIR/release.rule-settings.json" ]; then
-    
-        RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/pre-release.rule-settings.json"      
-        RESTORE=1
-    fi
+  dotnet code-analysis "$RULESET_TYPE" \
+              --ruleset "$RULESET_FILE" \
+              --changes "$RULESET_ADJUSTMENT_FILE" || die "Failed to update $RULESET_FILE"
 
-    [ -n "$RULESET_ADJUSTMENT_FILE" ] && \
-        dotnet code-analysis "$RULESET_TYPE" \
-                    --ruleset "$RULESET_FILE" \
-                    --changes "$RULESET_ADJUSTMENT_FILE" || die "Failed to update $RULESET_FILE"
 
-    RESTORE=1
+  RESTORE=1
 fi
 
 echo "***** Restoring... *****" 
