@@ -55,8 +55,10 @@ jobs:
       - name: "Get latest maxmind DB"
         shell: bash
         run: geoipupdate --config-file GeoIP.conf --database-directory geoip
-      - name: Set current date as environment variable
-        run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> "$GITHUB_ENV"
+      - name: "Set current date as environment variable"
+        id: time
+        shell: bash
+        run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
       - name: "Update changelog if changes occured"
         shell: bash
         run: |
@@ -65,11 +67,11 @@ jobs:
           git diff -s --exit-code || \
           dotnet changelog --add Changed --message "GEOIP - Updated GEOIP DB from MaxMind ($CURRENT_DATE)"
         env:
-          CURRENT_DATE: env.CURRENT_DATE
+          CURRENT_DATE: ${{steps.time.outputs.CURRENT_DATE}}
       - name: "Commit changes"
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: "[GEOIP] - Updated GEOIP DB from MaxMind (${{env.CURRENT_DATE}})"
+          commit_message: "[GEOIP] - Updated GEOIP DB from MaxMind (${{steps.time.outputs.CURRENT_DATE}})"
           file_pattern: "*.mmdb CHANGELOG.md"
           commit_user_name: "credfeto-geoip[bot]"
           commit_user_email: "credfeto@users.noreply.github.com"
