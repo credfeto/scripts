@@ -10,7 +10,6 @@ BASEDIR="$(dirname "$(readlink -f "$0")")"
 echo "Script Dir: $BASEDIR"
 SERVER=
 DB=
-AUTH=
 
 # Not following: 
 # shellcheck disable=1091
@@ -42,63 +41,67 @@ FILTER="$OUTPUT/Filter.scpf"
 DBXML="$TMP/db.xml"
 HOOKSXML="$TMP/hooks.xml"
 
-echo "<?xml version=\"1.0\" encoding=\"utf-16\" standalone=\"yes\"?>" > "$HOOKSXML"
-echo "<HooksConfig version=\"1\" type=\"HooksConfig\">" >> "$HOOKSXML"
-echo " <Name>Working Folder<^/Name>" >> "$HOOKSXML"
-echo " <Commands type=\"Commands\" version=\"2\">" >> "$HOOKSXML"
-echo "   <element>" >> "$HOOKSXML"
-echo "     <key type=\"string\">GetLatest</key>" >> "$HOOKSXML"
-echo "     <value version=\"1\" type=\"GenericHookCommand\">" >> "$HOOKSXML"
-echo "       <CommandLine></CommandLine>" >> "$HOOKSXML"
-echo "       <Verify>exitCode == 0</Verify>" >> "$HOOKSXML"
-echo "     </value>" >> "$HOOKSXML"
-echo "   </element>" >> "$HOOKSXML"
-echo "   <element>" >> "$HOOKSXML"
-echo "     <key type=\"string\">Add</key>" >> "$HOOKSXML"
-echo "     <value version=\"1\" type=\"GenericHookCommand\">" >> "$HOOKSXML"
-echo "       <CommandLine></CommandLine>" >> "$HOOKSXML"
-echo "       <Verify>exitCode == 0</Verify>" >> "$HOOKSXML"
-echo "     </value>" >> "$HOOKSXML"
-echo "   </element>" >> "$HOOKSXML"
-echo "   <element>" >> "$HOOKSXML"
-echo "     <^key type=\"string\">Edit<^/key>" >> "$HOOKSXML"
-echo "     <^value version=\"1\" type=\"GenericHookCommand\">" >> "$HOOKSXML"
-echo "       <CommandLine></CommandLine>" >> "$HOOKSXML"
-echo "       <Verify>exitCode == 0</Verify>" >> "$HOOKSXML"
-echo "     </value>" >> "$HOOKSXML"
-echo "   </element>" >> "$HOOKSXML"
-echo "   <element>" >> "$HOOKSXML"
-echo "     <key type=\"string\">Delete</key>" >> "$HOOKSXML"
-echo "     <value version=\"1\" type=\"GenericHookCommand\">" >> "$HOOKSXML"
-echo "       <CommandLine></CommandLine>" >> "$HOOKSXML"
-echo "       <Verify>exitCode == 0</Verify>" >> "$HOOKSXML"
-echo "     </value>" >> "$HOOKSXML"
-echo "   </element>" >> "$HOOKSXML"
-echo "   <element>" >> "$HOOKSXML"
-echo "     <key type=\"string\">Commit</key>" >> "$HOOKSXML"
-echo "     <value version=\"1\" type=\"GenericHookCommand\">" >> "$HOOKSXML"
-echo "       <CommandLine></CommandLine>" >> "$HOOKSXML"
-echo "       <Verify>exitCode == 0</Verify>" >> "$HOOKSXML"
-echo "     </value>" >> "$HOOKSXML"
-echo "   </element>" >> "$HOOKSXML"
-echo "   <element>" >> "$HOOKSXML"
-echo "     <key type=\"string\">Revert</key>" >> "$HOOKSXML"
-echo "     <value version=\"1\" type=\"GenericHookCommand\">" >> "$HOOKSXML"
-echo "       <CommandLine></CommandLine>" >> "$HOOKSXML"
-echo "       <Verify>exitCode == 0</Verify>" >> "$HOOKSXML"
-echo "     </value>" >> "$HOOKSXML"
-echo "   </element>" >> "$HOOKSXML"
-echo " </Commands>" >> "$HOOKSXML"
-echo "</HooksConfig>" >> "$HOOKSXML"
+cat << EOF > "$HOOKSXML"
+<?xml version="1.0" encoding="utf-16" standalone="yes"?>
+<HooksConfig version="1" type="HooksConfig">
+ <Name>Working Folder</Name>
+ <Commands type="Commands" version="2">
+   <element>
+     <key type="string">GetLatest</key>
+     <value version="1" type="GenericHookCommand">
+       <CommandLine></CommandLine>
+       <Verify>exitCode == 0</Verify>
+     </value>
+   </element>
+   <element>
+     <key type="string">Add</key>
+     <value version="1" type="GenericHookCommand">
+       <CommandLine></CommandLine>
+       <Verify>exitCode == 0</Verify>
+     </value>
+   </element>
+   <element>
+     <key type="string">Edit</key>
+     <value version="1" type="GenericHookCommand">
+       <CommandLine></CommandLine>
+       <Verify>exitCode == 0</Verify>
+     </value>
+   </element>
+   <element>
+     <key type="string">Delete</key>
+     <value version="1" type="GenericHookCommand">
+       <CommandLine></CommandLine>
+       <Verify>exitCode == 0</Verify>
+     </value>
+   </element>
+   <element>
+     <key type="string">Commit</key>
+     <value version="1" type="GenericHookCommand">
+       <CommandLine></CommandLine>
+       <Verify>exitCode == 0</Verify>
+     </value>
+   </element>
+   <element>
+     <key type="string">Revert</key>
+     <value version="1" type="GenericHookCommand">
+       <CommandLine></CommandLine>
+       <Verify>exitCode == 0</Verify>
+     </value>
+   </element>
+ </Commands>
+</HooksConfig>
+EOF
 
 
-echo "<?xml version=\"1.0\" encoding=\"utf-16\" standalone=\"yes\"?>" > "$DBXML"
-echo "<!-- -->" >> "$DBXML"
-echo "<ISOCCompareLocation version=\"2\" type=\"WorkingFolderGenericLocation\" >" >> "$DBXML"
-echo "  <LocalRepositoryFolder>%SOURCE%</LocalRepositoryFolder>" >> "$DBXML"
-echo "  <HooksConfigFile>$HOOKSXML</HooksConfigFile>" >> "$DBXML"
-echo "  <HooksFileInRepositoryFolder>False</HooksFileInRepositoryFolder>" >> "$DBXML"
-echo "</ISOCCompareLocation>" >> "$DBXML"
+cat << EOF > "$DBXML"
+<?xml version="1.0" encoding="utf-16" standalone="yes"?> 
+<!-- -->
+<ISOCCompareLocation version="2" type="WorkingFolderGenericLocation" >
+  <LocalRepositoryFolder>%SOURCE%</LocalRepositoryFolder>
+  <HooksConfigFile>$HOOKSXML</HooksConfigFile>
+  <HooksFileInRepositoryFolder>False</HooksFileInRepositoryFolder>
+</ISOCCompareLocation>
+EOF
 
 sudo "$BASEDIR/sqlcompare" \
   "$HOME" \

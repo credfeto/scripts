@@ -1,7 +1,5 @@
 #!/bin/sh
 
-PROG=$0
-
 die() {
     echo
     echo "$@"
@@ -18,6 +16,8 @@ OUTPUT=
 REPORT=
 LOG=
 
+# Not following: 
+# shellcheck disable=1091
 . "$BASEDIR/dbenv"
 
 while [ $# -gt 0 ]; do
@@ -64,7 +64,7 @@ REPORT="$OUTPUT.xml"
 #  "/token:$REDGATE_PAT" \
 
 echo "Running sqlcompare to produce $OUTPUT"
-sudo $BASEDIR/sqlcompare \
+sudo "$BASEDIR/sqlcompare" \
   "$HOME" \
   "/email:$REDGATE_EMAIL" \
   "/token:$REDGATE_PAT" \
