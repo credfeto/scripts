@@ -45,22 +45,24 @@ for FILE in $FILES; do
     SHEBANG_EXEC="${BASH_REMATCH[1]}"
     SHELL=
     if [[ "$SHEBANG_EXEC" == "/bin/bash" ]]; then
-      SHELL=bash
-      bash -n "$FILE" || fail "$SHELL: Invalid Script"
+      SHELL="bash"
+      bash -n -u "$FILE" || fail "$SHELL: Invalid Script"
       sh -n "$FILE" > /dev/null 2>&1 && hint "Could be run in bash?"
     elif [[ "$SHEBANG_EXEC" == "/usr/bin/env bash" ]]; then
-      SHELL=bash
-      bash -n "$FILE" || fail "$SHELL: Invalid Script"
+      SHELL="bash"
+      bash -n -u  "$FILE" || fail "$SHELL: Invalid Script"
       sh -n "$FILE" > /dev/null 2>&1 && hint "Could be run in bash?"
     elif [[ "$SHEBANG_EXEC" == "/bin/sh" ]]; then
-      SHELL=sh
+      SHELL="sh"
       sh -n "$FILE" || fail "$SHELL: Invalid Script"
     elif [[ "$SHEBANG_EXEC" == "/usr/bin/env sh" ]]; then
-      SHELL=sh
+      SHELL="sh"
       sh -n "$FILE" || fail "$SHELL: Invalid Script"
     else
       fail "Unknown Shell: $SHEBANG_EXEC"
     fi
+    
+    shellcheck "$FILE" || fail "Shellcheck"
   else
     fail "No Shebang: $FIRST_LINE"
   fi
