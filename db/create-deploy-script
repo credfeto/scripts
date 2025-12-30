@@ -1,7 +1,5 @@
 #!/bin/sh
 
-PROG=$0
-
 die() {
     echo
     echo "$@"

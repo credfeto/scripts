@@ -62,7 +62,7 @@ for FILE in $FILES; do
       fail "Unknown Shell: $SHEBANG_EXEC"
     fi
     
-    shellcheck "$FILE" || fail "Shellcheck"
+    shellcheck -x "$FILE" || fail "Shellcheck"
   else
     fail "No Shebang: $FIRST_LINE"
   fi
