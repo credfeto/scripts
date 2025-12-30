@@ -31,7 +31,7 @@ excluded() {
   FILE=$1
   
   
-  if [[ "$FILE" == "$BASEDIR/db/dbenv" ]]; then
+  if [ "$FILE" = "$BASEDIR/db/dbenv" ]; then
     echo "1"
   else
     echo "0"
@@ -41,7 +41,7 @@ excluded() {
 # Find all the script files both executable and ones with shebang
 FILES=$({ \
       find "$BASEDIR" -not -path '*/.*' -type f -executable -print || die "Search: find"
-      grep -rIzl --exclude-dir='.*' '^#![[:blank:]]' "$BASEDIR" || die "Search: Grep"
+      grep -rIzl --exclude-dir='.*' '^#![:blank:]' "$BASEDIR" || die "Search: Grep"
       } | sort | uniq)
 
 echo "Testing:"
@@ -57,18 +57,18 @@ for FILE in $FILES; do
   if [[ $FIRST_LINE =~ $REGEX_SHEBANG ]]; then
     SHEBANG_EXEC="${BASH_REMATCH[1]}"
     SHELL=
-    if [[ "$SHEBANG_EXEC" == "/bin/bash" ]]; then
+    if [ "$SHEBANG_EXEC" = "/bin/bash" ]; then
       SHELL="bash"
       bash -n -u "$FILE" || fail "$SHELL: Invalid Script"
       sh -n "$FILE" > /dev/null 2>&1 && hint "Could be run in bash?"
-    elif [[ "$SHEBANG_EXEC" == "/usr/bin/env bash" ]]; then
+    elif [ "$SHEBANG_EXEC" = "/usr/bin/env bash" ]; then
       SHELL="bash"
       bash -n -u  "$FILE" || fail "$SHELL: Invalid Script"
       sh -n "$FILE" > /dev/null 2>&1 && hint "Could be run in bash?"
-    elif [[ "$SHEBANG_EXEC" == "/bin/sh" ]]; then
+    elif [ "$SHEBANG_EXEC" = "/bin/sh" ]; then
       SHELL="sh"
       sh -n "$FILE" || fail "$SHELL: Invalid Script"
-    elif [[ "$SHEBANG_EXEC" == "/usr/bin/env sh" ]]; then
+    elif [ "$SHEBANG_EXEC" = "/usr/bin/env sh" ]; then
       SHELL="sh"
       sh -n "$FILE" || fail "$SHELL: Invalid Script"
     else
@@ -81,7 +81,7 @@ for FILE in $FILES; do
   fi
   
   ## Run Shellcheck on the file
-  if [[ $(excluded "$FILE") == "1" ]]; then
+  if [ "$(excluded "$FILE")" = "1" ]; then
     hint "Excluded from shellcheck"
   else
     shellcheck "$FILE" || fail "Shellcheck"
