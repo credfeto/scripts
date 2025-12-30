@@ -1,6 +1,5 @@
 #!/bin/sh
 
-PROG=$0
 BASEDIR="$(dirname "$(readlink -f "$0")")"
 
 die() {
@@ -14,6 +13,8 @@ echo "Script Dir: $BASEDIR"
 SERVER=
 DB=
 
+# Not following: 
+# shellcheck disable=1091
 . "$BASEDIR/dbenv" 
 
 [ -z "$SERVER" ] && die "--server not specified"

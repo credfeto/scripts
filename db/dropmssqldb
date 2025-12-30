@@ -1,7 +1,5 @@
 #!/bin/sh
 
-PROG=$0
-
 die() {
     echo
     echo "$@"
@@ -13,6 +11,8 @@ echo "Script Dir: $BASEDIR"
 SERVER=
 DB=
 
+# Not following: 
+# shellcheck disable=1091
 . "$BASEDIR/dbenv" 
 
 [ -z "$SERVER" ] && die "--server not specified"

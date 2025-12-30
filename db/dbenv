@@ -1,8 +1,7 @@
 #!/bin/sh
 
-PROG=$0
-CURRENTDIR=$PWD
-echo "Current Dir: $CURRENTDIR"
+CURRENT_DIR=$PWD
+echo "Current Dir: $CURRENT_DIR"
 
 die() {
     echo
@@ -18,7 +17,7 @@ SCHEMA=
 
 DB_SETTINGS_FILE=~/.database
 [ -f "$DB_SETTINGS_FILE" ]; echo "Using $DB_SETTINGS_FILE"
-[ -f "$DB_SETTINGS_FILE" ]; . "${DB_SETTINGS_FILE}"
+[ -f "$DB_SETTINGS_FILE" ]; . "$DB_SETTINGS_FILE"
 
 LOCAL_DB_SETTINGS_FILE=$(find $(CP="${PWD}"; while [ -n "$CP" ] ; do echo "$CP"; CP="${CP%/*}"; done;) -mindepth 1 -maxdepth 1 -type f -name ".database" | head -n 1)
 if [ ! -z "$LOCAL_DB_SETTINGS_FILE" ]; then
@@ -26,7 +25,7 @@ if [ ! -z "$LOCAL_DB_SETTINGS_FILE" ]; then
   LOCAL_DB_SETTINGS_FOLDER=$(dirname "$LOCAL_DB_SETTINGS_FILE")
   if [ "$LOCAL_DB_SETTINGS_FILE" != "$DB_SETTINGS_FILE" ]; then
     echo "Using settings from $LOCAL_DB_SETTINGS_FOLDER"
-    . "${LOCAL_DB_SETTINGS_FILE}"
+    . "$LOCAL_DB_SETTINGS_FILE"
     
     if [ ! -z "$DB" ]; then
       [ -z "$SOURCE" ] && SOURCE="$LOCAL_DB_SETTINGS_FOLDER/db"

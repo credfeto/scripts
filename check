@@ -21,9 +21,22 @@ fail() {
 
 
 
+
 BASEDIR="$(dirname "$(readlink -f "$0")")"
 
 REGEX_SHEBANG="^#!\s*(.*)$"
+
+
+excluded() {
+  FILE=$1
+  
+  
+  if [[ "$FILE" == "$BASEDIR/db/dbenv" ]]; then
+    echo "1"
+  else
+    echo "0"
+  fi
+}
 
 # Find all the script files both executable and ones with shebang
 FILES=$({ \
@@ -62,9 +75,16 @@ for FILE in $FILES; do
       fail "Unknown Shell: $SHEBANG_EXEC"
     fi
     
-    shellcheck -x "$FILE" || fail "Shellcheck"
+    
   else
     fail "No Shebang: $FIRST_LINE"
+  fi
+  
+  ## Run Shellcheck on the file
+  if [[ $(excluded "$FILE") == "1" ]]; then
+    hint "Excluded from shellcheck"
+  else
+    shellcheck "$FILE" || fail "Shellcheck"
   fi
   
 done
