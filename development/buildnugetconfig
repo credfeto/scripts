@@ -1,5 +1,4 @@
 #! /bin/bash
-BASEDIR=$(dirname "$(readlink -f "$0")")
 
 die() {
     echo
@@ -43,15 +42,13 @@ NUGET_CONF_FILE="$NUGET_CONF_DIR/NuGet.Config"
 echo "NuGet.Config: $NUGET_CONF_FILE"
 
 {
-  echo "<?xml version="1.0" encoding="utf-8"?>"
+  echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
   echo "<configuration>"
   echo "  <packageSources>"
   for index in ${!NAMES[@]}; do
-    NAME=${NAMES[$index]}
-    URL=${URLS[$index]}
-  #  echo "* Name: $NAME"
-  #  echo "*  Url: $URL"
-  echo "    <add key=\"$NAME\" value=\"$URL\" protocolVersion=\"3\" />"
+    NAME="${NAMES[$index]}"
+    URL="${URLS[$index]}"
+    echo "    <add key=\"$NAME\" value=\"$URL\" protocolVersion=\"3\" />"
   done
   echo "  </packageSources>"
   echo "</configuration>"
