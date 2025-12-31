@@ -33,7 +33,7 @@ while [ $# -gt 0 ]; do
 done
 
 PACK=0  
-HAS_PACKED=$(grep -R "<IsPackable>true</IsPackable>" . --include *.csproj | head -1)
+HAS_PACKED=$(grep -R "<IsPackable>true</IsPackable>" . --include "*.csproj" | head -1)
 if [ -n "$HAS_PACKED" ]; then
   PACK=1
 fi
@@ -91,6 +91,7 @@ do
   SOURCES="$SOURCES --source $SOURCE"
 done
 echo "Sources: $SOURCES"
+# shellcheck disable=2086
 SolutionDir="$SOURCE_DIR/" dotnet list "$SOLUTION" package --vulnerable --include-transitive $SOURCES || die "Vulnerabilities found"
 
 echo "***** Cleaning... *****" 
