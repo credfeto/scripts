@@ -45,7 +45,7 @@ echo "NuGet.Config: $NUGET_CONF_FILE"
   echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
   echo "<configuration>"
   echo "  <packageSources>"
-  for index in ${!NAMES[@]}; do
+  for index in "${!NAMES[@]}"; do
     NAME="${NAMES[$index]}"
     URL="${URLS[$index]}"
     echo "    <add key=\"$NAME\" value=\"$URL\" protocolVersion=\"3\" />"
