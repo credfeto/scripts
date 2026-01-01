@@ -7,7 +7,7 @@ ls -la "$HOME/.config/dotnet-tools.json"
 
 if [ ! -f "$HOME/.config/dotnet-tools.json" ]; then
 
-  cd $HOME && dotnet new tool-manifest
+  cd "$HOME" && dotnet new tool-manifest
 
 fi
 
