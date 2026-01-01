@@ -1,7 +1,4 @@
 #! /bin/sh
-PROG=$0
-CURRENTDIR=$PWD
-echo "Current Dir: $CURRENTDIR"
 
 error_exit() {
     echo
