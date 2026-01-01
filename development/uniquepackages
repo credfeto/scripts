@@ -1,4 +1,3 @@
 #! /bin/sh
-BASEDIR=$(dirname "$(readlink -f "$0")")
 
-find $(pwd) -name *.csproj | xargs grep PackageReference[[:blank:]]Include= | cut -d'"' -f2 | sort --unique
+grep -r --include "*.csproj" PackageReference[[:blank:]]Include= | cut -d'"' -f2 | sort --unique
