@@ -22,5 +22,27 @@ DB=
 [ -z "$USER" ] && die "--user not specified"
 [ -z "$PASSWORD" ] && die "--password not specified"
 
-dotnet pwsh -f "$BASEDIR/../powershell/DBAppSettings.ps1" --server "$SERVER" --user "$USER" --password "$PASSWORD" --database "$DB"
+for  CSPROJ in $(find "$PWD" -iname "*.csproj") IFS='\n'; do
+  PROJECT_DIR="$(dirname "$CSPROJ")"
+#  echo "Checking $PROJECT_DIR..."
+  APPSETTINGS_FILE="$PROJECT_DIR/appsettings.json"
+  LOCAL_APPSETTINGS_FILE="$PROJECT_DIR/appsettings-local.json"  
+  
+  if [  -f "$APPSETTINGS_FILE" ]; then
+    echo "* Found $APPSETTINGS_FILE"
+    if [ ! -f "$LOCAL_APPSETTINGS_FILE" ]; then
+      echo "* Creating $LOCAL_APPSETTINGS_FILE..."
+      cat << EOF > "$LOCAL_APPSETTINGS_FILE"
+{"DatabaseConfiguration": {"Provider":"","ConnectionString":""}}
+EOF
+    else
+      echo "* Existing $LOCAL_APPSETTINGS_FILE..."
+    fi
+      
+    cat "$LOCAL_APPSETTINGS_FILE" | \
+      jq --arg Provider "mssql" '.DatabaseConfiguration.Provider=$Provider' | \
+      jq --arg ConnectionString "Database=$DB;Server=$SERVER;User ID=$USER;Password=$PASSWORD;Application Name=$DB;Connection Timeout=60;TrustServerCertificate=true" '.DatabaseConfiguration.ConnectionString=$ConnectionString' | \
+      tee "$LOCAL_APPSETTINGS_FILE"
+  fi
+done
 
