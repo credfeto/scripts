@@ -57,6 +57,8 @@ LOG="$OUTPUT.log"
 REPORT="$OUTPUT.xml"
 
 [ -f "$OUTPUT" ] && sudo rm "$OUTPUT"
+[ -f "$LOG" ] && sudo rm "$LOG"
+[ -f "$REPORT" ] && sudo rm "$REPORT"
 
 [ -z "$REDGATE_EMAIL" ] && die "REDGATE_EMAIL not specified"
 [ -z "$REDGATE_PAT" ] && die "REDGATE_PAT not specified"
@@ -88,6 +90,7 @@ sudo "$BASEDIR/sqlcompare" \
   /database2:"$DB" \
   /username2:"$USER" \
   /password2:"$PASSWORD"
+
    
 #   \
 #  /assertidentical
