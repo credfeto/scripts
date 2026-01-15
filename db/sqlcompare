@@ -9,7 +9,8 @@ die() {
 }
 
 #SQLCOMPARE_VERSION=15.3.13
-SQLCOMPARE_VERSION=latest
+SQLCOMPARE_VERSION=16.0.0
+#SQLCOMPARE_VERSION=latest
 
 docker pull redgate/sqlcompare:$SQLCOMPARE_VERSION
 echo "docker run --rm \
