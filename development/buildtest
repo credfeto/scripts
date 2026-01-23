@@ -92,8 +92,7 @@ do
 done
 echo "Sources: $SOURCES"
 # shellcheck disable=2086
-SolutionDir="$SOURCE_DIR/" dotnet list "$SOLUTION" package --vulnerable --include-transitive $SOURCES 
-#|| die "Vulnerabilities found"
+#SolutionDir="$SOURCE_DIR/" dotnet list "$SOLUTION" package --vulnerable --include-transitive $SOURCES || die "Vulnerabilities found"
 
 echo "***** Cleaning... *****" 
 dotnet clean  \
