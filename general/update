@@ -1,7 +1,11 @@
 #! /bin/sh
 
 if [ -f /usr/bin/topgrade ]; then
-  /usr/bin/topgrade -y --disable=jetbrains_toolbox --disable=dotnet
+  /usr/bin/topgrade -y \
+        --disable=jetbrains_toolbox \
+        --disable=dotnet \
+        --disable=node \
+        --disable=containers
 else
 
   [ -f /usr/bin/flatpak ] && flatpak update -y
