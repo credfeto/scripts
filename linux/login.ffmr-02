@@ -3,13 +3,13 @@
 flatpak update -y
 flatpak uninstall --unused -y
 
-flatpak run --branch=stable --arch=x86_64 --command=brave --file-forwarding com.brave.Browser --enable-feature=UseOzonePlatform --ozone-platform=wayland &
+flatpak run --enable-feature=UseOzonePlatform --ozone-platform=wayland &
 
 flatpak run org.mozilla.firefox &
 
-flatpak run --branch=stable --arch=x86_64 --command=com.discordapp.Discord com.discordapp.Discord &
+flatpak run com.discordapp.Discord &
 
-flatpak run --branch=stable --arch=x86_64 --command=telegram-desktop --file-forwarding org.telegram.desktop &
+flatpak run org.telegram.desktop &
 
 flatpak run us.zoom.Zoom &
 
