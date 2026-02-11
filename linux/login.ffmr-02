@@ -3,7 +3,7 @@
 flatpak update -y
 flatpak uninstall --unused -y
 
-flatpak run --enable-feature=UseOzonePlatform --ozone-platform=wayland &
+flatpak run com.brave.Browser --enable-feature=UseOzonePlatform --ozone-platform=wayland &
 
 flatpak run org.mozilla.firefox &
 
