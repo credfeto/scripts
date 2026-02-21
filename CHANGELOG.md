@@ -9,7 +9,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 ### Added
 ### Fixed
 ### Changed
-- GEOIP - Updated GEOIP DB from MaxMind (2026-02-18)
+- GEOIP - Updated GEOIP DB from MaxMind (2026-02-21)
 ### Removed
 ### Deployment Changes
 
