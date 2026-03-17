@@ -129,8 +129,8 @@ dotnet test \
            --no-restore \
            --no-build \
            --long-running 10 \
-           ${TEST_BENCHMARKS} \
-           ${TEST_INTEGRATION} \
+           $TEST_BENCHMARKS \
+           $TEST_INTEGRATION \
            --parallel-algorithm aggressive \
            --ignore-exit-code 8 \
           "-p:ApiCompatGenerateSuppressionFile=true" \
