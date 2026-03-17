@@ -9,6 +9,8 @@ die() {
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
 RULESET_ADJUSTMENT_FILE=
+TEST_BENCHMARKS=
+TEST_INTEGRATION=
 CLEAR="http-cache"
 while [ $# -gt 0 ]; do
     key="$1"
@@ -24,6 +26,14 @@ while [ $# -gt 0 ]; do
       ;;
     -r|--release)
       [ -f "$SOURCE_DIR/release.rule-settings.json" ] && RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/release.rule-settings.json"
+      shift # past argument
+      ;;      
+    -b|--no-benchmmarks)
+      TEST_BENCHMARKS=--filter-not-namespace "*.BenchMark.Tests" --filter-not-namespace "*.BenchMark.Tests.*"
+      shift # past argument
+      ;;      
+    -i|--no-integratopn)
+      TEST_INTEGRATION=--filter-not-namespace "*.Integration.Tests" --filter-not-namespace "*.Integration.Tests.*"
       shift # past argument
       ;;      
     *)    # unknown option
@@ -113,11 +123,16 @@ dotnet build \
            -nodeReuse:False || die "######## Build Failed ########"
 
 echo "***** Testing... *****" 
+# shellcheck disable=SC2086
 dotnet test \
           --configuration Release \
            --no-restore \
            --no-build \
            --long-running 10 \
+           ${TEST_BENCHMARKS} \
+           ${TEST_INTEGRATION} \
+           --parallel-algorithm aggressive \
+           --ignore-exit-code 8 \
           "-p:ApiCompatGenerateSuppressionFile=true" \
           "-p:ContinuousIntegrationBuild=true" \
           "-p:IsProduction=false" \
