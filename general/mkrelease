@@ -1,13 +1,24 @@
-#! /bin/sh
+#!/bin/sh
 die() {
-    echo
-    echo "$@"
+    printf '\n\033[31m✗\033[0m %s\n' "$*"
     exit 1
 }
 
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
 
 RELEASE=$1
 
 [ -z "$RELEASE" ] && die "Invalid release"
 
-dotnet changelog -c "$RELEASE" && git add CHANGELOG.md && git commit CHANGELOG.md -m"Changelog for $RELEASE" -n && git push
+GIT_ROOT=$(git rev-parse --show-toplevel) || die "Not in a git repository"
+CHANGELOG=$GIT_ROOT/CHANGELOG.md
+
+[ -f "$CHANGELOG" ] || die "CHANGELOG.md not found in repository"
+
+dotnet changelog -c "$RELEASE" || die "Failed to update changelog"
+git add "$CHANGELOG" || die "Failed to stage $CHANGELOG"
+git commit "$CHANGELOG" -m"Changelog for $RELEASE" -n || die "Failed to commit changelog"
+git push --no-verify || die "Failed to push"
+success "Released $RELEASE"
