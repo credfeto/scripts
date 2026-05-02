@@ -14,7 +14,7 @@
 #
 # Generate a new SSH Key for a host
 #
-#   ssh-key-mgr create --host <host> --comment <comment> [--no-password]
+#   ssh-key-mgr create --host <host> [--comment <comment>] [--password]
 #
 #
 # Add an alias to use an existing key for another host
@@ -31,7 +31,7 @@
 #
 # Replace an SSH Key generating a new one
 #
-#   ssh-key-mgr rotate --host <host> --comment <comment> [--no-password]
+#   ssh-key-mgr rotate --host <host> [--comment <comment>] [--password]
 #
 #  ** Moves the old key into .ssh/old/<key>
 #
@@ -182,7 +182,7 @@ add_config_host_entry() {
 create_ssh_key() {
   HOST=
   COMMENT=
-  SKIP_PASSWORD=0
+  SKIP_PASSWORD=1
   while [ $# -gt 0 ]; do
     key="$1"
 
@@ -197,8 +197,8 @@ create_ssh_key() {
         shift # past argument
         shift # past value
         ;;
-      -n|--no-password)
-        SKIP_PASSWORD=1        
+      -p|--password)
+        SKIP_PASSWORD=0
         shift # past argument
         ;;
       *)    # unknown option
@@ -208,6 +208,7 @@ create_ssh_key() {
   done
   
   [ -z "$HOST" ] && die "--host not specified"
+  [ -z "$COMMENT" ] && COMMENT="$HOST for $USER@$HOSTNAME"
   [ -z "$COMMENT" ] && die "--comment not specified"
   
   HOST_FILE_HOST=$(find_host_file "$HOST")
