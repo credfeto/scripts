@@ -208,7 +208,7 @@ create_ssh_key() {
   done
   
   [ -z "$HOST" ] && die "--host not specified"
-  [ -z "$COMMENT" ] && COMMENT="$HOST for $USER@$HOSTNAME"
+  [ -z "$COMMENT" ] && COMMENT="$HOST for $USER@$(hostname)"
   [ -z "$COMMENT" ] && die "--comment not specified"
   
   HOST_FILE_HOST=$(find_host_file "$HOST")
