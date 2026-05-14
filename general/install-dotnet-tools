@@ -20,6 +20,7 @@ TOOLS="sleet \
        Credfeto.Package.Update \
        Credfeto.DotNet.Code.Analysis.Overrides.Cmd \
        Credfeto.DotNet.Repo.Tools.Cmd \
+       Credfeto.DotNet.Repo.Formatter \
        FunFair.Content.Packager.Cmd \
        FunFair.Content.PackageSigner.Cmd \
        JetBrains.ReSharper.GlobalTools \
