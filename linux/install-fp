@@ -1,5 +1,18 @@
 #! /bin/sh
 
+die() {
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    exit 1
+}
+
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
+
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
+}
+
 PACKAGES="com.brave.Browser \
           org.mozilla.firefox \
           com.opera.Opera \
@@ -12,6 +25,8 @@ PACKAGES="com.brave.Browser \
           com.ktechpit.whatsie"
 
 for PACKAGE in $PACKAGES; do
-  echo "* Installing $PACKAGE..."
+  info "Installing ${PACKAGE}..."
   flatpak install -y "$PACKAGE"
 done
+
+success "All flatpak packages installed"
