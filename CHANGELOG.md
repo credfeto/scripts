@@ -9,6 +9,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 ### Security
 ### Added
 ### Fixed
+- Shell scripts were cleaned up to pass pre-commit checks, and git/fetch now uses consistent info/success output.
 ### Changed
 - GEOIP - Updated GEOIP DB from MaxMind (2026-06-03)
 ### Deprecated
