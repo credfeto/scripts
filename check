@@ -16,7 +16,7 @@ hint() {
 fail() {
     echo "  - ERROR: $*"
     exit 1
-  
+
 }
 
 
@@ -29,8 +29,8 @@ REGEX_SHEBANG="^#!\s*(.*)$"
 
 excluded() {
   FILE=$1
-  
-  
+
+
   if [ "$FILE" = "$BASEDIR/db/dbenv" ]; then
     echo "1"
   else
@@ -41,7 +41,15 @@ excluded() {
 # Find all the script files both executable and ones with shebang
 FILES=$({ \
       find "$BASEDIR" -not -path '*/.*' -type f -executable -print || die "Search: find"
-      grep -rIzl --exclude-dir='.*' '^#![:blank:]' "$BASEDIR" || die "Search: Grep"
+      while IFS= read -r SHEBANG_FILE; do
+        IFS= read -r FIRST_LINE < "$SHEBANG_FILE" || continue
+
+        case $FIRST_LINE in
+          '#!'*)
+            printf '%s\n' "$SHEBANG_FILE"
+            ;;
+        esac
+      done < <(find "$BASEDIR" -not -path '*/.*' -type f -print) || die "Search: Shebang"
       } | sort | uniq)
 
 echo "Testing:"
@@ -51,7 +59,7 @@ for FILE in $FILES; do
   if [ ! -x "$FILE" ]; then
     fail "Not Executable"
   fi
-  
+
   testing "Shebang"
   FIRST_LINE=$(head -1 "$FILE")
   if [[ $FIRST_LINE =~ $REGEX_SHEBANG ]]; then
@@ -74,20 +82,17 @@ for FILE in $FILES; do
     else
       fail "Unknown Shell: $SHEBANG_EXEC"
     fi
-    
-    
+
+
   else
     fail "No Shebang: $FIRST_LINE"
   fi
-  
+
   ## Run Shellcheck on the file
   if [ "$(excluded "$FILE")" = "1" ]; then
     hint "Excluded from shellcheck"
   else
     shellcheck "$FILE" || fail "Shellcheck"
   fi
-  
+
 done
-
-
-   

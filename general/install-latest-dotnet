@@ -12,12 +12,13 @@ die() {
 # zip_path - $1
 # out_path - $2
 extract_dotnet_package() {
-    eval $invocation
-
     local zip_path="$1"
     local out_path="$2"
+    local temp_out_path
+    local folders_with_version_regex='^.*/[0-9]+\.[0-9]+[^/]+/'
+    local override_non_versioned_files=false
 
-    local temp_out_path="$(mktemp -d "$temporary_file_template")"
+    temp_out_path="$(mktemp -d "$temporary_file_template")"
 
     local failed=false
     tar -xzf "$zip_path" -C "$temp_out_path" > /dev/null || failed=true
@@ -25,22 +26,15 @@ extract_dotnet_package() {
     if [ "$failed" = true ]; then
         rm -f "$zip_path" && say_verbose "Temporary archive file $zip_path was removed"
         say_err "Extraction failed"
-        return 1
     fi
 
- 
-    local folders_with_version_regex='^.*/[0-9]+\.[0-9]+[^/]+/'
     find "$temp_out_path" -type f | grep -Eo "$folders_with_version_regex" | sort | copy_files_or_dirs_from_list "$temp_out_path" "$out_path" false
     find "$temp_out_path" -type f | grep -Ev "$folders_with_version_regex" | copy_files_or_dirs_from_list "$temp_out_path" "$out_path" "$override_non_versioned_files"
 
     rm -rf "$temp_out_path"
     rm -f "$zip_path" && say_verbose "Temporary archive file $zip_path was removed"
-    
 
-    if [ "$failed" = true ]; then
-        say_err "Extraction failed"
-        return 1
-    fi
+
     return 0
 }
 
@@ -50,22 +44,35 @@ extract_dotnet_package() {
 # out_path - $2
 # override - $3
 copy_files_or_dirs_from_list() {
-    eval $invocation
-
-    local root_path="$(remove_trailing_slash "$1")"
-    local out_path="$(remove_trailing_slash "$2")"
+    local root_path
+    local out_path
     local override="$3"
-    local override_switch="$(get_cp_options "$override")"
+    local override_switch
+
+    root_path="$(remove_trailing_slash "$1")"
+    out_path="$(remove_trailing_slash "$2")"
+    override_switch="$(get_cp_options "$override")"
 
     cat | uniq | while read -r file_path; do
-        local path="$(remove_beginning_slash "${file_path#$root_path}")"
-        local target="$out_path/$path"
-        if [ "$override" = true ] || (! ([ -d "$target" ] || [ -e "$target" ])); then
+        local path_suffix
+        local path
+        local target
+
+        path_suffix="${file_path#"$root_path"}"
+        path="$(remove_beginning_slash "$path_suffix")"
+        target="$out_path/$path"
+
+        if [ "$override" = true ] || { [ ! -d "$target" ] && [ ! -e "$target" ]; }; then
             sudo mkdir -p "$out_path/$(dirname "$path")"
             if [ -d "$target" ]; then
                 sudo rm -rf "$target"
             fi
-            sudo cp -R $override_switch "$root_path/$path" "$target"
+
+            if [ -n "$override_switch" ]; then
+                sudo cp -R "$override_switch" "$root_path/$path" "$target"
+            else
+                sudo cp -R "$root_path/$path" "$target"
+            fi
         fi
     done
 }
@@ -73,10 +80,11 @@ copy_files_or_dirs_from_list() {
 # args:
 # override - $1 (boolean, true or false)
 get_cp_options() {
-    eval $invocation
-
     local override="$1"
     local override_switch=""
+    local tmp_dir
+    local tmp_file
+    local tmp_file2
 
     if [ "$override" = false ]; then
         override_switch="-n"
@@ -143,7 +151,7 @@ set -e
 
 get_latest_dotnet_sdk_version() {
     DOTNET_CHANNEL_VERSION=$1
-    [ -z "$DOTNET_CHANNEL_VERSION" ] && die "Dotnet channel version not defined" 
+    [ -z "$DOTNET_CHANNEL_VERSION" ] && die "Dotnet channel version not defined"
     curl \
        --max-time 120 \
        --retry 5 \
@@ -155,7 +163,7 @@ get_latest_dotnet_sdk_version() {
        --user-agent "$USER_AGENT" \
        https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json |
     jq --arg v "$DOTNET_CHANNEL_VERSION" -r '
-            ."releases-index" 
+            ."releases-index"
             | map(select(."channel-version" | contains($v)))
             | first(.[])
           | ."latest-sdk"'
@@ -167,10 +175,9 @@ temporary_file_template="${TMPDIR:-/tmp}/dotnet.XXXXXXXXX"
 
 BASEDIR=$(dirname "$(readlink -f "$0")")
 
-[ -z "$BASEDIR" ] && die "BASEDIR Not defiled"  
+[ -z "$BASEDIR" ] && die "BASEDIR Not defiled"
 
 USER_AGENT="DotnetVersionChecker/1.0.0"
-DOTNET_SOURCE=https://builds.dotnet.microsoft.com
 #PROXY_HOST=http://builds.dotnet.local:5554
 PROXY_HOST=https://dotnet.markridgwell.com
 
@@ -181,14 +188,15 @@ DOWNLOAD_SOURCE=$PROXY_HOST
 VERSIONS_TO_INSTALL="8.0 \
                      9.0 \
                      10.0"
+verbose=false
 
 [ -d "/usr/share/dotnet" ] && sudo rm -fr /usr/share/dotnet
 
 # update to latest dotnet core
 for VERSION in $VERSIONS_TO_INSTALL; do
-  
+
   SDK_VERSION=$(get_latest_dotnet_sdk_version "$VERSION")
-  
+
   [ -z "$SDK_VERSION" ] && die "Could not determine latest SDK version for $VERSION"
 
   TEMPORARY_FILE="$(mktemp "$temporary_file_template")"
@@ -210,12 +218,12 @@ for VERSION in $VERSIONS_TO_INSTALL; do
     -f \
     --user-agent "$USER_AGENT" \
     "$DOWNLOAD_URL" \
-    -o "$TEMPORARY_FILE" || die "Could not download: $DOWNLOAD_URL"  
+    -o "$TEMPORARY_FILE" || die "Could not download: $DOWNLOAD_URL"
 
-  extract_dotnet_package "$TEMPORARY_FILE" "/usr/share/dotnet" || die "Could not install" 
-  
+  extract_dotnet_package "$TEMPORARY_FILE" "/usr/share/dotnet" || die "Could not install"
+
   /usr/share/dotnet/dotnet --list-sdks
-  
+
   echo ""
 done
 

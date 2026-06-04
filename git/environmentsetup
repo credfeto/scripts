@@ -8,7 +8,7 @@ git config --global user.email credfeto@users.noreply.github.com
 # use the following to get the ykey:
 # gpg --list-keys credfeto@users.noreply.github.com | grep -E "^\s\s\s\s\s\s([A-Z0-9]+)$"
 # git config --global user.signingkey 4876FADA8731645D
-git config --global user.signingkey `gpg --list-keys credfeto@users.noreply.github.com | grep -E "^\s\s\s\s\s\s([A-Z0-9]+)$"`
+git config --global user.signingkey "$(gpg --list-keys credfeto@users.noreply.github.com | grep -E '^[[:space:]]{6}[A-Z0-9]+$' | tr -d '[:space:]')"
 git config --global commit.gpgsign true
 
 # Git options

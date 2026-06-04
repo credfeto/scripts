@@ -1,24 +1,38 @@
-#! /bin/sh
+#!/bin/sh
 
+die() {
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    exit 1
+}
 
-for line in $(find $(pwd)/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache)
-do 
-  echo "$line"
-  CURRENT_DIR=$line  
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
 
-  echo ""
-  echo "Retrieving $CURRENT_DIR..."
-  git -C "$CURRENT_DIR" remote get-url origin 2>&1
-  git -C "$CURRENT_DIR" fetch --prune --prune-tags 2>&1
-  git -C "$CURRENT_DIR" remote update origin --prune 2>&1
-  
-  git -C "$CURRENT_DIR" status 2>&1
-  if [ $? -eq 0 ]
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
+}
+
+find "$(pwd)"/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache | while IFS= read -r line
+do
+  CURRENT_DIR=$line
+
+  info "Retrieving ${CURRENT_DIR}..."
+  git -C "$CURRENT_DIR" config --local --unset core.hookspath 2>/dev/null || true
+  git -C "$CURRENT_DIR" remote get-url origin 2>&1 || die "Could not determine origin for ${CURRENT_DIR}"
+  git -C "$CURRENT_DIR" fetch --prune --prune-tags 2>&1 || die "Could not fetch ${CURRENT_DIR}"
+  git -C "$CURRENT_DIR" remote update origin --prune 2>&1 || die "Could not update remote refs for ${CURRENT_DIR}"
+
+  REPO_STATUS=$(git -C "$CURRENT_DIR" status --porcelain 2>&1) || die "Could not read status for ${CURRENT_DIR}"
+
+  if [ -z "$REPO_STATUS" ]
   then
-    echo " + No pending changes in working folder. Rebasing..."
-    git -C "$CURRENT_DIR" rebase 2>&1
-    git -C "$CURRENT_DIR" rebase --abort 2>&1 > /dev/null
-  fi 
+    info "No pending changes in working folder. Rebasing..."
+    git -C "$CURRENT_DIR" rebase 2>&1 || die "Could not rebase ${CURRENT_DIR}"
+    git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
+  else
+    info "Pending changes in working folder. Skipping rebase."
+  fi
 
-  echo " * done"
+  success "Done with ${CURRENT_DIR}"
 done

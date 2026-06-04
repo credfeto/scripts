@@ -1,7 +1,5 @@
 #! /bin/sh
 
-PROG=$0
-
 die() {
     echo
     echo "$@"
@@ -10,6 +8,7 @@ die() {
 
 BASEDIR="$(dirname "$(readlink -f "$0")")"
 
+# shellcheck source=/dev/null
 . "$BASEDIR/preview-config"
 
 [ -z "$DOTNET_PREVIEW_VERSION" ] && die "DOTNET_PREVIEW_VERSION not defined"
@@ -22,37 +21,36 @@ LATEST_PRE_RELEASE=$(dotnet --list-sdks | cut -f 1 -d " " | grep "^$DOTNET_PREVI
 
 if [ -n "$LATEST_GA_RELEASE" ]; then
   echo "Latest GA release: $LATEST_GA_RELEASE";
-  
+
   TMP_JSON=$(mktemp)
   cat "$GLOBAL_JSON" | \
       jq --arg sdk "$LATEST_GA_RELEASE" '.sdk.version=$sdk' | \
       jq --argjson allowPrerelease false '.sdk.allowPrerelease=$allowPrerelease' > \
           "$TMP_JSON"
-  
+
   rm -f "$GLOBAL_JSON"
   mv "$TMP_JSON" "$GLOBAL_JSON"
-    
+
   cat "$GLOBAL_JSON"
-  
+
   git add "$GLOBAL_JSON" && git commit "$GLOBAL_JSON" -m"Updated DotNet SDK to $LATEST_GA_RELEASE" && git push
-  
+
 elif [ -n "$LATEST_PRE_RELEASE" ]; then
   echo "Latest preview release: $LATEST_PRE_RELEASE"
-  
+
   TMP_JSON=$(mktemp)
   cat "$GLOBAL_JSON" | \
         jq --arg sdk "$LATEST_PRE_RELEASE" '.sdk.version=$sdk' | \
         jq --argjson allowPrerelease true '.sdk.allowPrerelease=$allowPrerelease' > \
             "$TMP_JSON"
-  
+
   rm -f "$GLOBAL_JSON"
   mv "$TMP_JSON" "$GLOBAL_JSON"
-        
+
   cat "$GLOBAL_JSON"
-  
+
   git add "$GLOBAL_JSON" && git commit "$GLOBAL_JSON" -m"Updated DotNet SDK to $LATEST_PRE_RELEASE" && git push
-        
+
 else
   die "No suitable release found"
 fi
-
