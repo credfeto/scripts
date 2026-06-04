@@ -1,20 +1,18 @@
 #! /bin/sh
-
-
-for line in $(find $(pwd)/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache)
-do 
+find "$(pwd)"/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache | while IFS= read -r line
+do
   echo "$line"
-  CURRENT_DIR=$line  
+  CURRENT_DIR=$line
 
-  DEFAULT_BRANCH=$(git -C "$CURRENT_DIR" remote show origin | sed -n '/HEAD branch/s/.*: //p')  
+  DEFAULT_BRANCH=$(git -C "$CURRENT_DIR" remote show origin | sed -n '/HEAD branch/s/.*: //p')
   echo ""
   echo "Retrieving $CURRENT_DIR..."
   git -C "$CURRENT_DIR" remote get-url origin 2>&1
   git -C "$CURRENT_DIR" fetch origin 2>&1
-  
+
   [ -z "$DEFAULT_BRANCH" ] && echo "**** No default branch found"
   [ ! -z "$DEFAULT_BRANCH" ] && git -C "$CURRENT_DIR" checkout "$DEFAULT_BRANCH" 2>&1
   [ ! -z "$DEFAULT_BRANCH" ] && git -C "$CURRENT_DIR" fetch origin 2>&1
-  
+
   echo " * done"
 done

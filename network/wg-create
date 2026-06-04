@@ -6,8 +6,6 @@ die() {
     exit 1
 }
 
-BASEDIR=$(dirname "$(readlink -f "$0")")
-
 [ -f /usr/bin/wg ] || die "Missing wireguard-tools || pacman -S wireguard-tools"
 
 CLIENT_IP_ADDRESSES=
@@ -34,7 +32,7 @@ while [ $# -gt 0 ]; do
       PEER_ENDPOINT="$2"
       shift # past argument
       shift # past value
-      ;;      
+      ;;
     -f|--filename)
           SAVE_TO="$2"
           shift # past argument
@@ -46,7 +44,8 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-[ -f "$HOME/.wg-endpoint" ] && . "$HOME/.wg-endpoint" 
+# shellcheck source=/dev/null
+[ -f "$HOME/.wg-endpoint" ] && . "$HOME/.wg-endpoint"
 
 [ -z "$CLIENT_IP_ADDRESSES" ] && die "Client IP Addresses not specified"
 [ -z "$DNS" ] && die "DNS Addresses not specified"
@@ -68,7 +67,7 @@ PUBLIC_KEY=$(echo "$PRIVATE_KEY" | wg genkey)
   echo "[Peer]"
   echo "PublicKey = $PEER_PUBLIC_KEY"
   echo "PresharedKey = $PRESHARED_KEY"
-  echo "Endpoint = $PEER_ENDPOINT"  
+  echo "Endpoint = $PEER_ENDPOINT"
   echo "AllowedIPs = 0.0.0.0/0,::/0"
   echo "PersistentKeepalive = 5"
 

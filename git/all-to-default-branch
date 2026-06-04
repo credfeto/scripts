@@ -1,10 +1,8 @@
 #! /bin/sh
-
-
-for line in $(find $(pwd)/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache)
-do 
+find "$(pwd)"/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache | while IFS= read -r line
+do
   echo "$line"
-  CURRENT_DIR=$line  
+  CURRENT_DIR=$line
 
 
   echo ""
@@ -13,6 +11,6 @@ do
   git -C "$CURRENT_DIR" fetch origin 2>&1
   git -C "$CURRENT_DIR" checkout main 2>&1
   git -C "$CURRENT_DIR" fetch origin 2>&1
-  
+
   echo " * done"
 done

@@ -3,13 +3,13 @@
 BASEDIR="$(dirname "$(readlink -f "$0")")"
 echo "Script Dir: $BASEDIR"
 
-for line in $(find $(pwd)/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache)
-do 
+find "$(pwd)"/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache | while IFS= read -r line
+do
   echo "$line"
-  CURRENT_DIR=$line  
+  CURRENT_DIR=$line
 
   echo "==== $CURRENT_DIR ==="
-  cd "$CURRENT_DIR" && "$BASEDIR/missing-release-branches" 
+  cd "$CURRENT_DIR" && "$BASEDIR/missing-release-branches"
 
   echo " * done"
 done

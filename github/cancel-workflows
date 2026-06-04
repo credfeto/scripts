@@ -1,7 +1,8 @@
 #!/bin/bash
 
-
-PROG=$0
+info() {
+    echo "$@"
+}
 
 die() {
     echo
@@ -10,7 +11,7 @@ die() {
 }
 
 BASEDIR="$(dirname "$(readlink -f "$0")")"
-echo "Script Dir: $BASEDIR"
+info "Script Dir: $BASEDIR"
 
 
 TOKEN=
@@ -40,25 +41,27 @@ done
 [ -z "$REPO" ] && die "--repo not specified"
 
 
-c="1"
-while [ $c -gt 0 ]
+c=1
+while [ "$c" -gt 0 ]
 do
-        c="0"
+        c=0
 
         response=$(curl -s -H "Authorization: token $TOKEN" \
-             https://api.github.com/repos/$REPO/actions/runs?status=queued)
+             "https://api.github.com/repos/$REPO/actions/runs?status=queued")
 
-        ids=$(echo $response | \
+        ids=$(echo "$response" | \
              jq '.workflow_runs[] | select([.status] | inside(["queued"])) | .id')
-        set -- $ids
-        for i; do 
-                echo "Cancelling $i..."
+        while IFS= read -r i; do
+                [ -z "$i" ] && continue
+                info "Cancelling $i..."
                 curl \
                      --silent \
                      -H "Authorization: token $TOKEN" \
-                     -X POST "https://api.github.com/repos/$REPO/actions/runs/$i/cancel" > /dev/null
-                c=$[$c+1]
-        done
+                     -X POST "https://api.github.com/repos/$REPO/actions/runs/$i/cancel" > /dev/null || die "Failed to cancel $i"
+                c=$((c+1))
+        done <<EOF
+$ids
+EOF
 
-        echo "Total $c in this batch"
+        info "Total $c in this batch"
 done

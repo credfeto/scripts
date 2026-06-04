@@ -1,9 +1,9 @@
 #! /bin/sh
 
-while read line; do
+while IFS= read -r line; do
 
 
-  echo $line;
-  git clone $line;
+  echo "$line"
+  git clone "$line"
 
 done < "$1"

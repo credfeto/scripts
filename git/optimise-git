@@ -1,11 +1,11 @@
 #! /bin/sh
 
-echo PWD: $(pwd)
+echo "PWD: $(pwd)"
 
-for line in $(find $(pwd)/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache)
-do 
+find "$(pwd)"/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache | while IFS= read -r line
+do
   echo "$line"
-  CURRENT_DIR=$line  
+  CURRENT_DIR=$line
 
 echo ""
   echo "Optimising $CURRENT_DIR..."

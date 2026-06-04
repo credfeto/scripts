@@ -1,7 +1,5 @@
 #! /bin/sh
 
-PROG=$0
-
 die() {
     echo
     echo "$@"
@@ -10,6 +8,7 @@ die() {
 
 BASEDIR="$(dirname "$(readlink -f "$0")")"
 
+# shellcheck source=/dev/null
 . "$BASEDIR/preview-config"
 
 [ -z "$DOTNET_PREVIEW_VERSION" ] && die "DOTNET_PREVIEW_VERSION not defined"
