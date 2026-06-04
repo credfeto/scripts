@@ -10,6 +10,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 ### Added
 ### Fixed
 - Shell scripts were cleaned up to pass pre-commit checks, and git/fetch now uses consistent info/success output.
+- Replace raw echo output with standard die/success/info helpers in network/wg-create
 ### Changed
 - GEOIP - Updated GEOIP DB from MaxMind (2026-06-03)
 ### Deprecated
