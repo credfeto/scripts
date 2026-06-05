@@ -13,6 +13,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Shell scripts were cleaned up to pass pre-commit checks, and git/fetch now uses consistent info/success output.
 - Replace raw echo output with standard die/success/info helpers in network/wg-create
 - Replace raw echo with output helpers in linux/install-fp
+- Replace raw echo with output helpers in git/update-preview
 ### Changed
 - GEOIP - Updated GEOIP DB from MaxMind (2026-06-03)
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
