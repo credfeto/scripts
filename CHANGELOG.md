@@ -14,6 +14,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replace raw echo output with standard die/success/info helpers in network/wg-create
 - Replace raw echo with output helpers in linux/install-fp
 - Replace raw echo with output helpers in git/update-preview
+- Replace raw echo with standard output helpers in git/update-dotnet-sdk
 ### Changed
 - GEOIP - Updated GEOIP DB from MaxMind (2026-06-03)
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
