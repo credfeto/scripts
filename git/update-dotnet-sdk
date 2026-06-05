@@ -1,9 +1,12 @@
 #! /bin/sh
 
 die() {
-    echo
-    echo "$@"
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
     exit 1
+}
+
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
 }
 
 BASEDIR="$(dirname "$(readlink -f "$0")")"
@@ -20,7 +23,7 @@ LATEST_GA_RELEASE=$(dotnet --list-sdks | cut -f 1 -d " " | grep "^$DOTNET_PREVIE
 LATEST_PRE_RELEASE=$(dotnet --list-sdks | cut -f 1 -d " " | grep "^$DOTNET_PREVIEW_VERSION\.[0-9]*\.[0-9]*-" | sort | tail -1)
 
 if [ -n "$LATEST_GA_RELEASE" ]; then
-  echo "Latest GA release: $LATEST_GA_RELEASE";
+  info "Latest GA release: $LATEST_GA_RELEASE"
 
   TMP_JSON=$(mktemp)
   cat "$GLOBAL_JSON" | \
@@ -36,7 +39,7 @@ if [ -n "$LATEST_GA_RELEASE" ]; then
   git add "$GLOBAL_JSON" && git commit "$GLOBAL_JSON" -m"Updated DotNet SDK to $LATEST_GA_RELEASE" && git push
 
 elif [ -n "$LATEST_PRE_RELEASE" ]; then
-  echo "Latest preview release: $LATEST_PRE_RELEASE"
+  info "Latest preview release: $LATEST_PRE_RELEASE"
 
   TMP_JSON=$(mktemp)
   cat "$GLOBAL_JSON" | \
