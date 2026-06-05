@@ -13,6 +13,19 @@ info() {
     printf '\n\033[32m→\033[0m %s\n' "$*"
 }
 
+SWITCH_TO_MAIN=0
+
+for arg in "$@"; do
+    case "$arg" in
+        --switch-to-main)
+            SWITCH_TO_MAIN=1
+            ;;
+        *)
+            die "Unknown argument: $arg"
+            ;;
+    esac
+done
+
 find "$(pwd)"/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache | while IFS= read -r line
 do
   CURRENT_DIR=$line
@@ -32,6 +45,30 @@ do
     git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
   else
     info "Pending changes in working folder. Skipping rebase."
+  fi
+
+  if [ "$SWITCH_TO_MAIN" = "1" ]
+  then
+    CURRENT_BRANCH=$(git -C "$CURRENT_DIR" rev-parse --abbrev-ref HEAD 2>&1) || die "Could not determine current branch for ${CURRENT_DIR}"
+    DEFAULT_BRANCH=$(git -C "$CURRENT_DIR" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
+
+    if [ -z "$DEFAULT_BRANCH" ]
+    then
+      DEFAULT_BRANCH="main"
+    fi
+
+    if [ "$CURRENT_BRANCH" != "$DEFAULT_BRANCH" ]
+    then
+      if [ -z "$REPO_STATUS" ]
+      then
+        info "Switching to ${DEFAULT_BRANCH} branch..."
+        git -C "$CURRENT_DIR" checkout "$DEFAULT_BRANCH" 2>&1 || die "Could not switch to ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
+        git -C "$CURRENT_DIR" rebase 2>&1 || die "Could not rebase ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
+        git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
+      else
+        info "Pending changes in working folder. Skipping switch to ${DEFAULT_BRANCH}."
+      fi
+    fi
   fi
 
   success "Done with ${CURRENT_DIR}"
