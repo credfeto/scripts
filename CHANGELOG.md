@@ -18,9 +18,9 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replace raw echo with standard output helpers in git/switchtomain
 - Replace raw echo with output helpers in git/optimise-git
 ### Changed
-- GEOIP - Updated GEOIP DB from MaxMind (2026-06-03)
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
+- GEOIP - Updated GEOIP DB from MaxMind (2026-06-06)
 ### Deprecated
 ### Removed
 ### Deployment Changes
