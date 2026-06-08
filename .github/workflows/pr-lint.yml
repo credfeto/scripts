@@ -413,6 +413,7 @@ jobs:
           fetch-depth: 0
 
       - name: "Check Required Secrets"
+        if: github.actor != 'dependabot[bot]'
         shell: bash
         run: |
           if [ -z "${{secrets.SOURCE_PUSH_TOKEN}}" ]; then
@@ -424,7 +425,7 @@ jobs:
         uses: super-linter/super-linter@v8.6.0
         env:
           DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{secrets.SOURCE_PUSH_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.SOURCE_PUSH_TOKEN || github.token}}
           GITHUB_ACTIONS_CONFIG_FILE: actionlint.yaml
           ENABLE_GITHUB_ACTIONS_STEP_SUMMARY: true
           SAVE_SUPER_LINTER_SUMMARY: true
