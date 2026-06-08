@@ -1,3 +1,4 @@
+--- # GeoIP: Perform Maxmind GEOIP Updates
 name: "GeoIP: Perform Maxmind GEOIP Updates"
 
 on:
