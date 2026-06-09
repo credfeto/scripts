@@ -19,6 +19,7 @@ permissions:
 
 jobs:
   build-pre-release:
+    if: "!startsWith(github.ref, 'refs/heads/dependabot/')"
 
     runs-on: ubuntu-latest
 
