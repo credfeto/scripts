@@ -38,7 +38,7 @@ jobs:
       - name: "Request Copilot code review"
         uses: actions/github-script@v9.0.0
         with:
-          github-token: ${{ secrets.SOURCE_PUSH_TOKEN || github.token }}
+          github-token: ${{ secrets.SOURCE_PUSH_TOKEN }}
           script: |
             await github.rest.pulls.requestReviewers({
               owner: context.repo.owner,
