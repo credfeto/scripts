@@ -20,6 +20,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replace raw echo with output helpers in git/mkmissing-release
 - Replace raw echo with output helpers in git/init-preview
 - Replace raw echo with output helpers in git/clone-repos
+- Inline enable-auto-merge and auto-approve scripts in Pull Request workflow to fix pull_request_target local action resolution failure
 ### Changed
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
