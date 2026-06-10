@@ -231,10 +231,10 @@ for VERSION in $VERSIONS_TO_INSTALL; do
 done
 
 echo "Install/update powershell"
-dotnet tool update --local PowerShell || dotnet tool install --local PowerShell
+/usr/share/dotnet/dotnet tool update --local PowerShell || dotnet tool install --local PowerShell
 
 echo "Restoring tools"
-dotnet tool restore
+/usr/share/dotnet/dotnet tool restore
 
 
 echo "Done"
