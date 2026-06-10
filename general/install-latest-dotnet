@@ -192,6 +192,9 @@ verbose=false
 
 [ -d "/usr/share/dotnet" ] && sudo rm -fr /usr/share/dotnet
 
+mkdir /usr/share/dotnet || die "Could not create dotnet folder"
+chmod 755 /usr/share/dotnet || die "Could not set permissions for dotnet folder"
+
 # update to latest dotnet core
 for VERSION in $VERSIONS_TO_INSTALL; do
 
