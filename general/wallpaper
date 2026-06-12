@@ -1,22 +1,29 @@
 #! /bin/bash
 
 die() {
-    echo
-    echo "$@"
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
     exit 1
+}
+
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
+
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
 }
 
 if [ -d "$HOME/work/thirdparty/wallpapers" ]; then
   git -C "$HOME/work/thirdparty/wallpapers" pull
 else
   [ -d "$HOME/work/thirdparty" ] || mkdir -p "$HOME/work/thirdparty" || die "Could not create $HOME/work/thirdparty"
-  echo "h2"
+  info "Cloning wallpapers repository..."
   git clone https://gitlab.com/credfeto/wallpapers.git "$HOME/work/thirdparty/wallpapers" || die "Could not clone"
-  echo "h3"
+  success "Wallpapers repository cloned."
 fi
 
 if [ ! -d "$HOME/work/thirdparty/wallpapers" ]; then
-  echo "Could not find $HOME/work/thirdparty/wallpapers"
+  info "Could not find $HOME/work/thirdparty/wallpapers"
   exit 0
 fi
 
@@ -27,14 +34,14 @@ shopt -s nullglob
 files=("$HOME"/work/thirdparty/wallpapers/*.jpg)
 [ "${#files[@]}" -gt 0 ] || die "Could not find any JPG wallpapers in $HOME/work/thirdparty/wallpapers"
 wallpaper=${files[RANDOM % ${#files[@]}]}
-echo "$wallpaper"
+info "Selected wallpaper: $wallpaper"
 cp --reflink -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt.jpg"
 ln -s -f "$wallpaper" "$HOME/Pictures/Backgrounds/dt-link.jpg"
 
 if [ -d "$HOME/.var/app/us.zoom.Zoom/.zoom/data/VirtualBkgnd_Custom" ]; then
 
   WP=$(find "$HOME/.var/app/us.zoom.Zoom/.zoom/data/VirtualBkgnd_Custom" -maxdepth 1 -name '{*' -print -quit)
-  echo "Wallpaper = $WP"
+  info "Zoom virtual background: $WP"
 
   cp --reflink -f "$wallpaper" "$WP"
 
