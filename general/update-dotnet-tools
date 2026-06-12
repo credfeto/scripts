@@ -1,7 +1,20 @@
 #! /bin/sh
 
+die() {
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    exit 1
+}
+
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
+
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
+}
+
 for package in $(dotnet tool list --local | tail -n +3 | cut -f 1 -d " " | sort)
-do 
-  echo "Updating $package..."
+do
+  info "Updating $package..."
   dotnet tool update --local "$package"
 done
