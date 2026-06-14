@@ -1,16 +1,23 @@
 #! /bin/sh
 
 die() {
-    echo
-    echo "$@"
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
     exit 1
+}
+
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
+
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
 }
 
 STREAMER=$1
 [ -z "$STREAMER" ] && die "Streamer not specified"
 
 while true
-do 
+do
   streamlink --player=mpv "https://twitch.tv/$STREAMER" best > /dev/null 2>&1
   sleep 60
 done
