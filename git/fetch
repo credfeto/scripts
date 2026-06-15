@@ -40,9 +40,14 @@ do
 
   if [ -z "$REPO_STATUS" ]
   then
-    info "No pending changes in working folder. Rebasing..."
-    git -C "$CURRENT_DIR" rebase 2>&1 || die "Could not rebase ${CURRENT_DIR}"
-    git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
+    if git -C "$CURRENT_DIR" rev-parse --verify '@{upstream}' > /dev/null 2>&1
+    then
+      info "No pending changes in working folder. Rebasing..."
+      git -C "$CURRENT_DIR" rebase 2>&1 || die "Could not rebase ${CURRENT_DIR}"
+      git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
+    else
+      info "No valid upstream for current branch. Skipping rebase."
+    fi
   else
     info "Pending changes in working folder. Skipping rebase."
   fi
@@ -63,8 +68,13 @@ do
       then
         info "Switching to ${DEFAULT_BRANCH} branch..."
         git -C "$CURRENT_DIR" checkout "$DEFAULT_BRANCH" 2>&1 || die "Could not switch to ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
-        git -C "$CURRENT_DIR" rebase 2>&1 || die "Could not rebase ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
-        git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
+        if git -C "$CURRENT_DIR" rev-parse --verify '@{upstream}' > /dev/null 2>&1
+        then
+          git -C "$CURRENT_DIR" rebase 2>&1 || die "Could not rebase ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
+          git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
+        else
+          info "No valid upstream for ${DEFAULT_BRANCH}. Skipping rebase."
+        fi
       else
         info "Pending changes in working folder. Skipping switch to ${DEFAULT_BRANCH}."
       fi
