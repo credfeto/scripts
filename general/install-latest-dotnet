@@ -1,9 +1,28 @@
 #! /bin/bash
 
 die() {
-    echo
-    echo "$@"
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
     exit 1
+}
+
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
+
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
 }
 
 
@@ -131,21 +150,18 @@ remove_beginning_slash() {
 }
 
 say() {
-    echo "dotnet-install: $1"
+    info "dotnet-install: $*"
 }
 
 say_verbose() {
     if [ "$verbose" = true ]; then
-        say "$1"
+        say "$*"
     fi
 }
 
 say_err() {
-  say "$1"
-  exit 1
+    die "$*"
 }
-
-#!/bin/bash
 
 set -e
 
@@ -205,11 +221,8 @@ for VERSION in $VERSIONS_TO_INSTALL; do
   TEMPORARY_FILE="$(mktemp "$temporary_file_template")"
 
 
-  echo "**********************************************************************************************"
-  echo "* Installing dotnet: $VERSION"
-  echo "*       Current SDK: $SDK_VERSION"
-  echo "**********************************************************************************************"
-  echo ""
+  info "Installing dotnet $VERSION (SDK: $SDK_VERSION)"
+
   DOWNLOAD_URL=$DOWNLOAD_SOURCE/dotnet/Sdk/$SDK_VERSION/dotnet-sdk-$SDK_VERSION-linux-x64.tar.gz
   curl \
     --max-time 120 \
@@ -227,14 +240,12 @@ for VERSION in $VERSIONS_TO_INSTALL; do
 
   /usr/share/dotnet/dotnet --list-sdks
 
-  echo ""
 done
 
-echo "Install/update powershell"
+info "Install/update powershell"
 /usr/share/dotnet/dotnet tool update --local PowerShell || dotnet tool install --local PowerShell
 
-echo "Restoring tools"
+info "Restoring tools"
 /usr/share/dotnet/dotnet tool restore
 
-
-echo "Done"
+success "Done"
