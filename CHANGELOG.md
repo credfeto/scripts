@@ -24,6 +24,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replaced raw echo calls with die/info/success output helpers in general/wallpaper
 - Replace raw echo with output helpers in general/update-dotnet-tools
 - Replace raw echo with output helpers in general/stream
+- Replace raw echo with output helpers in general/ssh-key-mgr
 ### Changed
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
