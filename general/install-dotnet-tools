@@ -1,5 +1,29 @@
 #! /bin/sh
 
+die() {
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
+    exit 1
+}
+
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
+
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
+}
 
 if [ ! -f "$HOME/dotnet-tools.json" ]; then
 
@@ -7,8 +31,7 @@ if [ ! -f "$HOME/dotnet-tools.json" ]; then
 
 fi
 
-[ -f "$HOME/dotnet-tools.json" ] || echo "No tool manifest"
-[ -f "$HOME/dotnet-tools.json" ] || exit 1
+[ -f "$HOME/dotnet-tools.json" ] || die "No tool manifest"
 
 
 TOOLS="sleet \
@@ -31,6 +54,8 @@ TOOLS="sleet \
        ilspycmd"
 
 for TOOL in $TOOLS; do
-   echo "* $TOOL"
+   info "Installing $TOOL"
    dotnet tool install --local "$TOOL"
 done
+
+success "Done"
