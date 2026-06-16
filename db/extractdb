@@ -1,19 +1,14 @@
 #!/bin/sh
 
-die() {
-    echo
-    echo "$@"
-    exit 1
-}
-
 BASEDIR="$(dirname "$(readlink -f "$0")")"
-echo "Script Dir: $BASEDIR"
 SERVER=
 DB=
 
-# Not following: 
+# Not following:
 # shellcheck disable=1091
-. "$BASEDIR/dbenv" 
+. "$BASEDIR/dbenv"
+
+info "Script Dir: $BASEDIR"
 
 while [ $# -gt 0 ]; do
   key="$1"
@@ -94,7 +89,7 @@ EOF
 
 
 cat << EOF > "$DBXML"
-<?xml version="1.0" encoding="utf-16" standalone="yes"?> 
+<?xml version="1.0" encoding="utf-16" standalone="yes"?>
 <!-- -->
 <ISOCCompareLocation version="2" type="WorkingFolderGenericLocation" >
   <LocalRepositoryFolder>%SOURCE%</LocalRepositoryFolder>
@@ -115,4 +110,3 @@ sudo "$BASEDIR/sqlcompare" \
   /database1:"$DB" \
   /username1:"$USER" \
   /password1:"$PASSWORD"
-  

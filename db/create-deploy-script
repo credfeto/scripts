@@ -54,4 +54,3 @@ sqlcompare \
   /out:"$LOG" \
   /empty2 \
   /assertidentical
-

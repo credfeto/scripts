@@ -22,13 +22,11 @@ echo "docker run --rm \
         -e REDGATE_LICENSING_PAT_TOKEN=$REDGATE_PAT \
         redgate/sqlcompare:$SQLCOMPARE_VERSION \
         /IAgreeToTheEULA \
-        $*"  
+        $*"
 docker run --rm \
   --interactive \
   --tty \
   --mount "type=bind,src=$USER_HOME,dst=$USER_HOME" \
   --network multi-host-network \
   "redgate/sqlcompare:$SQLCOMPARE_VERSION" \
-  "$@" 
-    
-    
+  "$@"

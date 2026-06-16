@@ -20,4 +20,3 @@ flatpak run com.github.iwalton3.jellyfin-media-player &
 flatpak run com.ktechpit.whatsie &
 
 flatpak run com.fastmail.Fastmail &
-

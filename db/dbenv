@@ -1,36 +1,58 @@
 #!/bin/sh
 
-CURRENT_DIR=$PWD
-echo "Current Dir: $CURRENT_DIR"
-
 die() {
-    echo
-    echo "$@"
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
     exit 1
 }
+
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
+
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
+}
+
+CURRENT_DIR=$PWD
+info "Current Dir: $CURRENT_DIR"
 
 SERVER=
 DB=
 USER=
 PASSWORD=
-SCHEMA=
 
 DB_SETTINGS_FILE=~/.database
-[ -f "$DB_SETTINGS_FILE" ]; echo "Using $DB_SETTINGS_FILE"
-[ -f "$DB_SETTINGS_FILE" ]; . "$DB_SETTINGS_FILE"
+[ -f "$DB_SETTINGS_FILE" ]; info "Using $DB_SETTINGS_FILE"
+[ -f "$DB_SETTINGS_FILE" ]
+# shellcheck disable=SC1090
+. "$DB_SETTINGS_FILE"
 
+# shellcheck disable=SC2046
 LOCAL_DB_SETTINGS_FILE=$(find $(CP="${PWD}"; while [ -n "$CP" ] ; do echo "$CP"; CP="${CP%/*}"; done;) -mindepth 1 -maxdepth 1 -type f -name ".database" | head -n 1)
-if [ ! -z "$LOCAL_DB_SETTINGS_FILE" ]; then
+if [ -n "$LOCAL_DB_SETTINGS_FILE" ]; then
   LOCAL_DB_SETTINGS_FILE=$(readlink -f "$LOCAL_DB_SETTINGS_FILE")
   LOCAL_DB_SETTINGS_FOLDER=$(dirname "$LOCAL_DB_SETTINGS_FILE")
   if [ "$LOCAL_DB_SETTINGS_FILE" != "$DB_SETTINGS_FILE" ]; then
-    echo "Using settings from $LOCAL_DB_SETTINGS_FOLDER"
+    info "Using settings from $LOCAL_DB_SETTINGS_FOLDER"
+    # shellcheck disable=SC1090
     . "$LOCAL_DB_SETTINGS_FILE"
-    
-    if [ ! -z "$DB" ]; then
+
+    if [ -n "$DB" ]; then
       [ -z "$SOURCE" ] && SOURCE="$LOCAL_DB_SETTINGS_FOLDER/db"
       REDGATE=~/.redgate
-      [ ! -d "$REDGATE" ] && mkdir $REDGATE
+      [ ! -d "$REDGATE" ] && mkdir "$REDGATE"
       [ -z "$OUTPUT" ] && OUTPUT=$REDGATE/$DB.sql
     fi
   fi
@@ -62,14 +84,14 @@ while [ $# -gt 0 ]; do
       shift # past argument
       shift # past value
       ;;
-    *)    # unknown option - skip here      
+    *)    # unknown option - skip here
       shift # past argument
       ;;
   esac
 done
 }
 
-parse_cmdline $@
+parse_cmdline "$@"
 
 [ -z "$SERVER" ] && die "--server not specified"
 [ -z "$USER" ] && die "--user not specified"
@@ -78,14 +100,13 @@ parse_cmdline $@
 SQLCOMPARE_SERVER=$SERVER
 if [ "$SERVER" = "localhost" ]; then
   SQLCOMPARE_SERVER=$(sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' mssql)
-  if [ ! -z "$SQLCOMPARE_SERVER" ]; then
-    echo "Overriding localhost with Docker Server for compare at $SQLCOMPARE_SERVER"    
-  fi  
+  if [ -n "$SQLCOMPARE_SERVER" ]; then
+    info "Overriding localhost with Docker Server for compare at $SQLCOMPARE_SERVER"
+  fi
 fi
 
-echo "Server: $SERVER"
-echo "User: $USER"
-[ ! -z "$DB" ] && echo "DB: $DB"
-[ ! -z "$SOURCE" ] && echo "Source: $SOURCE"
-[ ! -z "$OUTPUT" ] && echo "Output: $OUTPUT"
-
+info "Server: $SERVER"
+info "User: $USER"
+[ -n "$DB" ] && info "DB: $DB"
+[ -n "$SOURCE" ] && info "Source: $SOURCE"
+[ -n "$OUTPUT" ] && info "Output: $OUTPUT"

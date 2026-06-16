@@ -24,7 +24,7 @@ else
 
   [ -f /usr/bin/flatpak ] && flatpak update -y
 
-  if [ -f /usr/bin/yay ]; then 
+  if [ -f /usr/bin/yay ]; then
     yay -Syu --noconfirm
     sudo rm -fr /var/cache/pacman/pkg/download-*
     yay -Sc --noconfirm

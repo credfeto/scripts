@@ -11,7 +11,7 @@ echo "Script Dir: $BASEDIR"
 
 cd "$BASEDIR" || die "Could not select $BASEDIR"
 
-# Not following: 
+# Not following:
 # shellcheck disable=1091
 . "$BASEDIR/dbenv"
 
@@ -25,7 +25,7 @@ while [ $# -gt 0 ]; do
       shift # past argument
       shift # past value
       ;;
-    *)    # unknown option - skip here      
+    *)    # unknown option - skip here
       shift # past argument
       ;;
   esac

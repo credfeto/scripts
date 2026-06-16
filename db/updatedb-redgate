@@ -1,13 +1,6 @@
 #!/bin/sh
 
-die() {
-    echo
-    echo "$@"
-    exit 1
-}
-
 BASEDIR="$(dirname "$(readlink -f "$0")")"
-echo "Script Dir: $BASEDIR"
 SOURCE=
 SERVER=
 USER=
@@ -16,9 +9,11 @@ OUTPUT=
 REPORT=
 LOG=
 
-# Not following: 
+# Not following:
 # shellcheck disable=1091
 . "$BASEDIR/dbenv"
+
+info "Script Dir: $BASEDIR"
 
 while [ $# -gt 0 ]; do
   key="$1"
@@ -65,7 +60,7 @@ REPORT="$OUTPUT.xml"
 #  "/email:$REDGATE_EMAIL" \
 #  "/token:$REDGATE_PAT" \
 
-echo "Running sqlcompare to produce $OUTPUT"
+info "Running sqlcompare to produce $OUTPUT"
 sudo "$BASEDIR/sqlcompare" \
   "$HOME" \
   "/email:$REDGATE_EMAIL" \
@@ -91,7 +86,7 @@ sudo "$BASEDIR/sqlcompare" \
   /username2:"$USER" \
   /password2:"$PASSWORD"
 
-   
+
 #   \
 #  /assertidentical
 
@@ -104,7 +99,7 @@ sudo "$BASEDIR/sqlcompare" \
 
 
 
-echo "Running sqlcmd to import $OUTPUT"
+info "Running sqlcmd to import $OUTPUT"
 sqlcmd \
   -C \
   -S "$SQLCOMPARE_SERVER" \
