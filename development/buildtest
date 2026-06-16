@@ -1,9 +1,28 @@
 #! /bin/sh
 
 die() {
-    echo
-    echo "$@"
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
     exit 1
+}
+
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
+
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
 }
 
 BASEDIR=$(dirname "$(readlink -f "$0")")
@@ -27,22 +46,22 @@ while [ $# -gt 0 ]; do
     -r|--release)
       [ -f "$SOURCE_DIR/release.rule-settings.json" ] && RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/release.rule-settings.json"
       shift # past argument
-      ;;      
+      ;;
     -b|--no-benchmmarks)
       TEST_BENCHMARKS=--filter-not-namespace "*.BenchMark.Tests" --filter-not-namespace "*.BenchMark.Tests.*"
       shift # past argument
-      ;;      
+      ;;
     -i|--no-integratopn)
       TEST_INTEGRATION=--filter-not-namespace "*.Integration.Tests" --filter-not-namespace "*.Integration.Tests.*"
       shift # past argument
-      ;;      
+      ;;
     *)    # unknown option
       shift # past argument
       ;;
   esac
 done
 
-PACK=0  
+PACK=0
 HAS_PACKED=$(grep -R "<IsPackable>true</IsPackable>" . --include "*.csproj" | head -1)
 if [ -n "$HAS_PACKED" ]; then
   PACK=1
@@ -56,14 +75,14 @@ SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
 SOURCE_DIR=$(dirname "$SOLUTION");
 [ -z "$SOURCE_DIR" ] && die "No Solution dir found in $SOURCE_DIR"
 
-echo "***** Clearing NuGet cache ($CLEAR)... *****" 
-dotnet nuget locals "$CLEAR" --clear  || die "######## Nuget Clear $CLEAR Failed ########"
+info "Clearing NuGet cache ($CLEAR)..."
+dotnet nuget locals "$CLEAR" --clear  || die "Nuget Clear $CLEAR Failed"
 
-echo "***** Restoring... *****" 
-dotnet tool restore  || die "######## Tool Restore Failed ########"
+info "Restoring..."
+dotnet tool restore  || die "Tool Restore Failed"
 
-echo "***** Checking... *****" 
-"$BASEDIR/buildcheck"  || die "######## Build Check Failed ########"
+info "Checking..."
+"$BASEDIR/buildcheck"  || die "Build Check Failed"
 
 cd "$SOURCE_DIR" || die "Could not change to $SOURCE_DIR"
 
@@ -81,7 +100,7 @@ fi
 
 RESTORE=0
 if [ -n "$RULESET_TYPE" ] && [ -f "$RULESET_ADJUSTMENT_FILE" ]; then
-  echo "Overriding $RULESET_FILE with $RULESET_ADJUSTMENT_FILE"
+  info "Overriding $RULESET_FILE with $RULESET_ADJUSTMENT_FILE"
 
   dotnet code-analysis "$RULESET_TYPE" \
               --ruleset "$RULESET_FILE" \
@@ -91,24 +110,24 @@ if [ -n "$RULESET_TYPE" ] && [ -f "$RULESET_ADJUSTMENT_FILE" ]; then
   RESTORE=1
 fi
 
-echo "***** Restoring... *****" 
-dotnet restore  || die "######## Restore Failed ########"
+info "Restoring..."
+dotnet restore  || die "Restore Failed"
 
-echo "***** Checking for package vulnerabilities... *****" 
+info "Checking for package vulnerabilities..."
 SOURCES="--source https://api.nuget.org/v3/index.json"
 for SOURCE in $(dotnet nuget list source | grep https:// | awk '{$1=$1;print}');
 do
   SOURCES="$SOURCES --source $SOURCE"
 done
-echo "Sources: $SOURCES"
+info "Sources: $SOURCES"
 # shellcheck disable=2086
 #SolutionDir="$SOURCE_DIR/" dotnet list "$SOLUTION" package --vulnerable --include-transitive $SOURCES || die "Vulnerabilities found"
 
-echo "***** Cleaning... *****" 
+info "Cleaning..."
 dotnet clean  \
-          "--nowarn:MSB4241" || die "######## Clean Failed ########"
+          "--nowarn:MSB4241" || die "Clean Failed"
 
-echo "***** Building... *****" 
+info "Building..."
 dotnet build \
           --warnaserror \
           --configuration Release \
@@ -120,9 +139,9 @@ dotnet build \
           "-p:Optimize=true" \
           "-p:SuppressNETCoreSdkPreviewMessage=true" \
           "-p:Version=0.0.0.1-test" \
-           -nodeReuse:False || die "######## Build Failed ########"
+           -nodeReuse:False || die "Build Failed"
 
-echo "***** Testing... *****" 
+info "Testing..."
 # shellcheck disable=SC2086
 dotnet test \
           --configuration Release \
@@ -139,10 +158,10 @@ dotnet test \
           "-p:Optimize=true" \
           "-p:SuppressNETCoreSdkPreviewMessage=true" \
           "-p:Version=0.0.0.1-test" \
-          || die "######## Tests Failed ########"
+          || die "Tests Failed"
 
-if [ "$PACK" = "1" ]; then          
-  echo "***** Packing... *****" 
+if [ "$PACK" = "1" ]; then
+  info "Packing..."
   dotnet pack \
             --warnaserror \
             --configuration Release \
@@ -155,12 +174,9 @@ if [ "$PACK" = "1" ]; then
             "-p:Optimize=true" \
             "-p:SuppressNETCoreSdkPreviewMessage=true" \
             "-p:Version=0.0.0.1-test" \
-            -nodeReuse:False || die "######## Packing Failed ########"
+            -nodeReuse:False || die "Packing Failed"
 fi
 
 [ "$RESTORE" = "1" ] && git checkout "$RULESET_ADJUSTMENT_FILE"
 
-echo "***** Completed *****" 
-
-
- 
+success "Completed"
