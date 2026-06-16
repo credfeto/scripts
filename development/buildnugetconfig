@@ -1,12 +1,29 @@
 #! /bin/bash
 
 die() {
-    echo
-    echo "$@"
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
     exit 1
 }
 
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
 
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
+}
 
 NAMES=()
 URLS=()
@@ -18,28 +35,27 @@ while [ $# -gt 0 ]; do
     -S|--source)
       NAME="$2"
       URL="$3"
-      
+
       NAMES+=("$NAME")
       URLS+=("$URL")
-      
+
       shift # past argument
       shift # past value 1 (Name)
-      shift # past value 2 (Url)      
+      shift # past value 2 (Url)
       ;;
-    
-    *)    # unknown option - skip here      
+
+    *)    # unknown option - skip here
       shift # past argument
       ;;
   esac
 done
 
-  
 NUGET_CONF_DIR=$HOME/.nuget/NuGet
 NUGET_CONF_FILE="$NUGET_CONF_DIR/NuGet.Config"
 
 [ -d "$NUGET_CONF_DIR" ] && mkdir -p "$NUGET_CONF_DIR"
 
-echo "NuGet.Config: $NUGET_CONF_FILE"
+info "NuGet.Config: $NUGET_CONF_FILE"
 
 {
   echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
@@ -52,5 +68,6 @@ echo "NuGet.Config: $NUGET_CONF_FILE"
   done
   echo "  </packageSources>"
   echo "</configuration>"
- 
 }
+
+success "Completed"
