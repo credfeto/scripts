@@ -1,11 +1,29 @@
 #! /bin/sh
 
 die() {
-    echo
-    echo "$@"
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
     exit 1
 }
 
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
+
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
+}
 
 LEGACY_SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
 [ -z "$LEGACY_SOLUTION" ] && die "No Solution found in $(pwd)"
@@ -13,16 +31,17 @@ LEGACY_SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
 NEW_SOLUTION=$(find "$PWD" -type f -iname "*.slnx" | head -1)
 [ -z "$NEW_SOLUTION" ] || die "SolutionX found in $(pwd)"
 
+info "Migrating ${LEGACY_SOLUTION} to slnx format"
+
 dotnet sln migrate || die "Migration failed"
 
 NEW_SOLUTION=$(find "$PWD" -type f -iname "*.slnx" | head -1)
 [ -z "$NEW_SOLUTION" ] && die "No SolutionX found in $(pwd) after migration"
-
-echo ""
 
 if [ -f "$NEW_SOLUTION" ]; then
   [ -f "$LEGACY_SOLUTION" ] && rm -f "$LEGACY_SOLUTION"
   [ -f "$LEGACY_SOLUTION.DotSettings" ] && mv "$LEGACY_SOLUTION.DotSettings" "$NEW_SOLUTION.DotSettings"
   [ -f "$LEGACY_SOLUTION.DotSettings.user" ] && mv "$LEGACY_SOLUTION.DotSettings.user" "$NEW_SOLUTION.DotSettings.user"
 fi
- 
+
+success "Migration complete: ${NEW_SOLUTION}"
