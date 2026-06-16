@@ -1,10 +1,40 @@
 #! /bin/sh
 
-echo "Clearing nuget cache"
+die() {
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
+    exit 1
+}
+
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
+
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
+}
+
+info "Clearing nuget cache"
 dotnet nuget locals all --clear
 
-echo "Restoring packages"
+info "Restoring packages"
 find "$HOME/work" -iname global.json | while read -r key; do
-  CURRENT_DIR=$(dirname "$key");
-  echo "* $CURRENT_DIR:" &&  cd "$CURRENT_DIR" && dotnet restore && echo "   * done" || echo "   * failed";     
-done 
+  CURRENT_DIR=$(dirname "$key")
+  info "Restoring $CURRENT_DIR"
+  if (cd "$CURRENT_DIR" && dotnet restore); then
+    success "Restored $CURRENT_DIR"
+  else
+    die "Failed to restore $CURRENT_DIR"
+  fi
+done
