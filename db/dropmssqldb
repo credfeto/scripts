@@ -1,19 +1,14 @@
 #!/bin/sh
 
-die() {
-    echo
-    echo "$@"
-    exit 1
-}
-
 BASEDIR="$(dirname "$(readlink -f "$0")")"
-echo "Script Dir: $BASEDIR"
 SERVER=
 DB=
 
 # Not following:
 # shellcheck disable=1091
 . "$BASEDIR/dbenv"
+
+info "Script Dir: $BASEDIR"
 
 [ -z "$SERVER" ] && die "--server not specified"
 [ -z "$DB" ] && die "--database not specified"
