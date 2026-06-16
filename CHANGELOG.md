@@ -28,6 +28,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replace raw echo with output helpers in general/install-latest-dotnet
 - Replaced raw echo with output helpers in general/install-dotnet-tools
 - Replace raw echo with output helpers in general/convert-video
+- Replace raw echo with output helpers in development/sln-migrate
 ### Changed
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
