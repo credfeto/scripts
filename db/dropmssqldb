@@ -11,9 +11,9 @@ echo "Script Dir: $BASEDIR"
 SERVER=
 DB=
 
-# Not following: 
+# Not following:
 # shellcheck disable=1091
-. "$BASEDIR/dbenv" 
+. "$BASEDIR/dbenv"
 
 [ -z "$SERVER" ] && die "--server not specified"
 [ -z "$DB" ] && die "--database not specified"
@@ -23,4 +23,3 @@ DB=
 
 sqlcmd -C -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') ALTER DATABASE $DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE"
 sqlcmd -C -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') DROP DATABASE $DB"
-

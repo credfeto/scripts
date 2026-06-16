@@ -16,7 +16,7 @@ OUTPUT=
 REPORT=
 LOG=
 
-# Not following: 
+# Not following:
 # shellcheck disable=1091
 . "$BASEDIR/dbenv"
 
@@ -91,7 +91,7 @@ sudo "$BASEDIR/sqlcompare" \
   /username2:"$USER" \
   /password2:"$PASSWORD"
 
-   
+
 #   \
 #  /assertidentical
 

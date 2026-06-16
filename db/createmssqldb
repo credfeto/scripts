@@ -15,9 +15,9 @@ USER=
 PASSWORD=
 SCHEMA=
 
-# Not following: 
+# Not following:
 # shellcheck disable=1091
-. "$BASEDIR/dbenv" 
+. "$BASEDIR/dbenv"
 
 while [ $# -gt 0 ]; do
   key="$1"

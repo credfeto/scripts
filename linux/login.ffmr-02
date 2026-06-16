@@ -23,4 +23,3 @@ flatpak run org.mozilla.Thunderbird &
 #flatpak run --branch=stable --arch=x86_64 --command=com.ghostery.browser --file-forwarding com.ghostery.browser &
 
 stream.paults_aquaescape &
-
