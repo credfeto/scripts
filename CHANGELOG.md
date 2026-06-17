@@ -33,7 +33,6 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replace raw echo with output helpers in development/buildtest
 - Replace raw echo with output helpers in development/buildnugetconfig
 - Replace raw echo with output helpers in development/buildcheck
-- Replace raw echo with output helpers in db/sqlcompare
 ### Changed
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
@@ -43,6 +42,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - GEOIP - Updated GEOIP DB from MaxMind (2026-06-17)
 ### Deprecated
 ### Removed
+- db/sqlcompare script deleted — no longer in use
 ### Deployment Changes
 <!--
 Releases that have at least been deployed to staging, BUT NOT necessarily released to live.  Changes should be moved from [Unreleased] into here as they are merged into the appropriate release branch
