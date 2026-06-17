@@ -42,6 +42,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - GEOIP - Updated GEOIP DB from MaxMind (2026-06-17)
 ### Deprecated
 ### Removed
+- db/sqlcompare script deleted — no longer in use
 ### Deployment Changes
 <!--
 Releases that have at least been deployed to staging, BUT NOT necessarily released to live.  Changes should be moved from [Unreleased] into here as they are merged into the appropriate release branch
