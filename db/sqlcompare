@@ -3,9 +3,28 @@ USER_HOME=$1
 shift # past argument
 
 die() {
-    echo
-    echo "$@"
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
     exit 1
+}
+
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
+
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
 }
 
 #SQLCOMPARE_VERSION=15.3.13
@@ -13,7 +32,7 @@ SQLCOMPARE_VERSION=16.0.0
 #SQLCOMPARE_VERSION=latest
 
 docker pull redgate/sqlcompare:$SQLCOMPARE_VERSION
-echo "docker run --rm \
+info "docker run --rm \
         --interactive \
         --tty \
         --mount type=bind,src=$USER_HOME,dst=$USER_HOME \
