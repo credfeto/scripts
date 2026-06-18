@@ -1,13 +1,32 @@
 #! /bin/sh
 
 die() {
-    echo
-    echo "$@"
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
     exit 1
 }
 
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
+
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
+}
+
 BASEDIR="$(dirname "$(readlink -f "$0")")"
-echo "Script Dir: $BASEDIR"
+info "Script Dir: $BASEDIR"
 
 cd "$BASEDIR" || die "Could not select $BASEDIR"
 
@@ -35,19 +54,20 @@ done
 [ -z "$SHARED_DATA" ] && die "--data not specified"
 
 
-echo "Ensuring Data exists"
+info "Ensuring Data exists"
 sudo mkdir -p "$SHARED_DATA/data"
 sudo mkdir -p "$SHARED_DATA/logs"
 sudo mkdir -p "$SHARED_DATA/secrets"
 
-echo "Ensuring docker has permission to access $SHARED_DATA"
+info "Ensuring docker has permission to access $SHARED_DATA"
 sudo chown -R 10001:docker "$SHARED_DATA"
 sudo chmod -R 700 "$SHARED_DATA"
 
 {
-  echo "PASSWORD=$PASSWORD"
-  echo "SHARED_DATA=$SHARED_DATA"
+  printf 'PASSWORD=%s\n' "$PASSWORD"
+  printf 'SHARED_DATA=%s\n' "$SHARED_DATA"
 } > "$BASEDIR/.env"
 sudo docker compose pull || die "Could not get mssql container"
 sudo docker compose up -d || die "Could not start mssql"
 rm -f "$BASEDIR/.env"
+success "mssql started"
