@@ -25,6 +25,12 @@ info() {
     fi
 }
 
+GLOBAL_HOOKS=$(git config --global core.hooksPath 2>/dev/null)
+SCRIPT_NAME=$(basename "$0")
+if [ -n "$GLOBAL_HOOKS" ] && [ -x "$GLOBAL_HOOKS/$SCRIPT_NAME" ]; then
+    exec "$GLOBAL_HOOKS/$SCRIPT_NAME" "$@"
+fi
+
 SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
 [ -z "$SOLUTION" ] && SOLUTION=$(find "$PWD" -type f -iname "*.slnx" | head -1)
 [ -z "$SOLUTION" ] && die "No Solution found in $(pwd)"
