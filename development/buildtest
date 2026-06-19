@@ -29,14 +29,20 @@ BASEDIR=$(dirname "$(readlink -f "$0")")
 
 SCRIPT_NAME=$(basename "$0")
 GLOBAL_HOOKS=$(git config --global core.hooksPath 2>/dev/null)
-if [ -n "$GLOBAL_HOOKS" ] && [ -x "$GLOBAL_HOOKS/$SCRIPT_NAME" ]; then
-    info "Using global pre-commit script: $GLOBAL_HOOKS/$SCRIPT_NAME"
-    exec "$GLOBAL_HOOKS/$SCRIPT_NAME" "$@"
+if [ -n "$GLOBAL_HOOKS" ]; then
+    GLOBAL_SCRIPTS=$(dirname "$GLOBAL_HOOKS")/scripts
+    if [ -x "$GLOBAL_SCRIPTS/$SCRIPT_NAME" ]; then
+        info "Using global pre-commit script: $GLOBAL_SCRIPTS/$SCRIPT_NAME"
+        exec "$GLOBAL_SCRIPTS/$SCRIPT_NAME" "$@"
+    fi
 fi
 SYSTEM_HOOKS=$(git config --system core.hooksPath 2>/dev/null)
-if [ -n "$SYSTEM_HOOKS" ] && [ -x "$SYSTEM_HOOKS/$SCRIPT_NAME" ]; then
-    info "Using system pre-commit script: $SYSTEM_HOOKS/$SCRIPT_NAME"
-    exec "$SYSTEM_HOOKS/$SCRIPT_NAME" "$@"
+if [ -n "$SYSTEM_HOOKS" ]; then
+    SYSTEM_SCRIPTS=$(dirname "$SYSTEM_HOOKS")/scripts
+    if [ -x "$SYSTEM_SCRIPTS/$SCRIPT_NAME" ]; then
+        info "Using system pre-commit script: $SYSTEM_SCRIPTS/$SCRIPT_NAME"
+        exec "$SYSTEM_SCRIPTS/$SCRIPT_NAME" "$@"
+    fi
 fi
 info "Using local $SCRIPT_NAME"
 
