@@ -28,12 +28,15 @@ info() {
 SCRIPT_NAME=$(basename "$0")
 GLOBAL_HOOKS=$(git config --global core.hooksPath 2>/dev/null)
 if [ -n "$GLOBAL_HOOKS" ] && [ -x "$GLOBAL_HOOKS/$SCRIPT_NAME" ]; then
+    info "Using global pre-commit script: $GLOBAL_HOOKS/$SCRIPT_NAME"
     exec "$GLOBAL_HOOKS/$SCRIPT_NAME" "$@"
 fi
 SYSTEM_HOOKS=$(git config --system core.hooksPath 2>/dev/null)
 if [ -n "$SYSTEM_HOOKS" ] && [ -x "$SYSTEM_HOOKS/$SCRIPT_NAME" ]; then
+    info "Using system pre-commit script: $SYSTEM_HOOKS/$SCRIPT_NAME"
     exec "$SYSTEM_HOOKS/$SCRIPT_NAME" "$@"
 fi
+info "Using local $SCRIPT_NAME"
 
 SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
 [ -z "$SOLUTION" ] && SOLUTION=$(find "$PWD" -type f -iname "*.slnx" | head -1)
