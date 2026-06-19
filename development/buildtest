@@ -33,7 +33,7 @@ if [ -n "$GLOBAL_HOOKS" ]; then
     GLOBAL_SCRIPTS=$(dirname "$GLOBAL_HOOKS")/scripts
     if [ -x "$GLOBAL_SCRIPTS/$SCRIPT_NAME" ]; then
         info "Using global pre-commit script: $GLOBAL_SCRIPTS/$SCRIPT_NAME"
-        exec "$GLOBAL_SCRIPTS/$SCRIPT_NAME" "$@"
+        buildcheck && exec "$GLOBAL_SCRIPTS/$SCRIPT_NAME" "$@"
     fi
 fi
 SYSTEM_HOOKS=$(git config --system core.hooksPath 2>/dev/null)
@@ -41,7 +41,7 @@ if [ -n "$SYSTEM_HOOKS" ]; then
     SYSTEM_SCRIPTS=$(dirname "$SYSTEM_HOOKS")/scripts
     if [ -x "$SYSTEM_SCRIPTS/$SCRIPT_NAME" ]; then
         info "Using system pre-commit script: $SYSTEM_SCRIPTS/$SCRIPT_NAME"
-        exec "$SYSTEM_SCRIPTS/$SCRIPT_NAME" "$@"
+        buildcheck && exec "$SYSTEM_SCRIPTS/$SCRIPT_NAME" "$@"
     fi
 fi
 info "Using local $SCRIPT_NAME"
