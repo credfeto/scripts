@@ -16,5 +16,7 @@ info "Script Dir: $BASEDIR"
 [ -z "$PASSWORD" ] && die "--password not specified"
 
 
-sqlcmd -C -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') ALTER DATABASE $DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE"
-sqlcmd -C -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') DROP DATABASE $DB"
+info "Dropping database $DB if it exists"
+sqlcmd -C -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') ALTER DATABASE $DB SET SINGLE_USER WITH ROLLBACK IMMEDIATE" || die "Could not set $DB to single-user mode"
+sqlcmd -C -S "$SERVER" -U "$USER" -P "$PASSWORD" -b -e -Q "IF EXISTS(SELECT Name from sys.Databases WHERE name = '$DB') DROP DATABASE $DB" || die "Could not drop database $DB"
+success "Database $DB dropped"
