@@ -25,10 +25,14 @@ info() {
     fi
 }
 
-GLOBAL_HOOKS=$(git config --global core.hooksPath 2>/dev/null)
 SCRIPT_NAME=$(basename "$0")
+GLOBAL_HOOKS=$(git config --global core.hooksPath 2>/dev/null)
 if [ -n "$GLOBAL_HOOKS" ] && [ -x "$GLOBAL_HOOKS/$SCRIPT_NAME" ]; then
     exec "$GLOBAL_HOOKS/$SCRIPT_NAME" "$@"
+fi
+SYSTEM_HOOKS=$(git config --system core.hooksPath 2>/dev/null)
+if [ -n "$SYSTEM_HOOKS" ] && [ -x "$SYSTEM_HOOKS/$SCRIPT_NAME" ]; then
+    exec "$SYSTEM_HOOKS/$SCRIPT_NAME" "$@"
 fi
 
 SOLUTION=$(find "$PWD" -type f -iname "*.sln" | head -1)
