@@ -38,6 +38,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replace raw echo with output helpers in db/dbenv
 - Replace raw echo with output helpers in db/dbappsettings
 - Replace raw echo with output helpers in db/createmssqldb
+- Replace raw echo with standard output helpers (die/info/success) in db/create-deploy-script
 ### Changed
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
