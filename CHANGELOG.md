@@ -40,6 +40,8 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replace raw echo with output helpers in db/createmssqldb
 - Replace raw echo with standard output helpers (die/info/success) in db/create-deploy-script
 - git/fetch: Unset core.hookspath for each repo during fetch so that globally-configured hook paths do not persist on individual repos
+- check: use mapfile array for file collection to handle filenames containing spaces correctly
+- check: guard against empty file list before checking — prevents false-positive success when no scripts are found
 ### Changed
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
