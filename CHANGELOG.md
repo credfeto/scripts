@@ -45,7 +45,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replace raw echo with output helpers (die, info, success) in git/missing-release-branches
 - git/make-preview: replaced raw echo with die/info/success output helpers
 - Replaced raw echo with output helpers (die/info/success) in git/clean-all
-- GEOIP - Updated GEOIP DB from MaxMind (2026-06-20)
+- GEOIP - Updated GEOIP DB from MaxMind (2026-06-24)
 ### Deprecated
 ### Removed
 - db/sqlcompare script deleted — no longer in use
