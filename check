@@ -74,11 +74,11 @@ for FILE in $FILES; do
     if [ "$SHEBANG_EXEC" = "/bin/bash" ]; then
       SHELL="bash"
       bash -n -u "$FILE" || die "$SHELL: Invalid Script"
-      sh -n "$FILE" > /dev/null 2>&1 && info "Could be run in sh?"
+      sh -n "$FILE" > /dev/null 2>&1 && info "Hint: Could be run in sh?"
     elif [ "$SHEBANG_EXEC" = "/usr/bin/env bash" ]; then
       SHELL="bash"
       bash -n -u  "$FILE" || die "$SHELL: Invalid Script"
-      sh -n "$FILE" > /dev/null 2>&1 && info "Could be run in sh?"
+      sh -n "$FILE" > /dev/null 2>&1 && info "Hint: Could be run in sh?"
     elif [ "$SHEBANG_EXEC" = "/bin/sh" ]; then
       SHELL="sh"
       sh -n "$FILE" || die "$SHELL: Invalid Script"
