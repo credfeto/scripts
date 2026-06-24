@@ -45,7 +45,7 @@ excluded() {
 }
 
 # Find all the script files both executable and ones with shebang
-FILES=$({ \
+mapfile -t FILES < <({ \
       find "$BASEDIR" -not -path '*/.*' -type f -executable -print || die "Search: find"
       while IFS= read -r SHEBANG_FILE; do
         IFS= read -r FIRST_LINE < "$SHEBANG_FILE" || continue
@@ -59,7 +59,7 @@ FILES=$({ \
       } | sort | uniq)
 
 info "Testing:"
-for FILE in $FILES; do
+for FILE in "${FILES[@]}"; do
   info "* $FILE"
   info "Executable"
   if [ ! -x "$FILE" ]; then
