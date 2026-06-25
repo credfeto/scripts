@@ -1,22 +1,28 @@
 #! /bin/bash
 
 die() {
-    echo "$@"
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
     exit 1
 }
 
-testing() {
-  echo " + $*"
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
 }
 
-hint() {
-    echo "  ? CHECK: $*"
-}
-
-fail() {
-    echo "  - ERROR: $*"
-    exit 1
-
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
 }
 
 
@@ -39,7 +45,7 @@ excluded() {
 }
 
 # Find all the script files both executable and ones with shebang
-FILES=$({ \
+mapfile -t FILES < <({ \
       find "$BASEDIR" -not -path '*/.*' -type f -executable -print || die "Search: find"
       while IFS= read -r SHEBANG_FILE; do
         IFS= read -r FIRST_LINE < "$SHEBANG_FILE" || continue
@@ -52,47 +58,51 @@ FILES=$({ \
       done < <(find "$BASEDIR" -not -path '*/.*' -type f -print) || die "Search: Shebang"
       } | sort | uniq)
 
-echo "Testing:"
-for FILE in $FILES; do
-  echo "* $FILE"
-  testing "Executable"
+[ "${#FILES[@]}" -gt 0 ] || die "No script files found in ${BASEDIR}"
+
+info "Testing:"
+for FILE in "${FILES[@]}"; do
+  info "* $FILE"
+  info "Executable"
   if [ ! -x "$FILE" ]; then
-    fail "Not Executable"
+    die "Not Executable: ${FILE}"
   fi
 
-  testing "Shebang"
+  info "Shebang"
   FIRST_LINE=$(head -1 "$FILE")
   if [[ $FIRST_LINE =~ $REGEX_SHEBANG ]]; then
     SHEBANG_EXEC="${BASH_REMATCH[1]}"
     SHELL=
     if [ "$SHEBANG_EXEC" = "/bin/bash" ]; then
       SHELL="bash"
-      bash -n -u "$FILE" || fail "$SHELL: Invalid Script"
-      sh -n "$FILE" > /dev/null 2>&1 && hint "Could be run in bash?"
+      bash -n -u "$FILE" || die "$SHELL: Invalid Script: ${FILE}"
+      sh -n "$FILE" > /dev/null 2>&1 && info "Hint: Could be run in sh?"
     elif [ "$SHEBANG_EXEC" = "/usr/bin/env bash" ]; then
       SHELL="bash"
-      bash -n -u  "$FILE" || fail "$SHELL: Invalid Script"
-      sh -n "$FILE" > /dev/null 2>&1 && hint "Could be run in bash?"
+      bash -n -u  "$FILE" || die "$SHELL: Invalid Script: ${FILE}"
+      sh -n "$FILE" > /dev/null 2>&1 && info "Hint: Could be run in sh?"
     elif [ "$SHEBANG_EXEC" = "/bin/sh" ]; then
       SHELL="sh"
-      sh -n "$FILE" || fail "$SHELL: Invalid Script"
+      sh -n "$FILE" || die "$SHELL: Invalid Script: ${FILE}"
     elif [ "$SHEBANG_EXEC" = "/usr/bin/env sh" ]; then
       SHELL="sh"
-      sh -n "$FILE" || fail "$SHELL: Invalid Script"
+      sh -n "$FILE" || die "$SHELL: Invalid Script: ${FILE}"
     else
-      fail "Unknown Shell: $SHEBANG_EXEC"
+      die "Unknown Shell: $SHEBANG_EXEC in ${FILE}"
     fi
 
 
   else
-    fail "No Shebang: $FIRST_LINE"
+    die "No Shebang: $FIRST_LINE in ${FILE}"
   fi
 
   ## Run Shellcheck on the file
   if [ "$(excluded "$FILE")" = "1" ]; then
-    hint "Excluded from shellcheck"
+    info "Excluded from shellcheck"
   else
-    shellcheck "$FILE" || fail "Shellcheck"
+    shellcheck "$FILE" || die "Shellcheck: ${FILE}"
   fi
 
 done
+
+success "All checks passed"
