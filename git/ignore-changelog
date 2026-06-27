@@ -1,0 +1,70 @@
+#! /bin/sh
+
+die() {
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    exit 1
+}
+
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
+
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
+}
+
+warn() {
+    printf '\n\033[33m!\033[0m %s\n' "$*"
+}
+
+IGNORE_FILE=".markdownlintignore"
+ENTRY="CHANGELOG.md"
+COMMIT_MSG="Add CHANGELOG.md to .markdownlintignore"
+DRY_RUN=0
+
+for arg in "$@"; do
+    case "$arg" in
+        -n|--dry-run) DRY_RUN=1 ;;
+        *) die "Unknown argument: $arg" ;;
+    esac
+done
+
+[ "$DRY_RUN" -eq 1 ] && info "Dry run — no files will be written or committed"
+
+for dir in "$(pwd)"/*/; do
+    [ -e "${dir}.git" ] || continue
+
+    info "$dir"
+
+    if [ ! -f "${dir}${IGNORE_FILE}" ]; then
+        if [ "$DRY_RUN" -eq 1 ]; then
+            info "Would create ${IGNORE_FILE} with ${ENTRY}"
+        else
+            printf '%s\n' "$ENTRY" > "${dir}${IGNORE_FILE}"
+            info "Created ${IGNORE_FILE}"
+        fi
+    elif grep -qx "$ENTRY" "${dir}${IGNORE_FILE}"; then
+        success "Already excludes ${ENTRY} — skipping"
+        continue
+    else
+        if [ "$DRY_RUN" -eq 1 ]; then
+            info "Would append ${ENTRY} to existing ${IGNORE_FILE}"
+        else
+            printf '\n%s\n' "$ENTRY" >> "${dir}${IGNORE_FILE}"
+            info "Appended ${ENTRY} to ${IGNORE_FILE}"
+        fi
+    fi
+
+    if [ "$DRY_RUN" -eq 1 ]; then
+        info "Would commit and push: ${COMMIT_MSG}"
+        continue
+    fi
+
+    git -C "$dir" add "$IGNORE_FILE" || { warn "git add failed in $dir"; continue; }
+    git -C "$dir" commit -m "$COMMIT_MSG" -n || { warn "git commit failed in $dir"; continue; }
+    if git -C "$dir" push; then
+        success "Pushed $dir"
+    else
+        warn "git push failed in $dir (committed locally)"
+    fi
+done
