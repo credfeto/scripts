@@ -10,6 +10,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 ### Added
 - fetch: added --switch-to-main flag to switch to the default branch and rebase it when not on it, skipping if there are uncommitted changes
 - git/ignore-changelog: script to add CHANGELOG.md to .markdownlintignore across git repositories
+- git/reset-all: script to run git reset --hard HEAD across all git repositories
 ### Fixed
 - Shell scripts were cleaned up to pass pre-commit checks, and git/fetch now uses consistent info/success output.
 - Replace raw echo output with standard die/success/info helpers in network/wg-create
