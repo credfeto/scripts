@@ -1,0 +1,24 @@
+#! /bin/sh
+
+die() {
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    exit 1
+}
+
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
+
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
+}
+
+find "$(pwd)"/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache | while IFS= read -r line
+do
+  info "$line"
+  CURRENT_DIR=$line
+
+  git -C "$CURRENT_DIR" push --no-verify 2>&1
+
+  success "Done."
+done
