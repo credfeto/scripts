@@ -8,6 +8,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 ## [Unreleased]
 ### Security
 ### Added
+- git/ignore-changelog: script to add CHANGELOG.md to .markdownlintignore across git repositories
 - fetch: added --switch-to-main flag to switch to the default branch and rebase it when not on it, skipping if there are uncommitted changes
 ### Fixed
 - Shell scripts were cleaned up to pass pre-commit checks, and git/fetch now uses consistent info/success output.
