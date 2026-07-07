@@ -1,0 +1,30 @@
+#! /bin/sh
+
+die() {
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    exit 1
+}
+
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
+
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
+}
+
+warn() {
+    printf '\n\033[33m!\033[0m %s\n' "$*"
+}
+
+for dir in "$(pwd)"/*/; do
+    [ -e "${dir}.git" ] || continue
+
+    info "$dir"
+
+    if git -C "$dir" pull --rebase; then
+        success "Done"
+    else
+        warn "pull --rebase failed in $dir"
+    fi
+done
