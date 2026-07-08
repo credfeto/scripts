@@ -13,6 +13,18 @@ info() {
     printf '\n\033[32m→\033[0m %s\n' "$*"
 }
 
+HOOKSPATH_RESET_WHITELIST_SKIP="funfair-treasury-reporting"
+
+is_hookspath_reset_skipped() {
+    repo_name=$(basename "$1")
+    for skipped in $HOOKSPATH_RESET_WHITELIST_SKIP; do
+        if [ "$repo_name" = "$skipped" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
 SWITCH_TO_MAIN=0
 
 for arg in "$@"; do
@@ -31,7 +43,12 @@ do
   CURRENT_DIR=$line
 
   info "Retrieving ${CURRENT_DIR}..."
-  git -C "$CURRENT_DIR" config --local --unset core.hookspath 2>/dev/null || true
+  if is_hookspath_reset_skipped "$CURRENT_DIR"
+  then
+    info "Skipping core.hookspath reset for ${CURRENT_DIR} (whitelisted)."
+  else
+    git -C "$CURRENT_DIR" config --local --unset core.hookspath 2>/dev/null || true
+  fi
   git -C "$CURRENT_DIR" remote get-url origin 2>&1 || die "Could not determine origin for ${CURRENT_DIR}"
   git -C "$CURRENT_DIR" fetch --prune --prune-tags 2>&1 || die "Could not fetch ${CURRENT_DIR}"
   git -C "$CURRENT_DIR" remote update origin --prune 2>&1 || die "Could not update remote refs for ${CURRENT_DIR}"
