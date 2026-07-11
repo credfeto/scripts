@@ -9,6 +9,10 @@ success() {
     printf '\n\033[32m✓\033[0m %s\n' "$*"
 }
 
+warn() {
+    printf '\n\033[33m⚠\033[0m %s\n' "$*" >&2
+}
+
 info() {
     printf '\n\033[32m→\033[0m %s\n' "$*"
 }
@@ -18,14 +22,23 @@ do
   info "$line"
   CURRENT_DIR=$line
 
-  DEFAULT_BRANCH=$(git -C "$CURRENT_DIR" remote show origin | sed -n '/HEAD branch/s/.*: //p')
   info "Retrieving $CURRENT_DIR..."
-  git -C "$CURRENT_DIR" remote get-url origin 2>&1
-  git -C "$CURRENT_DIR" fetch origin 2>&1
+  git -C "$CURRENT_DIR" remote get-url origin 2>&1 || { warn "Could not determine origin for ${CURRENT_DIR}"; continue; }
+  git -C "$CURRENT_DIR" fetch origin 2>&1 || { warn "Could not fetch ${CURRENT_DIR}"; continue; }
 
-  [ -z "$DEFAULT_BRANCH" ] && info "No default branch found"
-  [ -n "$DEFAULT_BRANCH" ] && git -C "$CURRENT_DIR" checkout "$DEFAULT_BRANCH" 2>&1
-  [ -n "$DEFAULT_BRANCH" ] && git -C "$CURRENT_DIR" fetch origin 2>&1
+  DEFAULT_BRANCH=$(git -C "$CURRENT_DIR" remote show origin | sed -n '/HEAD branch/s/.*: //p')
+
+  if [ -z "$DEFAULT_BRANCH" ]
+  then
+    info "No default branch found"
+  else
+    if git -C "$CURRENT_DIR" checkout "$DEFAULT_BRANCH" 2>&1
+    then
+      git -C "$CURRENT_DIR" fetch origin 2>&1 || warn "Could not fetch ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
+    else
+      warn "Could not switch to ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
+    fi
+  fi
 
   success "$CURRENT_DIR"
 done
