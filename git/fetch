@@ -9,6 +9,10 @@ success() {
     printf '\n\033[32m✓\033[0m %s\n' "$*"
 }
 
+warn() {
+    printf '\n\033[33m⚠\033[0m %s\n' "$*" >&2
+}
+
 info() {
     printf '\n\033[32m→\033[0m %s\n' "$*"
 }
@@ -49,18 +53,18 @@ do
   else
     git -C "$CURRENT_DIR" config --local --unset core.hookspath 2>/dev/null || true
   fi
-  git -C "$CURRENT_DIR" remote get-url origin 2>&1 || die "Could not determine origin for ${CURRENT_DIR}"
-  git -C "$CURRENT_DIR" fetch --prune --prune-tags 2>&1 || die "Could not fetch ${CURRENT_DIR}"
-  git -C "$CURRENT_DIR" remote update origin --prune 2>&1 || die "Could not update remote refs for ${CURRENT_DIR}"
+  git -C "$CURRENT_DIR" remote get-url origin 2>&1 || { warn "Could not determine origin for ${CURRENT_DIR}"; continue; }
+  git -C "$CURRENT_DIR" fetch --prune --prune-tags 2>&1 || { warn "Could not fetch ${CURRENT_DIR}"; continue; }
+  git -C "$CURRENT_DIR" remote update origin --prune 2>&1 || { warn "Could not update remote refs for ${CURRENT_DIR}"; continue; }
 
-  REPO_STATUS=$(git -C "$CURRENT_DIR" status --porcelain 2>&1) || die "Could not read status for ${CURRENT_DIR}"
+  REPO_STATUS=$(git -C "$CURRENT_DIR" status --porcelain 2>&1) || { warn "Could not read status for ${CURRENT_DIR}"; continue; }
 
   if [ -z "$REPO_STATUS" ]
   then
     if git -C "$CURRENT_DIR" rev-parse --verify '@{upstream}' > /dev/null 2>&1
     then
       info "No pending changes in working folder. Rebasing..."
-      git -C "$CURRENT_DIR" rebase 2>&1 || die "Could not rebase ${CURRENT_DIR}"
+      git -C "$CURRENT_DIR" rebase 2>&1 || warn "Could not rebase ${CURRENT_DIR}"
       git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
     else
       info "No valid upstream for current branch. Skipping rebase."
@@ -71,7 +75,7 @@ do
 
   if [ "$SWITCH_TO_MAIN" = "1" ]
   then
-    CURRENT_BRANCH=$(git -C "$CURRENT_DIR" rev-parse --abbrev-ref HEAD 2>&1) || die "Could not determine current branch for ${CURRENT_DIR}"
+    CURRENT_BRANCH=$(git -C "$CURRENT_DIR" rev-parse --abbrev-ref HEAD 2>&1) || { warn "Could not determine current branch for ${CURRENT_DIR}"; continue; }
     DEFAULT_BRANCH=$(git -C "$CURRENT_DIR" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
 
     if [ -z "$DEFAULT_BRANCH" ]
@@ -84,13 +88,17 @@ do
       if [ -z "$REPO_STATUS" ]
       then
         info "Switching to ${DEFAULT_BRANCH} branch..."
-        git -C "$CURRENT_DIR" checkout "$DEFAULT_BRANCH" 2>&1 || die "Could not switch to ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
-        if git -C "$CURRENT_DIR" rev-parse --verify '@{upstream}' > /dev/null 2>&1
+        if git -C "$CURRENT_DIR" checkout "$DEFAULT_BRANCH" 2>&1
         then
-          git -C "$CURRENT_DIR" rebase 2>&1 || die "Could not rebase ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
-          git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
+          if git -C "$CURRENT_DIR" rev-parse --verify '@{upstream}' > /dev/null 2>&1
+          then
+            git -C "$CURRENT_DIR" rebase 2>&1 || warn "Could not rebase ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
+            git -C "$CURRENT_DIR" rebase --abort > /dev/null 2>&1
+          else
+            info "No valid upstream for ${DEFAULT_BRANCH}. Skipping rebase."
+          fi
         else
-          info "No valid upstream for ${DEFAULT_BRANCH}. Skipping rebase."
+          warn "Could not switch to ${DEFAULT_BRANCH} in ${CURRENT_DIR}"
         fi
       else
         info "Pending changes in working folder. Skipping switch to ${DEFAULT_BRANCH}."
