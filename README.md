@@ -1,6 +1,6 @@
 # General Development Scripts
 
-# Git
+## Git
 
 Helper/Setup/Template scripts for working with git.
 
@@ -9,7 +9,7 @@ Helper/Setup/Template scripts for working with git.
 
 <!-- add details of process.cmd etc -->
 
-# Ethereum
+## Ethereum
 
 Helper/Setup/Template scripts for working with Ethereum/Ethereum clients
 
