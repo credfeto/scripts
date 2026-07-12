@@ -1,0 +1,46 @@
+#! /bin/sh
+
+die() {
+    if [ -t 2 ]; then
+        printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    else
+        printf '\n✗ %s\n' "$*" >&2
+    fi
+    exit 1
+}
+
+success() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m✓\033[0m %s\n' "$*"
+    else
+        printf '\n✓ %s\n' "$*"
+    fi
+}
+
+info() {
+    if [ -t 1 ]; then
+        printf '\n\033[32m→\033[0m %s\n' "$*"
+    else
+        printf '\n→ %s\n' "$*"
+    fi
+}
+
+# Same check at every level: does <hooks-folder>/pre-commit exist and is it
+# executable? Tried in order: repo's own hooks folder, system, global.
+hook_in() {
+    [ -n "$1" ] && [ -x "$1/pre-commit" ] && printf '%s/pre-commit\n' "$1"
+}
+
+GIT_DIR=$(git rev-parse --absolute-git-dir 2>/dev/null)
+REPO_HOOKS_DIR=""
+[ -n "$GIT_DIR" ] && REPO_HOOKS_DIR="$GIT_DIR/hooks"
+HOOK=$(hook_in "$REPO_HOOKS_DIR")
+
+[ -n "$HOOK" ] || HOOK=$(hook_in "$(git config --system --get core.hooksPath 2>/dev/null)")
+[ -n "$HOOK" ] || HOOK=$(hook_in "$(git config --global --get core.hooksPath 2>/dev/null)")
+
+[ -n "$HOOK" ] || die "No pre-commit hook found in the repo's hooks folder, system hooksPath, or global hooksPath"
+
+info "Running $HOOK --all-files"
+"$HOOK" --all-files || die "pre-commit hook failed"
+success "Pre-commit checks passed"
