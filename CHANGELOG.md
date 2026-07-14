@@ -12,6 +12,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - git/ignore-changelog: script to add CHANGELOG.md to .markdownlintignore across git repositories
 - git/reset-all: script to run git reset --hard HEAD across all git repositories
 - git/push-all: script to push all git repositories
+- linux/dev-update: script to pull core dev repos (scripts, credfeto-global-pre-commit, cs-template, credfeto-ai-skills) and reinstall AI skills
 ### Fixed
 - Shell scripts were cleaned up to pass pre-commit checks, and git/fetch now uses consistent info/success output.
 - Replace raw echo output with standard die/success/info helpers in network/wg-create
