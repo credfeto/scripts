@@ -28,6 +28,7 @@ update_repo() {
 update_repo "${HOME}/work/personal/scripts"
 update_repo "${HOME}/work/personal/credfeto-global-pre-commit"
 update_repo "${HOME}/work/personal/cs-template"
+update_repo "${HOME}/work/personal/credfeto-orchestrator"
 
 CREDFETO_AI_SKILLS="${HOME}/work/personal/credfeto-ai-skills"
 
