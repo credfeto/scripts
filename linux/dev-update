@@ -1,0 +1,47 @@
+#! /bin/sh
+
+die() {
+    printf '\n\033[31m✗\033[0m %s\n' "$*" >&2
+    exit 1
+}
+
+success() {
+    printf '\n\033[32m✓\033[0m %s\n' "$*"
+}
+
+info() {
+    printf '\n\033[32m→\033[0m %s\n' "$*"
+}
+
+update_repo() {
+    REPO_PATH="$1"
+
+    if [ ! -d "${REPO_PATH}" ]; then
+        info "Skipping ${REPO_PATH} (not present)"
+        return
+    fi
+
+    info "Pulling ${REPO_PATH}..."
+    git -C "${REPO_PATH}" pull || die "Failed to pull ${REPO_PATH}"
+}
+
+update_repo "${HOME}/work/personal/scripts"
+update_repo "${HOME}/work/personal/credfeto-global-pre-commit"
+update_repo "${HOME}/work/personal/cs-template"
+
+CREDFETO_AI_SKILLS="${HOME}/work/personal/credfeto-ai-skills"
+
+if [ -d "${CREDFETO_AI_SKILLS}" ]; then
+    update_repo "${CREDFETO_AI_SKILLS}"
+
+    INSTALL_SCRIPT="${CREDFETO_AI_SKILLS}/ai/skills/install"
+
+    [ -x "${INSTALL_SCRIPT}" ] || die "Install script not found or not executable: ${INSTALL_SCRIPT}"
+
+    info "Running ${INSTALL_SCRIPT}..."
+    "${INSTALL_SCRIPT}" || die "Failed to run ${INSTALL_SCRIPT}"
+else
+    info "Skipping ${CREDFETO_AI_SKILLS} (not present)"
+fi
+
+success "Dev environment updated"
