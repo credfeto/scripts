@@ -67,7 +67,7 @@ while [ $# -gt 0 ]; do
       shift # past argument
       ;;
     -b|--no-benchmmarks)
-      TEST_BENCHMARKS=--filter-not-namespace "*.BenchMark.Tests" --filter-not-namespace "*.BenchMark.Tests.*"
+      TEST_BENCHMARKS=1
       shift # past argument
       ;;
     -i|--no-integratopn)
@@ -161,12 +161,27 @@ dotnet build \
            -nodeReuse:False || die "Build Failed"
 
 info "Testing..."
+# Every benchmark test project is always excluded here, regardless of the
+# -b/--no-benchmmarks flag; benchmarks (if any) are run separately below, one
+# project per dotnet test invocation, since some benchmark projects' test
+# host rejects --long-running/--parallel-algorithm as invalid arguments when
+# passed to a combined run.
+#
+# Keep this split in sync with src/scripts/buildtest in
+# credfeto/credfeto-global-pre-commit - that repo is the source of truth for
+# this design; this file is a local fork/vendored copy, not consumed
+# directly from there (see credfeto/scripts#679, credfeto/scripts#723).
 # shellcheck disable=SC2086
 dotnet test \
           --configuration Release \
            --no-restore \
            --no-build \
-           $TEST_BENCHMARKS \
+           --long-running 10 \
+           --parallel-algorithm aggressive \
+           --filter-not-namespace "*.Benchmark.Tests" \
+           --filter-not-namespace "*.Benchmark.Tests.*" \
+           --filter-not-namespace "*.BenchMark.Tests" \
+           --filter-not-namespace "*.BenchMark.Tests.*" \
            $TEST_INTEGRATION \
            --ignore-exit-code 8 \
           "-p:ApiCompatGenerateSuppressionFile=true" \
@@ -176,6 +191,35 @@ dotnet test \
           "-p:SuppressNETCoreSdkPreviewMessage=true" \
           "-p:Version=0.0.0.1-test" \
           || die "Tests Failed"
+
+if [ -z "$TEST_BENCHMARKS" ]; then
+  BENCH_PROJECTS=$(find "$SOURCE_DIR" -type f -iname "*.csproj" -not -path "*/obj/*" -not -path "*/bin/*" | while IFS= read -r proj; do
+      bn=$(basename "$proj")
+      printf '%s\n' "$bn" | grep -qiE '(^|[.])bench(mark)?[.]tests?[.]csproj$' && printf '%s\n' "$proj"
+  done)
+
+  if [ -n "$BENCH_PROJECTS" ]; then
+    while IFS= read -r bench_project; do
+        [ -n "$bench_project" ] || continue
+
+        info "Running benchmark tests: $bench_project"
+        dotnet test "$bench_project" \
+          --configuration Release \
+          --no-restore \
+          --no-build \
+          --ignore-exit-code 8 \
+          "-p:ApiCompatGenerateSuppressionFile=false" \
+          "-p:ContinuousIntegrationBuild=true" \
+          "-p:IsProduction=true" \
+          "-p:Optimize=true" \
+          "-p:SuppressNETCoreSdkPreviewMessage=true" \
+          "-p:Version=0.0.0.1-test" \
+          || die "Benchmark Tests Failed ($bench_project)"
+    done <<BENCH_EOF
+$BENCH_PROJECTS
+BENCH_EOF
+  fi
+fi
 
 if [ "$PACK" = "1" ]; then
   info "Packing..."
