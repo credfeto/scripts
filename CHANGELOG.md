@@ -49,6 +49,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - check: guard against empty file list before checking — prevents false-positive success when no scripts are found
 - git/ignore-changelog: skip push hooks when pushing to target repositories
 - git/fetch and git/switchtomain now warn and skip a repo on error instead of aborting the whole run, so remaining repos still get processed.
+- development/buildtest now runs unit tests first, always excluding benchmark test projects, then runs any benchmark projects found individually without the --long-running/--parallel-algorithm flags, since some benchmark projects' test host rejects them as invalid arguments (exit code 5, zero tests ran) instead of running
 ### Changed
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
