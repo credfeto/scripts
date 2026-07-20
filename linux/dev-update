@@ -45,4 +45,7 @@ else
     info "Skipping ${CREDFETO_AI_SKILLS} (not present)"
 fi
 
+info "Installing claude hooks"
+/home/markr/work/personal/credfeto-orchestrator/install-claude-hooks
+
 success "Dev environment updated"
