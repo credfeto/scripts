@@ -66,12 +66,12 @@ while [ $# -gt 0 ]; do
       [ -f "$SOURCE_DIR/release.rule-settings.json" ] && RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/release.rule-settings.json"
       shift # past argument
       ;;
-    -b|--no-benchmmarks)
+    -b|--no-benchmarks)
       TEST_BENCHMARKS=1
       shift # past argument
       ;;
-    -i|--no-integratopn)
-      TEST_INTEGRATION=--filter-not-namespace "*.Integration.Tests" --filter-not-namespace "*.Integration.Tests.*"
+    -i|--no-integration)
+      TEST_INTEGRATION="--filter-not-namespace *.Integration.Tests --filter-not-namespace *.Integration.Tests.*"
       shift # past argument
       ;;
     *)    # unknown option
@@ -162,7 +162,7 @@ dotnet build \
 
 info "Testing..."
 # Every benchmark test project is always excluded here, regardless of the
-# -b/--no-benchmmarks flag; benchmarks (if any) are run separately below, one
+# -b/--no-benchmarks flag; benchmarks (if any) are run separately below, one
 # project per dotnet test invocation, since some benchmark projects' test
 # host rejects --long-running/--parallel-algorithm as invalid arguments when
 # passed to a combined run.
