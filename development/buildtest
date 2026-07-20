@@ -66,12 +66,12 @@ while [ $# -gt 0 ]; do
       [ -f "$SOURCE_DIR/release.rule-settings.json" ] && RULESET_ADJUSTMENT_FILE="$SOURCE_DIR/release.rule-settings.json"
       shift # past argument
       ;;
-    -b|--no-benchmmarks)
+    -b|--no-benchmarks)
       TEST_BENCHMARKS=1
       shift # past argument
       ;;
-    -i|--no-integratopn)
-      TEST_INTEGRATION=--filter-not-namespace "*.Integration.Tests" --filter-not-namespace "*.Integration.Tests.*"
+    -i|--no-integration)
+      TEST_INTEGRATION="--filter-not-namespace *.Integration.Tests --filter-not-namespace *.Integration.Tests.*"
       shift # past argument
       ;;
     *)    # unknown option
@@ -162,7 +162,7 @@ dotnet build \
 
 info "Testing..."
 # Every benchmark test project is always excluded here, regardless of the
-# -b/--no-benchmmarks flag; benchmarks (if any) are run separately below, one
+# -b/--no-benchmarks flag; benchmarks (if any) are run separately below, one
 # project per dotnet test invocation, since some benchmark projects' test
 # host rejects --long-running/--parallel-algorithm as invalid arguments when
 # passed to a combined run.
@@ -171,6 +171,10 @@ info "Testing..."
 # credfeto/credfeto-global-pre-commit - that repo is the source of truth for
 # this design; this file is a local fork/vendored copy, not consumed
 # directly from there (see credfeto/scripts#679, credfeto/scripts#723).
+# set -f disables pathname expansion for the unquoted $TEST_INTEGRATION below,
+# so a *.Integration.Tests(.*) file sitting in $SOURCE_DIR can't get glob-expanded
+# in place of the literal filter pattern; word splitting still applies.
+set -f
 # shellcheck disable=SC2086
 dotnet test \
           --configuration Release \
@@ -191,6 +195,7 @@ dotnet test \
           "-p:SuppressNETCoreSdkPreviewMessage=true" \
           "-p:Version=0.0.0.1-test" \
           || die "Tests Failed"
+set +f
 
 if [ -z "$TEST_BENCHMARKS" ]; then
   BENCH_PROJECTS=$(find "$SOURCE_DIR" -type f -iname "*.csproj" -not -path "*/obj/*" -not -path "*/bin/*" | while IFS= read -r proj; do

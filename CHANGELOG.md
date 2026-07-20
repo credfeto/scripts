@@ -1,6 +1,9 @@
 ﻿# Changelog
 All notable changes to this project will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 <!--
 Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 -->
@@ -50,6 +53,8 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - git/ignore-changelog: skip push hooks when pushing to target repositories
 - git/fetch and git/switchtomain now warn and skip a repo on error instead of aborting the whole run, so remaining repos still get processed.
 - development/buildtest now runs unit tests first, always excluding benchmark test projects, then runs any benchmark projects found individually without the --long-running/--parallel-algorithm flags, since some benchmark projects' test host rejects them as invalid arguments (exit code 5, zero tests ran) instead of running
+- development/buildtest: fixed the --no-benchmarks/--no-integration flag typos and the broken TEST_INTEGRATION filter assignment so --no-integration actually excludes integration tests
+- development/buildtest: disable shell pathname expansion (set -f) around the dotnet test invocation using the unquoted TEST_INTEGRATION filter, so a *.Integration.Tests(.*) file in the solution directory can no longer glob-expand and corrupt the --no-integration filter arguments
 ### Changed
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
