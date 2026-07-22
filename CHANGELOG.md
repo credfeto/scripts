@@ -63,7 +63,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - Replaced raw echo with output helpers (die/info/success) in git/clean-all
 - check: replaced raw echo-based output with standard die, info, and success helpers
 - git fetch: skip resetting core.hookspath for whitelisted repositories (e.g. funfair-treasury-reporting)
-- GEOIP - Updated GEOIP DB from MaxMind (2026-07-18)
+- GEOIP - Updated GEOIP DB from MaxMind (2026-07-22)
 ### Deprecated
 ### Removed
 - db/sqlcompare script deleted — no longer in use
