@@ -17,15 +17,15 @@ jobs:
 
     steps:
       - name: "Get Latest source"
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
           token: ${{ secrets.SOURCE_PUSH_TOKEN }}
       - name: "Detect dotnet version"
-        uses: credfeto/action-dotnet-version-detect@v1.3.0
+        uses: credfeto/action-dotnet-version-detect@d572bbd7285038bda731c8a4f237b9b8e64a9954 # v1.3.0
       - name: "Install dotnet"
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
         env:
           GITHUB_TOKEN: ${{ secrets.SOURCE_PUSH_TOKEN }}
         with:
@@ -70,7 +70,7 @@ jobs:
         env:
           CURRENT_DATE: ${{steps.time.outputs.CURRENT_DATE}}
       - name: "Commit changes"
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7
         with:
           commit_message: "[GEOIP] - Updated GEOIP DB from MaxMind (${{steps.time.outputs.CURRENT_DATE}})"
           file_pattern: "*.mmdb CHANGELOG.md"

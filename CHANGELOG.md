@@ -10,6 +10,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 
 ## [Unreleased]
 ### Security
+- Pin GitHub Actions uses: references to commit SHAs instead of mutable tags in geoipupdate.yml
 ### Added
 - fetch: added --switch-to-main flag to switch to the default branch and rebase it when not on it, skipping if there are uncommitted changes
 - git/ignore-changelog: script to add CHANGELOG.md to .markdownlintignore across git repositories
