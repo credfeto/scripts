@@ -42,7 +42,16 @@ for arg in "$@"; do
     esac
 done
 
-find "$(pwd)"/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache | while IFS= read -r line
+REPO_LIST=$(mktemp)
+trap 'rm -f "$REPO_LIST"' EXIT
+
+find "$(pwd)"/* -name '*.git' -print | sed "s|/.git$||" | sort -u | grep -v .cache > "$REPO_LIST"
+
+FETCHED_COUNT=0
+SKIPPED_COUNT=0
+SKIPPED_REPOS=""
+
+while IFS= read -r line
 do
   CURRENT_DIR=$line
 
@@ -53,11 +62,15 @@ do
   else
     git -C "$CURRENT_DIR" config --local --unset core.hookspath 2>/dev/null || true
   fi
-  git -C "$CURRENT_DIR" remote get-url origin 2>&1 || { warn "Could not determine origin for ${CURRENT_DIR}"; continue; }
-  git -C "$CURRENT_DIR" fetch --prune --prune-tags 2>&1 || { warn "Could not fetch ${CURRENT_DIR}"; continue; }
-  git -C "$CURRENT_DIR" remote update origin --prune 2>&1 || { warn "Could not update remote refs for ${CURRENT_DIR}"; continue; }
+  git -C "$CURRENT_DIR" remote get-url origin > /dev/null 2>&1 || { warn "Could not determine origin for ${CURRENT_DIR}"; SKIPPED_COUNT=$((SKIPPED_COUNT + 1)); SKIPPED_REPOS="${SKIPPED_REPOS}${CURRENT_DIR} (could not determine origin)
+"; continue; }
+  git -C "$CURRENT_DIR" fetch --prune --prune-tags > /dev/null 2>&1 || { warn "Could not fetch ${CURRENT_DIR}"; SKIPPED_COUNT=$((SKIPPED_COUNT + 1)); SKIPPED_REPOS="${SKIPPED_REPOS}${CURRENT_DIR} (could not fetch)
+"; continue; }
+  git -C "$CURRENT_DIR" remote update origin --prune > /dev/null 2>&1 || { warn "Could not update remote refs for ${CURRENT_DIR}"; SKIPPED_COUNT=$((SKIPPED_COUNT + 1)); SKIPPED_REPOS="${SKIPPED_REPOS}${CURRENT_DIR} (could not update remote refs)
+"; continue; }
 
-  REPO_STATUS=$(git -C "$CURRENT_DIR" status --porcelain 2>&1) || { warn "Could not read status for ${CURRENT_DIR}"; continue; }
+  REPO_STATUS=$(git -C "$CURRENT_DIR" status --porcelain 2>&1) || { warn "Could not read status for ${CURRENT_DIR}"; SKIPPED_COUNT=$((SKIPPED_COUNT + 1)); SKIPPED_REPOS="${SKIPPED_REPOS}${CURRENT_DIR} (could not read status)
+"; continue; }
 
   if [ -z "$REPO_STATUS" ]
   then
@@ -75,7 +88,8 @@ do
 
   if [ "$SWITCH_TO_MAIN" = "1" ]
   then
-    CURRENT_BRANCH=$(git -C "$CURRENT_DIR" rev-parse --abbrev-ref HEAD 2>&1) || { warn "Could not determine current branch for ${CURRENT_DIR}"; continue; }
+    CURRENT_BRANCH=$(git -C "$CURRENT_DIR" rev-parse --abbrev-ref HEAD 2>&1) || { warn "Could not determine current branch for ${CURRENT_DIR}"; SKIPPED_COUNT=$((SKIPPED_COUNT + 1)); SKIPPED_REPOS="${SKIPPED_REPOS}${CURRENT_DIR} (could not determine current branch)
+"; continue; }
     DEFAULT_BRANCH=$(git -C "$CURRENT_DIR" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||')
 
     if [ -z "$DEFAULT_BRANCH" ]
@@ -106,5 +120,13 @@ do
     fi
   fi
 
+  FETCHED_COUNT=$((FETCHED_COUNT + 1))
   success "Done with ${CURRENT_DIR}"
-done
+done < "$REPO_LIST"
+
+info "${FETCHED_COUNT} repo(s) fetched, ${SKIPPED_COUNT} repo(s) skipped"
+if [ "$SKIPPED_COUNT" -gt 0 ]
+then
+  warn "Skipped repositories:"
+  printf '%s' "$SKIPPED_REPOS" >&2
+fi

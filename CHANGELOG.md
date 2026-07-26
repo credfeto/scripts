@@ -56,6 +56,7 @@ Please ADD ALL Changes to the UNRELEASED SECTION and not a specific release
 - development/buildtest now runs unit tests first, always excluding benchmark test projects, then runs any benchmark projects found individually without the --long-running/--parallel-algorithm flags, since some benchmark projects' test host rejects them as invalid arguments (exit code 5, zero tests ran) instead of running
 - development/buildtest: fixed the --no-benchmarks/--no-integration flag typos and the broken TEST_INTEGRATION filter assignment so --no-integration actually excludes integration tests
 - development/buildtest: disable shell pathname expansion (set -f) around the dotnet test invocation using the unquoted TEST_INTEGRATION filter, so a *.Integration.Tests(.*) file in the solution directory can no longer glob-expand and corrupt the --no-integration filter arguments
+- git/fetch no longer prints raw git/ssh errors when a repo can't be reached, and reports a fetched/skipped summary at the end
 ### Changed
 - Replace raw echo with standard output helpers (die/info/success) in github/cancel-workflows
 - Replace raw echo with standard output helpers (die/info/success) in git/update-repos-personal
